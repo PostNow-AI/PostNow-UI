@@ -52,3 +52,4 @@ Follow these rules when you write code:
 - Always handle forms utilizing the package react-hook-form
 - Always handle forms validation utilizing the package zod, in conjunction with react-hook-form
 - Always handle API calls with Axios
+- All text the user can read must be in portuguese
