@@ -4,66 +4,75 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import { PublicRoute } from "./components/PublicRoute";
-import { Toaster } from "./components/ui/sonner";
+import {
+  DashboardLayout,
+  ErrorBoundary,
+  ProtectedRoute,
+  PublicRoute,
+  ThemeProvider,
+  Toaster,
+} from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AccountSettingsPage } from "./pages/AccountSettingsPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { RegisterPage } from "./pages/RegisterPage";
 
-function App() {
+const App = () => {
   return (
-    <ErrorBoundary>
-      <Router>
-        <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route
-              path="/login"
-              element={
-                <PublicRoute>
-                  <LoginPage />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PublicRoute>
-                  <RegisterPage />
-                </PublicRoute>
-              }
-            />
-            <Route
-              path="/auth/google/callback"
-              element={<GoogleCallbackPage />}
-            />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <HomePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/account-settings"
-              element={
-                <ProtectedRoute>
-                  <AccountSettingsPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-          <Toaster />
-        </AuthProvider>
-      </Router>
-    </ErrorBoundary>
+    <ThemeProvider defaultTheme="system" storageKey="sonora-ui-theme">
+      <ErrorBoundary>
+        <Router>
+          <AuthProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <LoginPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <PublicRoute>
+                    <RegisterPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/auth/google/callback"
+                element={<GoogleCallbackPage />}
+              />
+
+              {/* Protected Routes with Dashboard Layout */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="home" element={<HomePage />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route
+                  path="account-settings"
+                  element={<AccountSettingsPage />}
+                />
+              </Route>
+            </Routes>
+            <Toaster />
+          </AuthProvider>
+        </Router>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
-}
+};
 
 export default App;

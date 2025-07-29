@@ -8,11 +8,12 @@ import {
   CardTitle,
   Input,
   Label,
+  ThemeToggle,
 } from "@/components/ui";
 import { useRegister } from "@/hooks/useRegister";
 import { Link } from "react-router-dom";
 
-export function RegisterPage() {
+export const RegisterPage = () => {
   const { form, isLoading, onSubmit, handleGoogleRegister } = useRegister();
   const {
     register,
@@ -21,15 +22,16 @@ export function RegisterPage() {
   } = form;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="relative flex min-h-screen items-center justify-center px-4 bg-gradient-to-br from-background to-muted">
+      {/* Theme Toggle in top right */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-gray-900">
-            Criar Conta
-          </CardTitle>
-          <CardDescription className="text-gray-600">
-            Cadastre-se para começar
-          </CardDescription>
+          <CardTitle className="text-3xl font-bold">Criar Conta</CardTitle>
+          <CardDescription>Cadastre-se para começar</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -44,7 +46,7 @@ export function RegisterPage() {
                   placeholder="Seu nome"
                 />
                 {errors.firstName && (
-                  <p className="text-red-600 text-sm">
+                  <p className="text-destructive text-sm">
                     {errors.firstName.message}
                   </p>
                 )}
@@ -59,7 +61,7 @@ export function RegisterPage() {
                   placeholder="Seu sobrenome"
                 />
                 {errors.lastName && (
-                  <p className="text-red-600 text-sm">
+                  <p className="text-destructive text-sm">
                     {errors.lastName.message}
                   </p>
                 )}
@@ -75,7 +77,7 @@ export function RegisterPage() {
                 placeholder="Escolha um nome de usuário"
               />
               {errors.username && (
-                <p className="text-red-600 text-sm">
+                <p className="text-destructive text-sm">
                   {errors.username.message}
                 </p>
               )}
@@ -90,7 +92,9 @@ export function RegisterPage() {
                 placeholder="Digite seu email"
               />
               {errors.email && (
-                <p className="text-red-600 text-sm">{errors.email.message}</p>
+                <p className="text-destructive text-sm">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -103,7 +107,7 @@ export function RegisterPage() {
                 placeholder="Digite sua senha"
               />
               {errors.password && (
-                <p className="text-red-600 text-sm">
+                <p className="text-destructive text-sm">
                   {errors.password.message}
                 </p>
               )}
@@ -118,7 +122,7 @@ export function RegisterPage() {
                 placeholder="Confirme sua senha"
               />
               {errors.confirmPassword && (
-                <p className="text-red-600 text-sm">
+                <p className="text-destructive text-sm">
                   {errors.confirmPassword.message}
                 </p>
               )}
@@ -132,10 +136,10 @@ export function RegisterPage() {
           <div className="mt-8 space-y-4">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-2 bg-background text-muted-foreground">
                   Ou continue com
                 </span>
               </div>
@@ -150,11 +154,11 @@ export function RegisterPage() {
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Já tem uma conta?{" "}
               <Link
                 to="/login"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 Entre aqui
               </Link>
@@ -164,4 +168,4 @@ export function RegisterPage() {
       </Card>
     </div>
   );
-}
+};

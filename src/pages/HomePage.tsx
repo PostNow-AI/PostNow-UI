@@ -8,17 +8,10 @@ import {
   LoadingPage,
 } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
-import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export function HomePage() {
-  const navigate = useNavigate();
-  const { user, logout, isLoading } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const { user, isLoading } = useAuth();
 
   // Test functions for different toast types
   const showSuccessToast = () => {
@@ -50,39 +43,61 @@ export function HomePage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Card className="max-w-md w-full">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">
-            Bem-vindo ao Sonora
-          </CardTitle>
-          {user && (
-            <CardDescription className="text-gray-600">
-              Olá, {user.first_name} {user.last_name}!
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">
+          Bem-vindo ao Sonora
+        </h1>
+        {user && (
+          <p className="text-muted-foreground">
+            Olá, {user.first_name} {user.last_name}! Você entrou com sucesso.
+          </p>
+        )}
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Welcome Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Dashboard Principal</CardTitle>
+            <CardDescription>
+              Explore as funcionalidades do sistema
             </CardDescription>
-          )}
-          <CardDescription className="text-gray-600">
-            Você entrou com sucesso!
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <Link to="/account-settings" className="block">
-              <Button variant="outline" className="w-full">
-                Configurações da Conta
-              </Button>
-            </Link>
-            <Button onClick={handleLogout} className="w-full">
-              Sair
-            </Button>
-          </div>
-
-          {/* Toast Demo Section */}
-          <div className="pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600 mb-3 text-center">
-              Teste os Toast Coloridos:
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Este é seu painel principal. Aqui você pode acessar todas as
+              funcionalidades do sistema através do menu lateral.
             </p>
+            <div className="space-y-2">
+              <p className="text-sm">
+                <strong>✨ Funcionalidades disponíveis:</strong>
+              </p>
+              <ul className="text-sm text-muted-foreground space-y-1 ml-4">
+                <li>• Gerenciamento de perfil</li>
+                <li>• Configurações de conta</li>
+                <li>• Sistema de notificações coloridas</li>
+                <li>• Interface responsiva</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Toast Demo Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Sistema de Notificações</CardTitle>
+            <CardDescription>
+              Teste os diferentes tipos de toast
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Experimente os diferentes tipos de notificações coloridas
+              disponíveis no sistema:
+            </p>
+
             <div className="grid grid-cols-2 gap-2">
               <Button
                 onClick={showSuccessToast}
@@ -117,9 +132,110 @@ export function HomePage() {
                 ℹ Info
               </Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total de Sessões
+            </CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="h-4 w-4 text-muted-foreground"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">24</div>
+            <p className="text-xs text-muted-foreground">
+              +12% em relação ao mês passado
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Tempo Ativo</CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="h-4 w-4 text-muted-foreground"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12,6 12,12 16,14" />
+            </svg>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">2h 34m</div>
+            <p className="text-xs text-muted-foreground">
+              +8% em relação à semana passada
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Notificações</CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="h-4 w-4 text-muted-foreground"
+            >
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">128</div>
+            <p className="text-xs text-muted-foreground">+3 novas hoje</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Status</CardTitle>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="h-4 w-4 text-muted-foreground"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">Online</div>
+            <p className="text-xs text-muted-foreground">Sistema funcionando</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
