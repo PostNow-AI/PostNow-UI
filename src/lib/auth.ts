@@ -21,7 +21,7 @@ export const authApi = {
   login: (credentials: LoginRequest) =>
     authRequest(
       () => api.post<AuthResponse>("/api/v1/auth/login/", credentials),
-      "Login failed"
+      "Login falhou"
     ),
 
   register: (userData: RegisterRequest) =>
@@ -35,26 +35,26 @@ export const authApi = {
           password1: userData.password,
           password2: userData.confirmPassword,
         }),
-      "Registration failed"
+      "Registro falhou"
     ),
 
   handleGoogleCallback: (code: string) =>
     authRequest(
       () => api.post<AuthResponse>("/api/v1/auth/google/callback/", { code }),
-      "Google authentication failed"
+      "Autenticação Google falhou"
     ),
 
   // User data requests
   getCurrentUser: () =>
     apiRequest(
       () => api.get<AuthResponse["user"]>("/api/v1/auth/user/"),
-      "Failed to fetch user data"
+      "Falha ao buscar dados do usuário"
     ),
 
   googleAuth: () =>
     apiRequest(
       () => api.post<AuthResponse>("/api/v1/auth/google/auth/"),
-      "Google authentication failed"
+      "Autenticação Google falhou"
     ),
 
   // Token management
@@ -69,7 +69,7 @@ export const authApi = {
         api.post<{ access: string }>("/api/v1/auth/refresh/", {
           refresh: refreshToken,
         }),
-      "Token refresh failed"
+      "Atualização de token falhou"
     );
 
     // Update access token in cookies
@@ -83,7 +83,7 @@ export const authApi = {
   getSocialAccounts: () =>
     apiRequest(
       () => api.get<SocialAccountsResponse>("/api/v1/auth/social-accounts/"),
-      "Failed to fetch social accounts"
+      "Falha ao buscar contas sociais"
     ),
 
   disconnectSocialAccount: (accountId: number) =>
@@ -92,7 +92,7 @@ export const authApi = {
         api.delete<{ message: string; disconnected_provider: string }>(
           `/api/v1/auth/social-accounts/${accountId}/disconnect/`
         ),
-      "Failed to disconnect social account"
+      "Falha ao desconectar conta social"
     ),
 };
 

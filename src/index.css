@@ -118,3 +118,108 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Sonner Toast Styling */
+@layer components {
+  .toaster {
+    @apply font-sans;
+  }
+
+  .toast {
+    @apply shadow-lg border;
+  }
+
+  /* Success Toast - Green */
+  [data-sonner-toast][data-type="success"] {
+    @apply bg-green-50 text-green-800 border-green-200;
+  }
+
+  [data-sonner-toast][data-type="success"] [data-title] {
+    @apply text-green-900 font-semibold;
+  }
+
+  [data-sonner-toast][data-type="success"] [data-description] {
+    @apply text-green-700;
+  }
+
+  [data-sonner-toast][data-type="success"] [data-icon] {
+    @apply text-green-600;
+  }
+
+  /* Error Toast - Red */
+  [data-sonner-toast][data-type="error"] {
+    @apply bg-red-50 text-red-800 border-red-200;
+  }
+
+  [data-sonner-toast][data-type="error"] [data-title] {
+    @apply text-red-900 font-semibold;
+  }
+
+  [data-sonner-toast][data-type="error"] [data-description] {
+    @apply text-red-700;
+  }
+
+  [data-sonner-toast][data-type="error"] [data-icon] {
+    @apply text-red-600;
+  }
+
+  /* Warning Toast - Yellow */
+  [data-sonner-toast][data-type="warning"] {
+    @apply bg-yellow-50 text-yellow-800 border-yellow-200;
+  }
+
+  [data-sonner-toast][data-type="warning"] [data-title] {
+    @apply text-yellow-900 font-semibold;
+  }
+
+  [data-sonner-toast][data-type="warning"] [data-description] {
+    @apply text-yellow-700;
+  }
+
+  [data-sonner-toast][data-type="warning"] [data-icon] {
+    @apply text-yellow-600;
+  }
+
+  /* Info Toast - Blue */
+  [data-sonner-toast][data-type="info"] {
+    @apply bg-blue-50 text-blue-800 border-blue-200;
+  }
+
+  [data-sonner-toast][data-type="info"] [data-title] {
+    @apply text-blue-900 font-semibold;
+  }
+
+  [data-sonner-toast][data-type="info"] [data-description] {
+    @apply text-blue-700;
+  }
+
+  [data-sonner-toast][data-type="info"] [data-icon] {
+    @apply text-blue-600;
+  }
+
+  /* Loading Toast */
+  [data-sonner-toast][data-type="loading"] {
+    @apply bg-gray-50 text-gray-800 border-gray-200;
+  }
+
+  [data-sonner-toast][data-type="loading"] [data-title] {
+    @apply text-gray-900 font-semibold;
+  }
+
+  [data-sonner-toast][data-type="loading"] [data-description] {
+    @apply text-gray-700;
+  }
+
+  /* Default/Regular Toast */
+  [data-sonner-toast]:not([data-type]) {
+    @apply bg-white text-gray-900 border-gray-200;
+  }
+
+  [data-sonner-toast]:not([data-type]) [data-title] {
+    @apply text-gray-900 font-semibold;
+  }
+
+  [data-sonner-toast]:not([data-type]) [data-description] {
+    @apply text-gray-700;
+  }
+}

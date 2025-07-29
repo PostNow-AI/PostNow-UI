@@ -16,6 +16,56 @@ Um frontend React moderno construído com TypeScript, Vite e sistema de autentic
 - ✅ **Componentes UI** com shadcn/ui e Tailwind CSS
 - ✅ **Boundaries de Erro** e tratamento abrangente de erros
 - ✅ **Estados de Carregamento** e feedback do usuário com toasts
+- ✅ **Sistema de Toast Colorido** para feedback visual aprimorado
+
+## Sistema de Toast Colorido
+
+O projeto utiliza o Sonner para toasts com cores específicas para cada tipo:
+
+### Tipos de Toast Disponíveis
+
+```typescript
+import { toast } from "sonner";
+
+// ✅ Toast de Sucesso (Verde)
+toast.success("Operação realizada com sucesso!", {
+  description: "Detalhes opcionais do sucesso"
+});
+
+// ❌ Toast de Erro (Vermelho)
+toast.error("Ocorreu um erro!", {
+  description: "Detalhes do erro"
+});
+
+// ⚠️ Toast de Aviso (Amarelo)  
+toast.warning("Atenção necessária!", {
+  description: "Informações de alerta"
+});
+
+// ℹ️ Toast de Informação (Azul)
+toast.info("Informação importante", {
+  description: "Detalhes informativos"
+});
+
+// 🔄 Toast de Carregamento (Cinza)
+toast.loading("Processando...");
+
+// 📝 Toast Padrão (Branco)
+toast("Mensagem normal");
+```
+
+### Personalização Visual
+
+- **Sucesso**: Fundo verde claro, texto verde escuro, borda verde
+- **Erro**: Fundo vermelho claro, texto vermelho escuro, borda vermelha  
+- **Aviso**: Fundo amarelo claro, texto amarelo escuro, borda amarela
+- **Info**: Fundo azul claro, texto azul escuro, borda azul
+- **Loading**: Fundo cinza claro, texto cinza escuro
+- **Padrão**: Fundo branco, texto preto
+
+### Testando os Toasts
+
+Na página inicial após fazer login, você encontrará botões de teste para cada tipo de toast, permitindo visualizar todas as cores e estilos disponíveis.
 
 ## Configuração do Ambiente
 
@@ -66,3 +116,4 @@ npm run build
 - **API**: Axios + TanStack Query
 - **Roteamento**: React Router DOM
 - **Estado**: React Context API
+- **Toasts**: Sonner com tema customizado
