@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { LoadingPage } from "@/components/ui/loading";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -30,9 +30,17 @@ export function HomePage() {
         <p className="text-gray-600 text-center mb-6">
           You are successfully logged in!
         </p>
-        <Button onClick={handleLogout} className="w-full">
-          Logout
-        </Button>
+
+        <div className="space-y-3">
+          <Link to="/account-settings" className="block">
+            <Button variant="outline" className="w-full">
+              Account Settings
+            </Button>
+          </Link>
+          <Button onClick={handleLogout} className="w-full">
+            Logout
+          </Button>
+        </div>
       </div>
     </div>
   );

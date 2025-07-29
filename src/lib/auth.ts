@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { API_BASE_URL, api, cookieUtils } from "./api";
+import { api, API_BASE_URL, cookieUtils } from "./api";
 
 export interface LoginRequest {
   email: string;
@@ -24,6 +24,23 @@ export interface AuthResponse {
     first_name: string;
     last_name: string;
   };
+}
+
+export interface SocialAccount {
+  id: number;
+  provider: string;
+  uid: string;
+  extra_data: {
+    email?: string;
+    name?: string;
+    picture?: string;
+  };
+  date_joined: string;
+}
+
+export interface SocialAccountsResponse {
+  social_accounts: SocialAccount[];
+  total_count: number;
 }
 
 interface ApiError {
@@ -141,6 +158,20 @@ export const authApi = {
     }
   },
 
+  googleAuth: async (): Promise<AuthResponse> => {
+    try {
+      const response = await api.post<AuthResponse>(
+        "/api/v1/auth/google/auth/"
+      );
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        const apiError: ApiError = error.response.data;
+        throw new Error(apiError.message || "Google authentication failed");
+      }
+      throw new Error("Google authentication failed");
+    }
+  },
   refreshToken: async (): Promise<{ access: string }> => {
     const refreshToken = cookieUtils.getRefreshToken();
     if (!refreshToken) {
@@ -170,12 +201,65 @@ export const authApi = {
       throw new Error("Token refresh failed");
     }
   },
+
+  // Social account management
+  getSocialAccounts: async (): Promise<SocialAccountsResponse> => {
+    try {
+      const response = await api.get<SocialAccountsResponse>(
+        "/api/v1/auth/social-accounts/"
+      );
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        const apiError: ApiError = error.response.data;
+        throw new Error(apiError.message || "Failed to fetch social accounts");
+      }
+      throw new Error("Failed to fetch social accounts");
+    }
+  },
+
+  disconnectSocialAccount: async (
+    accountId: number
+  ): Promise<{ message: string; disconnected_provider: string }> => {
+    try {
+      const response = await api.delete<{
+        message: string;
+        disconnected_provider: string;
+      }>(`/api/v1/auth/social-accounts/${accountId}/disconnect/`);
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        const apiError: ApiError = error.response.data;
+        throw new Error(
+          apiError.message || "Failed to disconnect social account"
+        );
+      }
+      throw new Error("Failed to disconnect social account");
+    }
+  },
 };
 
 // Utility functions
 export const authUtils = {
   loginWithGoogle: (): void => {
-    const googleAuthUrl = `${API_BASE_URL}/api/v1/auth/google/auth`;
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    if (!googleClientId) {
+      console.error(
+        "Google Client ID not configured. Please set VITE_GOOGLE_CLIENT_ID in your .env file"
+      );
+      return;
+    }
+
+    const redirectUri = encodeURIComponent(
+      `${API_BASE_URL}/api/v1/auth/google/callback/`
+    );
+    const scope = encodeURIComponent("openid email profile");
+    const responseType = "code";
+    const accessType = "offline";
+
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}&access_type=${accessType}`;
+
     window.location.href = googleAuthUrl;
   },
 
@@ -206,4 +290,8 @@ export const authService = {
   logout: authUtils.logout,
   getAccessToken: authUtils.getAccessToken,
   isAuthenticated: authUtils.isAuthenticated,
+
+  // Social account management
+  getSocialAccounts: authApi.getSocialAccounts,
+  disconnectSocialAccount: authApi.disconnectSocialAccount,
 };
