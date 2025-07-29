@@ -175,7 +175,7 @@ export const authApi = {
 // Utility functions
 export const authUtils = {
   loginWithGoogle: (): void => {
-    const googleAuthUrl = `${API_BASE_URL}/api/v1/auth/google/`;
+    const googleAuthUrl = `${API_BASE_URL}/api/v1/auth/google/auth`;
     window.location.href = googleAuthUrl;
   },
 
