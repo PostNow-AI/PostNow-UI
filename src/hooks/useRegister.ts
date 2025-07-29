@@ -8,34 +8,28 @@ import { z } from "zod";
 
 const registerSchema = z
   .object({
-    firstName: z
-      .string()
-      .min(1, "First name is required")
-      .min(2, "First name must be at least 2 characters"),
-    lastName: z
-      .string()
-      .min(1, "Last name is required")
-      .min(2, "Last name must be at least 2 characters"),
-    email: z.string().email("Please enter a valid email address"),
+    firstName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+    lastName: z.string().min(2, "Sobrenome deve ter pelo menos 2 caracteres"),
     username: z
       .string()
-      .min(1, "Username is required")
-      .min(3, "Username must be at least 3 characters")
-      .max(20, "Username must be less than 20 characters")
+      .min(3, "Nome de usuário deve ter pelo menos 3 caracteres")
+      .max(20, "Nome de usuário deve ter no máximo 20 caracteres")
       .regex(
         /^[a-zA-Z0-9_]+$/,
-        "Username can only contain letters, numbers, and underscores"
+        "Nome de usuário pode conter apenas letras, números e underscore"
       ),
+    email: z.string().email("Por favor, digite um endereço de email válido"),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number"),
+      .min(8, "Senha deve ter pelo menos 8 caracteres")
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        "Senha deve conter pelo menos uma letra minúscula, maiúscula e um número"
+      ),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "Senhas não coincidem",
     path: ["confirmPassword"],
   });
 
@@ -56,7 +50,7 @@ export function useRegister() {
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
 
       // Show success toast
-      toast.success("Account created successfully! Welcome to Sonora.");
+      toast.success("Conta criada com sucesso! Bem-vindo ao Sonora.");
 
       // Small delay to ensure authentication state propagates
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -65,18 +59,18 @@ export function useRegister() {
       navigate("/home");
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Registration failed");
+      toast.error(error.message || "Falha no cadastro");
     },
   });
 
   const onSubmit = async (data: RegisterFormData) => {
     registerMutation.mutate({
       email: data.email,
-      password: data.password,
-      confirmPassword: data.confirmPassword,
+      username: data.username,
       firstName: data.firstName,
       lastName: data.lastName,
-      username: data.username,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
     });
   };
 
@@ -85,7 +79,7 @@ export function useRegister() {
       authUtils.loginWithGoogle();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Google registration failed"
+        error instanceof Error ? error.message : "Falha no cadastro com Google"
       );
     }
   };

@@ -13,32 +13,32 @@ export function HomePage() {
   };
 
   if (isLoading) {
-    return <LoadingPage text="Loading..." />;
+    return <LoadingPage text="Carregando..." />;
   }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-2xl font-bold text-center mb-6">
-          Welcome to Sonora
+          Bem-vindo ao Sonora
         </h1>
         {user && (
           <p className="text-gray-600 text-center mb-6">
-            Hello, {user.first_name} {user.last_name}!
+            Olá, {user.first_name} {user.last_name}!
           </p>
         )}
         <p className="text-gray-600 text-center mb-6">
-          You are successfully logged in!
+          Você entrou com sucesso!
         </p>
 
         <div className="space-y-3">
           <Link to="/account-settings" className="block">
             <Button variant="outline" className="w-full">
-              Account Settings
+              Configurações da Conta
             </Button>
           </Link>
           <Button onClick={handleLogout} className="w-full">
-            Logout
+            Sair
           </Button>
         </div>
       </div>

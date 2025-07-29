@@ -1,72 +1,21 @@
+import { GoogleOAuthButton } from "@/components/GoogleOAuthButton";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/ui/loading";
 import { useAuth } from "@/hooks/useAuth";
-import { authApi, type SocialAccount } from "@/lib/auth";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSocialAccounts } from "@/hooks/useSocialAccounts";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 
 export function AccountSettingsPage() {
   const { user, logout } = useAuth();
-  const queryClient = useQueryClient();
-
-  // Fetch social accounts
   const {
-    data: socialAccountsData,
+    socialAccountsData,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ["auth", "socialAccounts"],
-    queryFn: authApi.getSocialAccounts,
-    enabled: !!user,
-  });
-
-  // Disconnect social account mutation
-  const disconnectMutation = useMutation({
-    mutationFn: authApi.disconnectSocialAccount,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["auth", "socialAccounts"] });
-      toast.success(
-        `${data.disconnected_provider} account disconnected successfully`
-      );
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || "Failed to disconnect account");
-    },
-  });
-
-  const handleDisconnect = (account: SocialAccount) => {
-    if (
-      confirm(
-        `Are you sure you want to disconnect your ${account.provider} account?`
-      )
-    ) {
-      disconnectMutation.mutate(account.id);
-    }
-  };
-
-  const handleConnectGoogle = () => {
-    // Use the existing Google OAuth flow - it will automatically link if user is logged in
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-    if (!googleClientId) {
-      toast.error("Google Client ID not configured");
-      return;
-    }
-
-    const redirectUri = encodeURIComponent(
-      `${
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
-      }/api/v1/auth/google/callback/`
-    );
-    const scope = encodeURIComponent("openid email profile");
-    const responseType = "code";
-    const accessType = "offline";
-
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}&access_type=${accessType}`;
-
-    window.location.href = googleAuthUrl;
-  };
+    handleDisconnect,
+    handleConnectGoogle,
+    getGoogleAccount,
+    isDisconnecting,
+  } = useSocialAccounts();
 
   if (isLoading) {
     return (
@@ -76,23 +25,25 @@ export function AccountSettingsPage() {
     );
   }
 
+  const googleAccount = getGoogleAccount();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900">
-              Account Settings
+              Configurações da Conta
             </h1>
             <div className="space-x-4">
               <Link
                 to="/home"
                 className="text-blue-600 hover:text-blue-500 font-medium"
               >
-                Back to Home
+                Voltar ao Início
               </Link>
               <Button onClick={logout} variant="outline">
-                Logout
+                Sair
               </Button>
             </div>
           </div>
@@ -100,11 +51,11 @@ export function AccountSettingsPage() {
           {/* User Info Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Profile Information
+              Informações do Perfil
             </h2>
             <div className="bg-gray-50 rounded-lg p-4">
               <p>
-                <strong>Name:</strong> {user?.first_name} {user?.last_name}
+                <strong>Nome:</strong> {user?.first_name} {user?.last_name}
               </p>
               <p>
                 <strong>Email:</strong> {user?.email}
@@ -115,13 +66,13 @@ export function AccountSettingsPage() {
           {/* Connected Accounts Section */}
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Connected Accounts
+              Contas Conectadas
             </h2>
 
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                 <p className="text-red-600">
-                  Failed to load connected accounts
+                  Falha ao carregar contas conectadas
                 </p>
               </div>
             )}
@@ -151,58 +102,42 @@ export function AccountSettingsPage() {
                     </svg>
                   </div>
 
-                  {socialAccountsData?.social_accounts.find(
-                    (acc) => acc.provider === "google"
-                  ) ? (
+                  {googleAccount ? (
                     <div>
                       <p className="font-medium text-gray-900">Google</p>
                       <p className="text-sm text-gray-600">
-                        {
-                          socialAccountsData.social_accounts.find(
-                            (acc) => acc.provider === "google"
-                          )?.extra_data.email
-                        }
+                        {googleAccount.extra_data.email}
                       </p>
                     </div>
                   ) : (
                     <div>
                       <p className="font-medium text-gray-900">Google</p>
-                      <p className="text-sm text-gray-600">Not connected</p>
+                      <p className="text-sm text-gray-600">Não conectado</p>
                     </div>
                   )}
                 </div>
 
-                {socialAccountsData?.social_accounts.find(
-                  (acc) => acc.provider === "google"
-                ) ? (
+                {googleAccount ? (
                   <Button
-                    onClick={() => {
-                      const googleAccount =
-                        socialAccountsData.social_accounts.find(
-                          (acc) => acc.provider === "google"
-                        );
-                      if (googleAccount) handleDisconnect(googleAccount);
-                    }}
+                    onClick={() => handleDisconnect(googleAccount)}
                     variant="outline"
-                    disabled={disconnectMutation.isPending}
+                    disabled={isDisconnecting}
                   >
-                    {disconnectMutation.isPending
-                      ? "Disconnecting..."
-                      : "Disconnect"}
+                    {isDisconnecting ? "Desconectando..." : "Desconectar"}
                   </Button>
                 ) : (
-                  <Button onClick={handleConnectGoogle} variant="outline">
-                    Connect Google
-                  </Button>
+                  <GoogleOAuthButton onClick={handleConnectGoogle}>
+                    Conectar Google
+                  </GoogleOAuthButton>
                 )}
               </div>
             </div>
 
             {socialAccountsData?.total_count === 0 && (
               <div className="text-center py-8 text-gray-500">
-                <p>No social accounts connected</p>
+                <p>Nenhuma conta social conectada</p>
                 <p className="text-sm">
-                  Connect your social accounts for easier login
+                  Conecte suas contas sociais para facilitar o login
                 </p>
               </div>
             )}

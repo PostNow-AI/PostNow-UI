@@ -1,51 +1,51 @@
-# Sonora UI - React Frontend
+# Sonora UI - Frontend React
 
-A modern React frontend built with TypeScript, Vite, and comprehensive authentication system.
+Um frontend React moderno construído com TypeScript, Vite e sistema de autenticação abrangente.
 
-## Features
+## Funcionalidades
 
-- ✅ **Complete Authentication System**
-  - Email/password login and registration
-  - Google OAuth integration
-  - JWT token management with cookies
-  - Automatic token refresh
-- ✅ **Protected Routes & Route Guards**
-- ✅ **Global State Management** with React Context
-- ✅ **Modern Form Handling** with react-hook-form and zod validation
-- ✅ **API Integration** with Axios and TanStack Query
-- ✅ **UI Components** with shadcn/ui and Tailwind CSS
-- ✅ **Error Boundaries** and comprehensive error handling
-- ✅ **Loading States** and user feedback with toasts
+- ✅ **Sistema de Autenticação Completo**
+  - Login e cadastro por email/senha
+  - Integração com Google OAuth
+  - Gerenciamento de tokens JWT com cookies
+  - Atualização automática de tokens
+- ✅ **Rotas Protegidas & Guardas de Rota**
+- ✅ **Gerenciamento de Estado Global** com React Context
+- ✅ **Manipulação Moderna de Formulários** com react-hook-form e validação zod
+- ✅ **Integração de API** com Axios e TanStack Query
+- ✅ **Componentes UI** com shadcn/ui e Tailwind CSS
+- ✅ **Boundaries de Erro** e tratamento abrangente de erros
+- ✅ **Estados de Carregamento** e feedback do usuário com toasts
 
-## Environment Configuration
+## Configuração do Ambiente
 
-Create a `.env` file in the root directory with the following variables:
+Crie um arquivo `.env` no diretório raiz com as seguintes variáveis:
 
 ```env
-# API Configuration
+# Configuração da API
 VITE_API_BASE_URL=http://localhost:8000
 
-# Google OAuth Configuration
-VITE_GOOGLE_CLIENT_ID=your-google-client-id-here.apps.googleusercontent.com
+# Configuração do Google OAuth
+VITE_GOOGLE_CLIENT_ID=seu-google-client-id-aqui.apps.googleusercontent.com
 ```
 
-### Getting Google OAuth Client ID
+### Obtendo o Google OAuth Client ID
 
-1. Go to the [Google Console](https://console.developers.google.com/)
-2. Create a new project or select an existing one
-3. Enable the Google+ API
-4. Create credentials (OAuth 2.0 Client ID)
-5. Add your authorized redirect URIs:
-   - `http://localhost:5173/auth/google/callback` (development)
-   - Your production domain when deploying
+1. Vá para o [Google Console](https://console.developers.google.com/)
+2. Crie um novo projeto ou selecione um existente
+3. Habilite a API do Google+
+4. Crie credenciais (OAuth 2.0 Client ID)
+5. Adicione suas URIs de redirecionamento autorizadas:
+   - `http://localhost:5173/auth/google/callback` (desenvolvimento)
+   - Seu domínio de produção ao fazer deploy
 
-## Installation
+## Instalação
 
 ```bash
 npm install
 ```
 
-## Development
+## Desenvolvimento
 
 ```bash
 npm run dev
@@ -57,12 +57,12 @@ npm run dev
 npm run build
 ```
 
-## Tech Stack
+## Stack Tecnológica
 
-- **Framework**: React 18 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Forms**: react-hook-form + zod
+- **Framework**: React 18 com TypeScript
+- **Ferramenta de Build**: Vite
+- **Estilização**: Tailwind CSS + shadcn/ui
+- **Formulários**: react-hook-form + zod
 - **API**: Axios + TanStack Query
-- **Routing**: React Router DOM
-- **State**: React Context API
+- **Roteamento**: React Router DOM
+- **Estado**: React Context API

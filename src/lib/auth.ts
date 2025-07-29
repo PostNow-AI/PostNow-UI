@@ -1,297 +1,116 @@
-import { AxiosError } from "axios";
-import { api, API_BASE_URL, cookieUtils } from "./api";
+import {
+  type AuthResponse,
+  type LoginRequest,
+  type RegisterRequest,
+  type SocialAccountsResponse,
+} from "@/types/auth";
+import { api, cookieUtils } from "./api";
+import {
+  apiRequest,
+  authRequest,
+  dispatchAuthStateChange,
+} from "./auth-helpers";
+import { initiateGoogleOAuth } from "./google-oauth";
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-  confirmPassword: string;
-}
-
-export interface AuthResponse {
-  access: string;
-  refresh: string;
-  user: {
-    id: number;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
-}
-
-export interface SocialAccount {
-  id: number;
-  provider: string;
-  uid: string;
-  extra_data: {
-    email?: string;
-    name?: string;
-    picture?: string;
-  };
-  date_joined: string;
-}
-
-export interface SocialAccountsResponse {
-  social_accounts: SocialAccount[];
-  total_count: number;
-}
-
-interface ApiError {
-  message?: string;
-  errors?: Record<string, string[]>;
-}
-
-// Custom event system for authentication state changes
-const AUTH_STATE_CHANGED = "auth-state-changed";
-
-const dispatchAuthStateChange = () => {
-  window.dispatchEvent(new CustomEvent(AUTH_STATE_CHANGED));
-};
-
-export const subscribeToAuthChanges = (callback: () => void) => {
-  window.addEventListener(AUTH_STATE_CHANGED, callback);
-  return () => window.removeEventListener(AUTH_STATE_CHANGED, callback);
-};
+// Re-export auth helpers
+export { subscribeToAuthChanges } from "./auth-helpers";
 
 // API Functions for TanStack Query
 export const authApi = {
-  // POST/PUT/DELETE requests (for useMutation)
-  login: async (credentials: LoginRequest): Promise<AuthResponse> => {
-    try {
-      const response = await api.post<AuthResponse>(
-        "/api/v1/auth/login/",
-        credentials
-      );
-      const data = response.data;
+  // Authentication requests
+  login: (credentials: LoginRequest) =>
+    authRequest(
+      () => api.post<AuthResponse>("/api/v1/auth/login/", credentials),
+      "Login failed"
+    ),
 
-      // Store tokens in cookies
-      cookieUtils.setTokens(data.access, data.refresh);
-
-      // Notify components of authentication state change
-      dispatchAuthStateChange();
-
-      return data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        const apiError: ApiError = error.response.data;
-        throw new Error(apiError.message || "Login failed");
-      }
-      throw new Error("Login failed");
-    }
-  },
-
-  register: async (userData: RegisterRequest): Promise<AuthResponse> => {
-    try {
-      const response = await api.post<AuthResponse>(
-        "/api/v1/auth/registration/",
-        {
+  register: (userData: RegisterRequest) =>
+    authRequest(
+      () =>
+        api.post<AuthResponse>("/api/v1/auth/registration/", {
           email: userData.email,
           username: userData.username,
           first_name: userData.firstName,
           last_name: userData.lastName,
           password1: userData.password,
           password2: userData.confirmPassword,
-        }
-      );
-      const data = response.data;
+        }),
+      "Registration failed"
+    ),
 
-      // Store tokens in cookies
-      cookieUtils.setTokens(data.access, data.refresh);
+  handleGoogleCallback: (code: string) =>
+    authRequest(
+      () => api.post<AuthResponse>("/api/v1/auth/google/callback/", { code }),
+      "Google authentication failed"
+    ),
 
-      // Notify components of authentication state change
-      dispatchAuthStateChange();
+  // User data requests
+  getCurrentUser: () =>
+    apiRequest(
+      () => api.get<AuthResponse["user"]>("/api/v1/auth/user/"),
+      "Failed to fetch user data"
+    ),
 
-      return data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        const apiError: ApiError = error.response.data;
-        throw new Error(apiError.message || "Registration failed");
-      }
-      throw new Error("Registration failed");
-    }
-  },
+  googleAuth: () =>
+    apiRequest(
+      () => api.post<AuthResponse>("/api/v1/auth/google/auth/"),
+      "Google authentication failed"
+    ),
 
-  handleGoogleCallback: async (code: string): Promise<AuthResponse> => {
-    try {
-      const response = await api.post<AuthResponse>(
-        "/api/v1/auth/google/callback/",
-        { code }
-      );
-      const data = response.data;
-
-      // Store tokens in cookies
-      cookieUtils.setTokens(data.access, data.refresh);
-
-      // Notify components of authentication state change
-      dispatchAuthStateChange();
-
-      return data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        const apiError: ApiError = error.response.data;
-        throw new Error(apiError.message || "Google authentication failed");
-      }
-      throw new Error("Google authentication failed");
-    }
-  },
-
-  // GET requests (for useQuery)
-  getCurrentUser: async (): Promise<AuthResponse["user"]> => {
-    try {
-      const response = await api.get<AuthResponse["user"]>(
-        "/api/v1/auth/user/"
-      );
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        const apiError: ApiError = error.response.data;
-        throw new Error(apiError.message || "Failed to fetch user data");
-      }
-      throw new Error("Failed to fetch user data");
-    }
-  },
-
-  googleAuth: async (): Promise<AuthResponse> => {
-    try {
-      const response = await api.post<AuthResponse>(
-        "/api/v1/auth/google/auth/"
-      );
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        const apiError: ApiError = error.response.data;
-        throw new Error(apiError.message || "Google authentication failed");
-      }
-      throw new Error("Google authentication failed");
-    }
-  },
-  refreshToken: async (): Promise<{ access: string }> => {
+  // Token management
+  refreshToken: async () => {
     const refreshToken = cookieUtils.getRefreshToken();
     if (!refreshToken) {
       throw new Error("No refresh token found");
     }
 
-    try {
-      const response = await api.post<{ access: string }>(
-        "/api/v1/auth/refresh/",
-        {
+    const data = await apiRequest(
+      () =>
+        api.post<{ access: string }>("/api/v1/auth/refresh/", {
           refresh: refreshToken,
-        }
-      );
+        }),
+      "Token refresh failed"
+    );
 
-      // Update access token in cookies
-      cookieUtils.updateAccessToken(response.data.access);
+    // Update access token in cookies
+    cookieUtils.updateAccessToken(data.access);
+    dispatchAuthStateChange();
 
-      // Notify components of authentication state change
-      dispatchAuthStateChange();
-
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        const apiError: ApiError = error.response.data;
-        throw new Error(apiError.message || "Token refresh failed");
-      }
-      throw new Error("Token refresh failed");
-    }
+    return data;
   },
 
   // Social account management
-  getSocialAccounts: async (): Promise<SocialAccountsResponse> => {
-    try {
-      const response = await api.get<SocialAccountsResponse>(
-        "/api/v1/auth/social-accounts/"
-      );
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        const apiError: ApiError = error.response.data;
-        throw new Error(apiError.message || "Failed to fetch social accounts");
-      }
-      throw new Error("Failed to fetch social accounts");
-    }
-  },
+  getSocialAccounts: () =>
+    apiRequest(
+      () => api.get<SocialAccountsResponse>("/api/v1/auth/social-accounts/"),
+      "Failed to fetch social accounts"
+    ),
 
-  disconnectSocialAccount: async (
-    accountId: number
-  ): Promise<{ message: string; disconnected_provider: string }> => {
-    try {
-      const response = await api.delete<{
-        message: string;
-        disconnected_provider: string;
-      }>(`/api/v1/auth/social-accounts/${accountId}/disconnect/`);
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        const apiError: ApiError = error.response.data;
-        throw new Error(
-          apiError.message || "Failed to disconnect social account"
-        );
-      }
-      throw new Error("Failed to disconnect social account");
-    }
-  },
+  disconnectSocialAccount: (accountId: number) =>
+    apiRequest(
+      () =>
+        api.delete<{ message: string; disconnected_provider: string }>(
+          `/api/v1/auth/social-accounts/${accountId}/disconnect/`
+        ),
+      "Failed to disconnect social account"
+    ),
 };
 
 // Utility functions
 export const authUtils = {
-  loginWithGoogle: (): void => {
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  loginWithGoogle: initiateGoogleOAuth,
 
-    if (!googleClientId) {
-      console.error(
-        "Google Client ID not configured. Please set VITE_GOOGLE_CLIENT_ID in your .env file"
-      );
-      return;
-    }
-
-    const redirectUri = encodeURIComponent(
-      `${API_BASE_URL}/api/v1/auth/google/callback/`
-    );
-    const scope = encodeURIComponent("openid email profile");
-    const responseType = "code";
-    const accessType = "offline";
-
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=${responseType}&access_type=${accessType}`;
-
-    window.location.href = googleAuthUrl;
-  },
-
-  logout: (): void => {
+  logout: () => {
     cookieUtils.removeTokens();
-
-    // Notify components of authentication state change
     dispatchAuthStateChange();
-
-    // Note: User data will be cleared from context/cache by the AuthProvider
   },
 
-  getAccessToken: (): string | undefined => {
-    return cookieUtils.getAccessToken();
-  },
-
-  isAuthenticated: (): boolean => {
-    return !!cookieUtils.getAccessToken();
-  },
+  getAccessToken: () => cookieUtils.getAccessToken(),
+  isAuthenticated: () => !!cookieUtils.getAccessToken(),
 };
 
-// Legacy service for backward compatibility (can be removed later)
+// Legacy service for backward compatibility
 export const authService = {
-  login: authApi.login,
-  register: authApi.register,
-  loginWithGoogle: authUtils.loginWithGoogle,
-  handleGoogleCallback: authApi.handleGoogleCallback,
-  logout: authUtils.logout,
-  getAccessToken: authUtils.getAccessToken,
-  isAuthenticated: authUtils.isAuthenticated,
-
-  // Social account management
-  getSocialAccounts: authApi.getSocialAccounts,
-  disconnectSocialAccount: authApi.disconnectSocialAccount,
+  ...authApi,
+  ...authUtils,
 };

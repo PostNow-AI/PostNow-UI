@@ -7,8 +7,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().email("Por favor, digite um endereço de email válido"),
+  password: z.string().min(1, "Senha é obrigatória"),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;
@@ -29,7 +29,7 @@ export function useLogin() {
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
 
       // Show success toast
-      toast.success("Welcome back! You've been successfully logged in.");
+      toast.success("Bem-vindo de volta! Você entrou com sucesso.");
 
       // Small delay to ensure authentication state propagates
       await new Promise((resolve) => setTimeout(resolve, 100));
@@ -39,7 +39,7 @@ export function useLogin() {
       navigate(from, { replace: true });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Login failed");
+      toast.error(error.message || "Falha no login");
     },
   });
 
@@ -52,7 +52,7 @@ export function useLogin() {
       authUtils.loginWithGoogle();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Google login failed"
+        error instanceof Error ? error.message : "Falha no login com Google"
       );
     }
   };
