@@ -7,6 +7,7 @@ import {
 import {
   DashboardLayout,
   ErrorBoundary,
+  OnboardingWrapper,
   ProtectedRoute,
   PublicRoute,
   ThemeProvider,
@@ -50,12 +51,14 @@ const App = () => {
                 element={<GoogleCallbackPage />}
               />
 
-              {/* Protected Routes with Dashboard Layout */}
+              {/* Protected Routes with Onboarding Check */}
               <Route
                 path="/"
                 element={
                   <ProtectedRoute>
-                    <DashboardLayout />
+                    <OnboardingWrapper>
+                      <DashboardLayout />
+                    </OnboardingWrapper>
                   </ProtectedRoute>
                 }
               >
