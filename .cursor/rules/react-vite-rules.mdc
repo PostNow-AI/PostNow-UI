@@ -53,3 +53,4 @@ Follow these rules when you write code:
 - Always handle forms validation utilizing the package zod, in conjunction with react-hook-form
 - Always handle API calls with Axios
 - All text the user can read must be in portuguese
+- Always try to keep line count below 200 and separate UI from logic

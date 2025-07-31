@@ -1,3 +1,9 @@
+export {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./accordion";
 export { Alert, AlertDescription, AlertTitle } from "./alert";
 export { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 export { Button } from "./button";
@@ -9,6 +15,7 @@ export {
   CardHeader,
   CardTitle,
 } from "./card";
+export { Checkbox } from "./checkbox";
 export { Input } from "./input";
 export { Label } from "./label";
 export { Loading, LoadingPage } from "./loading";
