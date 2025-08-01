@@ -1,25 +1,29 @@
 import { LoadingPage } from "@/components/ui";
-import { creatorProfileApi } from "@/lib/creator-profile-api";
-import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks";
+import { useOnboardingFlow } from "@/hooks/useOnboardingFlow";
+import { Navigate } from "react-router-dom";
 import { OnboardingForm } from "./OnboardingForm";
+import { OptionalOnboardingForm } from "./OptionalOnboardingForm";
 
 interface OnboardingWrapperProps {
   children: React.ReactNode;
 }
 
 export const OnboardingWrapper = ({ children }: OnboardingWrapperProps) => {
-  // Check profile completion status
+  const { isAuthenticated } = useAuth();
   const {
-    data: status,
     isLoading,
     error,
+    currentStage,
+    completeRequired,
+    completeOptional,
+    skipOptional,
     refetch,
-  } = useQuery({
-    queryKey: ["profile-completion-status"],
-    queryFn: creatorProfileApi.getCompletionStatus,
-    staleTime: 0, // Always fetch fresh data
-    gcTime: 0, // Don't cache this query
-  });
+  } = useOnboardingFlow();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
 
   // Handle loading state
   if (isLoading) {
@@ -48,18 +52,21 @@ export const OnboardingWrapper = ({ children }: OnboardingWrapperProps) => {
     );
   }
 
-  // Show onboarding if not completed
-  if (!status?.onboarding_completed) {
+  // Show required onboarding steps
+  if (currentStage === "required") {
+    return <OnboardingForm onComplete={completeRequired} />;
+  }
+
+  // Show optional onboarding steps
+  if (currentStage === "optional") {
     return (
-      <OnboardingForm
-        onComplete={() => {
-          // Refetch status after completion
-          refetch();
-        }}
+      <OptionalOnboardingForm
+        onComplete={completeOptional}
+        onSkip={skipOptional}
       />
     );
   }
 
-  // Show main app if onboarding is completed
+  // Show main app if onboarding is complete
   return <>{children}</>;
 };

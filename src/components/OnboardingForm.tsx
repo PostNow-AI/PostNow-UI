@@ -12,6 +12,7 @@ import {
 import { creatorProfileApi } from "@/lib/creator-profile-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -84,20 +85,22 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
   // Submit onboarding mutation
   const onboardingMutation = useMutation({
     mutationFn: creatorProfileApi.submitOnboarding,
-    onSuccess: (data) => {
-      toast.success("Perfil criado com sucesso!", {
-        description: `${data.profile.completeness_percentage}% do seu perfil está completo`,
+    onSuccess: () => {
+      toast.success("✅ Etapa obrigatória concluída!", {
+        description: `Próximo: personalize ainda mais seu perfil para sugestões incríveis`,
       });
 
       setTimeout(() => {
         onComplete();
-      }, 1000);
+      }, 1500);
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message || "Erro ao criar perfil";
-      toast.error("Erro no onboarding", {
-        description: message,
-      });
+    onError: (error: unknown) => {
+      if (error instanceof AxiosError) {
+        const message = error.response?.data?.message || "Erro ao criar perfil";
+        toast.error("Erro no onboarding", {
+          description: message,
+        });
+      }
     },
   });
 

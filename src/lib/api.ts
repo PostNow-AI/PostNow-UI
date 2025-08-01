@@ -25,7 +25,6 @@ const REFRESH_TOKEN_COOKIE = "refresh";
 // Cookie utility functions
 export const cookieUtils = {
   setTokens: (accessToken: string, refreshToken: string) => {
-    console.log("Setting tokens:", accessToken, refreshToken);
     Cookies.set(ACCESS_TOKEN_COOKIE, accessToken, {
       ...COOKIE_OPTIONS,
       expires: 1, // Access token expires in 1 day

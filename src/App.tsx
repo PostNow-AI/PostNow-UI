@@ -4,15 +4,12 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
-import {
-  DashboardLayout,
-  ErrorBoundary,
-  OnboardingWrapper,
-  ProtectedRoute,
-  PublicRoute,
-  ThemeProvider,
-  Toaster,
-} from "./components/ui";
+// import { OnboardingDebug } from "./components/OnboardingDebug";
+import { DashboardLayout } from "./components/DashboardLayout";
+import { OnboardingWrapper } from "./components/OnboardingWrapper";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PublicRoute } from "./components/PublicRoute";
+import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AccountSettingsPage } from "./pages/AccountSettingsPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
@@ -28,7 +25,6 @@ const App = () => {
         <Router>
           <AuthProvider>
             <Routes>
-              {/* Public Routes */}
               <Route path="/" element={<Navigate to="/login" replace />} />
               <Route
                 path="/login"
@@ -51,7 +47,6 @@ const App = () => {
                 element={<GoogleCallbackPage />}
               />
 
-              {/* Protected Routes with Onboarding Check */}
               <Route
                 path="/"
                 element={
