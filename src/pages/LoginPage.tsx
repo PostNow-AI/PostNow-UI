@@ -8,11 +8,12 @@ import {
   CardTitle,
   Input,
   Label,
+  ThemeToggle,
 } from "@/components/ui";
 import { useLogin } from "@/hooks/useLogin";
 import { Link } from "react-router-dom";
 
-export function LoginPage() {
+export const LoginPage = () => {
   const { form, isLoading, onSubmit, handleGoogleLogin } = useLogin();
   const {
     register,
@@ -21,15 +22,18 @@ export function LoginPage() {
   } = form;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="relative flex min-h-screen items-center justify-center px-4 bg-gradient-to-br from-background to-muted">
+      {/* Theme Toggle in top right */}
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-gray-900">
+          <CardTitle className="text-3xl font-bold">
             Bem-vindo de Volta
           </CardTitle>
-          <CardDescription className="text-gray-600">
-            Entre na sua conta
-          </CardDescription>
+          <CardDescription>Entre na sua conta</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -43,7 +47,9 @@ export function LoginPage() {
                 placeholder="Digite seu email"
               />
               {errors.email && (
-                <p className="text-red-600 text-sm">{errors.email.message}</p>
+                <p className="text-destructive text-sm">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -56,7 +62,7 @@ export function LoginPage() {
                 placeholder="Digite sua senha"
               />
               {errors.password && (
-                <p className="text-red-600 text-sm">
+                <p className="text-destructive text-sm">
                   {errors.password.message}
                 </p>
               )}
@@ -70,10 +76,10 @@ export function LoginPage() {
           <div className="mt-8 space-y-4">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
+                <span className="px-2 bg-background text-muted-foreground">
                   Ou continue com
                 </span>
               </div>
@@ -85,11 +91,11 @@ export function LoginPage() {
           </div>
 
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Não tem uma conta?{" "}
               <Link
                 to="/register"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 Cadastre-se
               </Link>
@@ -99,4 +105,4 @@ export function LoginPage() {
       </Card>
     </div>
   );
-}
+};
