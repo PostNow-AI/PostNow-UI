@@ -16,6 +16,7 @@ export {
   CardTitle,
 } from "./card";
 export { Checkbox } from "./checkbox";
+export { ColorPicker } from "./color-picker";
 export { Input } from "./input";
 export { Label } from "./label";
 export { Loading, LoadingPage } from "./loading";
@@ -30,6 +31,14 @@ export {
   navigationMenuTriggerStyle,
   NavigationMenuViewport,
 } from "./navigation-menu";
+export { Popover, PopoverContent, PopoverTrigger } from "./popover";
+export {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./select";
 export { Separator } from "./separator";
 export {
   Sheet,
@@ -49,9 +58,6 @@ export { Switch } from "./switch";
 export { DashboardLayout } from "../DashboardLayout";
 export { ErrorBoundary } from "../ErrorBoundary";
 export { GoogleOAuthButton } from "../GoogleOAuthButton";
-export { OnboardingForm } from "../OnboardingForm";
-export { OnboardingWrapper } from "../OnboardingWrapper";
-export { ProfileCompletion } from "../ProfileCompletion";
 export { ProtectedRoute } from "../ProtectedRoute";
 export { PublicRoute } from "../PublicRoute";
 export { ThemeToggle } from "../ThemeToggle";

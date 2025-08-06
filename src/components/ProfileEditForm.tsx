@@ -17,17 +17,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { api } from "@/lib/api";
+import { creatorProfileApi } from "@/lib/creator-profile-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { Loader2, Palette, Share2, Type, User } from "lucide-react";
+import { Loader2, Palette, Share2, Type, User, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const onboardingSchema = z.object({
+const profileEditSchema = z.object({
   professional_name: z
     .string()
     .min(2, "Nome profissional deve ter pelo menos 2 caracteres")
@@ -72,11 +72,12 @@ const onboardingSchema = z.object({
   secondary_font: z.string().optional(),
 });
 
-type OnboardingFormData = z.infer<typeof onboardingSchema>;
+type ProfileEditFormData = z.infer<typeof profileEditSchema>;
 
-interface OnboardingFormProps {
+interface ProfileEditFormProps {
+  initialData?: Partial<ProfileEditFormData>;
   onComplete?: () => void;
-  onSkip?: () => void;
+  onCancel?: () => void;
 }
 
 // Predefined options
@@ -148,7 +149,11 @@ const fontOptions = [
   "Outro",
 ];
 
-export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
+export const ProfileEditForm = ({
+  initialData,
+  onComplete,
+  onCancel,
+}: ProfileEditFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
@@ -158,88 +163,58 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
     formState: { errors },
     watch,
     setValue,
-  } = useForm<OnboardingFormData>({
-    resolver: zodResolver(onboardingSchema),
+  } = useForm<ProfileEditFormData>({
+    resolver: zodResolver(profileEditSchema),
+    defaultValues: initialData,
   });
 
   const watchedValues = watch();
 
-  const onboardingMutation = useMutation({
-    mutationFn: async (data: OnboardingFormData) => {
-      const response = await api.post(
-        "/api/v1/creator-profile/onboarding/",
-        data
-      );
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: ProfileEditFormData) => {
+      const response = await creatorProfileApi.updateProfile(data);
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
-      toast.success("Dados salvos com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
+      toast.success("Perfil atualizado com sucesso!");
       onComplete?.();
     },
     onError: (error: unknown) => {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Erro ao salvar dados");
-      } else {
-        toast.error("Erro ao salvar dados");
-      }
-    },
-  });
-
-  const skipMutation = useMutation({
-    mutationFn: async () => {
-      const response = await api.post(
-        "/api/v1/creator-profile/onboarding/skip/"
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
-      toast.success("Onboarding pulado com sucesso!");
-      onSkip?.();
-    },
-    onError: (error: unknown) => {
-      if (error instanceof AxiosError) {
         toast.error(
-          error.response?.data?.message || "Erro ao pular onboarding"
+          error.response?.data?.message || "Erro ao atualizar perfil"
         );
       } else {
-        toast.error("Erro ao pular onboarding");
+        toast.error("Erro ao atualizar perfil");
       }
     },
   });
 
-  const handleFormSubmit = async (data: OnboardingFormData) => {
+  const handleFormSubmit = async (data: ProfileEditFormData) => {
     setIsSubmitting(true);
     try {
-      await onboardingMutation.mutateAsync(data);
+      await updateProfileMutation.mutateAsync(data);
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const handleSkip = async () => {
-    setIsSubmitting(true);
-    try {
-      await skipMutation.mutateAsync();
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const hasAnyData = Object.values(watchedValues).some(
-    (value) => value && value.toString().trim()
-  );
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold">Personalize sua Experiência</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Coletamos essas informações para personalizar suas campanhas e
-          melhorar a criação de conteúdo. Todos os campos são opcionais e podem
-          ser preenchidos posteriormente na página do perfil.
-        </p>
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Editar Perfil do Criador</h1>
+          <p className="text-muted-foreground">
+            Atualize suas informações profissionais e preferências de marca
+          </p>
+        </div>
+        {onCancel && (
+          <Button variant="outline" size="icon" onClick={onCancel}>
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
@@ -509,7 +484,18 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
         <Separator />
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-end">
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </Button>
+          )}
+
           <Button
             type="submit"
             disabled={isSubmitting}
@@ -521,29 +507,10 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
                 Salvando...
               </>
             ) : (
-              "Salvar Dados"
+              "Salvar Alterações"
             )}
           </Button>
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleSkip}
-            disabled={isSubmitting}
-            className="flex-1 sm:flex-none"
-          >
-            Pular Onboarding
-          </Button>
         </div>
-
-        {!hasAnyData && (
-          <div className="text-center text-sm text-muted-foreground">
-            <p>
-              Você pode pular o onboarding e preencher esses dados depois na
-              página do perfil.
-            </p>
-          </div>
-        )}
       </form>
     </div>
   );

@@ -27,44 +27,54 @@ export const CreatorProfileOverview = ({
     <Card>
       <CardHeader>
         <CardTitle>Perfil de Criador</CardTitle>
-        <CardDescription>Informações do seu onboarding</CardDescription>
+        <CardDescription>Informações de personalização</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Plataforma principal</span>
-            <span className="font-medium capitalize">
-              {profile.main_platform || "Não definido"}
-            </span>
-          </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Nicho</span>
+            <span className="text-muted-foreground">Nome profissional</span>
             <span className="font-medium">
-              {profile.niche || "Não definido"}
+              {profile.professional_name || "Não definido"}
             </span>
           </div>
 
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Experiência</span>
-            <span className="font-medium capitalize">
-              {profile.experience_level || "Não definido"}
-            </span>
-          </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Objetivo principal</span>
-            <span className="font-medium capitalize">
-              {profile.primary_goal || "Não definido"}
-            </span>
-          </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Tempo disponível</span>
+            <span className="text-muted-foreground">Profissão</span>
             <span className="font-medium">
-              {profile.time_available
-                ? `${profile.time_available} horas/semana`
-                : "Não definido"}
+              {profile.profession || "Não definido"}
+            </span>
+          </div>
+
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Especialização</span>
+            <span className="font-medium">
+              {profile.specialization || "Não definido"}
+            </span>
+          </div>
+
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Redes sociais</span>
+            <span className="font-medium">
+              {[
+                profile.linkedin_url,
+                profile.instagram_username,
+                profile.youtube_channel,
+                profile.tiktok_username,
+              ].filter(Boolean).length || 0}{" "}
+              configuradas
+            </span>
+          </div>
+
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Brandbook</span>
+            <span className="font-medium">
+              {[
+                profile.primary_color,
+                profile.secondary_color,
+                profile.primary_font,
+                profile.secondary_font,
+              ].filter(Boolean).length || 0}{" "}
+              elementos
             </span>
           </div>
         </div>

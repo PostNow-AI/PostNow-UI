@@ -57,7 +57,27 @@ export const useProfilePage = () => {
 
   const getCompletedFieldsCount = () => {
     if (!profile) return 0;
-    return Math.floor((profile.completeness_percentage / 100) * 34);
+
+    // Count filled onboarding fields
+    const onboardingFields = [
+      profile.professional_name,
+      profile.profession,
+      profile.specialization,
+      profile.linkedin_url,
+      profile.instagram_username,
+      profile.youtube_channel,
+      profile.tiktok_username,
+      profile.primary_color,
+      profile.secondary_color,
+      profile.accent_color_1,
+      profile.accent_color_2,
+      profile.accent_color_3,
+      profile.primary_font,
+      profile.secondary_font,
+    ];
+
+    return onboardingFields.filter((field) => field && field.toString().trim())
+      .length;
   };
 
   const getStatusConfig = () => {
@@ -67,6 +87,14 @@ export const useProfilePage = () => {
         className:
           "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
       };
+
+    if (profile.onboarding_skipped) {
+      return {
+        text: "⏭️ Pulado",
+        className:
+          "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+      };
+    }
 
     return profile.onboarding_completed
       ? {

@@ -9,80 +9,66 @@ export interface CreatorProfile {
     last_name: string;
     email: string;
   };
-  // Required fields (onboarding)
-  main_platform: string;
-  niche: string;
-  experience_level: string;
-  primary_goal: string;
-  time_available: string;
+  // Professional information
+  professional_name?: string;
+  profession?: string;
+  specialization?: string;
 
-  // Important fields (level 2)
-  specific_profession?: string;
-  target_audience?: string;
-  communication_tone?: string;
-  expertise_areas?: string[];
-  preferred_duration?: string;
-  complexity_level?: string;
-  theme_diversity?: number;
-  publication_frequency?: string;
-
-  // Optional fields (level 3)
-  instagram_username?: string;
+  // Social media
   linkedin_url?: string;
-  twitter_username?: string;
+  instagram_username?: string;
+  youtube_channel?: string;
   tiktok_username?: string;
-  revenue_stage?: string;
-  team_size?: string;
-  revenue_goal?: string;
-  authority_goal?: string;
-  leads_goal?: string;
-  has_designer?: boolean;
-  current_tools?: string[];
-  tools_budget?: string;
-  preferred_hours?: string[];
 
-  // Completion tracking
+  // Brandbook - Colors
+  primary_color?: string;
+  secondary_color?: string;
+  accent_color_1?: string;
+  accent_color_2?: string;
+  accent_color_3?: string;
+
+  // Brandbook - Typography
+  primary_font?: string;
+  secondary_font?: string;
+
+  // Metadata
   onboarding_completed: boolean;
-  completeness_percentage: number;
+  onboarding_skipped: boolean;
   created_at: string;
   updated_at: string;
   onboarding_completed_at?: string;
 }
 
 export interface OnboardingData {
-  main_platform: string;
-  niche: string;
-  experience_level: string;
-  primary_goal: string;
-  time_available: string;
+  professional_name?: string;
+  profession?: string;
+  specialization?: string;
+  linkedin_url?: string;
+  instagram_username?: string;
+  youtube_channel?: string;
+  tiktok_username?: string;
+  primary_color?: string;
+  secondary_color?: string;
+  accent_color_1?: string;
+  accent_color_2?: string;
+  accent_color_3?: string;
+  primary_font?: string;
+  secondary_font?: string;
 }
 
-export interface ProfileCompletionStatus {
+export interface OnboardingStatus {
   onboarding_completed: boolean;
-  completeness_percentage: number;
-  required_fields_missing: string[];
-  total_fields: number;
-  filled_fields: number;
+  onboarding_skipped: boolean;
+  has_data: boolean;
+  filled_fields_count: number;
+  total_fields_count: number;
 }
 
-export interface ProfileChoices {
-  platforms: { value: string; label: string }[];
-  experience_levels: { value: string; label: string }[];
-  goals: { value: string; label: string }[];
-  time_options: { value: string; label: string }[];
-  communication_tones: { value: string; label: string }[];
-  content_durations: { value: string; label: string }[];
-  complexity_levels: { value: string; label: string }[];
-  frequencies: { value: string; label: string }[];
-  revenue_stages: { value: string; label: string }[];
-  team_sizes: { value: string; label: string }[];
-}
-
-export interface ProfileSuggestions {
-  niches: string[];
-  tools: string[];
-  expertise_areas: string[];
-  preferred_hours: string[];
+export interface OnboardingSuggestions {
+  professions: string[];
+  specializations: string[];
+  fonts: string[];
+  colors: string[];
 }
 
 export interface UserBehavior {
@@ -110,9 +96,11 @@ export interface UserBehavior {
 // ===== API METHODS =====
 
 export const creatorProfileApi = {
-  // Get profile completion status
-  getCompletionStatus: async (): Promise<ProfileCompletionStatus> => {
-    const response = await api.get("/api/v1/creator-profile/status/");
+  // Get onboarding status
+  getOnboardingStatus: async (): Promise<OnboardingStatus> => {
+    const response = await api.get(
+      "/api/v1/creator-profile/onboarding/status/"
+    );
     return response.data;
   },
 
@@ -127,11 +115,10 @@ export const creatorProfileApi = {
     return response.data;
   },
 
-  // Skip onboarding (only works if required fields are completed)
+  // Skip onboarding
   skipOnboarding: async (): Promise<{
     message: string;
-    can_skip: boolean;
-    completeness_percentage: number;
+    skipped: boolean;
   }> => {
     const response = await api.post("/api/v1/creator-profile/onboarding/skip/");
     return response.data;
@@ -150,7 +137,7 @@ export const creatorProfileApi = {
         CreatorProfile,
         | "user"
         | "onboarding_completed"
-        | "completeness_percentage"
+        | "onboarding_skipped"
         | "created_at"
         | "updated_at"
         | "onboarding_completed_at"
@@ -167,15 +154,11 @@ export const creatorProfileApi = {
     return response.data;
   },
 
-  // Get profile field choices
-  getChoices: async (): Promise<ProfileChoices> => {
-    const response = await api.get("/api/v1/creator-profile/choices/");
-    return response.data;
-  },
-
-  // Get profile suggestions
-  getSuggestions: async (): Promise<ProfileSuggestions> => {
-    const response = await api.get("/api/v1/creator-profile/suggestions/");
+  // Get onboarding suggestions
+  getOnboardingSuggestions: async (): Promise<OnboardingSuggestions> => {
+    const response = await api.get(
+      "/api/v1/creator-profile/onboarding/suggestions/"
+    );
     return response.data;
   },
 

@@ -21,8 +21,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Check authentication status on mount and listen for changes
   useEffect(() => {
     const checkAuth = async () => {
-      // Allow a moment for any cookie/token checks
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      // Check authentication immediately to reduce flickering
       setIsAuthenticated(authUtils.isAuthenticated());
       setInitialLoading(false);
     };

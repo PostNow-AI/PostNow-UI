@@ -4,7 +4,6 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
-// import { OnboardingDebug } from "./components/OnboardingDebug";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { OnboardingWrapper } from "./components/OnboardingWrapper";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -25,7 +24,10 @@ const App = () => {
         <Router>
           <AuthProvider>
             <Routes>
-              <Route path="/" element={<Navigate to="/login" replace />} />
+              {/* Root redirect */}
+              <Route path="/" element={<Navigate to="/home" replace />} />
+
+              {/* Public routes */}
               <Route
                 path="/login"
                 element={
@@ -47,8 +49,8 @@ const App = () => {
                 element={<GoogleCallbackPage />}
               />
 
+              {/* Protected routes with shared layout */}
               <Route
-                path="/"
                 element={
                   <ProtectedRoute>
                     <OnboardingWrapper>
@@ -57,10 +59,10 @@ const App = () => {
                   </ProtectedRoute>
                 }
               >
-                <Route path="home" element={<HomePage />} />
-                <Route path="profile" element={<ProfilePage />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route
-                  path="account-settings"
+                  path="/account-settings"
                   element={<AccountSettingsPage />}
                 />
               </Route>

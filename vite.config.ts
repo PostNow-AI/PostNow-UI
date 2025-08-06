@@ -11,4 +11,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    allowedHosts: ["workable-wealthy-haddock.ngrok-free.app"],
+  },
 });
