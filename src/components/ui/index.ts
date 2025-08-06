@@ -17,6 +17,7 @@ export {
 } from "./card";
 export { Checkbox } from "./checkbox";
 export { ColorPicker } from "./color-picker";
+export { ImagePicker } from "./image-picker";
 export { Input } from "./input";
 export { Label } from "./label";
 export { Loading, LoadingPage } from "./loading";
@@ -53,7 +54,6 @@ export {
 export { Skeleton } from "./skeleton";
 export { Toaster } from "./sonner";
 export { Switch } from "./switch";
-export { ImagePicker } from "./image-picker";
 
 // Export custom components
 export { DashboardLayout } from "../DashboardLayout";

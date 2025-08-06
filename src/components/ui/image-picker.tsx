@@ -31,7 +31,9 @@ export const ImagePicker = ({
   const validateFile = (file: File): string | null => {
     // Check file size
     if (file.size > maxSize) {
-      return `Arquivo muito grande. Tamanho máximo: ${Math.round(maxSize / 1024 / 1024)}MB`;
+      return `Arquivo muito grande. Tamanho máximo: ${Math.round(
+        maxSize / 1024 / 1024
+      )}MB`;
     }
 
     // Check file type
@@ -46,7 +48,7 @@ export const ImagePicker = ({
 
   const processFile = async (file: File) => {
     setIsLoading(true);
-    
+
     try {
       const error = validateFile(file);
       if (error) {
@@ -65,6 +67,7 @@ export const ImagePicker = ({
         setIsLoading(false);
       };
       reader.readAsDataURL(file);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       onError?.("Erro ao processar o arquivo");
       setIsLoading(false);
@@ -112,7 +115,7 @@ export const ImagePicker = ({
   return (
     <div className={cn("space-y-4", className)}>
       <Label>Imagem de Perfil</Label>
-      
+
       {/* Image Preview */}
       {value && (
         <div className="relative inline-block">
@@ -159,7 +162,9 @@ export const ImagePicker = ({
             </div>
             <div className="space-y-1">
               <p className="text-sm font-medium">
-                {isLoading ? "Processando..." : "Clique para selecionar ou arraste uma imagem"}
+                {isLoading
+                  ? "Processando..."
+                  : "Clique para selecionar ou arraste uma imagem"}
               </p>
               <p className="text-xs text-muted-foreground">
                 PNG, JPG, GIF até {Math.round(maxSize / 1024 / 1024)}MB
@@ -194,4 +199,4 @@ export const ImagePicker = ({
       )}
     </div>
   );
-}; 
+};

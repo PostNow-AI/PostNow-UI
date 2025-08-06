@@ -10,16 +10,15 @@ import {
   CardTitle,
   Input,
   Label,
-  ImagePicker,
 } from "@/components/ui";
-import { type User } from "@/types/auth";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
+import { type User } from "@/types/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Camera, Loader2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const userProfileSchema = z.object({
   first_name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -48,6 +47,7 @@ export const BasicUserInfo = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [avatarData, setAvatarData] = useState(avatar || "");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -70,24 +70,59 @@ export const BasicUserInfo = ({
       setIsEditing(false);
       onSaveProfile();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Erro ao atualizar perfil";
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao atualizar perfil";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleAvatarUpload = async (avatarBase64: string) => {
+  const handleAvatarUpload = async (file: File) => {
     try {
-      await api.post("/api/v1/creator-profile/user/avatar/", {
-        avatar: avatarBase64,
-      });
-      setAvatarData(avatarBase64);
-      onAvatarChange?.(avatarBase64);
-      toast.success("Avatar atualizado com sucesso!");
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Erro ao fazer upload do avatar";
-      toast.error(errorMessage);
+      // Validate file size (1MB)
+      if (file.size > 1048576) {
+        toast.error("Arquivo muito grande. Tamanho máximo: 1MB");
+        return;
+      }
+
+      // Validate file type
+      const validTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!validTypes.includes(file.type)) {
+        toast.error("Formato não suportado. Use JPEG, PNG ou GIF.");
+        return;
+      }
+
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64 = e.target?.result as string;
+        
+        try {
+          await api.post("/api/v1/creator-profile/user/avatar/", {
+            avatar: base64,
+          });
+          setAvatarData(base64);
+          onAvatarChange?.(base64);
+          toast.success("Avatar atualizado com sucesso!");
+        } catch (error: unknown) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Erro ao fazer upload do avatar";
+          toast.error(errorMessage);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      toast.error("Erro ao processar o arquivo");
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleAvatarUpload(file);
     }
   };
 
@@ -103,20 +138,29 @@ export const BasicUserInfo = ({
         <CardDescription>Seus dados pessoais</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Avatar Section */}
+                {/* Avatar Section */}
         <div className="flex flex-col items-center gap-4">
-          <Avatar className="h-24 w-24">
-            <AvatarImage src={avatarData || ""} alt={userName} />
-            <AvatarFallback className="text-lg">{userInitials}</AvatarFallback>
-          </Avatar>
+          <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+            <Avatar className="h-24 w-24 transition-transform group-hover:scale-105">
+              <AvatarImage src={avatarData || ""} alt={userName} />
+              <AvatarFallback className="text-lg">{userInitials}</AvatarFallback>
+            </Avatar>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+              <Camera className="h-6 w-6 text-white" />
+            </div>
+          </div>
           
-          <ImagePicker
-            value={avatarData}
-            onChange={handleAvatarUpload}
-            onError={(error) => toast.error(error)}
-            maxSize={1048576} // 1MB
-            acceptedFormats={["image/jpeg", "image/png", "image/gif"]}
-            className="w-full max-w-xs"
+          <p className="text-xs text-muted-foreground text-center">
+            Clique na imagem para alterar
+          </p>
+          
+          {/* Hidden file input */}
+          <Input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif"
+            onChange={handleFileSelect}
+            className="hidden"
           />
         </div>
 
@@ -132,7 +176,9 @@ export const BasicUserInfo = ({
                 className={errors.first_name ? "border-destructive" : ""}
               />
               {errors.first_name && (
-                <p className="text-sm text-destructive">{errors.first_name.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.first_name.message}
+                </p>
               )}
             </div>
             <div className="space-y-2">
@@ -144,7 +190,9 @@ export const BasicUserInfo = ({
                 className={errors.last_name ? "border-destructive" : ""}
               />
               {errors.last_name && (
-                <p className="text-sm text-destructive">{errors.last_name.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.last_name.message}
+                </p>
               )}
             </div>
           </div>
