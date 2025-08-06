@@ -9,6 +9,8 @@ export interface CreatorProfile {
     last_name: string;
     email: string;
   };
+  // Basic user info
+  avatar?: string;
   // Professional information
   professional_name?: string;
   profession?: string;

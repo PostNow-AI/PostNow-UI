@@ -53,6 +53,7 @@ export {
 export { Skeleton } from "./skeleton";
 export { Toaster } from "./sonner";
 export { Switch } from "./switch";
+export { ImagePicker } from "./image-picker";
 
 // Export custom components
 export { DashboardLayout } from "../DashboardLayout";
