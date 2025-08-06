@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 interface UseAvatarUploadProps {
-  onUpload: (avatarData: string) => Promise<void>;
+  onUpload: (avatarData: string) => void;
   maxSize?: number;
   acceptedFormats?: string[];
 }
@@ -16,7 +16,9 @@ export const useAvatarUpload = ({
 
   const validateFile = (file: File): string | null => {
     if (file.size > maxSize) {
-      return `Arquivo muito grande. Tamanho máximo: ${Math.round(maxSize / 1024 / 1024)}MB`;
+      return `Arquivo muito grande. Tamanho máximo: ${Math.round(
+        maxSize / 1024 / 1024
+      )}MB`;
     }
 
     if (!acceptedFormats.includes(file.type)) {
@@ -28,40 +30,30 @@ export const useAvatarUpload = ({
     return null;
   };
 
-  const processFile = async (file: File) => {
+  const processFile = (file: File) => {
+    const error = validateFile(file);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
     setIsProcessing(true);
 
-    try {
-      const error = validateFile(file);
-      if (error) {
-        toast.error(error);
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const result = e.target?.result as string;
-        try {
-          await onUpload(result);
-        } catch (error) {
-          console.error("Upload error:", error);
-        } finally {
-          setIsProcessing(false);
-        }
-      };
-      reader.onerror = () => {
-        toast.error("Erro ao ler o arquivo");
-        setIsProcessing(false);
-      };
-      reader.readAsDataURL(file);
-    } catch {
-      toast.error("Erro ao processar o arquivo");
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      onUpload(result);
       setIsProcessing(false);
-    }
+    };
+    reader.onerror = () => {
+      toast.error("Erro ao ler o arquivo");
+      setIsProcessing(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   return {
     processFile,
     isProcessing,
   };
-}; 
+};

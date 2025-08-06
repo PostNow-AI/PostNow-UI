@@ -1,8 +1,14 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
-import { type User } from "@/types/auth";
-import { useProfile } from "@/hooks/useProfile";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
 import { useAvatarUpload } from "@/hooks/useAvatarUpload";
+import { useProfile } from "@/hooks/useProfile";
 import { useUserForm } from "@/hooks/useUserForm";
+import { type User } from "@/types/auth";
 import { AvatarSection } from "./AvatarSection";
 import { UserFormSection } from "./UserFormSection";
 
@@ -23,20 +29,27 @@ export const BasicUserInfo = ({
   avatar,
   onAvatarChange,
 }: BasicUserInfoProps) => {
-  const { updateUserProfile, uploadAvatar, isUpdatingUserProfile } = useProfile();
+  const { updateUserProfile, uploadAvatar, isUpdatingUserProfile } =
+    useProfile();
 
   const { processFile, isProcessing } = useAvatarUpload({
-    onUpload: async (avatarData: string) => {
-      await uploadAvatar(avatarData);
-      onAvatarChange?.(avatarData);
+    onUpload: (avatarData: string) => {
+      uploadAvatar(avatarData, {
+        onSuccess: () => {
+          onAvatarChange?.(avatarData);
+        },
+      });
     },
   });
 
   const userForm = useUserForm({
     user,
-    onSubmit: async (data) => {
-      await updateUserProfile(data);
-      onSaveProfile();
+    onSubmit: (data) => {
+      updateUserProfile(data, {
+        onSuccess: () => {
+          onSaveProfile();
+        },
+      });
     },
   });
 
@@ -60,7 +73,7 @@ export const BasicUserInfo = ({
           userInitials={userInitials}
           onFileSelect={handleFileSelect}
         />
-        
+
         <UserFormSection
           user={user}
           form={userForm.form}
@@ -68,6 +81,7 @@ export const BasicUserInfo = ({
           isSubmitting={isUpdatingUserProfile || isProcessing}
           onStartEditing={userForm.startEditing}
           onCancel={userForm.handleCancel}
+          onSubmit={userForm.handleSubmit}
         />
       </CardContent>
     </Card>

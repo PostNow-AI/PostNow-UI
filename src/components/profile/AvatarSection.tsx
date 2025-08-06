@@ -1,6 +1,6 @@
-import { useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage, Input } from "@/components/ui";
 import { Camera } from "lucide-react";
+import { useRef } from "react";
 
 interface AvatarSectionProps {
   avatarData: string;
@@ -45,4 +45,4 @@ export const AvatarSection = ({
       />
     </div>
   );
-}; 
+};

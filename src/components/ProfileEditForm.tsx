@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Loader2, X } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -68,7 +67,6 @@ export const ProfileEditForm = ({
   onComplete,
   onCancel,
 }: ProfileEditFormProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
   const form = useForm<ProfileEditFormData>({
@@ -77,10 +75,7 @@ export const ProfileEditForm = ({
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: ProfileEditFormData) => {
-      const response = await creatorProfileApi.updateProfile(data);
-      return response.data;
-    },
+    mutationFn: creatorProfileApi.updateProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
@@ -89,20 +84,17 @@ export const ProfileEditForm = ({
     },
     onError: (error: unknown) => {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Erro ao atualizar perfil");
+        toast.error(
+          error.response?.data?.message || "Erro ao atualizar perfil"
+        );
       } else {
         toast.error("Erro ao atualizar perfil");
       }
     },
   });
 
-  const handleFormSubmit = async (data: ProfileEditFormData) => {
-    setIsSubmitting(true);
-    try {
-      await updateProfileMutation.mutateAsync(data);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const handleFormSubmit = (data: ProfileEditFormData) => {
+    updateProfileMutation.mutate(data);
   };
 
   return (
@@ -121,7 +113,10 @@ export const ProfileEditForm = ({
         )}
       </div>
 
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+        className="space-y-6"
+      >
         <ProfessionalInfoSection form={form} />
 
         <Separator />
@@ -132,7 +127,7 @@ export const ProfileEditForm = ({
               type="button"
               variant="outline"
               onClick={onCancel}
-              disabled={isSubmitting}
+              disabled={updateProfileMutation.isPending}
             >
               Cancelar
             </Button>
@@ -140,10 +135,10 @@ export const ProfileEditForm = ({
 
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={updateProfileMutation.isPending}
             className="flex-1 sm:flex-none"
           >
-            {isSubmitting ? (
+            {updateProfileMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Salvando...

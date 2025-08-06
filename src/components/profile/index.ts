@@ -1,5 +1,5 @@
 export { AccountStatistics } from "./AccountStatistics";
+export { AvatarSection } from "./AvatarSection";
 export { BasicUserInfo } from "./BasicUserInfo";
 export { CreatorProfileOverview } from "./CreatorProfileOverview";
-export { AvatarSection } from "./AvatarSection";
 export { UserFormSection } from "./UserFormSection";

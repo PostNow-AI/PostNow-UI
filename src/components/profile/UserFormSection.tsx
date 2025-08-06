@@ -1,15 +1,21 @@
 import { Button, Input, Label } from "@/components/ui";
-import { Loader2 } from "lucide-react";
 import { type User } from "@/types/auth";
-import { UseFormReturn } from "react-hook-form";
+import { Loader2 } from "lucide-react";
+import { type UseFormReturn } from "react-hook-form";
+
+interface UserFormData {
+  first_name: string;
+  last_name: string;
+}
 
 interface UserFormSectionProps {
   user: User | null;
-  form: UseFormReturn<any>;
+  form: UseFormReturn<UserFormData>;
   isEditing: boolean;
   isSubmitting: boolean;
   onStartEditing: () => void;
   onCancel: () => void;
+  onSubmit: (data: UserFormData) => void;
 }
 
 export const UserFormSection = ({
@@ -19,11 +25,15 @@ export const UserFormSection = ({
   isSubmitting,
   onStartEditing,
   onCancel,
+  onSubmit,
 }: UserFormSectionProps) => {
-  const { register, formState: { errors, isDirty } } = form;
+  const {
+    register,
+    formState: { errors, isDirty },
+  } = form;
 
   return (
-    <form onSubmit={form.handleSubmit} className="space-y-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="firstName">Nome</Label>
@@ -102,4 +112,4 @@ export const UserFormSection = ({
       </div>
     </form>
   );
-}; 
+};

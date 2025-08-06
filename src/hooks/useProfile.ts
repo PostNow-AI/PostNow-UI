@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { creatorProfileApi } from "@/lib/creator-profile-api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "sonner";
 
 export const useProfile = () => {
   const queryClient = useQueryClient();
@@ -22,22 +23,37 @@ export const useProfile = () => {
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
       toast.success("Perfil atualizado com sucesso!");
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Erro ao atualizar perfil");
+    onError: (error: unknown) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message || "Erro ao atualizar perfil"
+        );
+      } else {
+        toast.error("Erro ao atualizar perfil");
+      }
     },
   });
 
   const updateUserProfileMutation = useMutation({
     mutationFn: async (data: { first_name?: string; last_name?: string }) => {
-      const response = await api.patch("/api/v1/creator-profile/user/profile/", data);
+      const response = await api.patch(
+        "/api/v1/creator-profile/user/profile/",
+        data
+      );
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       toast.success("Perfil atualizado com sucesso!");
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Erro ao atualizar perfil");
+    onError: (error: unknown) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message || "Erro ao atualizar perfil"
+        );
+      } else {
+        toast.error("Erro ao atualizar perfil");
+      }
     },
   });
 
@@ -52,8 +68,14 @@ export const useProfile = () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       toast.success("Avatar atualizado com sucesso!");
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Erro ao fazer upload do avatar");
+    onError: (error: unknown) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message || "Erro ao fazer upload do avatar"
+        );
+      } else {
+        toast.error("Erro ao fazer upload do avatar");
+      }
     },
   });
 
@@ -68,4 +90,4 @@ export const useProfile = () => {
     isUpdatingUserProfile: updateUserProfileMutation.isPending,
     isUploadingAvatar: uploadAvatarMutation.isPending,
   };
-}; 
+};

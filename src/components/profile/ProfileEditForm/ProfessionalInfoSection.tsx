@@ -1,13 +1,39 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui";
 import { User } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import { type UseFormReturn } from "react-hook-form";
 
-interface ProfessionalInfoSectionProps {
-  form: UseFormReturn<any>;
+interface ProfileFormData {
+  professional_name?: string;
+  profession?: string;
+  specialization?: string;
 }
 
-export const ProfessionalInfoSection = ({ form }: ProfessionalInfoSectionProps) => {
-  const { register, watch, setValue, formState: { errors } } = form;
+interface ProfessionalInfoSectionProps {
+  form: UseFormReturn<ProfileFormData>;
+}
+
+export const ProfessionalInfoSection = ({
+  form,
+}: ProfessionalInfoSectionProps) => {
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
   const watchedValues = watch();
 
   return (
@@ -60,7 +86,9 @@ export const ProfessionalInfoSection = ({ form }: ProfessionalInfoSectionProps) 
                 <SelectItem value="Professor">Professor</SelectItem>
                 <SelectItem value="Fisioterapeuta">Fisioterapeuta</SelectItem>
                 <SelectItem value="Nutricionista">Nutricionista</SelectItem>
-                <SelectItem value="Personal Trainer">Personal Trainer</SelectItem>
+                <SelectItem value="Personal Trainer">
+                  Personal Trainer
+                </SelectItem>
               </SelectContent>
             </Select>
             {errors.profession && (
@@ -90,23 +118,45 @@ export const ProfessionalInfoSection = ({ form }: ProfessionalInfoSectionProps) 
                 <SelectItem value="Estratégico">Estratégico</SelectItem>
                 <SelectItem value="Cardiologia">Cardiologia</SelectItem>
                 <SelectItem value="Ortopedia">Ortopedia</SelectItem>
-                <SelectItem value="Psicologia Clínica">Psicologia Clínica</SelectItem>
-                <SelectItem value="Psicologia Organizacional">Psicologia Organizacional</SelectItem>
+                <SelectItem value="Psicologia Clínica">
+                  Psicologia Clínica
+                </SelectItem>
+                <SelectItem value="Psicologia Organizacional">
+                  Psicologia Organizacional
+                </SelectItem>
                 <SelectItem value="Endodontia">Endodontia</SelectItem>
                 <SelectItem value="Ortodontia">Ortodontia</SelectItem>
-                <SelectItem value="Contabilidade Tributária">Contabilidade Tributária</SelectItem>
-                <SelectItem value="Contabilidade Societária">Contabilidade Societária</SelectItem>
-                <SelectItem value="Arquitetura Residencial">Arquitetura Residencial</SelectItem>
-                <SelectItem value="Arquitetura Comercial">Arquitetura Comercial</SelectItem>
+                <SelectItem value="Contabilidade Tributária">
+                  Contabilidade Tributária
+                </SelectItem>
+                <SelectItem value="Contabilidade Societária">
+                  Contabilidade Societária
+                </SelectItem>
+                <SelectItem value="Arquitetura Residencial">
+                  Arquitetura Residencial
+                </SelectItem>
+                <SelectItem value="Arquitetura Comercial">
+                  Arquitetura Comercial
+                </SelectItem>
                 <SelectItem value="Design Gráfico">Design Gráfico</SelectItem>
-                <SelectItem value="Design de Produto">Design de Produto</SelectItem>
-                <SelectItem value="Desenvolvimento Web">Desenvolvimento Web</SelectItem>
-                <SelectItem value="Desenvolvimento Mobile">Desenvolvimento Mobile</SelectItem>
+                <SelectItem value="Design de Produto">
+                  Design de Produto
+                </SelectItem>
+                <SelectItem value="Desenvolvimento Web">
+                  Desenvolvimento Web
+                </SelectItem>
+                <SelectItem value="Desenvolvimento Mobile">
+                  Desenvolvimento Mobile
+                </SelectItem>
                 <SelectItem value="Clínica Geral">Clínica Geral</SelectItem>
                 <SelectItem value="Pediatria">Pediatria</SelectItem>
                 <SelectItem value="Educação Física">Educação Física</SelectItem>
-                <SelectItem value="Nutrição Esportiva">Nutrição Esportiva</SelectItem>
-                <SelectItem value="Nutrição Clínica">Nutrição Clínica</SelectItem>
+                <SelectItem value="Nutrição Esportiva">
+                  Nutrição Esportiva
+                </SelectItem>
+                <SelectItem value="Nutrição Clínica">
+                  Nutrição Clínica
+                </SelectItem>
               </SelectContent>
             </Select>
             {errors.specialization && (
@@ -119,4 +169,4 @@ export const ProfessionalInfoSection = ({ form }: ProfessionalInfoSectionProps) 
       </CardContent>
     </Card>
   );
-}; 
+};

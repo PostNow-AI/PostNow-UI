@@ -1,13 +1,13 @@
 export type { AuthContextType } from "../types/auth";
 export { useAuth } from "./useAuth";
+export { useAvatarUpload } from "./useAvatarUpload";
 export { useGoogleCallback } from "./useGoogleCallback";
 export { useHomePage } from "./useHomePage";
 export { useLogin } from "./useLogin";
 export { useOnboardingFlow } from "./useOnboardingFlow";
+export { useProfile } from "./useProfile";
 export { useProfilePage } from "./useProfilePage";
 export { useRegister } from "./useRegister";
 export { useSocialAccounts } from "./useSocialAccounts";
 export { useTokenRefresh } from "./useTokenRefresh";
-export { useProfile } from "./useProfile";
-export { useAvatarUpload } from "./useAvatarUpload";
 export { useUserForm } from "./useUserForm";
