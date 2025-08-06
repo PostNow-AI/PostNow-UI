@@ -57,6 +57,24 @@ export const ProfilePage = () => {
     );
   }
 
+  // Check if user has any profile data filled in
+  const hasProfileData = !!(
+    profile.professional_name ||
+    profile.profession ||
+    profile.specialization ||
+    profile.linkedin_url ||
+    profile.instagram_username ||
+    profile.youtube_channel ||
+    profile.tiktok_username ||
+    profile.primary_color ||
+    profile.secondary_color ||
+    profile.accent_color_1 ||
+    profile.accent_color_2 ||
+    profile.accent_color_3 ||
+    profile.primary_font ||
+    profile.secondary_font
+  );
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -102,7 +120,233 @@ export const ProfilePage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {profile.onboarding_skipped ? (
+              {hasProfileData ? (
+                <div className="space-y-6">
+                  {/* Professional Information Section */}
+                  {(profile.professional_name || profile.profession || profile.specialization) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <Label className="text-sm font-semibold text-green-700 dark:text-green-400">
+                          Informações Profissionais
+                        </Label>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4">
+                        {profile.professional_name && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Nome Profissional
+                            </Label>
+                            <p className="text-sm font-medium">
+                              {profile.professional_name}
+                            </p>
+                          </div>
+                        )}
+                        {profile.profession && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Profissão
+                            </Label>
+                            <p className="text-sm font-medium">
+                              {profile.profession}
+                            </p>
+                          </div>
+                        )}
+                        {profile.specialization && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Especialização
+                            </Label>
+                            <p className="text-sm font-medium">
+                              {profile.specialization}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Social Media Section */}
+                  {(profile.linkedin_url || profile.instagram_username || profile.youtube_channel || profile.tiktok_username) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <Label className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+                          Redes Sociais
+                        </Label>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">
+                        {profile.linkedin_url && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              LinkedIn
+                            </Label>
+                            <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                              {profile.linkedin_url}
+                            </p>
+                          </div>
+                        )}
+                        {profile.instagram_username && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Instagram
+                            </Label>
+                            <p className="text-sm font-medium text-pink-600 dark:text-pink-400">
+                              {profile.instagram_username}
+                            </p>
+                          </div>
+                        )}
+                        {profile.youtube_channel && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              YouTube
+                            </Label>
+                            <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                              {profile.youtube_channel}
+                            </p>
+                          </div>
+                        )}
+                        {profile.tiktok_username && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              TikTok
+                            </Label>
+                            <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
+                              {profile.tiktok_username}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Brandbook Section */}
+                  {(profile.primary_color || profile.secondary_color || profile.accent_color_1 || profile.accent_color_2 || profile.accent_color_3 || profile.primary_font || profile.secondary_font) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <Label className="text-sm font-semibold text-purple-700 dark:text-purple-400">
+                          Brandbook
+                        </Label>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4">
+                        {/* Colors */}
+                        {(profile.primary_color || profile.secondary_color || profile.accent_color_1 || profile.accent_color_2 || profile.accent_color_3) && (
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Paleta de Cores
+                            </Label>
+                            <div className="flex flex-wrap gap-2">
+                              {profile.primary_color && (
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-4 h-4 rounded border"
+                                    style={{ backgroundColor: profile.primary_color }}
+                                  ></div>
+                                  <span className="text-xs text-muted-foreground">Primária</span>
+                                </div>
+                              )}
+                              {profile.secondary_color && (
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-4 h-4 rounded border"
+                                    style={{ backgroundColor: profile.secondary_color }}
+                                  ></div>
+                                  <span className="text-xs text-muted-foreground">Secundária</span>
+                                </div>
+                              )}
+                              {profile.accent_color_1 && (
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-4 h-4 rounded border"
+                                    style={{ backgroundColor: profile.accent_color_1 }}
+                                  ></div>
+                                  <span className="text-xs text-muted-foreground">Destaque 1</span>
+                                </div>
+                              )}
+                              {profile.accent_color_2 && (
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-4 h-4 rounded border"
+                                    style={{ backgroundColor: profile.accent_color_2 }}
+                                  ></div>
+                                  <span className="text-xs text-muted-foreground">Destaque 2</span>
+                                </div>
+                              )}
+                              {profile.accent_color_3 && (
+                                <div className="flex items-center gap-2">
+                                  <div 
+                                    className="w-4 h-4 rounded border"
+                                    style={{ backgroundColor: profile.accent_color_3 }}
+                                  ></div>
+                                  <span className="text-xs text-muted-foreground">Destaque 3</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Typography */}
+                        {(profile.primary_font || profile.secondary_font) && (
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Tipografia
+                            </Label>
+                            <div className="space-y-1">
+                              {profile.primary_font && (
+                                <div className="space-y-1">
+                                  <Label className="text-xs font-medium text-muted-foreground">
+                                    Fonte Primária
+                                  </Label>
+                                  <p className="text-sm font-medium" style={{ fontFamily: profile.primary_font }}>
+                                    {profile.primary_font}
+                                  </p>
+                                </div>
+                              )}
+                              {profile.secondary_font && (
+                                <div className="space-y-1">
+                                  <Label className="text-xs font-medium text-muted-foreground">
+                                    Fonte Secundária
+                                  </Label>
+                                  <p className="text-sm font-medium" style={{ fontFamily: profile.secondary_font }}>
+                                    {profile.secondary_font}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Success Message */}
+                  <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                        Dados de personalização configurados com sucesso!
+                      </p>
+                    </div>
+                    <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                      Suas informações serão usadas para personalizar suas campanhas e conteúdo.
+                    </p>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditMode(true)}
+                    >
+                      Editar Dados de Personalização
+                    </Button>
+                  </div>
+                </div>
+              ) : profile.onboarding_skipped ? (
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">
                     Você pulou o onboarding inicial. Para melhorar a
@@ -112,111 +356,6 @@ export const ProfilePage = () => {
                   <Button variant="outline" onClick={() => setIsEditMode(true)}>
                     Preencher Dados de Personalização
                   </Button>
-                </div>
-              ) : profile.onboarding_completed ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {profile.professional_name && (
-                      <div>
-                        <Label className="text-sm font-medium">
-                          Nome Profissional
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {profile.professional_name}
-                        </p>
-                      </div>
-                    )}
-                    {profile.profession && (
-                      <div>
-                        <Label className="text-sm font-medium">Profissão</Label>
-                        <p className="text-sm text-muted-foreground">
-                          {profile.profession}
-                        </p>
-                      </div>
-                    )}
-                    {profile.specialization && (
-                      <div>
-                        <Label className="text-sm font-medium">
-                          Especialização
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {profile.specialization}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {(profile.linkedin_url ||
-                    profile.instagram_username ||
-                    profile.youtube_channel ||
-                    profile.tiktok_username) && (
-                    <div>
-                      <Label className="text-sm font-medium">
-                        Redes Sociais
-                      </Label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                        {profile.linkedin_url && (
-                          <p className="text-sm text-muted-foreground">
-                            LinkedIn: {profile.linkedin_url}
-                          </p>
-                        )}
-                        {profile.instagram_username && (
-                          <p className="text-sm text-muted-foreground">
-                            Instagram: {profile.instagram_username}
-                          </p>
-                        )}
-                        {profile.youtube_channel && (
-                          <p className="text-sm text-muted-foreground">
-                            YouTube: {profile.youtube_channel}
-                          </p>
-                        )}
-                        {profile.tiktok_username && (
-                          <p className="text-sm text-muted-foreground">
-                            TikTok: {profile.tiktok_username}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {(profile.primary_color ||
-                    profile.secondary_color ||
-                    profile.primary_font) && (
-                    <div>
-                      <Label className="text-sm font-medium">Brandbook</Label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                        {profile.primary_color && (
-                          <p className="text-sm text-muted-foreground">
-                            Cor Primária: {profile.primary_color}
-                          </p>
-                        )}
-                        {profile.secondary_color && (
-                          <p className="text-sm text-muted-foreground">
-                            Cor Secundária: {profile.secondary_color}
-                          </p>
-                        )}
-                        {profile.primary_font && (
-                          <p className="text-sm text-muted-foreground">
-                            Fonte Primária: {profile.primary_font}
-                          </p>
-                        )}
-                        {profile.secondary_font && (
-                          <p className="text-sm text-muted-foreground">
-                            Fonte Secundária: {profile.secondary_font}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex justify-end mt-6">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditMode(true)}
-                    >
-                      Editar Dados de Personalização
-                    </Button>
-                  </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
