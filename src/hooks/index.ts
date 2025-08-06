@@ -8,3 +8,6 @@ export { useProfilePage } from "./useProfilePage";
 export { useRegister } from "./useRegister";
 export { useSocialAccounts } from "./useSocialAccounts";
 export { useTokenRefresh } from "./useTokenRefresh";
+export { useProfile } from "./useProfile";
+export { useAvatarUpload } from "./useAvatarUpload";
+export { useUserForm } from "./useUserForm";
