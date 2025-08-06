@@ -97,7 +97,7 @@ export const BasicUserInfo = ({
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64 = e.target?.result as string;
-        
+
         try {
           await api.post("/api/v1/creator-profile/user/avatar/", {
             avatar: base64,
@@ -138,22 +138,27 @@ export const BasicUserInfo = ({
         <CardDescription>Seus dados pessoais</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-                {/* Avatar Section */}
+        {/* Avatar Section */}
         <div className="flex flex-col items-center gap-4">
-          <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+          <div
+            className="relative group cursor-pointer"
+            onClick={() => fileInputRef.current?.click()}
+          >
             <Avatar className="h-24 w-24 transition-transform group-hover:scale-105">
               <AvatarImage src={avatarData || ""} alt={userName} />
-              <AvatarFallback className="text-lg">{userInitials}</AvatarFallback>
+              <AvatarFallback className="text-lg">
+                {userInitials}
+              </AvatarFallback>
             </Avatar>
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
               <Camera className="h-6 w-6 text-white" />
             </div>
           </div>
-          
+
           <p className="text-xs text-muted-foreground text-center">
             Clique na imagem para alterar
           </p>
-          
+
           {/* Hidden file input */}
           <Input
             ref={fileInputRef}
