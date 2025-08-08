@@ -16,11 +16,11 @@ import { Palette, Type } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 
 interface BrandbookFormData {
-  primary_color?: string;
-  secondary_color?: string;
-  accent_color_1?: string;
-  accent_color_2?: string;
-  accent_color_3?: string;
+  primary_color?: string | null;
+  secondary_color?: string | null;
+  accent_color_1?: string | null;
+  accent_color_2?: string | null;
+  accent_color_3?: string | null;
   primary_font?: string;
   secondary_font?: string;
 }
@@ -48,10 +48,12 @@ const fontOptions = [
   "Outro",
 ];
 
-export const BrandbookSection = ({
-  form,
-}: BrandbookSectionProps) => {
-  const { watch, setValue, formState: { errors } } = form;
+export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
+  const {
+    watch,
+    setValue,
+    formState: { errors },
+  } = form;
   const watchedValues = watch();
 
   return (
@@ -71,35 +73,35 @@ export const BrandbookSection = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ColorPicker
               label="Cor Primária"
-              value={watchedValues.primary_color}
+              value={watchedValues.primary_color || ""}
               onChange={(color) => setValue("primary_color", color)}
               placeholder="#3B82F6"
             />
 
             <ColorPicker
               label="Cor Secundária"
-              value={watchedValues.secondary_color}
+              value={watchedValues.secondary_color || ""}
               onChange={(color) => setValue("secondary_color", color)}
               placeholder="#EF4444"
             />
 
             <ColorPicker
               label="Cor de Destaque 1"
-              value={watchedValues.accent_color_1}
+              value={watchedValues.accent_color_1 || ""}
               onChange={(color) => setValue("accent_color_1", color)}
               placeholder="#10B981"
             />
 
             <ColorPicker
               label="Cor de Destaque 2"
-              value={watchedValues.accent_color_2}
+              value={watchedValues.accent_color_2 || ""}
               onChange={(color) => setValue("accent_color_2", color)}
               placeholder="#F59E0B"
             />
 
             <ColorPicker
               label="Cor de Destaque 3"
-              value={watchedValues.accent_color_3}
+              value={watchedValues.accent_color_3 || ""}
               onChange={(color) => setValue("accent_color_3", color)}
               placeholder="#8B5CF6"
             />
@@ -170,4 +172,4 @@ export const BrandbookSection = ({
       </Card>
     </>
   );
-}; 
+};

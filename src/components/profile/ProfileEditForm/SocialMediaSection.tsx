@@ -21,10 +21,11 @@ interface SocialMediaSectionProps {
   form: UseFormReturn<SocialMediaFormData>;
 }
 
-export const SocialMediaSection = ({
-  form,
-}: SocialMediaSectionProps) => {
-  const { register, formState: { errors } } = form;
+export const SocialMediaSection = ({ form }: SocialMediaSectionProps) => {
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
     <Card>
@@ -98,4 +99,4 @@ export const SocialMediaSection = ({
       </CardContent>
     </Card>
   );
-}; 
+};

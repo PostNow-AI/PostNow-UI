@@ -7,53 +7,59 @@ import { Loader2, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { BrandbookSection } from "./profile/ProfileEditForm/BrandbookSection";
 import { ProfessionalInfoSection } from "./profile/ProfileEditForm/ProfessionalInfoSection";
 import { SocialMediaSection } from "./profile/ProfileEditForm/SocialMediaSection";
-import { BrandbookSection } from "./profile/ProfileEditForm/BrandbookSection";
 
 const profileEditSchema = z.object({
-  professional_name: z
-    .string()
-    .min(2, "Nome profissional deve ter pelo menos 2 caracteres")
-    .optional(),
-  profession: z
-    .string()
-    .min(2, "Profissão deve ter pelo menos 2 caracteres")
-    .optional(),
-  specialization: z
-    .string()
-    .min(2, "Especialização deve ter pelo menos 2 caracteres")
-    .optional(),
+  professional_name: z.string().optional().or(z.literal("")),
+  profession: z.string().optional().or(z.literal("")),
+  specialization: z.string().optional().or(z.literal("")),
   linkedin_url: z
     .string()
     .url("URL do LinkedIn deve ser válida")
     .optional()
     .or(z.literal("")),
-  instagram_username: z.string().optional(),
-  youtube_channel: z.string().optional(),
-  tiktok_username: z.string().optional(),
+  instagram_username: z.string().optional().or(z.literal("")),
+  youtube_channel: z.string().optional().or(z.literal("")),
+  tiktok_username: z.string().optional().or(z.literal("")),
   primary_color: z
     .string()
     .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
-    .optional(),
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(undefined))
+    .or(z.literal(null)),
   secondary_color: z
     .string()
     .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
-    .optional(),
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(undefined))
+    .or(z.literal(null)),
   accent_color_1: z
     .string()
     .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
-    .optional(),
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(undefined))
+    .or(z.literal(null)),
   accent_color_2: z
     .string()
     .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
-    .optional(),
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(undefined))
+    .or(z.literal(null)),
   accent_color_3: z
     .string()
     .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
-    .optional(),
-  primary_font: z.string().optional(),
-  secondary_font: z.string().optional(),
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(undefined))
+    .or(z.literal(null)),
+  primary_font: z.string().optional().or(z.literal("")),
+  secondary_font: z.string().optional().or(z.literal("")),
 });
 
 type ProfileEditFormData = z.infer<typeof profileEditSchema>;
@@ -96,7 +102,14 @@ export const ProfileEditForm = ({
   });
 
   const handleFormSubmit = (data: ProfileEditFormData) => {
-    updateProfileMutation.mutate(data);
+    // Clean up empty values before sending
+    const cleanedData = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => 
+        value !== "" && value !== undefined && value !== null
+      )
+    );
+    
+    updateProfileMutation.mutate(cleanedData);
   };
 
   return (
