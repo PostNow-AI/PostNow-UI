@@ -6,6 +6,7 @@ export {
 } from "./accordion";
 export { Alert, AlertDescription, AlertTitle } from "./alert";
 export { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+export { Badge } from "./badge";
 export { Button } from "./button";
 export {
   Card,
@@ -17,6 +18,15 @@ export {
 } from "./card";
 export { Checkbox } from "./checkbox";
 export { ColorPicker } from "./color-picker";
+export {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./dialog";
 export { ImagePicker } from "./image-picker";
 export { Input } from "./input";
 export { Label } from "./label";

@@ -13,6 +13,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { AccountSettingsPage } from "./pages/AccountSettingsPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { HomePage } from "./pages/HomePage";
+import { IdeaBankPage } from "./pages/IdeaBankPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -60,6 +61,7 @@ const App = () => {
                 }
               >
                 <Route path="/home" element={<HomePage />} />
+                <Route path="/ideabank" element={<IdeaBankPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route
                   path="/account-settings"
