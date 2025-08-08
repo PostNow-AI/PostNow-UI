@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ProfessionalInfoSection } from "./profile/ProfileEditForm/ProfessionalInfoSection";
+import { SocialMediaSection } from "./profile/ProfileEditForm/SocialMediaSection";
+import { BrandbookSection } from "./profile/ProfileEditForm/BrandbookSection";
 
 const profileEditSchema = z.object({
   professional_name: z
@@ -118,6 +120,10 @@ export const ProfileEditForm = ({
         className="space-y-6"
       >
         <ProfessionalInfoSection form={form} />
+
+        <SocialMediaSection form={form} />
+
+        <BrandbookSection form={form} />
 
         <Separator />
 
