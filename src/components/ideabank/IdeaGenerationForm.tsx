@@ -52,11 +52,6 @@ export const IdeaGenerationForm = ({
   onSubmit,
   isGenerating,
 }: IdeaGenerationFormProps) => {
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [contentTypes, setContentTypes] = useState<Record<string, string[]>>(
-    {}
-  );
-
   const form = useForm<IdeaGenerationFormData>({
     resolver: zodResolver(ideaGenerationSchema),
     defaultValues: {
@@ -66,23 +61,34 @@ export const IdeaGenerationForm = ({
     },
   });
 
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [contentTypes, setContentTypes] = useState<Record<string, string[]>>(
+    {}
+  );
+
   const handleSubmit = (data: IdeaGenerationFormData) => {
-    data.platforms = selectedPlatforms;
-    data.content_types = contentTypes;
+    // The form values are already updated by setValue calls
     onSubmit(data);
   };
 
   const handlePlatformChange = (platform: string, checked: boolean) => {
+    let newPlatforms: string[];
+
     if (checked) {
-      setSelectedPlatforms([...selectedPlatforms, platform]);
+      newPlatforms = [...selectedPlatforms, platform];
+      setSelectedPlatforms(newPlatforms);
     } else {
-      setSelectedPlatforms(selectedPlatforms.filter((p) => p !== platform));
+      newPlatforms = selectedPlatforms.filter((p) => p !== platform);
+      setSelectedPlatforms(newPlatforms);
       setContentTypes((prev) => {
         const newTypes = { ...prev };
         delete newTypes[platform];
         return newTypes;
       });
     }
+
+    // Update form value
+    form.setValue("platforms", newPlatforms);
   };
 
   const handleContentTypeChange = (
@@ -92,19 +98,28 @@ export const IdeaGenerationForm = ({
   ) => {
     setContentTypes((prev) => {
       const currentTypes = prev[platform] || [];
+      let newContentTypes: Record<string, string[]>;
+
       if (checked) {
-        return { ...prev, [platform]: [...currentTypes, contentType] };
+        newContentTypes = {
+          ...prev,
+          [platform]: [...currentTypes, contentType],
+        };
       } else {
-        return {
+        newContentTypes = {
           ...prev,
           [platform]: currentTypes.filter((t) => t !== contentType),
         };
       }
+
+      // Update form value
+      form.setValue("content_types", newContentTypes);
+      return newContentTypes;
     });
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       {/* Campaign Objectives */}
       <Card>
         <CardHeader>
@@ -121,7 +136,7 @@ export const IdeaGenerationForm = ({
             {options?.objectives?.map((objective: OptionItem) => (
               <div
                 key={objective.value}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
               >
                 <Checkbox
                   id={objective.value}
@@ -141,7 +156,12 @@ export const IdeaGenerationForm = ({
                     }
                   }}
                 />
-                <Label htmlFor={objective.value}>{objective.label}</Label>
+                <Label
+                  htmlFor={objective.value}
+                  className="cursor-pointer font-medium"
+                >
+                  {objective.label}
+                </Label>
               </div>
             ))}
           </div>
@@ -160,7 +180,7 @@ export const IdeaGenerationForm = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="persona_age">Idade</Label>
               <Input
@@ -186,27 +206,32 @@ export const IdeaGenerationForm = ({
               />
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="persona_interests">Interesses</Label>
-            <Textarea
-              id="persona_interests"
-              placeholder="Ex: Tecnologia, fitness, viagens..."
-              {...form.register("persona_interests")}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="persona_behavior">Comportamento</Label>
-            <Textarea
-              id="persona_behavior"
-              placeholder="Ex: Ativos nas redes sociais, gostam de conteúdo educativo..."
-              {...form.register("persona_behavior")}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="persona_interests">Interesses</Label>
+              <Textarea
+                id="persona_interests"
+                placeholder="Ex: Tecnologia, fitness, viagens..."
+                rows={3}
+                {...form.register("persona_interests")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="persona_behavior">Comportamento</Label>
+              <Textarea
+                id="persona_behavior"
+                placeholder="Ex: Ativos nas redes sociais, gostam de conteúdo educativo..."
+                rows={3}
+                {...form.register("persona_behavior")}
+              />
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="persona_pain_points">Dores e Necessidades</Label>
             <Textarea
               id="persona_pain_points"
               placeholder="Ex: Falta de tempo, dificuldade em organizar..."
+              rows={2}
               {...form.register("persona_pain_points")}
             />
           </div>
@@ -225,9 +250,12 @@ export const IdeaGenerationForm = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {options?.platforms?.map((platform: OptionItem) => (
-              <div key={platform.value} className="flex items-center space-x-2">
+              <div
+                key={platform.value}
+                className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+              >
                 <Checkbox
                   id={platform.value}
                   checked={selectedPlatforms.includes(platform.value)}
@@ -235,7 +263,12 @@ export const IdeaGenerationForm = ({
                     handlePlatformChange(platform.value, checked as boolean)
                   }
                 />
-                <Label htmlFor={platform.value}>{platform.label}</Label>
+                <Label
+                  htmlFor={platform.value}
+                  className="cursor-pointer font-medium"
+                >
+                  {platform.label}
+                </Label>
               </div>
             ))}
           </div>
@@ -254,15 +287,18 @@ export const IdeaGenerationForm = ({
               Selecione os tipos de conteúdo para cada plataforma
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             {selectedPlatforms.map((platform) => (
-              <div key={platform} className="space-y-2">
-                <Label className="text-sm font-medium">{platform}</Label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div key={platform} className="space-y-3">
+                <div className="flex items-center gap-2 pb-2 border-b border-border/50">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <Label className="text-base font-semibold">{platform}</Label>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                   {options?.content_types?.map((contentType: OptionItem) => (
                     <div
                       key={contentType.value}
-                      className="flex items-center space-x-2"
+                      className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent/30 transition-colors"
                     >
                       <Checkbox
                         id={`${platform}-${contentType.value}`}
@@ -280,7 +316,7 @@ export const IdeaGenerationForm = ({
                       />
                       <Label
                         htmlFor={`${platform}-${contentType.value}`}
-                        className="text-xs"
+                        className="text-sm cursor-pointer"
                       >
                         {contentType.label}
                       </Label>
@@ -294,8 +330,13 @@ export const IdeaGenerationForm = ({
       )}
 
       {/* Submit Button */}
-      <div className="flex justify-end">
-        <Button type="submit" disabled={isGenerating}>
+      <div className="flex justify-end pt-4 border-t border-border/50">
+        <Button
+          type="submit"
+          disabled={isGenerating}
+          size="lg"
+          className="min-w-40"
+        >
           {isGenerating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

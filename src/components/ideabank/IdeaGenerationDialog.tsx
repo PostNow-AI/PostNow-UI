@@ -83,8 +83,11 @@ export const IdeaGenerationDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent
+        className="max-h-[90vh] overflow-hidden flex flex-col"
+        style={{ width: "95vw", maxWidth: "1400px" }}
+      >
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Loader2 className="h-5 w-5" />
             Gerar Ideias de Campanha
@@ -94,7 +97,7 @@ export const IdeaGenerationDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto pr-2">
           {generatedIdeas.length === 0 ? (
             <IdeaGenerationForm
               options={options}
