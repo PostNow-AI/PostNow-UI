@@ -120,7 +120,7 @@ export const PublicIdeaGenerationPage = () => {
   // If ideas were generated, show them
   if (generatedIdeas.length > 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted max-h-screen overflow-y-auto">
         {/* Header */}
         <div className="container mx-auto p-6">
           <div className="flex items-center justify-between mb-8">
@@ -224,7 +224,7 @@ export const PublicIdeaGenerationPage = () => {
 
   // Show the form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted max-h-screen overflow-y-auto">
       {/* Header */}
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-between mb-8">

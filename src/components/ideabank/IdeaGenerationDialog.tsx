@@ -50,7 +50,7 @@ export const IdeaGenerationDialog = ({
 
   // Generate ideas mutation
   const generateIdeasMutation = useMutation({
-    mutationFn: async (data: Promise<IdeaGenerationFormData>) => {
+    mutationFn: async (data: IdeaGenerationFormData) => {
       const response = await api.post("/api/v1/ideabank/generate/", data);
       return response.data;
     },
@@ -71,9 +71,7 @@ export const IdeaGenerationDialog = ({
 
   const handleGenerateIdeas = (formData: IdeaGenerationFormData) => {
     setIsGenerating(true);
-    generateIdeasMutation.mutate(
-      formData as unknown as Promise<IdeaGenerationFormData>
-    );
+    generateIdeasMutation.mutate(formData);
   };
 
   const handleClose = () => {
