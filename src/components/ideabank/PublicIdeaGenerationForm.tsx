@@ -45,7 +45,7 @@ interface OptionItem {
 
 interface PublicIdeaGenerationOptions {
   objectives: OptionItem[];
-  content_types: OptionItem[];
+  content_types: Record<string, string[]>; // {platform: [content_types]}
   platforms: OptionItem[];
 }
 
@@ -60,6 +60,19 @@ export const PublicIdeaGenerationForm = ({
   onSubmit,
   isGenerating,
 }: PublicIdeaGenerationFormProps) => {
+  // Helper function to get content type labels
+  const getContentTypeLabel = (contentType: string): string => {
+    const contentTypeLabels: Record<string, string> = {
+      post: "Post",
+      story: "Story",
+      reel: "Reel",
+      video: "Vídeo",
+      carousel: "Carrossel",
+      live: "Live",
+      custom: "Custom",
+    };
+    return contentTypeLabels[contentType] || contentType;
+  };
   const form = useForm<PublicIdeaGenerationFormData>({
     resolver: zodResolver(ideaGenerationSchema),
     defaultValues: {
@@ -182,7 +195,7 @@ export const PublicIdeaGenerationForm = ({
                   />
                   <Label
                     htmlFor={objective.value}
-                    className="cursor-pointer font-medium"
+                    className="font-medium flex-1 cursor-pointer"
                   >
                     {objective.label}
                   </Label>
@@ -289,7 +302,7 @@ export const PublicIdeaGenerationForm = ({
                   />
                   <Label
                     htmlFor={platform.value}
-                    className="cursor-pointer font-medium"
+                    className="font-medium flex-1 cursor-pointer"
                   >
                     {platform.label}
                   </Label>
@@ -321,34 +334,40 @@ export const PublicIdeaGenerationForm = ({
                     </Label>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-                    {options?.content_types?.map((contentType: OptionItem) => (
-                      <div
-                        key={contentType.value}
-                        className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent/30 transition-colors"
-                      >
-                        <Checkbox
-                          id={`${platform}-${contentType.value}`}
-                          checked={
-                            contentTypes[platform]?.includes(
-                              contentType.value
-                            ) || false
-                          }
-                          onCheckedChange={(checked) =>
-                            handleContentTypeChange(
-                              platform,
-                              contentType.value,
-                              checked as boolean
-                            )
-                          }
-                        />
-                        <Label
-                          htmlFor={`${platform}-${contentType.value}`}
-                          className="text-sm cursor-pointer"
-                        >
-                          {contentType.label}
-                        </Label>
-                      </div>
-                    ))}
+                    {options?.content_types?.[platform]?.map(
+                      (contentType: string) => {
+                        // Get the label for the content type
+                        const contentTypeLabel =
+                          getContentTypeLabel(contentType);
+                        return (
+                          <div
+                            key={contentType}
+                            className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent/30 transition-colors"
+                          >
+                            <Checkbox
+                              id={`${platform}-${contentType}`}
+                              checked={
+                                contentTypes[platform]?.includes(contentType) ||
+                                false
+                              }
+                              onCheckedChange={(checked) =>
+                                handleContentTypeChange(
+                                  platform,
+                                  contentType,
+                                  checked as boolean
+                                )
+                              }
+                            />
+                            <Label
+                              htmlFor={`${platform}-${contentType}`}
+                              className="text-sm flex-1 cursor-pointer"
+                            >
+                              {contentTypeLabel}
+                            </Label>
+                          </div>
+                        );
+                      }
+                    )}
                   </div>
                 </div>
               ))}
