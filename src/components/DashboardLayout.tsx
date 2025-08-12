@@ -224,18 +224,18 @@ export const DashboardLayout = () => {
   );
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      {/* Desktop Sidebar */}
-      <div className="hidden border-r bg-muted/40 md:block">
-        <div className="flex h-screen max-h-screen flex-col">
+    <div className="flex h-screen w-full overflow-hidden">
+      {/* Desktop Sidebar - Fixed */}
+      <div className="hidden w-[220px] lg:w-[280px] border-r bg-muted/40 md:block flex-shrink-0">
+        <div className="h-full flex flex-col">
           <SidebarContent />
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-col">
+      {/* Main Content Area - Scrollable */}
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden">
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden flex-shrink-0">
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="shrink-0">
@@ -274,9 +274,11 @@ export const DashboardLayout = () => {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-          <Outlet />
+        {/* Page Content - Scrollable */}
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <div className="max-w-none">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

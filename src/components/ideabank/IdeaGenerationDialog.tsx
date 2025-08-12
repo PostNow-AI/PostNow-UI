@@ -43,7 +43,7 @@ export const IdeaGenerationDialog = ({
   const { data: options } = useQuery({
     queryKey: ["idea-options"],
     queryFn: async () => {
-      const response = await api.get("/api/v1/ideabank/options/");
+      const response = await api.get("/api/v1/ideabank/public/options/");
       return response.data;
     },
   });

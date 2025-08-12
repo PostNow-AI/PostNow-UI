@@ -9,13 +9,11 @@ import { type CreatorProfile } from "@/lib/creator-profile-api";
 
 interface AccountStatisticsProps {
   profile: CreatorProfile;
-  completedFieldsCount: number;
   formatDate: (dateString: string) => string;
 }
 
 export const AccountStatistics = ({
   profile,
-  completedFieldsCount,
   formatDate,
 }: AccountStatisticsProps) => {
   return (
