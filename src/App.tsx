@@ -12,7 +12,6 @@ import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AccountSettingsPage } from "./pages/AccountSettingsPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
-import { HomePage } from "./pages/HomePage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -27,7 +26,7 @@ const App = () => {
           <AuthProvider>
             <Routes>
               {/* Root redirect */}
-              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/" element={<Navigate to="/ideabank" replace />} />
 
               {/* Public routes */}
               <Route
@@ -65,7 +64,6 @@ const App = () => {
                   </ProtectedRoute>
                 }
               >
-                <Route path="/home" element={<HomePage />} />
                 <Route path="/ideabank" element={<IdeaBankPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route

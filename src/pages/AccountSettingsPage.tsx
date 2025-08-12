@@ -48,7 +48,7 @@ export function AccountSettingsPage() {
               </div>
               <div className="space-x-4">
                 <Link
-                  to="/home"
+                  to="/ideabank"
                   className="text-blue-600 hover:text-blue-500 font-medium"
                 >
                   Voltar ao Início

@@ -122,11 +122,6 @@ const LightbulbIcon = () => (
 // Navigation items
 const navigationItems = [
   {
-    name: "Início",
-    href: "/home",
-    icon: HomeIcon,
-  },
-  {
     name: "Banco de Ideias",
     href: "/ideabank",
     icon: LightbulbIcon,
@@ -194,7 +189,7 @@ export const DashboardLayout = () => {
     <>
       {/* Logo/Brand */}
       <div className="flex h-14 items-center justify-between border-b px-4 lg:h-[60px] lg:px-6">
-        <Link to="/home" className="flex items-center gap-2 font-semibold">
+        <Link to="/ideabank" className="flex items-center gap-2 font-semibold">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">S</span>
           </div>
@@ -288,7 +283,10 @@ export const DashboardLayout = () => {
 
           {/* Mobile brand and theme toggle */}
           <div className="flex items-center justify-between flex-1">
-            <Link to="/home" className="flex items-center gap-2 font-semibold">
+            <Link
+              to="/ideabank"
+              className="flex items-center gap-2 font-semibold"
+            >
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">
                   S

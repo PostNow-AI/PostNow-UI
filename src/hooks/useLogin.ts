@@ -35,7 +35,7 @@ export function useLogin() {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Navigate to intended destination or home page
-      const from = location.state?.from?.pathname || "/home";
+      const from = location.state?.from?.pathname || "/ideabank";
       navigate(from, { replace: true });
     },
     onError: (error: Error) => {

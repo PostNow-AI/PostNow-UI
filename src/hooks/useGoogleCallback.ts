@@ -31,7 +31,7 @@ export function useGoogleCallback() {
 
       // Small delay to ensure authentication state propagates
       setTimeout(() => {
-        navigate("/home", { replace: true });
+        navigate("/ideabank", { replace: true });
       }, 100);
     } else {
       // Neither success nor error parameter found

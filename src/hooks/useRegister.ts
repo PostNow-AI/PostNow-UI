@@ -56,7 +56,7 @@ export function useRegister() {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Navigate to home page
-      navigate("/home");
+      navigate("/ideabank");
     },
     onError: (error: Error) => {
       toast.error(error.message || "Falha no cadastro");
