@@ -11,6 +11,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
   LoadingPage,
 } from "@/components/ui";
 import { Label } from "@/components/ui/label";
@@ -432,32 +437,40 @@ export const ProfilePage = () => {
       </div>
 
       {/* Edit Form Modal */}
-      {isEditMode && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-background rounded-lg shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto m-4">
-            <ProfileEditForm
-              initialData={{
-                professional_name: profile?.professional_name,
-                profession: profile?.profession,
-                specialization: profile?.specialization,
-                linkedin_url: profile?.linkedin_url,
-                instagram_username: profile?.instagram_username,
-                youtube_channel: profile?.youtube_channel,
-                tiktok_username: profile?.tiktok_username,
-                primary_color: profile?.primary_color,
-                secondary_color: profile?.secondary_color,
-                accent_color_1: profile?.accent_color_1,
-                accent_color_2: profile?.accent_color_2,
-                accent_color_3: profile?.accent_color_3,
-                primary_font: profile?.primary_font,
-                secondary_font: profile?.secondary_font,
-              }}
-              onComplete={() => setIsEditMode(false)}
-              onCancel={() => setIsEditMode(false)}
-            />
-          </div>
-        </div>
-      )}
+      <Dialog open={isEditMode} onOpenChange={setIsEditMode}>
+        <DialogContent
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          style={{ width: "95vw", maxWidth: "1400px" }}
+        >
+          <DialogHeader>
+            <DialogTitle>Editar Dados de Personalização</DialogTitle>
+            <DialogDescription>
+              Atualize suas informações profissionais, redes sociais e brandbook
+              para melhorar a personalização do seu conteúdo.
+            </DialogDescription>
+          </DialogHeader>
+          <ProfileEditForm
+            initialData={{
+              professional_name: profile?.professional_name,
+              profession: profile?.profession,
+              specialization: profile?.specialization,
+              linkedin_url: profile?.linkedin_url,
+              instagram_username: profile?.instagram_username,
+              youtube_channel: profile?.youtube_channel,
+              tiktok_username: profile?.tiktok_username,
+              primary_color: profile?.primary_color,
+              secondary_color: profile?.secondary_color,
+              accent_color_1: profile?.accent_color_1,
+              accent_color_2: profile?.accent_color_2,
+              accent_color_3: profile?.accent_color_3,
+              primary_font: profile?.primary_font,
+              secondary_font: profile?.secondary_font,
+            }}
+            onComplete={() => setIsEditMode(false)}
+            onCancel={() => setIsEditMode(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

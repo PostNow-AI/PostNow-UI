@@ -5,7 +5,19 @@ export {
   AccordionTrigger,
 } from "./accordion";
 export { Alert, AlertDescription, AlertTitle } from "./alert";
+export {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./alert-dialog";
 export { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+export { Badge } from "./badge";
 export { Button } from "./button";
 export {
   Card,
@@ -17,6 +29,16 @@ export {
 } from "./card";
 export { Checkbox } from "./checkbox";
 export { ColorPicker } from "./color-picker";
+export {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./dialog";
+export { IdeaDiffViewer } from "./idea-diff-viewer";
 export { ImagePicker } from "./image-picker";
 export { Input } from "./input";
 export { Label } from "./label";
@@ -33,6 +55,7 @@ export {
   NavigationMenuViewport,
 } from "./navigation-menu";
 export { Popover, PopoverContent, PopoverTrigger } from "./popover";
+export { RichTextEditor } from "./rich-text-editor";
 export {
   Select,
   SelectContent,
@@ -54,6 +77,7 @@ export {
 export { Skeleton } from "./skeleton";
 export { Toaster } from "./sonner";
 export { Switch } from "./switch";
+export { Textarea } from "./textarea";
 
 // Export custom components
 export { DashboardLayout } from "../DashboardLayout";

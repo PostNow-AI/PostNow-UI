@@ -3,6 +3,7 @@ export { useAuth } from "./useAuth";
 export { useAvatarUpload } from "./useAvatarUpload";
 export { useGoogleCallback } from "./useGoogleCallback";
 export { useHomePage } from "./useHomePage";
+export { useIdeaBank } from "./useIdeaBank";
 export { useLogin } from "./useLogin";
 export { useOnboardingFlow } from "./useOnboardingFlow";
 export { useProfile } from "./useProfile";
