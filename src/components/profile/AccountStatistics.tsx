@@ -39,11 +39,6 @@ export const AccountStatistics = ({
               {formatDate(profile.updated_at)}
             </span>
           </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Campos preenchidos</span>
-            <span className="font-medium">{completedFieldsCount}/34</span>
-          </div>
         </div>
       </CardContent>
     </Card>

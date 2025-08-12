@@ -1,4 +1,4 @@
-import { StatsGrid, ToastDemoCard, WelcomeCard } from "@/components/ideabank";
+import { StatsGrid, ToastDemoCard, WelcomeCard } from "@/components/home";
 import { LoadingPage } from "@/components/ui";
 import { useHomePage } from "@/hooks/useHomePage";
 
