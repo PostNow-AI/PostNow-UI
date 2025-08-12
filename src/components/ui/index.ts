@@ -38,6 +38,7 @@ export {
   DialogTitle,
   DialogTrigger,
 } from "./dialog";
+export { IdeaDiffViewer } from "./idea-diff-viewer";
 export { ImagePicker } from "./image-picker";
 export { Input } from "./input";
 export { Label } from "./label";
@@ -76,6 +77,7 @@ export {
 export { Skeleton } from "./skeleton";
 export { Toaster } from "./sonner";
 export { Switch } from "./switch";
+export { Textarea } from "./textarea";
 
 // Export custom components
 export { DashboardLayout } from "../DashboardLayout";

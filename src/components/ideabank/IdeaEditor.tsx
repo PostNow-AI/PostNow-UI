@@ -19,6 +19,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  IdeaDiffViewer,
   Input,
   Label,
   RichTextEditor,
@@ -27,10 +28,19 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Textarea,
 } from "@/components/ui";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Edit, Eye, Save, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Edit,
+  Eye,
+  Loader2,
+  Save,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -45,6 +55,11 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
   const [viewingIdea, setViewingIdea] = useState<any>(null);
   const [editingIdea, setEditingIdea] = useState<any>(null);
   const [deletingIdea, setDeletingIdea] = useState<any>(null);
+  const [improvingIdea, setImprovingIdea] = useState<any>(null);
+  const [improvementPrompt, setImprovementPrompt] = useState("");
+  const [showDiff, setShowDiff] = useState(false);
+  const [originalIdea, setOriginalIdea] = useState<any>(null);
+  const [improvedIdea, setImprovedIdea] = useState<any>(null);
   const queryClient = useQueryClient();
 
   // Group ideas by platform
@@ -97,6 +112,59 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
     },
   });
 
+  const improveIdeaMutation = useMutation({
+    mutationFn: async ({
+      ideaId,
+      improvementPrompt,
+    }: {
+      ideaId: number;
+      improvementPrompt: string;
+    }) => {
+      const response = await api.post(
+        `/api/v1/ideabank/ideas/${ideaId}/improve/`,
+        {
+          improvement_prompt: improvementPrompt,
+        }
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
+      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      toast.success("Ideia melhorada com sucesso!");
+
+      // Store original and improved versions for comparison
+      setOriginalIdea({
+        title: improvingIdea?.title,
+        description: improvingIdea?.description,
+        content: improvingIdea?.content,
+      });
+      setImprovedIdea({
+        title: data.idea?.title || data.title,
+        description: data.idea?.description || data.description,
+        content: data.idea?.content || data.content,
+      });
+
+      // Update local state with improved idea
+      setEditingIdeas((prev) =>
+        prev.map((idea) =>
+          idea.id === improvingIdea?.id
+            ? { ...idea, ...(data.idea || data), status: "draft" }
+            : idea
+        )
+      );
+
+      setImprovingIdea(null);
+      setImprovementPrompt("");
+      setShowDiff(true);
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.error || "Erro ao melhorar ideia";
+      toast.error(errorMessage);
+    },
+  });
+
   const handleIdeaUpdate = (index: number, field: string, value: string) => {
     const updatedIdeas = [...editingIdeas];
     updatedIdeas[index] = { ...updatedIdeas[index], [field]: value };
@@ -138,6 +206,23 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
 
   const handleEditIdea = (idea: any) => {
     setEditingIdea({ ...idea });
+  };
+
+  const handleImproveIdea = (idea: any) => {
+    setImprovingIdea(idea);
+    setImprovementPrompt("");
+  };
+
+  const handleSubmitImprovement = () => {
+    if (!improvingIdea || !improvementPrompt.trim()) {
+      toast.error("Por favor, descreva como a IA pode melhorar a ideia");
+      return;
+    }
+
+    improveIdeaMutation.mutate({
+      ideaId: improvingIdea.id,
+      improvementPrompt: improvementPrompt.trim(),
+    });
   };
 
   const handleSaveEditIdea = () => {
@@ -246,6 +331,14 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
                           <Button
                             size="sm"
                             variant="outline"
+                            onClick={() => handleImproveIdea(idea)}
+                            title="Melhorar com IA"
+                          >
+                            <Sparkles className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
                             onClick={() => setDeletingIdea(idea)}
                             title="Deletar"
                           >
@@ -278,42 +371,30 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`description-${globalIndex}`}>
-                          Descrição
-                        </Label>
-                        <RichTextEditor
-                          value={idea.description}
-                          onChange={(value) =>
-                            handleIdeaUpdate(
-                              globalIndex,
-                              "description",
-                              value || ""
-                            )
-                          }
-                          placeholder="Descrição breve da ideia"
-                          height={120}
-                          preview="edit"
-                        />
-                      </div>
+                      <RichTextEditor
+                        label="Descrição"
+                        value={idea.description}
+                        onChange={(value) =>
+                          handleIdeaUpdate(
+                            globalIndex,
+                            "description",
+                            value || ""
+                          )
+                        }
+                        placeholder="Descrição breve da ideia"
+                        height={120}
+                        preview="edit"
+                      />
 
-                      <div className="space-y-2">
-                        <Label htmlFor={`content-${globalIndex}`}>
-                          Conteúdo
-                        </Label>
-                        <RichTextEditor
-                          value={idea.content}
-                          onChange={(value) =>
-                            handleIdeaUpdate(
-                              globalIndex,
-                              "content",
-                              value || ""
-                            )
-                          }
-                          placeholder="Conteúdo detalhado da ideia"
-                          height={300}
-                        />
-                      </div>
+                      <RichTextEditor
+                        label="Conteúdo"
+                        value={idea.content}
+                        onChange={(value) =>
+                          handleIdeaUpdate(globalIndex, "content", value || "")
+                        }
+                        placeholder="Conteúdo detalhado da ideia"
+                        height={300}
+                      />
                     </CardContent>
                   </Card>
                 );
@@ -479,6 +560,143 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* AI Improvement Modal */}
+      <Dialog
+        open={improvingIdea !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setImprovingIdea(null);
+            setImprovementPrompt("");
+          }
+        }}
+      >
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Melhorar Ideia com IA
+            </DialogTitle>
+            <DialogDescription>
+              Descreva como você gostaria que a IA melhorasse esta ideia. Seja
+              específico sobre o que você quer aprimorar.
+            </DialogDescription>
+          </DialogHeader>
+
+          {improvingIdea && (
+            <div className="space-y-4">
+              {/* Current Idea Preview */}
+              <div className="p-4 bg-muted rounded-lg space-y-2">
+                <h4 className="font-semibold text-sm text-muted-foreground">
+                  Ideia Atual:
+                </h4>
+                <h5 className="font-medium">{improvingIdea.title}</h5>
+                <p className="text-sm text-muted-foreground line-clamp-3">
+                  {improvingIdea.description}
+                </p>
+              </div>
+
+              {/* Improvement Prompt */}
+              <div className="space-y-2">
+                <Label htmlFor="improvement-prompt">
+                  Como a IA pode melhorar esta ideia?
+                </Label>
+                <Textarea
+                  id="improvement-prompt"
+                  placeholder="Ex: Tornar o conteúdo mais envolvente, adicionar mais detalhes sobre o produto, criar um call-to-action mais persuasivo, adaptar para um tom mais formal..."
+                  value={improvementPrompt}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setImprovementPrompt(e.target.value)
+                  }
+                  rows={4}
+                  className="resize-none"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setImprovingIdea(null);
+                    setImprovementPrompt("");
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleSubmitImprovement}
+                  disabled={
+                    improveIdeaMutation.isPending || !improvementPrompt.trim()
+                  }
+                  className="min-w-32"
+                >
+                  {improveIdeaMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Melhorando...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Melhorar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Idea Comparison Modal */}
+      <Dialog
+        open={showDiff}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowDiff(false);
+            setOriginalIdea(null);
+            setImprovedIdea(null);
+          }
+        }}
+      >
+        <DialogContent
+          className="max-w-7xl max-h-[95vh] overflow-y-auto"
+          style={{ width: "95vw", maxWidth: "1400px" }}
+        >
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Melhoria Aplicada com Sucesso
+            </DialogTitle>
+            <DialogDescription>
+              Compare as alterações feitas pela IA na sua ideia
+            </DialogDescription>
+          </DialogHeader>
+
+          {originalIdea && improvedIdea && (
+            <div className="space-y-6">
+              <IdeaDiffViewer
+                originalIdea={originalIdea}
+                improvedIdea={improvedIdea}
+              />
+
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowDiff(false);
+                    setOriginalIdea(null);
+                    setImprovedIdea(null);
+                  }}
+                >
+                  Fechar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

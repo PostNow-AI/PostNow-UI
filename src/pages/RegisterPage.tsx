@@ -153,16 +153,41 @@ export const RegisterPage = () => {
             </GoogleOAuthButton>
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              Já tem uma conta?{" "}
+          <div className="mt-8 space-y-4">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                Já tem uma conta?{" "}
+                <Link
+                  to="/login"
+                  className="font-medium text-primary hover:text-primary/80 transition-colors"
+                >
+                  Entre aqui
+                </Link>
+              </p>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-background text-muted-foreground">
+                  Ou experimente
+                </span>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-2">
+                Quer gerar ideias sem criar conta?
+              </p>
               <Link
-                to="/login"
-                className="font-medium text-primary hover:text-primary/80 transition-colors"
+                to="/public/ideas"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
               >
-                Entre aqui
+                Gerador Público de Ideias
               </Link>
-            </p>
+            </div>
           </div>
         </CardContent>
       </Card>

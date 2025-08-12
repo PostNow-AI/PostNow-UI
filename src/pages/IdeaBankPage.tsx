@@ -1,3 +1,4 @@
+import { IdeaEditor } from "@/components/ideabank/IdeaEditor";
 import { IdeaGenerationDialog } from "@/components/ideabank/IdeaGenerationDialog";
 import { IdeaList } from "@/components/ideabank/IdeaList";
 import {
@@ -20,14 +21,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  Input,
-  Label,
-  RichTextEditor,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@/components/ui";
 import { useIdeaBank, type CampaignIdea } from "@/hooks/useIdeaBank";
 import { api } from "@/lib/api";
@@ -39,33 +32,12 @@ import { toast } from "sonner";
 export const IdeaBankPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [viewingIdea, setViewingIdea] = useState<CampaignIdea | null>(null);
-  const [editingIdea, setEditingIdea] = useState<CampaignIdea | null>(null);
+
   const [deletingIdea, setDeletingIdea] = useState<CampaignIdea | null>(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
   const { ideas, stats, isLoading } = useIdeaBank();
   const queryClient = useQueryClient();
-
-  // Mutations
-  const updateIdeaMutation = useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<CampaignIdea>;
-    }) => {
-      const response = await api.patch(`/api/v1/ideabank/ideas/${id}/`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
-      toast.success("Ideia atualizada com sucesso!");
-      setEditingIdea(null);
-    },
-    onError: () => {
-      toast.error("Erro ao atualizar ideia");
-    },
-  });
 
   const deleteIdeaMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -88,31 +60,39 @@ export const IdeaBankPage = () => {
   };
 
   const handleEdit = (idea: CampaignIdea) => {
-    setEditingIdea(idea);
+    setEditorIdeas([idea]);
+    setShowEditor(true);
   };
 
   const handleDelete = (idea: CampaignIdea) => {
     setDeletingIdea(idea);
   };
 
-  const handleSaveEdit = () => {
-    if (!editingIdea) return;
-
-    updateIdeaMutation.mutate({
-      id: editingIdea.id,
-      data: {
-        title: editingIdea.title,
-        description: editingIdea.description,
-        content: editingIdea.content,
-        status: editingIdea.status,
-      },
-    });
-  };
-
   const handleConfirmDelete = () => {
     if (!deletingIdea) return;
     deleteIdeaMutation.mutate(deletingIdea.id);
   };
+
+  const handleEditorBack = () => {
+    setShowEditor(false);
+    setEditorIdeas([]);
+  };
+
+  const handleEditorClose = () => {
+    setShowEditor(false);
+    setEditorIdeas([]);
+  };
+
+  // Se estiver mostrando o editor, renderizar apenas ele
+  if (showEditor) {
+    return (
+      <IdeaEditor
+        ideas={editorIdeas}
+        onBack={handleEditorBack}
+        onClose={handleEditorClose}
+      />
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -218,7 +198,7 @@ export const IdeaBankPage = () => {
         }}
       >
         <DialogContent
-          className="max-h-[90vh]   overflow-hidden flex flex-col"
+          className="max-h-[90vh] overflow-hidden flex flex-col"
           style={{ width: "95vw", maxWidth: "1400px" }}
         >
           {" "}
@@ -248,91 +228,6 @@ export const IdeaBankPage = () => {
                     {viewingIdea.content || "Sem conteúdo"}
                   </div>
                 </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Modal */}
-      <Dialog
-        open={editingIdea !== null}
-        onOpenChange={(open) => {
-          if (!open) setEditingIdea(null);
-        }}
-      >
-        <DialogContent
-          className="max-h-[90vh] overflow-hidden flex flex-col"
-          style={{ width: "95vw", maxWidth: "1400px" }}
-        >
-          <DialogHeader>
-            <DialogTitle>Editar Ideia</DialogTitle>
-            <DialogDescription>
-              Faça as alterações necessárias na sua ideia
-            </DialogDescription>
-          </DialogHeader>
-          {editingIdea && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-title">Título</Label>
-                <Input
-                  id="edit-title"
-                  value={editingIdea.title}
-                  onChange={(e) =>
-                    setEditingIdea({ ...editingIdea, title: e.target.value })
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-description">Descrição</Label>
-                <RichTextEditor
-                  value={editingIdea.description}
-                  onChange={(value) =>
-                    setEditingIdea({ ...editingIdea, description: value || "" })
-                  }
-                  height={150}
-                  placeholder="Descrição da ideia..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-content">Conteúdo</Label>
-                <RichTextEditor
-                  value={editingIdea.content}
-                  onChange={(value) =>
-                    setEditingIdea({ ...editingIdea, content: value || "" })
-                  }
-                  height={300}
-                  placeholder="Conteúdo detalhado da ideia..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-status">Status</Label>
-                <Select
-                  value={editingIdea.status}
-                  onValueChange={(value: "draft" | "approved" | "archived") =>
-                    setEditingIdea({ ...editingIdea, status: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Rascunho</SelectItem>
-                    <SelectItem value="approved">Aprovado</SelectItem>
-                    <SelectItem value="archived">Arquivado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => setEditingIdea(null)}>
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleSaveEdit}
-                  disabled={updateIdeaMutation.isPending}
-                >
-                  {updateIdeaMutation.isPending ? "Salvando..." : "Salvar"}
-                </Button>
               </div>
             </div>
           )}

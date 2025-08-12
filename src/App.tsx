@@ -16,6 +16,7 @@ import { HomePage } from "./pages/HomePage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { PublicIdeaGenerationPage } from "./pages/PublicIdeaGenerationPage";
 import { RegisterPage } from "./pages/RegisterPage";
 
 const App = () => {
@@ -48,6 +49,10 @@ const App = () => {
               <Route
                 path="/auth/google/callback"
                 element={<GoogleCallbackPage />}
+              />
+              <Route
+                path="/public/ideas"
+                element={<PublicIdeaGenerationPage />}
               />
 
               {/* Protected routes with shared layout */}

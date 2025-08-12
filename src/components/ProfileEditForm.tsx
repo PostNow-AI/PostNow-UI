@@ -3,7 +3,7 @@ import { creatorProfileApi } from "@/lib/creator-profile-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -104,30 +104,16 @@ export const ProfileEditForm = ({
   const handleFormSubmit = (data: ProfileEditFormData) => {
     // Clean up empty values before sending
     const cleanedData = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => 
-        value !== "" && value !== undefined && value !== null
+      Object.entries(data).filter(
+        ([_, value]) => value !== "" && value !== undefined && value !== null
       )
     );
-    
+
     updateProfileMutation.mutate(cleanedData);
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Editar Perfil do Criador</h1>
-          <p className="text-muted-foreground">
-            Atualize suas informações profissionais e preferências de marca
-          </p>
-        </div>
-        {onCancel && (
-          <Button variant="outline" size="icon" onClick={onCancel}>
-            <X className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
+    <div className="p-6 space-y-6">
       <form
         onSubmit={form.handleSubmit(handleFormSubmit)}
         className="space-y-6"
