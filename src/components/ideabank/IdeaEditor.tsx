@@ -43,12 +43,119 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CampaignViewer } from "./CampaignViewer";
 
 interface IdeaEditorProps {
   ideas: any[];
   onBack: () => void;
   onClose: () => void;
 }
+
+// Função para detectar se uma ideia é uma campanha
+const isCampaignIdea = (idea: any): boolean => {
+  try {
+    if (!idea.content) return false;
+    const content = JSON.parse(idea.content);
+    return content.variacao_a && content.variacao_b && content.variacao_c;
+  } catch {
+    return false;
+  }
+};
+
+// Função para converter qualquer ideia em dados de campanha
+const ideaToCampaignData = (idea: any) => {
+  try {
+    // Se já é uma campanha, retorna os dados
+    if (isCampaignIdea(idea)) {
+      const content = JSON.parse(idea.content);
+      return {
+        plataforma: content.plataforma || idea.platform,
+        tipo_conteudo: content.tipo_conteudo || idea.content_type,
+        titulo_principal: content.titulo_principal || idea.title,
+        variacao_a: content.variacao_a || {},
+        variacao_b: content.variacao_b || {},
+        variacao_c: content.variacao_c || {},
+        estrategia_implementacao:
+          content.estrategia_implementacao || idea.description,
+        metricas_sucesso: content.metricas_sucesso || [],
+        proximos_passos: content.proximos_passos || [],
+      };
+    }
+
+    // Se não é uma campanha, cria uma estrutura de campanha a partir da ideia
+    return {
+      plataforma: idea.platform || "instagram",
+      tipo_conteudo: idea.content_type || "post",
+      titulo_principal: idea.title || "Ideia",
+      variacao_a: {
+        headline: idea.headline || idea.title,
+        copy: idea.copy || idea.description,
+        cta: idea.cta || "Clique para saber mais!",
+        hashtags: idea.hashtags || ["#ideia", "#conteudo"],
+        visual_description:
+          idea.visual_description || "Descrição visual padrão",
+        color_composition: idea.color_composition || "Paleta de cores padrão",
+      },
+      variacao_b: {
+        headline: idea.headline || idea.title,
+        copy: idea.copy || idea.description,
+        cta: idea.cta || "Clique para saber mais!",
+        hashtags: idea.hashtags || ["#ideia", "#conteudo"],
+        visual_description:
+          idea.visual_description || "Descrição visual padrão",
+        color_composition: idea.color_composition || "Paleta de cores padrão",
+      },
+      variacao_c: {
+        headline: idea.headline || idea.title,
+        copy: idea.copy || idea.description,
+        cta: idea.cta || "Clique para saber mais!",
+        hashtags: idea.hashtags || ["#ideia", "#conteudo"],
+        visual_description:
+          idea.visual_description || "Descrição visual padrão",
+        color_composition: idea.color_composition || "Paleta de cores padrão",
+      },
+      estrategia_implementacao:
+        idea.description || "Implementar conforme planejado",
+      metricas_sucesso: ["Engajamento", "Alcance", "Conversões"],
+      proximos_passos: ["Monitorar resultados", "Otimizar campanha"],
+    };
+  } catch {
+    // Fallback para ideias sem conteúdo estruturado
+    return {
+      plataforma: idea.platform || "instagram",
+      tipo_conteudo: idea.content_type || "post",
+      titulo_principal: idea.title || "Ideia",
+      variacao_a: {
+        headline: idea.title || "Ideia",
+        copy: idea.description || "Descrição da ideia",
+        cta: "Clique para saber mais!",
+        hashtags: ["#ideia", "#conteudo"],
+        visual_description: "Descrição visual padrão",
+        color_composition: "Paleta de cores padrão",
+      },
+      variacao_b: {
+        headline: idea.title || "Ideia",
+        copy: idea.description || "Descrição da ideia",
+        cta: "Clique para saber mais!",
+        hashtags: ["#ideia", "#conteudo"],
+        visual_description: "Descrição visual padrão",
+        color_composition: "Paleta de cores padrão",
+      },
+      variacao_c: {
+        headline: idea.title || "Ideia",
+        copy: idea.description || "Descrição da ideia",
+        cta: "Clique para saber mais!",
+        hashtags: ["#ideia", "#conteudo"],
+        visual_description: "Descrição visual padrão",
+        color_composition: "Paleta de cores padrão",
+      },
+      estrategia_implementacao:
+        idea.description || "Implementar conforme planejado",
+      metricas_sucesso: ["Engajamento", "Alcance", "Conversões"],
+      proximos_passos: ["Monitorar resultados", "Otimizar campanha"],
+    };
+  }
+};
 
 export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
   const [editingIdeas, setEditingIdeas] = useState(ideas);
@@ -83,7 +190,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
     onSuccess: () => {
       toast.success("Ideia atualizada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
     },
     onError: (error: any, variables) => {
       toast.error(error.response?.data?.error || "Erro ao atualizar ideia");
@@ -104,7 +211,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
     onSuccess: () => {
       toast.success("Ideia deletada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
       setDeletingIdea(null);
     },
     onError: (error: any) => {
@@ -130,7 +237,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
       toast.success("Ideia melhorada com sucesso!");
 
       // Store original and improved versions for comparison
@@ -411,7 +518,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
           if (!open) setViewingIdea(null);
         }}
       >
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {viewingIdea?.title || "Visualizar Ideia"}
@@ -423,22 +530,23 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
           </DialogHeader>
           {viewingIdea && (
             <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">Descrição:</h4>
-                <div className="p-3 bg-muted rounded-md">
-                  <div className="prose prose-sm max-w-none">
-                    {viewingIdea.description || "Sem descrição"}
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Conteúdo:</h4>
-                <div className="p-3 bg-muted rounded-md">
-                  <div className="prose prose-sm max-w-none whitespace-pre-wrap">
-                    {viewingIdea.content || "Sem conteúdo"}
-                  </div>
-                </div>
-              </div>
+              <CampaignViewer
+                campaign={ideaToCampaignData(viewingIdea)}
+                onEdit={(campaignData) => {
+                  // Converter de volta para formato de ideia
+                  const updatedContent = JSON.stringify(campaignData);
+                  handleIdeaUpdate(
+                    editingIdeas.findIndex((i) => i.id === viewingIdea.id),
+                    "content",
+                    updatedContent
+                  );
+                  setViewingIdea(null);
+                }}
+                onDelete={() => {
+                  setDeletingIdea(viewingIdea);
+                  setViewingIdea(null);
+                }}
+              />
             </div>
           )}
         </DialogContent>

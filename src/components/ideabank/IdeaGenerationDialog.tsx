@@ -24,6 +24,13 @@ interface GeneratedIdea {
   platform: string;
   content_type: string;
   status: string;
+  variation_type?: string;
+  headline?: string;
+  copy?: string;
+  cta?: string;
+  hashtags?: string[];
+  visual_description?: string;
+  color_composition?: string;
 }
 
 interface IdeaGenerationDialogProps {
@@ -51,7 +58,7 @@ export const IdeaGenerationDialog = ({
   // Generate ideas mutation
   const generateIdeasMutation = useMutation({
     mutationFn: async (data: IdeaGenerationFormData) => {
-      const response = await api.post("/api/v1/ideabank/generate/", data);
+      const response = await api.post("/api/v1/ideabank/campaigns/generate/", data);
       return response.data;
     },
     onSuccess: (data) => {
@@ -59,7 +66,7 @@ export const IdeaGenerationDialog = ({
       setIsGenerating(false);
       toast.success("Ideias geradas com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
     },
     onError: (error: unknown) => {
       setIsGenerating(false);

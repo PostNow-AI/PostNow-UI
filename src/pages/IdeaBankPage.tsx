@@ -25,7 +25,7 @@ import {
 import { useIdeaBank, type CampaignIdea } from "@/hooks/useIdeaBank";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Archive, FileText, Lightbulb, Plus, TrendingUp } from "lucide-react";
+import { Lightbulb, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -45,7 +45,7 @@ export const IdeaBankPage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
       toast.success("Ideia deletada com sucesso!");
       setDeletingIdea(null);
     },
@@ -114,55 +114,6 @@ export const IdeaBankPage = () => {
           <Plus className="h-4 w-4" />
           Gerar Nova Ideia
         </Button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total de Ideias
-            </CardTitle>
-            <Lightbulb className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_ideas || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rascunhos</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.draft_ideas || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aprovadas</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.approved_ideas || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Arquivadas</CardTitle>
-            <Archive className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.archived_ideas || 0}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Ideas List */}

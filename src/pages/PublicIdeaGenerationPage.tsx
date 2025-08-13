@@ -21,24 +21,53 @@ interface GeneratedIdea {
   content: string;
   platform: string;
   content_type: string;
+  variation_type?: string;
+  headline?: string;
+  copy?: string;
+  cta?: string;
+  hashtags?: string[];
+  visual_description?: string;
+  color_composition?: string;
 }
 
 interface PublicIdeaGenerationFormData {
+  // Campaign info
+  title: string;
+  description?: string;
+
+  // Campaign objective
   objectives: string[];
+
+  // Target persona
   persona_age?: string;
   persona_location?: string;
   persona_income?: string;
   persona_interests?: string;
   persona_behavior?: string;
   persona_pain_points?: string;
+
+  // Social platforms and content types
   platforms: string[];
   content_types?: Record<string, string[]>;
+
+  // Voice tone
+  voice_tone: string;
+
+  // Campaign details for AI generation
+  product_description?: string;
+  value_proposition?: string;
+  campaign_urgency?: string;
 }
 
 export const PublicIdeaGenerationPage = () => {
   const [generatedIdeas, setGeneratedIdeas] = useState<GeneratedIdea[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [options, setOptions] = useState<any>(null);
+  const [options, setOptions] = useState<{
+    objectives: { value: string; label: string }[];
+    content_types: Record<string, string[]>;
+    platforms: { value: string; label: string }[];
+    voice_tones: { value: string; label: string }[];
+  } | null>(null);
   const [isLoadingOptions, setIsLoadingOptions] = useState(true);
 
   // Fetch options on component mount
@@ -76,10 +105,10 @@ export const PublicIdeaGenerationPage = () => {
 
       setGeneratedIdeas(response.data.ideas);
       toast.success("Ideias geradas com sucesso!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Erro ao gerar ideias:", error);
       const errorMessage =
-        error.response?.data?.error || "Erro ao gerar ideias";
+        error instanceof Error ? error.message : "Erro ao gerar ideias";
       toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
@@ -92,7 +121,7 @@ export const PublicIdeaGenerationPage = () => {
     try {
       await navigator.clipboard.writeText(ideaText);
       toast.success("Ideia copiada para a área de transferência!");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao copiar ideia");
     }
   };
@@ -267,7 +296,7 @@ export const PublicIdeaGenerationPage = () => {
             </Card>
           ) : (
             <PublicIdeaGenerationForm
-              options={options}
+              options={options || undefined}
               onSubmit={handleGenerateIdeas}
               isGenerating={isGenerating}
             />
