@@ -2,6 +2,7 @@ import { ApiKeyStatus } from "@/components/ideabank/ApiKeyStatus";
 import { IdeaEditor } from "@/components/ideabank/IdeaEditor";
 import { IdeaGenerationDialog } from "@/components/ideabank/IdeaGenerationDialog";
 import { IdeaList } from "@/components/ideabank/IdeaList";
+import { SubscriptionOverlay } from "@/components/subscription/SubscriptionOverlay";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,10 +25,11 @@ import {
   DialogTitle,
 } from "@/components/ui";
 import { useIdeaBank, type CampaignIdea } from "@/hooks/useIdeaBank";
-import { api, geminiKeyApi } from "@/lib/api";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSubscription } from "@/hooks/useSubscription";
+import { api } from "@/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const IdeaBankPage = () => {
@@ -36,22 +38,22 @@ export const IdeaBankPage = () => {
   const [deletingIdea, setDeletingIdea] = useState<CampaignIdea | null>(null);
   const [showEditor, setShowEditor] = useState(false);
   const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
+  const [showSubscriptionOverlay, setShowSubscriptionOverlay] = useState(false);
 
   const { ideas, isLoading } = useIdeaBank();
+  const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
   const queryClient = useQueryClient();
 
-  // Verificar status da chave da API
-  const { data: keyStatus } = useQuery({
-    queryKey: ["gemini-key-status"],
-    queryFn: () => geminiKeyApi.getStatus(),
-    retry: false,
-  });
+  // Mostrar overlay de assinatura se usuário não for assinante
+  useEffect(() => {
+    if (!subscriptionLoading && !isSubscribed) {
+      setShowSubscriptionOverlay(true);
+    }
+  }, [isSubscribed, subscriptionLoading]);
 
   const handleNewIdeaClick = () => {
-    if (!keyStatus?.has_key) {
-      toast.error(
-        "Configure sua chave da API do Gemini para gerar novas ideias"
-      );
+    if (!isSubscribed) {
+      setShowSubscriptionOverlay(true);
       return;
     }
     setIsDialogOpen(true);
@@ -101,6 +103,89 @@ export const IdeaBankPage = () => {
     setEditorIdeas([]);
   };
 
+  // Se estiver carregando, mostrar loading
+  if (subscriptionLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="text-muted-foreground">
+              Verificando status de assinatura...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Se não for assinante, mostrar tela restrita
+  if (!isSubscribed) {
+    return (
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+            <div className="h-10 w-10 text-muted-foreground">🔒</div>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Acesso Restrito</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            O Banco de Ideias é uma funcionalidade exclusiva para assinantes.
+            Para acessar todas as funcionalidades do Sonora, entre em contato
+            conosco.
+          </p>
+        </div>
+
+        {/* Card de Assinatura */}
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader className="text-center">
+            <CardTitle className="flex items-center justify-center gap-2">
+              💳 Assine o Sonora
+            </CardTitle>
+            <CardDescription>
+              Desbloqueie todas as funcionalidades e crie campanhas incríveis
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium">Geração Ilimitada</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Use a IA para criar ideias
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium">Banco Completo</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Salve suas campanhas
+                  </p>
+                </div>
+              </div>
+            </div>
+            <Button
+              onClick={() => setShowSubscriptionOverlay(true)}
+              className="w-full"
+            >
+              💳 Ver Opções de Assinatura
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Subscription Overlay */}
+        {showSubscriptionOverlay && (
+          <SubscriptionOverlay
+            onClose={() => setShowSubscriptionOverlay(false)}
+          />
+        )}
+      </div>
+    );
+  }
+
   // Se estiver mostrando o editor, renderizar apenas ele
   if (showEditor) {
     return (
@@ -124,20 +209,10 @@ export const IdeaBankPage = () => {
         </div>
         <div className="flex items-center gap-4">
           <ApiKeyStatus />
-          {keyStatus?.has_key && (
-            <Button
-              onClick={handleNewIdeaClick}
-              className="relative"
-              title={
-                !keyStatus?.has_key
-                  ? "Configure sua chave da API do Gemini para gerar novas ideias"
-                  : ""
-              }
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Nova Ideia
-            </Button>
-          )}
+          <Button onClick={handleNewIdeaClick}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Ideia
+          </Button>
         </div>
       </div>
 
@@ -237,8 +312,12 @@ export const IdeaBankPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Api Key Status */}
-      <ApiKeyStatus />
+      {/* Subscription Overlay */}
+      {showSubscriptionOverlay && (
+        <SubscriptionOverlay
+          onClose={() => setShowSubscriptionOverlay(false)}
+        />
+      )}
     </div>
   );
 };
