@@ -76,6 +76,40 @@ const translateKey = (key: string): string => {
   return KEY_TRANSLATIONS[key] || key;
 };
 
+// Tradução de valores específicos (ex.: tipo de conteúdo)
+const CONTENT_TYPE_TRANSLATIONS: Record<string, string> = {
+  post: "Post",
+  story: "Story",
+  reel: "Reel",
+  video: "Vídeo",
+  carousel: "Carrossel",
+  live: "Live",
+  custom: "Personalizado",
+};
+
+// Mapa inverso para salvar valor normalizado ao editar
+const CONTENT_TYPE_INVERSE: Record<string, string> = {
+  post: "post",
+  story: "story",
+  reel: "reel",
+  video: "video",
+  vídeo: "video",
+  carrossel: "carousel",
+  carousel: "carousel",
+  live: "live",
+  personalizado: "custom",
+  personalizad: "custom", // tolerância a digitação comum
+};
+
+const translateValue = (key: string, value: unknown): unknown => {
+  if (typeof value !== "string") return value;
+  // Traduzir apenas exibição do tipo de conteúdo
+  if (key === "tipo_conteudo" || key === "content_type") {
+    return CONTENT_TYPE_TRANSLATIONS[value] || value;
+  }
+  return value;
+};
+
 export const JsonContentViewer = ({
   content,
   readOnly = true,
@@ -153,7 +187,10 @@ export const JsonContentViewer = ({
       (Array.isArray(value) && value.length === 0);
 
     if (typeof value === "string") {
-      const isLong = value.length > 100;
+      const isContentTypeKey =
+        key === "tipo_conteudo" || key === "content_type";
+      const displayValue = translateValue(key, value) as string;
+      const isLong = displayValue.length > 100;
 
       if (isLong) {
         return (
@@ -167,8 +204,16 @@ export const JsonContentViewer = ({
               )}
             </Label>
             <Textarea
-              value={value}
-              onChange={(e) => handleFieldChange(path, e.target.value)}
+              value={displayValue}
+              onChange={(e) => {
+                if (isContentTypeKey) {
+                  const typed = e.target.value.toLowerCase().trim();
+                  const normalized = CONTENT_TYPE_INVERSE[typed] || typed;
+                  handleFieldChange(path, normalized);
+                } else {
+                  handleFieldChange(path, e.target.value);
+                }
+              }}
               readOnly={readOnly}
               className="min-h-[100px]"
               placeholder={`Digite o valor para ${translatedKey}...`}
@@ -187,8 +232,16 @@ export const JsonContentViewer = ({
               )}
             </Label>
             <Input
-              value={value}
-              onChange={(e) => handleFieldChange(path, e.target.value)}
+              value={displayValue}
+              onChange={(e) => {
+                if (isContentTypeKey) {
+                  const typed = e.target.value.toLowerCase().trim();
+                  const normalized = CONTENT_TYPE_INVERSE[typed] || typed;
+                  handleFieldChange(path, normalized);
+                } else {
+                  handleFieldChange(path, e.target.value);
+                }
+              }}
               readOnly={readOnly}
               placeholder={`Digite o valor para ${translatedKey}...`}
             />
