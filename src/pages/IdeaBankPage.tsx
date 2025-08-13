@@ -1,3 +1,4 @@
+import { ApiKeyStatus } from "@/components/ideabank/ApiKeyStatus";
 import { IdeaEditor } from "@/components/ideabank/IdeaEditor";
 import { IdeaGenerationDialog } from "@/components/ideabank/IdeaGenerationDialog";
 import { IdeaList } from "@/components/ideabank/IdeaList";
@@ -23,21 +24,38 @@ import {
   DialogTitle,
 } from "@/components/ui";
 import { useIdeaBank, type CampaignIdea } from "@/hooks/useIdeaBank";
-import { api } from "@/lib/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Lightbulb, Plus } from "lucide-react";
+import { api, geminiKeyApi } from "@/lib/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export const IdeaBankPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [viewingIdea, setViewingIdea] = useState<CampaignIdea | null>(null);
-
   const [deletingIdea, setDeletingIdea] = useState<CampaignIdea | null>(null);
   const [showEditor, setShowEditor] = useState(false);
   const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
-  const { ideas, stats, isLoading } = useIdeaBank();
+
+  const { ideas, isLoading } = useIdeaBank();
   const queryClient = useQueryClient();
+
+  // Verificar status da chave da API
+  const { data: keyStatus } = useQuery({
+    queryKey: ["gemini-key-status"],
+    queryFn: () => geminiKeyApi.getStatus(),
+    retry: false,
+  });
+
+  const handleNewIdeaClick = () => {
+    if (!keyStatus?.has_key) {
+      toast.error(
+        "Configure sua chave da API do Gemini para gerar novas ideias"
+      );
+      return;
+    }
+    setIsDialogOpen(true);
+  };
 
   const deleteIdeaMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -98,22 +116,29 @@ export const IdeaBankPage = () => {
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Lightbulb className="h-8 w-8 text-primary" />
-            Banco de Ideias
-          </h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Banco de Ideias</h1>
           <p className="text-muted-foreground">
-            Gere ideias criativas para suas campanhas usando IA
+            Gerencie suas ideias de campanhas e use IA para criar novas
           </p>
         </div>
-        <Button
-          onClick={() => setIsDialogOpen(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Gerar Nova Ideia
-        </Button>
+        <div className="flex items-center gap-4">
+          <ApiKeyStatus />
+          {keyStatus?.has_key && (
+            <Button
+              onClick={handleNewIdeaClick}
+              className="relative"
+              title={
+                !keyStatus?.has_key
+                  ? "Configure sua chave da API do Gemini para gerar novas ideias"
+                  : ""
+              }
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Nova Ideia
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Ideas List */}
@@ -211,6 +236,9 @@ export const IdeaBankPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Api Key Status */}
+      <ApiKeyStatus />
     </div>
   );
 };
