@@ -98,14 +98,6 @@ export const IdeaList = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onView?.(idea)}
-                  title="Visualizar"
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
                   onClick={() => onEdit?.(idea)}
                   title="Editar"
                 >

@@ -1,14 +1,14 @@
-import { cn } from "@/lib/utils";
-import { ArrowRight, CheckCircle } from "lucide-react";
-import { Badge } from "./badge";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./card";
-import { RichTextEditor } from "./rich-text-editor";
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { ArrowRight, CheckCircle } from "lucide-react";
+import { JsonContentViewer } from "../ideabank/JsonContentViewer";
 
 interface IdeaDiffViewerProps {
   originalIdea: {
@@ -150,11 +150,9 @@ export const IdeaDiffViewer = ({
                 Original
               </CardDescription>
               <div className="border border-muted rounded-lg overflow-hidden">
-                <RichTextEditor
-                  value={originalIdea.content}
-                  preview="preview"
-                  height={200}
-                  readOnly
+                <JsonContentViewer
+                  content={originalIdea.content}
+                  readOnly={true}
                 />
               </div>
             </div>
@@ -163,11 +161,9 @@ export const IdeaDiffViewer = ({
                 Melhorado
               </CardDescription>
               <div className="border border-blue-200 dark:border-blue-800 rounded-lg overflow-hidden bg-blue-50/50 dark:bg-blue-950/10">
-                <RichTextEditor
-                  value={improvedIdea.content}
-                  preview="preview"
-                  height={200}
-                  readOnly
+                <JsonContentViewer
+                  content={improvedIdea.content}
+                  readOnly={true}
                 />
               </div>
             </div>
