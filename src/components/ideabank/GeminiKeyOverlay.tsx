@@ -8,7 +8,7 @@ import {
   Input,
   Label,
 } from "@/components/ui";
-import { geminiKeyApi } from "@/lib/api";
+import { geminiKeyApi } from "@/lib/gemini-key-api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, ExternalLink, Key, Shield } from "lucide-react";
 import { useState } from "react";

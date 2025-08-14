@@ -49,7 +49,7 @@ export function useGoogleCallback() {
       // Success but missing tokens
       toast.error("Autenticação bem-sucedida, mas tokens não recebidos");
       setTimeout(() => {
-        navigate("/login", { replace: true });
+        navigate("/ideabank", { replace: true });
       }, 2000);
     } else {
       // Neither success nor error parameter found

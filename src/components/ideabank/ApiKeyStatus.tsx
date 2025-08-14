@@ -1,5 +1,5 @@
 import { Badge, Button } from "@/components/ui";
-import { geminiKeyApi } from "@/lib/api";
+import { geminiKeyApi } from "@/lib/gemini-key-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Key, Settings, Trash2 } from "lucide-react";
 import { useState } from "react";

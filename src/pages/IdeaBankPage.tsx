@@ -26,7 +26,8 @@ import {
 } from "@/components/ui";
 import { useIdeaBank, type CampaignIdea } from "@/hooks/useIdeaBank";
 import { useSubscription } from "@/hooks/useSubscription";
-import { api, geminiKeyApi } from "@/lib/api";
+import { api } from "@/lib/api";
+import { geminiKeyApi } from "@/lib/gemini-key-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
