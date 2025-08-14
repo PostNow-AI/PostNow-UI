@@ -161,7 +161,7 @@ O projeto utiliza um layout de dashboard profissional com navegação lateral pa
 
 | Página | Rota | Descrição |
 |--------|------|-----------|
-| **Início** | `/home` | Dashboard principal com estatísticas e teste de toasts |
+| **Início** | `/ideabank` | Dashboard principal com estatísticas e teste de toasts |
 | **Perfil** | `/profile` | Informações pessoais e configurações de perfil |
 | **Configurações** | `/account-settings` | Gerenciamento de contas sociais e configurações |
 

@@ -9,13 +9,11 @@ import { type CreatorProfile } from "@/lib/creator-profile-api";
 
 interface AccountStatisticsProps {
   profile: CreatorProfile;
-  completedFieldsCount: number;
   formatDate: (dateString: string) => string;
 }
 
 export const AccountStatistics = ({
   profile,
-  completedFieldsCount,
   formatDate,
 }: AccountStatisticsProps) => {
   return (
@@ -38,11 +36,6 @@ export const AccountStatistics = ({
             <span className="font-medium">
               {formatDate(profile.updated_at)}
             </span>
-          </div>
-
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Campos preenchidos</span>
-            <span className="font-medium">{completedFieldsCount}/34</span>
           </div>
         </div>
       </CardContent>

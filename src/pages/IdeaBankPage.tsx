@@ -1,6 +1,8 @@
+import { ApiKeyStatus } from "@/components/ideabank/ApiKeyStatus";
 import { IdeaEditor } from "@/components/ideabank/IdeaEditor";
 import { IdeaGenerationDialog } from "@/components/ideabank/IdeaGenerationDialog";
 import { IdeaList } from "@/components/ideabank/IdeaList";
+import { SubscriptionOverlay } from "@/components/subscription/SubscriptionOverlay";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,21 +25,39 @@ import {
   DialogTitle,
 } from "@/components/ui";
 import { useIdeaBank, type CampaignIdea } from "@/hooks/useIdeaBank";
+import { useSubscription } from "@/hooks/useSubscription";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Archive, FileText, Lightbulb, Plus, TrendingUp } from "lucide-react";
-import { useState } from "react";
+import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const IdeaBankPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [viewingIdea, setViewingIdea] = useState<CampaignIdea | null>(null);
-
   const [deletingIdea, setDeletingIdea] = useState<CampaignIdea | null>(null);
   const [showEditor, setShowEditor] = useState(false);
   const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
-  const { ideas, stats, isLoading } = useIdeaBank();
+  const [showSubscriptionOverlay, setShowSubscriptionOverlay] = useState(false);
+
+  const { ideas, isLoading } = useIdeaBank();
+  const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
   const queryClient = useQueryClient();
+
+  // Mostrar overlay de assinatura se usuário não for assinante
+  useEffect(() => {
+    if (!subscriptionLoading && !isSubscribed) {
+      setShowSubscriptionOverlay(true);
+    }
+  }, [isSubscribed, subscriptionLoading]);
+
+  const handleNewIdeaClick = () => {
+    if (!isSubscribed) {
+      setShowSubscriptionOverlay(true);
+      return;
+    }
+    setIsDialogOpen(true);
+  };
 
   const deleteIdeaMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -45,7 +65,7 @@ export const IdeaBankPage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
       toast.success("Ideia deletada com sucesso!");
       setDeletingIdea(null);
     },
@@ -55,9 +75,6 @@ export const IdeaBankPage = () => {
   });
 
   // Handlers
-  const handleView = (idea: CampaignIdea) => {
-    setViewingIdea(idea);
-  };
 
   const handleEdit = (idea: CampaignIdea) => {
     setEditorIdeas([idea]);
@@ -83,6 +100,89 @@ export const IdeaBankPage = () => {
     setEditorIdeas([]);
   };
 
+  // Se estiver carregando, mostrar loading
+  if (subscriptionLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="text-muted-foreground">
+              Verificando status de assinatura...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Se não for assinante, mostrar tela restrita
+  if (!isSubscribed) {
+    return (
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+            <div className="h-10 w-10 text-muted-foreground">🔒</div>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">Acesso Restrito</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            O Banco de Ideias é uma funcionalidade exclusiva para assinantes.
+            Para acessar todas as funcionalidades do Sonora, entre em contato
+            conosco.
+          </p>
+        </div>
+
+        {/* Card de Assinatura */}
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader className="text-center">
+            <CardTitle className="flex items-center justify-center gap-2">
+              💳 Assine o Sonora
+            </CardTitle>
+            <CardDescription>
+              Desbloqueie todas as funcionalidades e crie campanhas incríveis
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium">Geração Ilimitada</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Use a IA para criar ideias
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
+                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium">Banco Completo</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Salve suas campanhas
+                  </p>
+                </div>
+              </div>
+            </div>
+            <Button
+              onClick={() => setShowSubscriptionOverlay(true)}
+              className="w-full"
+            >
+              💳 Ver Opções de Assinatura
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Subscription Overlay */}
+        {showSubscriptionOverlay && (
+          <SubscriptionOverlay
+            onClose={() => setShowSubscriptionOverlay(false)}
+          />
+        )}
+      </div>
+    );
+  }
+
   // Se estiver mostrando o editor, renderizar apenas ele
   if (showEditor) {
     return (
@@ -98,71 +198,19 @@ export const IdeaBankPage = () => {
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Lightbulb className="h-8 w-8 text-primary" />
-            Banco de Ideias
-          </h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Banco de Ideias</h1>
           <p className="text-muted-foreground">
-            Gere ideias criativas para suas campanhas usando IA
+            Gerencie suas ideias de campanhas e use IA para criar novas
           </p>
         </div>
-        <Button
-          onClick={() => setIsDialogOpen(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Gerar Nova Ideia
-        </Button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total de Ideias
-            </CardTitle>
-            <Lightbulb className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_ideas || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rascunhos</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.draft_ideas || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aprovadas</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.approved_ideas || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Arquivadas</CardTitle>
-            <Archive className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.archived_ideas || 0}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-4">
+          <ApiKeyStatus />
+          <Button onClick={handleNewIdeaClick}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Ideia
+          </Button>
+        </div>
       </div>
 
       {/* Ideas List */}
@@ -177,7 +225,6 @@ export const IdeaBankPage = () => {
           <IdeaList
             ideas={ideas}
             isLoading={isLoading}
-            onView={handleView}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
@@ -260,6 +307,13 @@ export const IdeaBankPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Subscription Overlay */}
+      {showSubscriptionOverlay && (
+        <SubscriptionOverlay
+          onClose={() => setShowSubscriptionOverlay(false)}
+        />
+      )}
     </div>
   );
 };

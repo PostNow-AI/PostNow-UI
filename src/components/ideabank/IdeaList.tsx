@@ -13,7 +13,6 @@ import { Calendar, Edit, Eye, Trash2 } from "lucide-react";
 interface IdeaListProps {
   ideas: CampaignIdea[];
   isLoading: boolean;
-  onView?: (idea: CampaignIdea) => void;
   onEdit?: (idea: CampaignIdea) => void;
   onDelete?: (idea: CampaignIdea) => void;
 }
@@ -21,7 +20,6 @@ interface IdeaListProps {
 export const IdeaList = ({
   ideas,
   isLoading,
-  onView,
   onEdit,
   onDelete,
 }: IdeaListProps) => {
@@ -95,14 +93,6 @@ export const IdeaList = ({
                 </CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onView?.(idea)}
-                  title="Visualizar"
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
                 <Button
                   variant="outline"
                   size="sm"

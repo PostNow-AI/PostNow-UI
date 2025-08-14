@@ -8,6 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Badge,
   Button,
   Card,
   CardContent,
@@ -22,7 +23,6 @@ import {
   IdeaDiffViewer,
   Input,
   Label,
-  RichTextEditor,
   Select,
   SelectContent,
   SelectItem,
@@ -32,23 +32,95 @@ import {
 } from "@/components/ui";
 import { api } from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  ArrowLeft,
-  Edit,
-  Eye,
-  Loader2,
-  Save,
-  Sparkles,
-  Trash2,
-} from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Edit, Loader2, Save, Sparkles, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { JsonContentViewer } from "./JsonContentViewer";
 
 interface IdeaEditorProps {
   ideas: any[];
   onBack: () => void;
   onClose: () => void;
 }
+
+// Função para detectar se uma ideia é uma campanha
+const isCampaignIdea = (idea: any): boolean => {
+  try {
+    if (!idea.content) return false;
+    const content = JSON.parse(idea.content);
+    return content.variacao_a && content.variacao_b && content.variacao_c;
+  } catch {
+    return false;
+  }
+};
+
+// Função para converter qualquer ideia em dados de campanha
+const ideaToCampaignData = (idea: any) => {
+  try {
+    // Se já é uma campanha, retorna os dados
+    if (isCampaignIdea(idea)) {
+      const content = JSON.parse(idea.content);
+      return {
+        plataforma: content.plataforma || idea.platform,
+        tipo_conteudo: content.tipo_conteudo || idea.content_type,
+        titulo_principal: content.titulo_principal || idea.title,
+        variacao_a: content.variacao_a || {},
+        variacao_b: content.variacao_b || {},
+        variacao_c: content.variacao_c || {},
+        estrategia_implementacao:
+          content.estrategia_implementacao || idea.description,
+        metricas_sucesso: content.metricas_sucesso || [],
+        proximos_passos: content.proximos_passos || [],
+      };
+    }
+
+    // Se não é uma campanha, cria uma estrutura de campanha a partir da ideia
+    const baseVariation = {
+      headline: idea.headline || idea.title,
+      copy: idea.copy || idea.description,
+      cta: idea.cta || "Clique para saber mais!",
+      hashtags: idea.hashtags || ["#ideia", "#conteudo"],
+      visual_description: idea.visual_description || "Descrição visual padrão",
+      color_composition: idea.color_composition || "Paleta de cores padrão",
+    };
+
+    return {
+      plataforma: idea.platform || "instagram",
+      tipo_conteudo: idea.content_type || "post",
+      titulo_principal: idea.title || "Ideia",
+      variacao_a: { ...baseVariation },
+      variacao_b: { ...baseVariation },
+      variacao_c: { ...baseVariation },
+      estrategia_implementacao:
+        idea.description || "Implementar conforme planejado",
+      metricas_sucesso: ["Engajamento", "Alcance", "Conversões"],
+      proximos_passos: ["Monitorar resultados", "Otimizar campanha"],
+    };
+  } catch {
+    // Fallback para ideias sem conteúdo estruturado
+    const baseVariation = {
+      headline: idea.title || "Ideia",
+      copy: idea.description || "Descrição da ideia",
+      cta: "Clique para saber mais!",
+      hashtags: ["#ideia", "#conteudo"],
+      visual_description: "Descrição visual padrão",
+      color_composition: "Paleta de cores padrão",
+    };
+
+    return {
+      plataforma: idea.platform || "instagram",
+      tipo_conteudo: idea.content_type || "post",
+      titulo_principal: idea.title || "Ideia",
+      variacao_a: { ...baseVariation },
+      variacao_b: { ...baseVariation },
+      variacao_c: { ...baseVariation },
+      estrategia_implementacao:
+        idea.description || "Implementar conforme planejado",
+      metricas_sucesso: ["Engajamento", "Alcance", "Conversões"],
+      proximos_passos: ["Monitorar resultados", "Otimizar campanha"],
+    };
+  }
+};
 
 export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
   const [editingIdeas, setEditingIdeas] = useState(ideas);
@@ -61,6 +133,13 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
   const [originalIdea, setOriginalIdea] = useState<any>(null);
   const [improvedIdea, setImprovedIdea] = useState<any>(null);
   const queryClient = useQueryClient();
+
+  // Sincronizar o estado local com as props quando elas mudarem
+  useEffect(() => {
+    if (ideas && ideas.length > 0) {
+      setEditingIdeas(ideas);
+    }
+  }, [ideas]);
 
   // Group ideas by platform
   const ideasByPlatform = editingIdeas.reduce(
@@ -83,7 +162,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
     onSuccess: () => {
       toast.success("Ideia atualizada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
     },
     onError: (error: any, variables) => {
       toast.error(error.response?.data?.error || "Erro ao atualizar ideia");
@@ -104,7 +183,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
     onSuccess: () => {
       toast.success("Ideia deletada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
       setDeletingIdea(null);
     },
     onError: (error: any) => {
@@ -130,7 +209,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["idea-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
       toast.success("Ideia melhorada com sucesso!");
 
       // Store original and improved versions for comparison
@@ -202,10 +281,6 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
     // Remove from local state immediately
     const updatedIdeas = editingIdeas.filter((item) => item.id !== idea.id);
     setEditingIdeas(updatedIdeas);
-  };
-
-  const handleEditIdea = (idea: any) => {
-    setEditingIdea({ ...idea });
   };
 
   const handleImproveIdea = (idea: any) => {
@@ -312,22 +387,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
                               </SelectItem>
                             </SelectContent>
                           </Select>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setViewingIdea(idea)}
-                            title="Visualizar"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEditIdea(idea)}
-                            title="Editar"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
+
                           <Button
                             size="sm"
                             variant="outline"
@@ -356,10 +416,20 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor={`title-${globalIndex}`}>Título</Label>
+                        <Label htmlFor={`title-${globalIndex}`}>
+                          Título
+                          {!idea.title && (
+                            <Badge
+                              variant="destructive"
+                              className="ml-2 text-xs"
+                            >
+                              Campo Vazio
+                            </Badge>
+                          )}
+                        </Label>
                         <Input
                           id={`title-${globalIndex}`}
-                          value={idea.title}
+                          value={idea.title || ""}
                           onChange={(e) =>
                             handleIdeaUpdate(
                               globalIndex,
@@ -368,33 +438,69 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
                             )
                           }
                           placeholder="Título da ideia"
+                          className={
+                            !idea.title
+                              ? "border-destructive bg-destructive/5"
+                              : ""
+                          }
                         />
+                        {!idea.title && (
+                          <p className="text-sm text-destructive">
+                            Este campo está vazio. Adicione um título para sua
+                            ideia.
+                          </p>
+                        )}
                       </div>
 
-                      <RichTextEditor
-                        label="Descrição"
-                        value={idea.description}
-                        onChange={(value) =>
-                          handleIdeaUpdate(
-                            globalIndex,
-                            "description",
-                            value || ""
-                          )
-                        }
-                        placeholder="Descrição breve da ideia"
-                        height={120}
-                        preview="edit"
-                      />
+                      <div className="space-y-2">
+                        <Label htmlFor={`description-${globalIndex}`}>
+                          Descrição
+                          {!idea.description && (
+                            <Badge
+                              variant="destructive"
+                              className="ml-2 text-xs"
+                            >
+                              Campo Vazio
+                            </Badge>
+                          )}
+                        </Label>
+                        <Textarea
+                          id={`description-${globalIndex}`}
+                          value={idea.description || ""}
+                          onChange={(e) =>
+                            handleIdeaUpdate(
+                              globalIndex,
+                              "description",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Descrição breve da ideia"
+                          className={`min-h-[100px] ${
+                            !idea.description
+                              ? "border-destructive bg-destructive/5"
+                              : ""
+                          }`}
+                        />
+                        {!idea.description && (
+                          <p className="text-sm text-destructive">
+                            Este campo está vazio. Adicione uma descrição para
+                            sua ideia.
+                          </p>
+                        )}
+                      </div>
 
-                      <RichTextEditor
-                        label="Conteúdo"
-                        value={idea.content}
-                        onChange={(value) =>
-                          handleIdeaUpdate(globalIndex, "content", value || "")
-                        }
-                        placeholder="Conteúdo detalhado da ideia"
-                        height={300}
-                      />
+                      <div className="space-y-2">
+                        <Label htmlFor={`content-${globalIndex}`}>
+                          Conteúdo
+                        </Label>
+                        <JsonContentViewer
+                          content={idea.content || ""}
+                          readOnly={false}
+                          onContentChange={(newContent) =>
+                            handleIdeaUpdate(globalIndex, "content", newContent)
+                          }
+                        />
+                      </div>
                     </CardContent>
                   </Card>
                 );
@@ -405,44 +511,6 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
       </div>
 
       {/* View Modal */}
-      <Dialog
-        open={viewingIdea !== null}
-        onOpenChange={(open) => {
-          if (!open) setViewingIdea(null);
-        }}
-      >
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {viewingIdea?.title || "Visualizar Ideia"}
-            </DialogTitle>
-            <DialogDescription>
-              {viewingIdea?.platform_display || viewingIdea?.platform} •{" "}
-              {viewingIdea?.content_type_display || viewingIdea?.content_type}
-            </DialogDescription>
-          </DialogHeader>
-          {viewingIdea && (
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium mb-2">Descrição:</h4>
-                <div className="p-3 bg-muted rounded-md">
-                  <div className="prose prose-sm max-w-none">
-                    {viewingIdea.description || "Sem descrição"}
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Conteúdo:</h4>
-                <div className="p-3 bg-muted rounded-md">
-                  <div className="prose prose-sm max-w-none whitespace-pre-wrap">
-                    {viewingIdea.content || "Sem conteúdo"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* Edit Modal */}
       <Dialog
@@ -461,33 +529,71 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
           {editingIdea && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-title">Título</Label>
+                <Label htmlFor="edit-title">
+                  Título
+                  {!editingIdea.title && (
+                    <Badge variant="destructive" className="ml-2 text-xs">
+                      Campo Vazio
+                    </Badge>
+                  )}
+                </Label>
                 <Input
                   id="edit-title"
-                  value={editingIdea.title}
+                  value={editingIdea.title || ""}
                   onChange={(e) =>
                     setEditingIdea({ ...editingIdea, title: e.target.value })
                   }
+                  className={
+                    !editingIdea.title
+                      ? "border-destructive bg-destructive/5"
+                      : ""
+                  }
                 />
+                {!editingIdea.title && (
+                  <p className="text-sm text-destructive">
+                    Este campo está vazio. Adicione um título para sua ideia.
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-description">Descrição</Label>
-                <RichTextEditor
-                  value={editingIdea.description}
-                  onChange={(value) =>
-                    setEditingIdea({ ...editingIdea, description: value || "" })
+                <Label htmlFor="edit-description">
+                  Descrição
+                  {!editingIdea.description && (
+                    <Badge variant="destructive" className="ml-2 text-xs">
+                      Campo Vazio
+                    </Badge>
+                  )}
+                </Label>
+                <Textarea
+                  id="edit-description"
+                  value={editingIdea.description || ""}
+                  onChange={(e) =>
+                    setEditingIdea({
+                      ...editingIdea,
+                      description: e.target.value,
+                    })
                   }
-                  height={150}
+                  className={`min-h-[100px] ${
+                    !editingIdea.description
+                      ? "border-destructive bg-destructive/5"
+                      : ""
+                  }`}
                 />
+                {!editingIdea.description && (
+                  <p className="text-sm text-destructive">
+                    Este campo está vazio. Adicione uma descrição para sua
+                    ideia.
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-content">Conteúdo</Label>
-                <RichTextEditor
-                  value={editingIdea.content}
-                  onChange={(value) =>
-                    setEditingIdea({ ...editingIdea, content: value || "" })
+                <Label htmlFor="edit-content">Conteúdo </Label>
+                <JsonContentViewer
+                  content={editingIdea.content || ""}
+                  readOnly={false}
+                  onContentChange={(newContent) =>
+                    setEditingIdea({ ...editingIdea, content: newContent })
                   }
-                  height={300}
                 />
               </div>
               <div className="space-y-2">
@@ -691,6 +797,114 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
                   }}
                 >
                   Fechar
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View Modal */}
+      <Dialog
+        open={viewingIdea !== null}
+        onOpenChange={(open) => {
+          if (!open) setViewingIdea(null);
+        }}
+      >
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Visualizar Ideia</DialogTitle>
+            <DialogDescription>
+              Detalhes da ideia para visualização
+            </DialogDescription>
+          </DialogHeader>
+          {viewingIdea && (
+            <div className="space-y-4">
+              {/* Campos básicos */}
+              <div className="space-y-4 p-4 bg-muted rounded-lg">
+                <div>
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    Título
+                    {!viewingIdea.title && (
+                      <Badge variant="destructive" className="text-xs">
+                        Campo Vazio
+                      </Badge>
+                    )}
+                  </h4>
+                  <div
+                    className={`p-3 rounded-md border ${
+                      !viewingIdea.title
+                        ? "bg-destructive/10 border-destructive"
+                        : "bg-background"
+                    }`}
+                  >
+                    {viewingIdea.title || "Sem título"}
+                  </div>
+                  {!viewingIdea.title && (
+                    <p className="text-sm text-destructive mt-2">
+                      Este campo está vazio. Adicione um título para sua ideia.
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    Descrição
+                    {!viewingIdea.description && (
+                      <Badge variant="destructive" className="text-xs">
+                        Campo Vazio
+                      </Badge>
+                    )}
+                  </h4>
+                  <div
+                    className={`p-3 rounded-md border ${
+                      !viewingIdea.description
+                        ? "bg-destructive/10 border-destructive"
+                        : "bg-background"
+                    }`}
+                  >
+                    {viewingIdea.description || "Sem descrição"}
+                  </div>
+                  {!viewingIdea.description && (
+                    <p className="text-sm text-destructive mt-2">
+                      Este campo está vazio. Adicione uma descrição para sua
+                      ideia.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Conteúdo JSON */}
+              <div>
+                <h4 className="font-medium mb-2">Conteúdo Estruturado</h4>
+                <JsonContentViewer
+                  content={
+                    viewingIdea.content ||
+                    JSON.stringify(ideaToCampaignData(viewingIdea), null, 2)
+                  }
+                  readOnly={true}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  onClick={() => {
+                    setEditingIdea(viewingIdea);
+                    setViewingIdea(null);
+                  }}
+                  variant="outline"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar
+                </Button>
+                <Button
+                  onClick={() => {
+                    setDeletingIdea(viewingIdea);
+                    setViewingIdea(null);
+                  }}
+                  variant="destructive"
+                >
+                  Excluir
                 </Button>
               </div>
             </div>

@@ -8,24 +8,46 @@ import {
   Checkbox,
   Input,
   Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Share2, Target, Type, Users } from "lucide-react";
+import { Loader2, Share2, Target, Type, Users, Volume2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const ideaGenerationSchema = z.object({
+  // Campaign info
+  title: z.string().min(3, "Título deve ter pelo menos 3 caracteres"),
+  description: z.string().optional(),
+
+  // Campaign objective
   objectives: z.array(z.string()).min(1, "Selecione pelo menos um objetivo"),
+
+  // Target persona
   persona_age: z.string().optional(),
   persona_location: z.string().optional(),
   persona_income: z.string().optional(),
   persona_interests: z.string().optional(),
   persona_behavior: z.string().optional(),
   persona_pain_points: z.string().optional(),
+
+  // Social platforms and content types
   platforms: z.array(z.string()).min(1, "Selecione pelo menos uma plataforma"),
   content_types: z.record(z.string(), z.array(z.string())).optional(),
+
+  // Voice tone
+  voice_tone: z.string(),
+
+  // Campaign details for AI generation
+  product_description: z.string().optional(),
+  value_proposition: z.string().optional(),
+  campaign_urgency: z.string().optional(),
 });
 
 export type IdeaGenerationFormData = z.infer<typeof ideaGenerationSchema>;
@@ -37,8 +59,9 @@ interface OptionItem {
 
 interface IdeaGenerationOptions {
   objectives: OptionItem[];
-  content_types: OptionItem[];
+  content_types: Record<string, string[]>; // {platform: [content_types]}
   platforms: OptionItem[];
+  voice_tones: OptionItem[];
 }
 
 interface IdeaGenerationFormProps {
@@ -52,12 +75,31 @@ export const IdeaGenerationForm = ({
   onSubmit,
   isGenerating,
 }: IdeaGenerationFormProps) => {
+  // Helper function to get content type labels
+  const getContentTypeLabel = (contentType: string): string => {
+    const contentTypeLabels: Record<string, string> = {
+      post: "Post",
+      story: "Story",
+      reel: "Reel",
+      video: "Vídeo",
+      carousel: "Carrossel",
+      live: "Live",
+      custom: "Custom",
+    };
+    return contentTypeLabels[contentType] || contentType;
+  };
   const form = useForm<IdeaGenerationFormData>({
     resolver: zodResolver(ideaGenerationSchema),
     defaultValues: {
+      title: "",
+      description: "",
       objectives: [],
       platforms: [],
       content_types: {},
+      voice_tone: "professional",
+      product_description: "",
+      value_proposition: "",
+      campaign_urgency: "",
     },
   });
 
@@ -158,7 +200,7 @@ export const IdeaGenerationForm = ({
                 />
                 <Label
                   htmlFor={objective.value}
-                  className="cursor-pointer font-medium"
+                  className="font-medium flex-1 cursor-pointer"
                 >
                   {objective.label}
                 </Label>
@@ -265,7 +307,7 @@ export const IdeaGenerationForm = ({
                 />
                 <Label
                   htmlFor={platform.value}
-                  className="cursor-pointer font-medium"
+                  className="font-medium flex-1 cursor-pointer"
                 >
                   {platform.label}
                 </Label>
@@ -295,39 +337,147 @@ export const IdeaGenerationForm = ({
                   <Label className="text-base font-semibold">{platform}</Label>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-                  {options?.content_types?.map((contentType: OptionItem) => (
-                    <div
-                      key={contentType.value}
-                      className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent/30 transition-colors"
-                    >
-                      <Checkbox
-                        id={`${platform}-${contentType.value}`}
-                        checked={
-                          contentTypes[platform]?.includes(contentType.value) ||
-                          false
-                        }
-                        onCheckedChange={(checked) =>
-                          handleContentTypeChange(
-                            platform,
-                            contentType.value,
-                            checked as boolean
-                          )
-                        }
-                      />
-                      <Label
-                        htmlFor={`${platform}-${contentType.value}`}
-                        className="text-sm cursor-pointer"
-                      >
-                        {contentType.label}
-                      </Label>
-                    </div>
-                  ))}
+                  {options?.content_types?.[platform]?.map(
+                    (contentType: string) => {
+                      // Get the label for the content type
+                      const contentTypeLabel = getContentTypeLabel(contentType);
+                      return (
+                        <div
+                          key={contentType}
+                          className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent/30 transition-colors"
+                        >
+                          <Checkbox
+                            id={`${platform}-${contentType}`}
+                            checked={
+                              contentTypes[platform]?.includes(contentType) ||
+                              false
+                            }
+                            onCheckedChange={(checked) =>
+                              handleContentTypeChange(
+                                platform,
+                                contentType,
+                                checked as boolean
+                              )
+                            }
+                          />
+                          <Label
+                            htmlFor={`${platform}-${contentType}`}
+                            className="text-sm flex-1 cursor-pointer"
+                          >
+                            {contentTypeLabel}
+                          </Label>
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               </div>
             ))}
           </CardContent>
         </Card>
       )}
+
+      {/* Voice Tone */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Volume2 className="h-5 w-5" />
+            Tom de Voz
+          </CardTitle>
+          <CardDescription>
+            Escolha o tom de voz que deseja para a campanha
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Select
+            onValueChange={(value) => form.setValue("voice_tone", value)}
+            value={form.watch("voice_tone")}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione um tom de voz" />
+            </SelectTrigger>
+            <SelectContent>
+              {options?.voice_tones?.map((tone: OptionItem) => (
+                <SelectItem key={tone.value} value={tone.value}>
+                  {tone.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      {/* Campaign Details */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Type className="h-5 w-5" />
+            Detalhes da Campanha
+          </CardTitle>
+          <CardDescription>
+            Forneça mais detalhes para a geração de ideias
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Título da Campanha</Label>
+              <Input
+                id="title"
+                placeholder="Ex: Campanha de Marketing Digital"
+                {...form.register("title")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Descrição da Campanha</Label>
+              <Textarea
+                id="description"
+                placeholder="Ex: Descrição detalhada da campanha..."
+                rows={2}
+                {...form.register("description")}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="product_description">Descrição do Produto</Label>
+              <Textarea
+                id="product_description"
+                placeholder="Ex: Descrição detalhada do produto/serviço..."
+                rows={2}
+                {...form.register("product_description")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="value_proposition">Proposta de Valor</Label>
+              <Textarea
+                id="value_proposition"
+                placeholder="Ex: Explique a proposta de valor da sua oferta..."
+                rows={2}
+                {...form.register("value_proposition")}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="campaign_urgency">Urgência da Campanha</Label>
+            <Select
+              onValueChange={(value) =>
+                form.setValue("campaign_urgency", value)
+              }
+              value={form.watch("campaign_urgency")}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione a urgência" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="high">Alta</SelectItem>
+                <SelectItem value="medium">Média</SelectItem>
+                <SelectItem value="low">Baixa</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Submit Button */}
       <div className="flex justify-end pt-4 border-t border-border/50">

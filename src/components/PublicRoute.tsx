@@ -9,7 +9,7 @@ interface PublicRouteProps {
 
 export function PublicRoute({
   children,
-  redirectTo = "/home",
+  redirectTo = "/ideabank",
 }: PublicRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();

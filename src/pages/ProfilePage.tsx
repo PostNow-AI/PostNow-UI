@@ -32,7 +32,6 @@ export const ProfilePage = () => {
     userName,
     userInitials,
     statusConfig,
-    completedFieldsCount,
     handleSaveProfile,
     formatDate,
   } = useProfilePage();
@@ -113,11 +112,7 @@ export const ProfilePage = () => {
             />
           )}
 
-          <AccountStatistics
-            profile={profile}
-            completedFieldsCount={completedFieldsCount}
-            formatDate={formatDate}
-          />
+          <AccountStatistics profile={profile} formatDate={formatDate} />
         </div>
 
         {/* Right Column - Onboarding Data */}

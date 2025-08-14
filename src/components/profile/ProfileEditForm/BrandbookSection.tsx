@@ -1,9 +1,11 @@
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  Input,
   Label,
   Select,
   SelectContent,
@@ -12,8 +14,12 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { Palette, Type } from "lucide-react";
+import { globalOptionsApi } from "@/lib/global-options-api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Loader2, Palette, Type } from "lucide-react";
+import { useState } from "react";
 import { type UseFormReturn } from "react-hook-form";
+import { toast } from "sonner";
 
 interface BrandbookFormData {
   primary_color?: string | null;
@@ -23,30 +29,13 @@ interface BrandbookFormData {
   accent_color_3?: string | null;
   primary_font?: string;
   secondary_font?: string;
+  custom_primary_font?: string;
+  custom_secondary_font?: string;
 }
 
 interface BrandbookSectionProps {
   form: UseFormReturn<BrandbookFormData>;
 }
-
-const fontOptions = [
-  "Inter",
-  "Roboto",
-  "Open Sans",
-  "Poppins",
-  "Montserrat",
-  "Lato",
-  "Source Sans Pro",
-  "Nunito",
-  "Ubuntu",
-  "Raleway",
-  "Playfair Display",
-  "Merriweather",
-  "PT Sans",
-  "Noto Sans",
-  "Work Sans",
-  "Outro",
-];
 
 export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
   const {
@@ -55,6 +44,67 @@ export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
     formState: { errors },
   } = form;
   const watchedValues = watch();
+  const queryClient = useQueryClient();
+  const [customPrimaryFontInput, setCustomPrimaryFontInput] = useState("");
+  const [customSecondaryFontInput, setCustomSecondaryFontInput] = useState("");
+
+  // Buscar fontes da API
+  const { data: fonts = { predefined: [], custom: [] } } = useQuery({
+    queryKey: ["fonts"],
+    queryFn: globalOptionsApi.getFonts,
+  });
+
+  // Mutation para criar fontes customizadas
+  const createFontMutation = useMutation({
+    mutationFn: globalOptionsApi.createCustomFont,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["fonts"] });
+      toast.success("Fonte criada com sucesso!");
+    },
+    onError: (error: unknown) => {
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
+        toast.error(
+          axiosError.response?.data?.message || "Erro ao criar fonte"
+        );
+      } else {
+        toast.error("Erro ao criar fonte");
+      }
+    },
+  });
+
+  // Handlers para criar fontes customizadas
+  const handleAddCustomFont = (fontType: "primary" | "secondary") => {
+    const customValue =
+      fontType === "primary"
+        ? customPrimaryFontInput
+        : customSecondaryFontInput;
+    if (customValue.trim()) {
+      createFontMutation.mutate(
+        { name: customValue.trim() },
+        {
+          onSuccess: () => {
+            if (fontType === "primary") {
+              setCustomPrimaryFontInput("");
+              setValue("primary_font", customValue.trim());
+            } else {
+              setCustomSecondaryFontInput("");
+              setValue("secondary_font", customValue.trim());
+            }
+          },
+        }
+      );
+    }
+  };
+
+  // Obter todas as fontes disponíveis
+  const allAvailableFonts = [
+    ...fonts.predefined.map((f: { name: string }) => f.name),
+    ...fonts.custom.map((f: { name: string }) => f.name),
+    "Outro",
+  ];
 
   return (
     <>
@@ -130,7 +180,7 @@ export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
                   <SelectValue placeholder="Selecione uma fonte" />
                 </SelectTrigger>
                 <SelectContent>
-                  {fontOptions.map((font) => (
+                  {allAvailableFonts.map((font) => (
                     <SelectItem key={font} value={font}>
                       {font}
                     </SelectItem>
@@ -141,6 +191,44 @@ export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
                 <p className="text-sm text-destructive">
                   {errors.primary_font.message}
                 </p>
+              )}
+
+              {/* Campo para fonte primária customizada */}
+              {watchedValues.primary_font === "Outro" && (
+                <div className="space-y-2">
+                  <Label htmlFor="custom_primary_font">
+                    Qual é sua fonte primária?
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="custom_primary_font"
+                      placeholder="Descreva sua fonte"
+                      value={customPrimaryFontInput}
+                      onChange={(e) =>
+                        setCustomPrimaryFontInput(e.target.value)
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => handleAddCustomFont("primary")}
+                      disabled={
+                        !customPrimaryFontInput.trim() ||
+                        createFontMutation.isPending
+                      }
+                    >
+                      {createFontMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        "Adicionar"
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Sua fonte será salva para referência futura de outros
+                    usuários.
+                  </p>
+                </div>
               )}
             </div>
 
@@ -154,7 +242,7 @@ export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
                   <SelectValue placeholder="Selecione uma fonte" />
                 </SelectTrigger>
                 <SelectContent>
-                  {fontOptions.map((font) => (
+                  {allAvailableFonts.map((font) => (
                     <SelectItem key={font} value={font}>
                       {font}
                     </SelectItem>
@@ -165,6 +253,44 @@ export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
                 <p className="text-sm text-destructive">
                   {errors.secondary_font.message}
                 </p>
+              )}
+
+              {/* Campo para fonte secundária customizada */}
+              {watchedValues.secondary_font === "Outro" && (
+                <div className="space-y-2">
+                  <Label htmlFor="custom_secondary_font">
+                    Qual é sua fonte secundária?
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="custom_secondary_font"
+                      placeholder="Descreva sua fonte"
+                      value={customSecondaryFontInput}
+                      onChange={(e) =>
+                        setCustomSecondaryFontInput(e.target.value)
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => handleAddCustomFont("secondary")}
+                      disabled={
+                        !customSecondaryFontInput.trim() ||
+                        createFontMutation.isPending
+                      }
+                    >
+                      {createFontMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        "Adicionar"
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Sua fonte será salva para referência futura de outros
+                    usuários.
+                  </p>
+                </div>
               )}
             </div>
           </div>
