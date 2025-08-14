@@ -26,8 +26,8 @@ import {
 } from "@/components/ui";
 import { useIdeaBank, type CampaignIdea } from "@/hooks/useIdeaBank";
 import { useSubscription } from "@/hooks/useSubscription";
-import { api } from "@/lib/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api, geminiKeyApi } from "@/lib/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -44,6 +44,10 @@ export const IdeaBankPage = () => {
   const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
   const queryClient = useQueryClient();
 
+  const { data: keyStatus, isLoading: isLoadingApiKeyStatus } = useQuery({
+    queryKey: ["gemini-key-status"],
+    queryFn: () => geminiKeyApi.getStatus(),
+  });
   // Mostrar overlay de assinatura se usuário não for assinante
   useEffect(() => {
     if (!subscriptionLoading && !isSubscribed) {
@@ -101,7 +105,7 @@ export const IdeaBankPage = () => {
   };
 
   // Se estiver carregando, mostrar loading
-  if (subscriptionLoading) {
+  if (subscriptionLoading || isLoadingApiKeyStatus) {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-center min-h-[400px]">
@@ -204,32 +208,48 @@ export const IdeaBankPage = () => {
             Gerencie suas ideias de campanhas e use IA para criar novas
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <ApiKeyStatus />
-          <Button onClick={handleNewIdeaClick}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nova Ideia
-          </Button>
-        </div>
+        {!keyStatus?.has_key ? null : (
+          <div className="flex items-center gap-4">
+            <ApiKeyStatus />
+            <Button onClick={handleNewIdeaClick}>
+              <Plus className="mr-2 h-4 w-4" />
+              Nova Ideia
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Ideas List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Suas Ideias</CardTitle>
-          <CardDescription>
-            Visualize e gerencie todas as suas ideias de campanha
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <IdeaList
-            ideas={ideas}
-            isLoading={isLoading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </CardContent>
-      </Card>
+      {!keyStatus?.has_key ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Configure sua chave de API antes de iniciar a criação de ideias
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {" "}
+            <ApiKeyStatus />
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Suas Ideias</CardTitle>
+            <CardDescription>
+              Visualize e gerencie todas as suas ideias de campanha
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <IdeaList
+              ideas={ideas}
+              isLoading={isLoading}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Generation Dialog */}
       <IdeaGenerationDialog
