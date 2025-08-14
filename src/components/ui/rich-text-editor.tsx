@@ -2,7 +2,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import MDEditor from "@uiw/react-md-editor";
 import { Expand, Minimize } from "lucide-react";
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Button } from "./button";
 
 interface RichTextEditorProps {
@@ -45,8 +45,10 @@ export const RichTextEditor = ({
     }
   };
 
-  const handleHeightChange = (newHeight: number) => {
-    setCurrentHeight(newHeight);
+  const handleHeightChange = (value?: CSSProperties["height"]) => {
+    if (typeof value === "number") {
+      setCurrentHeight(value);
+    }
   };
 
   // Se showOnlyPreview é true, mostrar apenas a visualização

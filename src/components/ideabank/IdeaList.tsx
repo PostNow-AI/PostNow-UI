@@ -13,7 +13,6 @@ import { Calendar, Edit, Eye, Trash2 } from "lucide-react";
 interface IdeaListProps {
   ideas: CampaignIdea[];
   isLoading: boolean;
-  onView?: (idea: CampaignIdea) => void;
   onEdit?: (idea: CampaignIdea) => void;
   onDelete?: (idea: CampaignIdea) => void;
 }
@@ -21,7 +20,6 @@ interface IdeaListProps {
 export const IdeaList = ({
   ideas,
   isLoading,
-  onView,
   onEdit,
   onDelete,
 }: IdeaListProps) => {

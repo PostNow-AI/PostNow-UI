@@ -75,9 +75,6 @@ export const IdeaBankPage = () => {
   });
 
   // Handlers
-  const handleView = (idea: CampaignIdea) => {
-    setViewingIdea(idea);
-  };
 
   const handleEdit = (idea: CampaignIdea) => {
     setEditorIdeas([idea]);
@@ -228,7 +225,6 @@ export const IdeaBankPage = () => {
           <IdeaList
             ideas={ideas}
             isLoading={isLoading}
-            onView={handleView}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
