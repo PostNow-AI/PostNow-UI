@@ -48,7 +48,7 @@ export const IdeaBankPage = () => {
   const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
   const [showSubscriptionOverlay, setShowSubscriptionOverlay] = useState(false);
 
-  const { campaigns, isLoading, refetchCampaigns } = useIdeaBank();
+  const { campaigns, isLoading } = useIdeaBank();
   const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
   const queryClient = useQueryClient();
 
@@ -126,9 +126,10 @@ export const IdeaBankPage = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
-      toast.success("Ideia criada com IA com sucesso!");
-      refetchCampaigns();
+      // Don't invalidate queries here - let the component handle it
+      // queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
+      // toast.success("Ideia criada com IA com sucesso!");
+      // refetchCampaigns();
     },
     onError: (error) => {
       toast.error("Erro ao criar ideia");
