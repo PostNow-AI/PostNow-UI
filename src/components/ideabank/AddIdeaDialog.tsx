@@ -19,7 +19,6 @@ import { api } from "@/lib/api";
 import { Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface AddIdeaDialogProps {
   campaign: Campaign | null;
@@ -53,7 +52,6 @@ export const AddIdeaDialog = ({
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const queryClient = useQueryClient();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -64,9 +62,7 @@ export const AddIdeaDialog = ({
     if (formData.platform && formData.content_type) {
       setIsSubmitting(true);
       try {
-        console.log("=== DEBUG: Submitting idea ===");
         const createdIdea = await onSave(formData);
-        console.log("=== DEBUG: Idea created successfully ===", createdIdea);
 
         // Reset form
         setFormData({
@@ -78,26 +74,16 @@ export const AddIdeaDialog = ({
           variation_type: "a",
         });
 
-        // Open the created idea in edit mode FIRST
-        console.log("=== DEBUG: Checking onEditIdea ===", !!onEditIdea);
-        if (createdIdea && onEditIdea) {
-          console.log("=== DEBUG: Calling onEditIdea ===", createdIdea);
-          // Invalidate queries to refresh the list
-          queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
-          // Add a small delay to ensure state is properly updated
-          setTimeout(() => {
-            onEditIdea(createdIdea);
-          }, 100);
-        } else {
-          console.log("=== DEBUG: onEditIdea not available or createdIdea is null ===");
-        }
-
-        // Close dialog AFTER calling onEditIdea
-        console.log("=== DEBUG: Closing dialog ===");
+        // Close dialog
         onClose();
 
         // Show success message
         toast.success("Ideia criada com sucesso!");
+
+        // Open the created idea in edit mode directly
+        if (createdIdea && onEditIdea) {
+          onEditIdea(createdIdea);
+        }
       } catch (error) {
         console.error("Error saving idea:", error);
         toast.error("Erro ao criar ideia. Tente novamente.");
@@ -285,27 +271,6 @@ export const AddIdeaDialog = ({
               A IA irá gerar automaticamente o título, descrição e conteúdo da
               ideia baseado na campanha e nos parâmetros selecionados.
             </p>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGenerateWithAI}
-              disabled={
-                isGenerating || !formData.platform || !formData.content_type
-              }
-              className="w-full"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Gerando com IA...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Gerar Ideia com IA
-                </>
-              )}
-            </Button>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">
@@ -332,7 +297,7 @@ export const AddIdeaDialog = ({
                   Criando...
                 </>
               ) : (
-                "Criar Ideia"
+                "Gerar Ideia com IA"
               )}
             </Button>
           </div>
