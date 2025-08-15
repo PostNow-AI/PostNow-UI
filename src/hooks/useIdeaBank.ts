@@ -25,6 +25,7 @@ export interface Campaign {
   updated_at: string;
   ideas_count: number;
   approved_ideas_count: number;
+  ideas?: CampaignIdea[]; // Add ideas as children
 }
 
 export interface CampaignIdea {
@@ -66,28 +67,22 @@ export interface CampaignStats {
 
 export const useIdeaBank = () => {
   const {
-    data: campaigns = [],
+    data: campaignsWithIdeas = [],
     isLoading: campaignsLoading,
     error: campaignsError,
+    refetch: refetchCampaigns,
   } = useQuery({
-    queryKey: ["campaigns"],
+    queryKey: ["campaigns-with-ideas"],
     queryFn: async (): Promise<Campaign[]> => {
-      const response = await api.get("/api/v1/ideabank/campaigns/");
-      return response.data;
+      const response = await api.get("/api/v1/ideabank/campaigns-with-ideas/");
+      return response.data.campaigns;
     },
   });
 
-  const {
-    data: ideas = [],
-    isLoading: ideasLoading,
-    error: ideasError,
-  } = useQuery({
-    queryKey: ["campaign-ideas"],
-    queryFn: async (): Promise<CampaignIdea[]> => {
-      const response = await api.get("/api/v1/ideabank/ideas/");
-      return response.data;
-    },
-  });
+  // Extract all ideas from campaigns for backward compatibility
+  const allIdeas = campaignsWithIdeas.flatMap(
+    (campaign) => campaign.ideas || []
+  );
 
   const {
     data: stats,
@@ -102,10 +97,11 @@ export const useIdeaBank = () => {
   });
 
   return {
-    campaigns,
-    ideas,
+    campaigns: campaignsWithIdeas,
+    ideas: allIdeas, // For backward compatibility
     stats,
-    isLoading: campaignsLoading || ideasLoading || statsLoading,
-    error: campaignsError || ideasError || statsError,
+    isLoading: campaignsLoading || statsLoading,
+    error: campaignsError || statsError,
+    refetchCampaigns,
   };
 };

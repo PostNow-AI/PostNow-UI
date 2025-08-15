@@ -681,11 +681,11 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Melhorar Ideia com IA
+              Melhorar Campanha com IA
             </DialogTitle>
             <DialogDescription>
-              Descreva como você gostaria que a IA melhorasse esta ideia. Seja
-              específico sobre o que você quer aprimorar.
+              Descreva como você gostaria que a IA melhorasse esta campanha.
+              Seja específico sobre o que você quer aprimorar.
             </DialogDescription>
           </DialogHeader>
 
@@ -694,7 +694,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
               {/* Current Idea Preview */}
               <div className="p-4 bg-muted rounded-lg space-y-2">
                 <h4 className="font-semibold text-sm text-muted-foreground">
-                  Ideia Atual:
+                  Campanha Atual:
                 </h4>
                 <h5 className="font-medium">{improvingIdea.title}</h5>
                 <p className="text-sm text-muted-foreground line-clamp-3">
@@ -705,7 +705,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
               {/* Improvement Prompt */}
               <div className="space-y-2">
                 <Label htmlFor="improvement-prompt">
-                  Como a IA pode melhorar esta ideia?
+                  Como a IA pode melhorar esta campanha?
                 </Label>
                 <Textarea
                   id="improvement-prompt"
@@ -776,7 +776,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
               Melhoria Aplicada com Sucesso
             </DialogTitle>
             <DialogDescription>
-              Compare as alterações feitas pela IA na sua ideia
+              Compare as alterações feitas pela IA na sua campanha
             </DialogDescription>
           </DialogHeader>
 
@@ -813,9 +813,9 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
       >
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Visualizar Ideia</DialogTitle>
+            <DialogTitle>Visualizar Campanha</DialogTitle>
             <DialogDescription>
-              Detalhes da ideia para visualização
+              Detalhes da campanha para visualização
             </DialogDescription>
           </DialogHeader>
           {viewingIdea && (
@@ -842,7 +842,8 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
                   </div>
                   {!viewingIdea.title && (
                     <p className="text-sm text-destructive mt-2">
-                      Este campo está vazio. Adicione um título para sua ideia.
+                      Este campo está vazio. Adicione um título para sua
+                      campanha.
                     </p>
                   )}
                 </div>
@@ -868,7 +869,7 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
                   {!viewingIdea.description && (
                     <p className="text-sm text-destructive mt-2">
                       Este campo está vazio. Adicione uma descrição para sua
-                      ideia.
+                      campanha.
                     </p>
                   )}
                 </div>

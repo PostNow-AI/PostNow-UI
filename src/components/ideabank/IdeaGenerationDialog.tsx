@@ -58,14 +58,18 @@ export const IdeaGenerationDialog = ({
   // Generate ideas mutation
   const generateIdeasMutation = useMutation({
     mutationFn: async (data: IdeaGenerationFormData) => {
-      const response = await api.post("/api/v1/ideabank/campaigns/generate/", data);
+      const response = await api.post(
+        "/api/v1/ideabank/campaigns/generate/",
+        data
+      );
       return response.data;
     },
     onSuccess: (data) => {
       setGeneratedIdeas(data.ideas);
       setIsGenerating(false);
-      toast.success("Ideias geradas com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
+      toast.success("Campanha e 3 ideias geradas com sucesso!");
+      // Refresh the campaigns-with-ideas query to show the new campaign
+      queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
       queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
     },
     onError: (error: unknown) => {

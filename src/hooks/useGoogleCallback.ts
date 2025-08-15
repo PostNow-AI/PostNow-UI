@@ -22,7 +22,7 @@ export function useGoogleCallback() {
         errorDescription || "Falha na autenticação com Google";
       toast.error(errorMessage);
       setTimeout(() => {
-        navigate("/login", { replace: true });
+        navigate("/ideabank", { replace: true });
       }, 2000);
       return;
     }
@@ -57,7 +57,7 @@ export function useGoogleCallback() {
         "Callback inválido - resposta inesperada da autenticação Google"
       );
       setTimeout(() => {
-        navigate("/login", { replace: true });
+        navigate("/ideabank", { replace: true });
       }, 2000);
     }
   }, [searchParams, navigate, queryClient]);

@@ -1,0 +1,420 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import type { Campaign } from "@/hooks/useIdeaBank";
+import { X } from "lucide-react";
+import { useState } from "react";
+
+interface CampaignEditFormProps {
+  campaign: Campaign;
+  onSave: (updatedCampaign: Partial<Campaign>) => void;
+  onCancel: () => void;
+  isLoading?: boolean;
+}
+
+export const CampaignEditForm = ({
+  campaign,
+  onSave,
+  onCancel,
+  isLoading = false,
+}: CampaignEditFormProps) => {
+  const [formData, setFormData] = useState({
+    title: campaign.title || "",
+    description: campaign.description || "",
+    objectives: Array.isArray(campaign.objectives) ? campaign.objectives : [],
+    platforms: Array.isArray(campaign.platforms) ? campaign.platforms : [],
+    content_types: campaign.content_types || {},
+    voice_tone: campaign.voice_tone || "professional",
+    product_description: campaign.product_description || "",
+    value_proposition: campaign.value_proposition || "",
+    campaign_urgency: campaign.campaign_urgency || "",
+    persona_age: campaign.persona_age || "",
+    persona_location: campaign.persona_location || "",
+    persona_income: campaign.persona_income || "",
+    persona_interests: campaign.persona_interests || "",
+    persona_behavior: campaign.persona_behavior || "",
+    persona_pain_points: campaign.persona_pain_points || "",
+  });
+
+  const [newObjective, setNewObjective] = useState("");
+  const [newPlatform, setNewPlatform] = useState("");
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleArrayChange = (field: string, value: string[]) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const addObjective = (objective: string) => {
+    if (objective && !formData.objectives.includes(objective)) {
+      handleArrayChange("objectives", [...formData.objectives, objective]);
+    }
+  };
+
+  const removeObjective = (index: number) => {
+    const updated = formData.objectives.filter((_, i) => i !== index);
+    handleArrayChange("objectives", updated);
+  };
+
+  const addPlatform = (platform: string) => {
+    if (platform && !formData.platforms.includes(platform)) {
+      handleArrayChange("platforms", [...formData.platforms, platform]);
+    }
+  };
+
+  const removePlatform = (index: number) => {
+    const updated = formData.platforms.filter((_, i) => i !== index);
+    handleArrayChange("platforms", updated);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  const voiceToneOptions = [
+    { value: "professional", label: "Profissional" },
+    { value: "casual", label: "Casual" },
+    { value: "inspirational", label: "Inspirador" },
+    { value: "urgent", label: "Urgente" },
+    { value: "educational", label: "Educativo" },
+  ];
+
+  const objectiveOptions = [
+    "sales", // Vendas
+    "branding", // Branding
+    "engagement", // Engajamento
+  ];
+
+  const platformOptions = [
+    "instagram", // Instagram
+    "tiktok", // TikTok
+    "youtube", // YouTube
+    "linkedin", // LinkedIn
+  ];
+
+  // Helper function to get display names
+  const getObjectiveDisplayName = (value: string) => {
+    const displayNames: Record<string, string> = {
+      sales: "Vendas",
+      branding: "Branding",
+      engagement: "Engajamento",
+      awareness: "Awareness",
+      conversion: "Conversão",
+      leads: "Leads",
+      retention: "Fidelização",
+      education: "Educação",
+      support: "Suporte",
+      community: "Comunidade",
+    };
+    return displayNames[value] || value;
+  };
+
+  const getPlatformDisplayName = (value: string) => {
+    const displayNames: Record<string, string> = {
+      instagram: "Instagram",
+      tiktok: "TikTok",
+      youtube: "YouTube",
+      linkedin: "LinkedIn",
+      facebook: "Facebook",
+      twitter: "Twitter",
+      pinterest: "Pinterest",
+      snapchat: "Snapchat",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    };
+    return displayNames[value] || value;
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Informações Básicas */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Informações Básicas</h3>
+
+          <div className="space-y-2">
+            <Label htmlFor="title">Título da Campanha *</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => handleInputChange("title", e.target.value)}
+              placeholder="Digite o título da campanha"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Descrição</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              placeholder="Descreva a campanha"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="voice_tone">Tom de Voz</Label>
+            <Select
+              value={formData.voice_tone}
+              onValueChange={(value) => handleInputChange("voice_tone", value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {voiceToneOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Objetivos e Plataformas */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Objetivos e Plataformas</h3>
+
+          <div className="space-y-2">
+            <Label>Objetivos</Label>
+            <Select
+              value={newObjective}
+              onValueChange={(value) => {
+                setNewObjective(value);
+                addObjective(value);
+                setNewObjective("");
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecionar objetivo" />
+              </SelectTrigger>
+              <SelectContent>
+                {objectiveOptions
+                  .filter((obj) => !formData.objectives.includes(obj))
+                  .map((objective) => (
+                    <SelectItem key={objective} value={objective}>
+                      {getObjectiveDisplayName(objective)}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.objectives.map((objective, index) => (
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
+                  {getObjectiveDisplayName(objective)}
+                  <button
+                    type="button"
+                    onClick={() => removeObjective(index)}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Plataformas</Label>
+            <Select
+              value={newPlatform}
+              onValueChange={(value) => {
+                setNewPlatform(value);
+                addPlatform(value);
+                setNewPlatform("");
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecionar plataforma" />
+              </SelectTrigger>
+              <SelectContent>
+                {platformOptions
+                  .filter((platform) => !formData.platforms.includes(platform))
+                  .map((platform) => (
+                    <SelectItem key={platform} value={platform}>
+                      {getPlatformDisplayName(platform)}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.platforms.map((platform, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="flex items-center gap-1"
+                >
+                  {getPlatformDisplayName(platform)}
+                  <button
+                    type="button"
+                    onClick={() => removePlatform(index)}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Produto e Proposta de Valor */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Produto e Proposta de Valor</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="product_description">
+              Descrição do Produto/Serviço
+            </Label>
+            <Textarea
+              id="product_description"
+              value={formData.product_description}
+              onChange={(e) =>
+                handleInputChange("product_description", e.target.value)
+              }
+              placeholder="Descreva o produto ou serviço"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="value_proposition">Proposta de Valor</Label>
+            <Textarea
+              id="value_proposition"
+              value={formData.value_proposition}
+              onChange={(e) =>
+                handleInputChange("value_proposition", e.target.value)
+              }
+              placeholder="Qual é a proposta de valor?"
+              rows={3}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="campaign_urgency">Urgência da Campanha</Label>
+          <Textarea
+            id="campaign_urgency"
+            value={formData.campaign_urgency}
+            onChange={(e) =>
+              handleInputChange("campaign_urgency", e.target.value)
+            }
+            placeholder="Descreva a urgência ou timing da campanha"
+            rows={2}
+          />
+        </div>
+      </div>
+
+      {/* Persona */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Persona do Público-Alvo</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="persona_age">Faixa Etária</Label>
+            <Input
+              id="persona_age"
+              value={formData.persona_age}
+              onChange={(e) => handleInputChange("persona_age", e.target.value)}
+              placeholder="Ex: 25-35 anos"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="persona_location">Localização</Label>
+            <Input
+              id="persona_location"
+              value={formData.persona_location}
+              onChange={(e) =>
+                handleInputChange("persona_location", e.target.value)
+              }
+              placeholder="Ex: São Paulo, Brasil"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="persona_income">Faixa de Renda</Label>
+            <Input
+              id="persona_income"
+              value={formData.persona_income}
+              onChange={(e) =>
+                handleInputChange("persona_income", e.target.value)
+              }
+              placeholder="Ex: Classe A-B"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="persona_interests">Interesses</Label>
+          <Textarea
+            id="persona_interests"
+            value={formData.persona_interests}
+            onChange={(e) =>
+              handleInputChange("persona_interests", e.target.value)
+            }
+            placeholder="Quais são os interesses do público-alvo?"
+            rows={2}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="persona_behavior">Comportamento</Label>
+          <Textarea
+            id="persona_behavior"
+            value={formData.persona_behavior}
+            onChange={(e) =>
+              handleInputChange("persona_behavior", e.target.value)
+            }
+            placeholder="Como o público-alvo se comporta?"
+            rows={2}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="persona_pain_points">Pontos de Dor</Label>
+          <Textarea
+            id="persona_pain_points"
+            value={formData.persona_pain_points}
+            onChange={(e) =>
+              handleInputChange("persona_pain_points", e.target.value)
+            }
+            placeholder="Quais são os problemas do público-alvo?"
+            rows={2}
+          />
+        </div>
+      </div>
+
+      {/* Botões de Ação */}
+      <div className="flex justify-end gap-3 pt-4 border-t">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Salvando..." : "Salvar Campanha"}
+        </Button>
+      </div>
+    </form>
+  );
+};
