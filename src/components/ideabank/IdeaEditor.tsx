@@ -41,7 +41,6 @@ import { JsonContentViewer } from "./JsonContentViewer";
 interface IdeaEditorProps {
   ideas: any[];
   onBack: () => void;
-  onClose: () => void;
 }
 
 // Função para detectar se uma ideia é uma campanha
@@ -123,7 +122,7 @@ const ideaToCampaignData = (idea: any) => {
   }
 };
 
-export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
+export const IdeaEditor = ({ ideas, onBack }: IdeaEditorProps) => {
   const [editingIdeas, setEditingIdeas] = useState(ideas);
   const [viewingIdea, setViewingIdea] = useState<any>(null);
   const [editingIdea, setEditingIdea] = useState<any>(null);
@@ -411,11 +410,6 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
           <ArrowLeft className="h-4 w-4" />
           Voltar
         </Button>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onClose}>
-            Fechar
-          </Button>
-        </div>
       </div>
 
       <div className="space-y-8">

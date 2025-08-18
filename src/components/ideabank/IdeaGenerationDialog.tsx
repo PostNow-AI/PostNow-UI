@@ -209,7 +209,6 @@ export const IdeaGenerationDialog = ({
             <IdeaEditor
               ideas={generatedIdeas}
               onBack={() => setGeneratedIdeas([])}
-              onClose={handleClose}
             />
           )}
         </div>

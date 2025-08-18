@@ -105,7 +105,7 @@ export const ProfileEditForm = ({
     // Clean up empty values before sending
     const cleanedData = Object.fromEntries(
       Object.entries(data).filter(
-        ([_, value]) => value !== "" && value !== undefined && value !== null
+        ([, value]) => value !== "" && value !== undefined && value !== null
       )
     );
 

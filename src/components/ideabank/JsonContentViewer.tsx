@@ -159,8 +159,6 @@ export const JsonContentViewer = ({
       const parsed = JSON.parse(cleanedContent);
       setParsedContent(parsed);
       setError(null);
-
-      console.log("JSON parsed successfully:", parsed);
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
       console.error("Raw content:", content);

@@ -52,11 +52,6 @@ export const BasicUserInfo = ({
     null
   );
 
-  // Debug logs
-  console.log("BasicUserInfo renderizado");
-  console.log("authUser:", authUser);
-  console.log("googleAccount state:", googleAccount);
-
   const { processFile, isProcessing } = useAvatarUpload({
     onUpload: (avatarData: string) => {
       uploadAvatar(avatarData, {
@@ -80,22 +75,13 @@ export const BasicUserInfo = ({
 
   // Buscar contas sociais conectadas
   useEffect(() => {
-    console.log("useEffect executado, authUser:", authUser);
-
     const fetchSocialAccounts = async () => {
       try {
-        console.log("Fazendo requisição para /api/v1/auth/social-accounts/");
         const response = await api.get("/api/v1/auth/social-accounts/");
-        console.log("Resposta da API:", response.data);
-
-        // A API retorna { social_accounts: [...], total_count: ... }
         const socialAccounts = response.data.social_accounts || [];
         const googleAcc = socialAccounts.find(
           (acc: SocialAccount) => acc.provider === "google"
         );
-
-        console.log("Contas sociais encontradas:", socialAccounts);
-        console.log("Conta Google:", googleAcc);
 
         setGoogleAccount(googleAcc || null);
       } catch (error) {
@@ -104,10 +90,7 @@ export const BasicUserInfo = ({
     };
 
     if (authUser) {
-      console.log("authUser existe, buscando contas sociais...");
       fetchSocialAccounts();
-    } else {
-      console.log("authUser não existe ainda");
     }
   }, [authUser]);
 
@@ -120,7 +103,6 @@ export const BasicUserInfo = ({
 
   const handleConnectGoogle = () => {
     // Implementar conexão com Google
-    console.log("Conectar Google");
   };
 
   const handleDisconnect = async (account: SocialAccount) => {
@@ -168,19 +150,6 @@ export const BasicUserInfo = ({
             <p className="text-sm text-muted-foreground">
               Gerencie suas contas sociais conectadas
             </p>
-          </div>
-
-          {/* Debug Info */}
-          <div className="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              Debug: authUser = {authUser ? "Sim" : "Não"}, googleAccount ={" "}
-              {googleAccount ? "Sim" : "Não"}
-            </p>
-            {googleAccount && (
-              <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                Email: {googleAccount.extra_data?.email}
-              </p>
-            )}
           </div>
 
           {/* Google Account */}

@@ -254,7 +254,7 @@ export const PublicIdeaGenerationForm = ({
                 <Label htmlFor="persona_age">Idade</Label>
                 <Input
                   id="persona_age"
-                  placeholder="Ex: 25-35 anos"
+                  placeholder="Ex: 25-35 anos, 18-24 anos, 40+ anos"
                   {...form.register("persona_age")}
                 />
               </div>
@@ -262,7 +262,7 @@ export const PublicIdeaGenerationForm = ({
                 <Label htmlFor="persona_location">Localização</Label>
                 <Input
                   id="persona_location"
-                  placeholder="Ex: São Paulo, SP"
+                  placeholder="Ex: São Paulo, SP, Brasil, América Latina"
                   {...form.register("persona_location")}
                 />
               </div>
@@ -270,7 +270,7 @@ export const PublicIdeaGenerationForm = ({
                 <Label htmlFor="persona_income">Renda</Label>
                 <Input
                   id="persona_income"
-                  placeholder="Ex: R$ 3.000 - 5.000"
+                  placeholder="Ex: R$ 3.000-5.000, Classe A-B, Renda média"
                   {...form.register("persona_income")}
                 />
               </div>
@@ -280,7 +280,7 @@ export const PublicIdeaGenerationForm = ({
                 <Label htmlFor="persona_interests">Interesses</Label>
                 <Textarea
                   id="persona_interests"
-                  placeholder="Ex: Tecnologia, fitness, viagens..."
+                  placeholder="Ex: Tecnologia, fitness, viagens, gastronomia, sustentabilidade, empreendedorismo, educação online..."
                   rows={3}
                   {...form.register("persona_interests")}
                 />
@@ -289,7 +289,7 @@ export const PublicIdeaGenerationForm = ({
                 <Label htmlFor="persona_behavior">Comportamento</Label>
                 <Textarea
                   id="persona_behavior"
-                  placeholder="Ex: Ativos nas redes sociais, gostam de conteúdo educativo..."
+                  placeholder="Ex: Ativos nas redes sociais, consomem conteúdo educativo, preferem vídeos curtos, gostam de interagir com marcas..."
                   rows={3}
                   {...form.register("persona_behavior")}
                 />
@@ -299,7 +299,7 @@ export const PublicIdeaGenerationForm = ({
               <Label htmlFor="persona_pain_points">Dores e Necessidades</Label>
               <Textarea
                 id="persona_pain_points"
-                placeholder="Ex: Falta de tempo, dificuldade em organizar..."
+                placeholder="Ex: Falta de tempo, dificuldade em organizar, busca por soluções rápidas, necessidade de aprendizado contínuo..."
                 rows={2}
                 {...form.register("persona_pain_points")}
               />
@@ -454,7 +454,7 @@ export const PublicIdeaGenerationForm = ({
                 <Label htmlFor="title">Título da Campanha</Label>
                 <Input
                   id="title"
-                  placeholder="Ex: Campanha de Marketing Digital"
+                  placeholder="Ex: Campanha de Marketing Digital, Lançamento de Produto, Black Friday, Conscientização sobre Sustentabilidade"
                   {...form.register("title")}
                 />
               </div>
@@ -462,7 +462,7 @@ export const PublicIdeaGenerationForm = ({
                 <Label htmlFor="description">Descrição da Campanha</Label>
                 <Textarea
                   id="description"
-                  placeholder="Ex: Descrição detalhada da campanha..."
+                  placeholder="Ex: Campanha focada em aumentar o engajamento nas redes sociais, com foco em conteúdo educativo e interativo para nossa audiência..."
                   rows={2}
                   {...form.register("description")}
                 />
@@ -475,7 +475,7 @@ export const PublicIdeaGenerationForm = ({
                 </Label>
                 <Textarea
                   id="product_description"
-                  placeholder="Ex: Descrição detalhada do produto/serviço..."
+                  placeholder="Ex: Software de gestão empresarial que automatiza processos, reduz custos e aumenta a produtividade da equipe..."
                   rows={2}
                   {...form.register("product_description")}
                 />
@@ -484,7 +484,7 @@ export const PublicIdeaGenerationForm = ({
                 <Label htmlFor="value_proposition">Proposta de Valor</Label>
                 <Textarea
                   id="value_proposition"
-                  placeholder="Ex: Explique a proposta de valor da sua oferta..."
+                  placeholder="Ex: Economia de 10 horas semanais em tarefas administrativas, ROI de 300% em 6 meses, suporte 24/7 incluído..."
                   rows={2}
                   {...form.register("value_proposition")}
                 />

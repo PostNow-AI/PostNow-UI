@@ -309,13 +309,7 @@ export const IdeaBankPage = () => {
 
   // Se estiver mostrando o editor, renderizar apenas ele
   if (showEditor) {
-    return (
-      <IdeaEditor
-        ideas={editorIdeas}
-        onBack={handleEditorBack}
-        onClose={() => setShowEditor(false)}
-      />
-    );
+    return <IdeaEditor ideas={editorIdeas} onBack={handleEditorBack} />;
   }
 
   return (
@@ -331,10 +325,12 @@ export const IdeaBankPage = () => {
         {!keyStatus?.has_key ? null : (
           <div className="flex items-center gap-4">
             <ApiKeyStatus />
-            <Button onClick={handleNewIdeaClick}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nova campanha
-            </Button>
+            {campaigns.length > 0 && (
+              <Button onClick={handleNewIdeaClick}>
+                <Plus className="mr-2 h-4 w-4" />
+                Nova campanha
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -362,6 +358,7 @@ export const IdeaBankPage = () => {
           </CardHeader>
           <CardContent>
             <CampaignIdeaList
+              handleNewIdeaClick={handleNewIdeaClick}
               campaigns={campaigns}
               isLoading={isLoading}
               onEditIdea={handleEditIdea}

@@ -12,6 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Textarea,
 } from "@/components/ui";
 import { globalOptionsApi } from "@/lib/global-options-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -50,8 +51,6 @@ export const ProfessionalInfoSection = ({
   const watchedValues = watch();
   const queryClient = useQueryClient();
   const [customProfessionInput, setCustomProfessionInput] = useState("");
-  const [customSpecializationInput, setCustomSpecializationInput] =
-    useState("");
 
   // Buscar dados da API
   const { data: professions = [] } = useQuery({
@@ -99,79 +98,23 @@ export const ProfessionalInfoSection = ({
     },
   });
 
-  const createSpecializationMutation = useMutation({
-    mutationFn: globalOptionsApi.createCustomSpecialization,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["specializations"] });
-      queryClient.invalidateQueries({ queryKey: ["professions"] });
-      toast.success("Especialização criada com sucesso!");
-      setCustomSpecializationInput("");
-    },
-    onError: (error: unknown) => {
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { data?: { message?: string } };
-        };
-        toast.error(
-          axiosError.response?.data?.message || "Erro ao criar especialização"
-        );
-      } else {
-        toast.error("Erro ao criar especialização");
-      }
-    },
-  });
+  const handleAddCustomProfession = async () => {
+    if (!customProfessionInput.trim()) return;
 
-  // Handlers para criar opções customizadas
-  const handleAddCustomProfession = () => {
-    if (customProfessionInput.trim()) {
-      createProfessionMutation.mutate({ name: customProfessionInput.trim() });
-    }
-  };
-
-  const handleAddCustomSpecialization = () => {
-    if (customSpecializationInput.trim()) {
-      if (watchedValues.profession === "Outro" && customProfessionInput) {
-        // Criar profissão e depois especialização
-        createProfessionMutation.mutate(
-          { name: customProfessionInput.trim() },
-          {
-            onSuccess: (newProfession) => {
-              createSpecializationMutation.mutate({
-                name: customSpecializationInput.trim(),
-                profession: newProfession.id,
-              });
-            },
-          }
-        );
-      } else {
-        // Profissão já existe, criar apenas a especialização
-        const profession = professions.find(
-          (p) => p.name === watchedValues.profession
-        );
-        if (profession) {
-          globalOptionsApi
-            .createCustomSpecializationForProfession({
-              name: customSpecializationInput.trim(),
-              profession: profession.id,
-            })
-            .then(() => {
-              queryClient.invalidateQueries({ queryKey: ["specializations"] });
-              queryClient.invalidateQueries({ queryKey: ["professions"] });
-              toast.success("Especialização criada com sucesso!");
-              setCustomSpecializationInput("");
-            })
-            .catch((error) => {
-              toast.error(
-                error.response?.data?.message || "Erro ao criar especialização"
-              );
-            });
-        }
-      }
+    try {
+      await createProfessionMutation.mutateAsync({
+        name: customProfessionInput.trim(),
+      });
+    } catch {
+      // Error is handled by the mutation
     }
   };
 
   // Obter todas as profissões disponíveis
-  const allAvailableProfessions = [...professions.map((p) => p.name), "Outro"];
+  const allAvailableProfessions = [
+    ...(professions.map((p) => p.name) || []),
+    "Outro",
+  ];
 
   // Obter especializações disponíveis para a profissão selecionada
   const availableSpecializations = specializations?.specializations || [];
@@ -193,7 +136,7 @@ export const ProfessionalInfoSection = ({
             <Label htmlFor="professional_name">Nome Profissional</Label>
             <Input
               id="professional_name"
-              placeholder="Ex: Dr. João Silva"
+              placeholder="Ex: Dr. João Silva, Maria Santos Consultoria, Tech Solutions Ltda"
               {...register("professional_name")}
             />
             {errors.professional_name && (
@@ -268,7 +211,7 @@ export const ProfessionalInfoSection = ({
             <div className="flex gap-2">
               <Input
                 id="custom_profession"
-                placeholder="Descreva sua profissão"
+                placeholder="Ex: Especialista em marketing digital, Consultor de vendas, Designer UX/UI, Analista de dados..."
                 value={customProfessionInput}
                 onChange={(e) => setCustomProfessionInput(e.target.value)}
               />
@@ -299,36 +242,14 @@ export const ProfessionalInfoSection = ({
         {watchedValues.profession && watchedValues.profession !== "Outro" && (
           <div className="space-y-2">
             <Label htmlFor="custom_specialization">
-              Adicionar especialização personalizada para{" "}
-              {watchedValues.profession}
+              Especialização Personalizada
             </Label>
-            <div className="flex gap-2">
-              <Input
-                id="custom_specialization"
-                placeholder="Descreva uma especialização personalizada"
-                value={customSpecializationInput}
-                onChange={(e) => setCustomSpecializationInput(e.target.value)}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleAddCustomSpecialization}
-                disabled={
-                  !customSpecializationInput.trim() ||
-                  createSpecializationMutation.isPending
-                }
-              >
-                {createSpecializationMutation.isPending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  "Adicionar"
-                )}
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Sua especialização será salva para referência futura de outros
-              usuários.
-            </p>
+            <Textarea
+              id="custom_specialization"
+              placeholder="Ex: Marketing de influência para nichos específicos, automação de processos de vendas, estratégias de conteúdo para LinkedIn..."
+              rows={3}
+              {...register("custom_specialization")}
+            />
           </div>
         )}
       </CardContent>

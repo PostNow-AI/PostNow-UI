@@ -103,8 +103,7 @@ export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
   const allAvailableFonts = [
     ...fonts.predefined.map((f: { name: string }) => f.name),
     ...fonts.custom.map((f: { name: string }) => f.name),
-    "Outro",
-  ];
+  ].sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   return (
     <>

@@ -42,6 +42,7 @@ interface CampaignIdeaListProps {
       variation_type: string;
     }
   ) => Promise<CampaignIdea>;
+  handleNewIdeaClick: () => void;
 }
 
 export const CampaignIdeaList = ({
@@ -52,6 +53,7 @@ export const CampaignIdeaList = ({
   onEditCampaign,
   onDeleteCampaign,
   onAddIdea,
+  handleNewIdeaClick,
 }: CampaignIdeaListProps) => {
   const [expandedCampaigns, setExpandedCampaigns] = useState<Set<number>>(
     new Set()
@@ -131,7 +133,13 @@ export const CampaignIdeaList = ({
           <h3 className="text-lg font-semibold mb-2">
             Nenhuma campanha encontrada
           </h3>
-          <p>Comece gerando sua primeira campanha com ideias!</p>
+          <p className="mb-4">
+            Comece gerando sua primeira campanha com ideias!
+          </p>
+          <Button onClick={handleNewIdeaClick}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova campanha
+          </Button>
         </div>
       </div>
     );

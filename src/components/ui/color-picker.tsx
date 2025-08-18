@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./button";
 import { Input } from "./input";
 import { Label } from "./label";
@@ -38,13 +38,13 @@ export const ColorPicker = ({
   label,
   placeholder,
 }: ColorPickerProps) => {
-  const [customColor, setCustomColor] = useState(value || "");
+  const [customColor, setCustomColor] = useState(value || "#3B82F6");
   const [isOpen, setIsOpen] = useState(false);
   const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(100);
   const [lightness, setLightness] = useState(50);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Inicializar com uma cor padrão se não houver valor
   useEffect(() => {
     if (value && value.match(/^#[0-9A-F]{6}$/i)) {
       const rgb = hexToRgb(value);
@@ -53,63 +53,16 @@ export const ColorPicker = ({
         setHue(hsl.h);
         setSaturation(hsl.s);
         setLightness(hsl.l);
+        setCustomColor(value);
       }
+    } else {
+      // Se não houver valor, usar a cor padrão
+      setCustomColor("#3B82F6");
+      setHue(217); // Azul
+      setSaturation(100);
+      setLightness(50);
     }
   }, [value]);
-
-  useEffect(() => {
-    if (canvasRef.current) {
-      drawColorSpectrum();
-    }
-  }, [hue]);
-
-  const drawColorSpectrum = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const width = canvas.width;
-    const height = canvas.height;
-
-    // Desenhar espectro de saturação e luminosidade
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const s = (x / width) * 100;
-        const l = ((height - y) / height) * 100;
-        const color = `hsl(${hue}, ${s}%, ${l}%)`;
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, 1, 1);
-      }
-    }
-  };
-
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const s = (x / canvas.width) * 100;
-    const l = ((canvas.height - y) / canvas.height) * 100;
-
-    const color = hslToHex(hue, s, l);
-    onChange(color);
-    setCustomColor(color);
-    setSaturation(s);
-    setLightness(l);
-  };
-
-  const handleHueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newHue = parseInt(e.target.value);
-    setHue(newHue);
-    const color = hslToHex(newHue, saturation, lightness);
-    onChange(color);
-    setCustomColor(color);
-  };
 
   const handleColorSelect = (color: string) => {
     onChange(color);
@@ -149,7 +102,13 @@ export const ColorPicker = ({
                     min="0"
                     max="360"
                     value={hue}
-                    onChange={handleHueChange}
+                    onChange={(e) => {
+                      const newHue = parseInt(e.target.value);
+                      setHue(newHue);
+                      const color = hslToHex(newHue, saturation, lightness);
+                      onChange(color);
+                      setCustomColor(color);
+                    }}
                     className="flex-1 h-2 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-purple-500 to-red-500 rounded-lg appearance-none cursor-pointer"
                     style={{
                       background: `linear-gradient(to right, hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%), hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%))`,
@@ -163,22 +122,55 @@ export const ColorPicker = ({
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Espectro de Cores</Label>
                 <div className="relative">
-                  <canvas
-                    ref={canvasRef}
-                    width={200}
-                    height={150}
-                    className="w-full h-32 rounded border cursor-crosshair"
-                    onClick={handleCanvasClick}
-                    title="Clique para selecionar uma cor"
-                  />
                   <div
-                    className="absolute w-3 h-3 border-2 border-white rounded-full pointer-events-none shadow-lg"
+                    className="w-full h-32 rounded border cursor-crosshair relative overflow-hidden"
                     style={{
-                      left: `${(saturation / 100) * 200}px`,
-                      top: `${((100 - lightness) / 100) * 150}px`,
-                      transform: "translate(-50%, -50%)",
+                      background: `linear-gradient(to right, 
+                        hsl(${hue}, 0%, 50%), 
+                        hsl(${hue}, 100%, 50%)
+                      ), linear-gradient(to top, 
+                        hsl(${hue}, 100%, 0%), 
+                        hsl(${hue}, 100%, 50%), 
+                        hsl(${hue}, 100%, 100%)
+                      )`,
                     }}
-                  />
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const x = e.clientX - rect.left;
+                      const y = e.clientY - rect.top;
+
+                      // Calcular saturação e luminosidade baseado na posição
+                      const s = Math.max(
+                        0,
+                        Math.min(100, (x / rect.width) * 100)
+                      );
+                      const l = Math.max(
+                        0,
+                        Math.min(100, ((rect.height - y) / rect.height) * 100)
+                      );
+
+                      // Atualizar estados
+                      setSaturation(s);
+                      setLightness(l);
+
+                      // Gerar nova cor
+                      const color = hslToHex(hue, s, l);
+                      onChange(color);
+                      setCustomColor(color);
+                    }}
+                    title="Clique para selecionar uma cor"
+                  >
+                    {/* Indicador de posição */}
+                    <div
+                      className="absolute w-3 h-3 border-2 border-white rounded-full pointer-events-none shadow-lg"
+                      style={{
+                        left: `${(saturation / 100) * 100}%`,
+                        top: `${((100 - lightness) / 100) * 100}%`,
+                        transform: "translate(-50%, -50%)",
+                        zIndex: 10,
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 

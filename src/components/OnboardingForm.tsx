@@ -136,8 +136,6 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
   const watchedValues = watch();
   const selectedProfession = watchedValues.profession;
   const selectedSpecialization = watchedValues.specialization;
-  const selectedPrimaryFont = watchedValues.primary_font;
-  const selectedSecondaryFont = watchedValues.secondary_font;
   const customProfessionInput = watchedValues.custom_profession;
 
   // Buscar dados da API
@@ -159,11 +157,9 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
           (p) => p.name === selectedProfession
         );
         if (profession) {
-          console.log("Buscando especializações para profissão:", profession);
           const result = await globalOptionsApi.getProfessionSpecializations(
             profession.id
           );
-          console.log("Especializações encontradas:", result);
           return result;
         }
       }
@@ -172,12 +168,10 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
     enabled: !!selectedProfession && selectedProfession !== "Outro",
   });
 
-  // Obter todas as fontes disponíveis
   const allAvailableFonts = [
-    ...fonts.predefined.map((f) => f.name),
-    ...fonts.custom.map((f) => f.name),
-    "Outro",
-  ];
+    ...fonts.predefined.map((f: { name: string }) => f.name),
+    ...fonts.custom.map((f: { name: string }) => f.name),
+  ].sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   // Verificar se deve mostrar campo de especialização customizada
   const shouldShowCustomSpecializationField =
@@ -193,10 +187,6 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
   const availableSpecializations = specializations?.specializations || [];
 
   // Debug: Log das especializações
-  console.log("Profissão selecionada:", selectedProfession);
-  console.log("Especializações carregadas:", specializations);
-  console.log("Especializações disponíveis:", availableSpecializations);
-
   // Mutations para criar opções customizadas
   const createProfessionMutation = useMutation({
     mutationFn: globalOptionsApi.createCustomProfession,
@@ -239,16 +229,16 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
     },
   });
 
-  const createFontMutation = useMutation({
-    mutationFn: globalOptionsApi.createCustomFont,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fonts"] });
-      toast.success("Fonte criada com sucesso!");
-    },
-    onError: (error: ApiError) => {
-      toast.error(error.response?.data?.message || "Erro ao criar fonte");
-    },
-  });
+  // const createFontMutation = useMutation({
+  //   mutationFn: globalOptionsApi.createCustomFont,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["fonts"] });
+  //     toast.success("Fonte criada com sucesso!");
+  //   },
+  //   onError: (error: ApiError) => {
+  //     toast.error(error.response?.data?.message || "Erro ao criar fonte");
+  //   },
+  // });
 
   // Handlers para criar opções customizadas
   const handleAddCustomProfession = () => {
@@ -313,21 +303,21 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
     }
   };
 
-  const handleAddCustomFont = (fontType: "primary" | "secondary") => {
-    const customValue =
-      watchedValues[
-        fontType === "primary" ? "custom_primary_font" : "custom_secondary_font"
-      ];
-    if (customValue && customValue.trim()) {
-      createFontMutation.mutate({ name: customValue.trim() });
-      setValue(
-        fontType === "primary"
-          ? "custom_primary_font"
-          : "custom_secondary_font",
-        ""
-      );
-    }
-  };
+  // const handleAddCustomFont = (fontType: "primary" | "secondary") => {
+  //   const customValue =
+  //     watchedValues[
+  //       fontType === "primary" ? "custom_primary_font" : "custom_secondary_font"
+  //     ];
+  //   if (customValue && customValue.trim()) {
+  //     createFontMutation.mutate({ name: customValue.trim() });
+  //     setValue(
+  //       fontType === "primary"
+  //         ? "custom_primary_font"
+  //         : "custom_secondary_font",
+  //       ""
+  //     );
+  //   }
+  // };
 
   const onboardingMutation = useMutation({
     mutationFn: async (data: OnboardingFormData) => {
@@ -856,7 +846,7 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
               </div>
             </div>
 
-            {/* Campos condicionais para fontes personalizadas */}
+            {/* Campos condicionais para fontes personalizadas
             {selectedPrimaryFont === "Outro" && (
               <div className="space-y-2">
                 <Label htmlFor="custom_primary_font">
@@ -894,9 +884,9 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
                   usuários.
                 </p>
               </div>
-            )}
+            )} */}
 
-            {selectedSecondaryFont === "Outro" && (
+            {/* {selectedSecondaryFont === "Outro" && (
               <div className="text-xs text-muted-foreground">
                 <Label htmlFor="custom_secondary_font">
                   Qual é sua fonte secundária?
@@ -933,7 +923,7 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
                   usuários.
                 </p>
               </div>
-            )}
+            )} */}
           </CardContent>
         </Card>
 

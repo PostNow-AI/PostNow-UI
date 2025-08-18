@@ -23,13 +23,13 @@ import { z } from "zod";
 
 const ideaGenerationSchema = z.object({
   // Campaign info
-  title: z.string().min(3, "Título deve ter pelo menos 3 caracteres"),
+  title: z.string().optional(),
   description: z.string().optional(),
 
-  // Campaign objective
+  // Campaign objective (required)
   objectives: z.array(z.string()).min(1, "Selecione pelo menos um objetivo"),
 
-  // Target persona
+  // Target persona (optional)
   persona_age: z.string().optional(),
   persona_location: z.string().optional(),
   persona_income: z.string().optional(),
@@ -37,14 +37,14 @@ const ideaGenerationSchema = z.object({
   persona_behavior: z.string().optional(),
   persona_pain_points: z.string().optional(),
 
-  // Social platforms and content types
+  // Social platforms and content types (required platforms)
   platforms: z.array(z.string()).min(1, "Selecione pelo menos uma plataforma"),
   content_types: z.record(z.string(), z.array(z.string())).optional(),
 
-  // Voice tone
-  voice_tone: z.string(),
+  // Voice tone (required)
+  voice_tone: z.string().min(1, "Selecione um tom de voz"),
 
-  // Campaign details for AI generation
+  // Campaign details for AI generation (optional)
   product_description: z.string().optional(),
   value_proposition: z.string().optional(),
   campaign_urgency: z.string().optional(),
@@ -102,6 +102,9 @@ export const IdeaGenerationForm = ({
       campaign_urgency: "",
     },
   });
+  const {
+    formState: { errors },
+  } = form;
 
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [contentTypes, setContentTypes] = useState<Record<string, string[]>>(
@@ -109,7 +112,6 @@ export const IdeaGenerationForm = ({
   );
 
   const handleSubmit = (data: IdeaGenerationFormData) => {
-    // The form values are already updated by setValue calls
     onSubmit(data);
   };
 
@@ -130,7 +132,7 @@ export const IdeaGenerationForm = ({
     }
 
     // Update form value
-    form.setValue("platforms", newPlatforms);
+    form.setValue("platforms", newPlatforms, { shouldValidate: true });
   };
 
   const handleContentTypeChange = (
@@ -167,7 +169,8 @@ export const IdeaGenerationForm = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            Objetivo da Campanha
+            Objetivo da Campanha{" "}
+            <span className="text-destructive">(obrigatório)</span>
           </CardTitle>
           <CardDescription>
             Selecione os objetivos que deseja alcançar
@@ -186,17 +189,22 @@ export const IdeaGenerationForm = ({
                   onCheckedChange={(checked) => {
                     const current = form.watch("objectives");
                     if (checked) {
-                      form.setValue("objectives", [
-                        ...current,
-                        objective.value,
-                      ]);
+                      form.setValue(
+                        "objectives",
+                        [...current, objective.value],
+                        {
+                          shouldValidate: true,
+                        }
+                      );
                     } else {
                       form.setValue(
                         "objectives",
-                        current.filter((o) => o !== objective.value)
+                        current.filter((o) => o !== objective.value),
+                        { shouldValidate: true }
                       );
                     }
                   }}
+                  aria-required="true"
                 />
                 <Label
                   htmlFor={objective.value}
@@ -207,6 +215,11 @@ export const IdeaGenerationForm = ({
               </div>
             ))}
           </div>
+          {errors.objectives && (
+            <p className="text-sm text-destructive">
+              {String(errors.objectives.message)}
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -215,7 +228,8 @@ export const IdeaGenerationForm = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Persona Alvo
+            Persona Alvo{" "}
+            <span className="text-muted-foreground">(opcional)</span>
           </CardTitle>
           <CardDescription>
             Defina as características do público que deseja atingir
@@ -227,7 +241,7 @@ export const IdeaGenerationForm = ({
               <Label htmlFor="persona_age">Idade</Label>
               <Input
                 id="persona_age"
-                placeholder="Ex: 25-35 anos"
+                placeholder="Ex: 25-35 anos, 18-24 anos, 40+ anos"
                 {...form.register("persona_age")}
               />
             </div>
@@ -235,7 +249,7 @@ export const IdeaGenerationForm = ({
               <Label htmlFor="persona_location">Localização</Label>
               <Input
                 id="persona_location"
-                placeholder="Ex: São Paulo, SP"
+                placeholder="Ex: São Paulo, SP, Brasil, América Latina"
                 {...form.register("persona_location")}
               />
             </div>
@@ -243,7 +257,7 @@ export const IdeaGenerationForm = ({
               <Label htmlFor="persona_income">Renda</Label>
               <Input
                 id="persona_income"
-                placeholder="Ex: R$ 3.000 - 5.000"
+                placeholder="Ex: R$ 3.000-5.000, Classe A-B, Renda média"
                 {...form.register("persona_income")}
               />
             </div>
@@ -253,7 +267,7 @@ export const IdeaGenerationForm = ({
               <Label htmlFor="persona_interests">Interesses</Label>
               <Textarea
                 id="persona_interests"
-                placeholder="Ex: Tecnologia, fitness, viagens..."
+                placeholder="Ex: Tecnologia, fitness, viagens, gastronomia, sustentabilidade, empreendedorismo, educação online..."
                 rows={3}
                 {...form.register("persona_interests")}
               />
@@ -262,7 +276,7 @@ export const IdeaGenerationForm = ({
               <Label htmlFor="persona_behavior">Comportamento</Label>
               <Textarea
                 id="persona_behavior"
-                placeholder="Ex: Ativos nas redes sociais, gostam de conteúdo educativo..."
+                placeholder="Ex: Ativos nas redes sociais, consomem conteúdo educativo, preferem vídeos curtos, gostam de interagir com marcas..."
                 rows={3}
                 {...form.register("persona_behavior")}
               />
@@ -272,7 +286,7 @@ export const IdeaGenerationForm = ({
             <Label htmlFor="persona_pain_points">Dores e Necessidades</Label>
             <Textarea
               id="persona_pain_points"
-              placeholder="Ex: Falta de tempo, dificuldade em organizar..."
+              placeholder="Ex: Falta de tempo, dificuldade em organizar, busca por soluções rápidas, necessidade de aprendizado contínuo..."
               rows={2}
               {...form.register("persona_pain_points")}
             />
@@ -285,7 +299,8 @@ export const IdeaGenerationForm = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Share2 className="h-5 w-5" />
-            Plataformas de Redes Sociais
+            Plataformas de Redes Sociais{" "}
+            <span className="text-destructive">(obrigatório)</span>
           </CardTitle>
           <CardDescription>
             Selecione as plataformas onde deseja criar conteúdo
@@ -304,6 +319,7 @@ export const IdeaGenerationForm = ({
                   onCheckedChange={(checked) =>
                     handlePlatformChange(platform.value, checked as boolean)
                   }
+                  aria-required="true"
                 />
                 <Label
                   htmlFor={platform.value}
@@ -314,6 +330,11 @@ export const IdeaGenerationForm = ({
               </div>
             ))}
           </div>
+          {errors.platforms && (
+            <p className="text-sm text-destructive">
+              {String(errors.platforms.message)}
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -323,7 +344,8 @@ export const IdeaGenerationForm = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Type className="h-5 w-5" />
-              Tipos de Conteúdo
+              Tipos de Conteúdo{" "}
+              <span className="text-muted-foreground">(opcional)</span>
             </CardTitle>
             <CardDescription>
               Selecione os tipos de conteúdo para cada plataforma
@@ -339,7 +361,6 @@ export const IdeaGenerationForm = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
                   {options?.content_types?.[platform]?.map(
                     (contentType: string) => {
-                      // Get the label for the content type
                       const contentTypeLabel = getContentTypeLabel(contentType);
                       return (
                         <div
@@ -382,7 +403,7 @@ export const IdeaGenerationForm = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Volume2 className="h-5 w-5" />
-            Tom de Voz
+            Tom de Voz <span className="text-destructive">(obrigatório)</span>
           </CardTitle>
           <CardDescription>
             Escolha o tom de voz que deseja para a campanha
@@ -390,10 +411,12 @@ export const IdeaGenerationForm = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <Select
-            onValueChange={(value) => form.setValue("voice_tone", value)}
+            onValueChange={(value) =>
+              form.setValue("voice_tone", value, { shouldValidate: true })
+            }
             value={form.watch("voice_tone")}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full" aria-required="true">
               <SelectValue placeholder="Selecione um tom de voz" />
             </SelectTrigger>
             <SelectContent>
@@ -404,6 +427,11 @@ export const IdeaGenerationForm = ({
               ))}
             </SelectContent>
           </Select>
+          {errors.voice_tone && (
+            <p className="text-sm text-destructive">
+              {String(errors.voice_tone.message)}
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -412,7 +440,8 @@ export const IdeaGenerationForm = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Type className="h-5 w-5" />
-            Detalhes da Campanha
+            Detalhes da Campanha{" "}
+            <span className="text-muted-foreground">(opcional)</span>
           </CardTitle>
           <CardDescription>
             Forneça mais detalhes para a geração de ideias
@@ -421,18 +450,29 @@ export const IdeaGenerationForm = ({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Título da Campanha</Label>
+              <Label htmlFor="title">
+                Título da Campanha{" "}
+                <span className="text-muted-foreground">(opcional)</span>
+              </Label>
               <Input
                 id="title"
-                placeholder="Ex: Campanha de Marketing Digital"
+                placeholder="Ex: Campanha de Marketing Digital, Lançamento de Produto, Black Friday, Conscientização sobre Sustentabilidade"
                 {...form.register("title")}
               />
+              {errors.title && (
+                <p className="text-sm text-destructive">
+                  {String(errors.title.message)}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Descrição da Campanha</Label>
+              <Label htmlFor="description">
+                Descrição da Campanha{" "}
+                <span className="text-muted-foreground">(opcional)</span>
+              </Label>
               <Textarea
                 id="description"
-                placeholder="Ex: Descrição detalhada da campanha..."
+                placeholder="Ex: Campanha focada em aumentar o engajamento nas redes sociais, com foco em conteúdo educativo e interativo para nossa audiência..."
                 rows={2}
                 {...form.register("description")}
               />
@@ -440,26 +480,35 @@ export const IdeaGenerationForm = ({
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="product_description">Descrição do Produto</Label>
+              <Label htmlFor="product_description">
+                Descrição do Produto{" "}
+                <span className="text-muted-foreground">(opcional)</span>
+              </Label>
               <Textarea
                 id="product_description"
-                placeholder="Ex: Descrição detalhada do produto/serviço..."
+                placeholder="Ex: Software de gestão empresarial que automatiza processos, reduz custos e aumenta a produtividade da equipe..."
                 rows={2}
                 {...form.register("product_description")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="value_proposition">Proposta de Valor</Label>
+              <Label htmlFor="value_proposition">
+                Proposta de Valor{" "}
+                <span className="text-muted-foreground">(opcional)</span>
+              </Label>
               <Textarea
                 id="value_proposition"
-                placeholder="Ex: Explique a proposta de valor da sua oferta..."
+                placeholder="Ex: Economia de 10 horas semanais em tarefas administrativas, ROI de 300% em 6 meses, suporte 24/7 incluído..."
                 rows={2}
                 {...form.register("value_proposition")}
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="campaign_urgency">Urgência da Campanha</Label>
+            <Label htmlFor="campaign_urgency">
+              Urgência da Campanha{" "}
+              <span className="text-muted-foreground">(opcional)</span>
+            </Label>
             <Select
               onValueChange={(value) =>
                 form.setValue("campaign_urgency", value)

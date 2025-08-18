@@ -150,7 +150,7 @@ export const CampaignEditForm = ({
               id="title"
               value={formData.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="Digite o título da campanha"
+              placeholder="Ex: Campanha de Marketing Digital, Lançamento de Produto, Black Friday"
               required
             />
           </div>
@@ -161,7 +161,7 @@ export const CampaignEditForm = ({
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Descreva a campanha"
+              placeholder="Ex: Campanha focada em aumentar o engajamento nas redes sociais, com foco em conteúdo educativo..."
               rows={3}
             />
           </div>
@@ -293,7 +293,7 @@ export const CampaignEditForm = ({
               onChange={(e) =>
                 handleInputChange("product_description", e.target.value)
               }
-              placeholder="Descreva o produto ou serviço"
+              placeholder="Ex: Software de gestão empresarial que automatiza processos, reduz custos e aumenta a produtividade da equipe..."
               rows={3}
             />
           </div>
@@ -306,7 +306,7 @@ export const CampaignEditForm = ({
               onChange={(e) =>
                 handleInputChange("value_proposition", e.target.value)
               }
-              placeholder="Qual é a proposta de valor?"
+              placeholder="Ex: Economia de 10 horas semanais em tarefas administrativas, ROI de 300% em 6 meses, suporte 24/7 incluído..."
               rows={3}
             />
           </div>
@@ -320,7 +320,7 @@ export const CampaignEditForm = ({
             onChange={(e) =>
               handleInputChange("campaign_urgency", e.target.value)
             }
-            placeholder="Descreva a urgência ou timing da campanha"
+            placeholder="Ex: Campanha sazonal para o Natal, lançamento urgente devido à concorrência, promoção por tempo limitado..."
             rows={2}
           />
         </div>
@@ -337,7 +337,7 @@ export const CampaignEditForm = ({
               id="persona_age"
               value={formData.persona_age}
               onChange={(e) => handleInputChange("persona_age", e.target.value)}
-              placeholder="Ex: 25-35 anos"
+              placeholder="Ex: 25-35 anos, 18-24 anos, 40+ anos"
             />
           </div>
 
@@ -349,7 +349,7 @@ export const CampaignEditForm = ({
               onChange={(e) =>
                 handleInputChange("persona_location", e.target.value)
               }
-              placeholder="Ex: São Paulo, Brasil"
+              placeholder="Ex: São Paulo, SP, Brasil, América Latina"
             />
           </div>
 
@@ -361,7 +361,7 @@ export const CampaignEditForm = ({
               onChange={(e) =>
                 handleInputChange("persona_income", e.target.value)
               }
-              placeholder="Ex: Classe A-B"
+              placeholder="Ex: Classe A-B, R$ 5.000-10.000, Renda média"
             />
           </div>
         </div>
@@ -374,7 +374,7 @@ export const CampaignEditForm = ({
             onChange={(e) =>
               handleInputChange("persona_interests", e.target.value)
             }
-            placeholder="Quais são os interesses do público-alvo?"
+            placeholder="Ex: Tecnologia, fitness, viagens, gastronomia, sustentabilidade, empreendedorismo, educação online..."
             rows={2}
           />
         </div>
@@ -387,7 +387,7 @@ export const CampaignEditForm = ({
             onChange={(e) =>
               handleInputChange("persona_behavior", e.target.value)
             }
-            placeholder="Como o público-alvo se comporta?"
+            placeholder="Ex: Ativos nas redes sociais, consomem conteúdo educativo, preferem vídeos curtos, gostam de interagir com marcas..."
             rows={2}
           />
         </div>
@@ -400,7 +400,7 @@ export const CampaignEditForm = ({
             onChange={(e) =>
               handleInputChange("persona_pain_points", e.target.value)
             }
-            placeholder="Quais são os problemas do público-alvo?"
+            placeholder="Ex: Falta de tempo, dificuldade em organizar, busca por soluções rápidas, necessidade de aprendizado contínuo..."
             rows={2}
           />
         </div>

@@ -221,7 +221,7 @@ const AddIdeaDialog: React.FC<AddIdeaDialogProps> = ({
               <Input
                 value={formData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
-                placeholder="Deixe vazio para gerar automaticamente"
+                placeholder="Ex: Como aumentar a produtividade em 5 passos simples"
               />
             </div>
 
@@ -234,7 +234,7 @@ const AddIdeaDialog: React.FC<AddIdeaDialogProps> = ({
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)
                 }
-                placeholder="Deixe vazio para gerar automaticamente"
+                placeholder="Ex: Guia prático para profissionais que querem otimizar seu tempo e aumentar resultados no trabalho"
                 rows={3}
               />
             </div>
@@ -246,7 +246,7 @@ const AddIdeaDialog: React.FC<AddIdeaDialogProps> = ({
               <Textarea
                 value={formData.content}
                 onChange={(e) => handleInputChange("content", e.target.value)}
-                placeholder="Deixe vazio para gerar automaticamente"
+                placeholder="Ex: Conteúdo detalhado da ideia, incluindo pontos principais, exemplos práticos e call-to-action..."
                 rows={4}
               />
             </div>
