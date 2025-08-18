@@ -131,11 +131,46 @@ export const JsonContentViewer = ({
         return;
       }
 
-      const parsed = JSON.parse(content);
+      // Limpar o conteúdo antes de fazer o parse
+      let cleanedContent = content.trim();
+
+      // Remover markdown se presente
+      if (cleanedContent.startsWith("```json")) {
+        cleanedContent = cleanedContent.substring(7);
+      }
+      if (cleanedContent.startsWith("```")) {
+        cleanedContent = cleanedContent.substring(3);
+      }
+      if (cleanedContent.endsWith("```")) {
+        cleanedContent = cleanedContent.substring(0, cleanedContent.length - 3);
+      }
+
+      // Remover espaços extras e quebras de linha desnecessárias
+      cleanedContent = cleanedContent.trim();
+
+      // Converter aspas simples para duplas (problema comum do Gemini)
+      cleanedContent = cleanedContent.replace(/'/g, '"');
+
+      // Corrigir problemas comuns de formatação
+      cleanedContent = cleanedContent.replace(/,\s*}/g, "}"); // Remove vírgulas finais
+      cleanedContent = cleanedContent.replace(/,\s*]/g, "]"); // Remove vírgulas finais em arrays
+
+      // Tentar fazer o parse
+      const parsed = JSON.parse(cleanedContent);
       setParsedContent(parsed);
       setError(null);
-    } catch {
-      setError("Erro ao analisar JSON");
+
+      console.log("JSON parsed successfully:", parsed);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      console.error("Raw content:", content);
+      console.error("Cleaned content:", content.trim());
+
+      setError(
+        `Erro ao analisar JSON: ${
+          parseError instanceof Error ? parseError.message : "Erro desconhecido"
+        }`
+      );
       setParsedContent(null);
     }
   };
@@ -355,7 +390,32 @@ export const JsonContentViewer = ({
                 <Button
                   onClick={() => {
                     try {
-                      const parsed = JSON.parse(content);
+                      // Aplicar a mesma lógica de limpeza
+                      let cleanedContent = content.trim();
+
+                      if (cleanedContent.startsWith("```json")) {
+                        cleanedContent = cleanedContent.substring(7);
+                      }
+                      if (cleanedContent.startsWith("```")) {
+                        cleanedContent = cleanedContent.substring(3);
+                      }
+                      if (cleanedContent.endsWith("```")) {
+                        cleanedContent = cleanedContent.substring(
+                          0,
+                          cleanedContent.length - 3
+                        );
+                      }
+
+                      cleanedContent = cleanedContent.trim();
+
+                      // Converter aspas simples para duplas (problema comum do Gemini)
+                      cleanedContent = cleanedContent.replace(/'/g, '"');
+
+                      // Corrigir problemas comuns de formatação
+                      cleanedContent = cleanedContent.replace(/,\s*}/g, "}"); // Remove vírgulas finais
+                      cleanedContent = cleanedContent.replace(/,\s*]/g, "]"); // Remove vírgulas finais em arrays
+
+                      const parsed = JSON.parse(cleanedContent);
                       setParsedContent(parsed);
                       setError(null);
                     } catch {

@@ -60,6 +60,7 @@ export {
   NavigationMenuViewport,
 } from "./navigation-menu";
 export { Popover, PopoverContent, PopoverTrigger } from "./popover";
+export { ProgressBar } from "./progress-bar";
 export { RichTextEditor } from "./rich-text-editor";
 export {
   Select,

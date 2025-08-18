@@ -23,6 +23,7 @@ import {
   IdeaDiffViewer,
   Input,
   Label,
+  ProgressBar,
   Select,
   SelectContent,
   SelectItem,
@@ -132,6 +133,17 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
   const [showDiff, setShowDiff] = useState(false);
   const [originalIdea, setOriginalIdea] = useState<any>(null);
   const [improvedIdea, setImprovedIdea] = useState<any>(null);
+  const [improvementProgress, setImprovementProgress] = useState<{
+    percentage: number;
+    currentStep: number;
+    totalSteps: number;
+    currentStepName: string;
+    elapsedTime: number;
+  } | null>(null);
+  const [improvementStatus, setImprovementStatus] = useState<
+    "idle" | "generating" | "complete" | "error"
+  >("idle");
+  const [improvementError, setImprovementError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   // Sincronizar o estado local com as props quando elas mudarem
@@ -199,13 +211,74 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
       ideaId: number;
       improvementPrompt: string;
     }) => {
-      const response = await api.post(
-        `/api/v1/ideabank/ideas/${ideaId}/improve/`,
-        {
-          improvement_prompt: improvementPrompt,
-        }
-      );
-      return response.data;
+      setImprovementStatus("generating");
+      setImprovementError(null);
+
+      // Simulate progress updates for improvement
+      const progressInterval = setInterval(() => {
+        setImprovementProgress((prev) => {
+          if (!prev) {
+            return {
+              percentage: 0,
+              currentStep: 0,
+              totalSteps: 6,
+              currentStepName: "Iniciando melhoria...",
+              elapsedTime: 0,
+            };
+          }
+
+          const newStep = Math.min(prev.currentStep + 1, prev.totalSteps);
+          const newPercentage = Math.round((newStep / prev.totalSteps) * 100);
+
+          const stepNames = [
+            "Iniciando melhoria...",
+            "Analisando ideia atual...",
+            "Processando prompt de melhoria...",
+            "Gerando conteúdo melhorado...",
+            "Validando e otimizando...",
+            "Concluído!",
+          ];
+
+          return {
+            percentage: newPercentage,
+            currentStep: newStep,
+            totalSteps: prev.totalSteps,
+            currentStepName: stepNames[newStep - 1] || "Processando...",
+            elapsedTime: prev.elapsedTime + 1,
+          };
+        });
+      }, 600);
+
+      try {
+        const response = await api.post(
+          `/api/v1/ideabank/ideas/${ideaId}/improve/`,
+          {
+            improvement_prompt: improvementPrompt,
+          }
+        );
+
+        clearInterval(progressInterval);
+        setImprovementStatus("complete");
+        setImprovementProgress((prev) =>
+          prev
+            ? {
+                ...prev,
+                percentage: 100,
+                currentStep: prev.totalSteps,
+                currentStepName: "Concluído!",
+              }
+            : null
+        );
+
+        return response.data;
+      } catch (error) {
+        clearInterval(progressInterval);
+        setImprovementStatus("error");
+        setImprovementError(
+          error instanceof Error ? error.message : "Erro desconhecido"
+        );
+        throw error;
+      }
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
@@ -236,11 +309,17 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
       setImprovingIdea(null);
       setImprovementPrompt("");
       setShowDiff(true);
+      setImprovementStatus("idle");
+      setImprovementProgress(null);
+      setImprovementError(null);
     },
     onError: (error: any) => {
       const errorMessage =
         error?.response?.data?.error || "Erro ao melhorar ideia";
       toast.error(errorMessage);
+      setImprovementStatus("idle");
+      setImprovementProgress(null);
+      setImprovementError(null);
     },
   });
 
@@ -691,65 +770,85 @@ export const IdeaEditor = ({ ideas, onBack, onClose }: IdeaEditorProps) => {
 
           {improvingIdea && (
             <div className="space-y-4">
-              {/* Current Idea Preview */}
-              <div className="p-4 bg-muted rounded-lg space-y-2">
-                <h4 className="font-semibold text-sm text-muted-foreground">
-                  Campanha Atual:
-                </h4>
-                <h5 className="font-medium">{improvingIdea.title}</h5>
-                <p className="text-sm text-muted-foreground line-clamp-3">
-                  {improvingIdea.description}
-                </p>
-              </div>
+              {improvementStatus === "generating" ? (
+                <div className="space-y-4">
+                  <ProgressBar
+                    percentage={improvementProgress?.percentage || 0}
+                    currentStep={improvementProgress?.currentStep || 0}
+                    totalSteps={improvementProgress?.totalSteps || 6}
+                    currentStepName={improvementProgress?.currentStepName || ""}
+                    elapsedTime={improvementProgress?.elapsedTime || 0}
+                    status={improvementStatus}
+                    error={improvementError || undefined}
+                  />
+                </div>
+              ) : (
+                <>
+                  {/* Current Idea Preview */}
+                  <div className="p-4 bg-muted rounded-lg space-y-2">
+                    <h4 className="font-semibold text-sm text-muted-foreground">
+                      Campanha Atual:
+                    </h4>
+                    <h5 className="font-medium">{improvingIdea.title}</h5>
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {improvingIdea.description}
+                    </p>
+                  </div>
 
-              {/* Improvement Prompt */}
-              <div className="space-y-2">
-                <Label htmlFor="improvement-prompt">
-                  Como a IA pode melhorar esta campanha?
-                </Label>
-                <Textarea
-                  id="improvement-prompt"
-                  placeholder="Ex: Tornar o conteúdo mais envolvente, adicionar mais detalhes sobre o produto, criar um call-to-action mais persuasivo, adaptar para um tom mais formal..."
-                  value={improvementPrompt}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    setImprovementPrompt(e.target.value)
-                  }
-                  rows={4}
-                  className="resize-none"
-                />
-              </div>
+                  {/* Improvement Prompt */}
+                  <div className="space-y-2">
+                    <Label htmlFor="improvement-prompt">
+                      Como a IA pode melhorar esta campanha?
+                    </Label>
+                    <Textarea
+                      id="improvement-prompt"
+                      placeholder="Ex: Tornar o conteúdo mais envolvente, adicionar mais detalhes sobre o produto, criar um call-to-action mais persuasivo, adaptar para um tom mais formal..."
+                      value={improvementPrompt}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                        setImprovementPrompt(e.target.value)
+                      }
+                      rows={4}
+                      className="resize-none"
+                    />
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-2 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setImprovingIdea(null);
-                    setImprovementPrompt("");
-                  }}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={handleSubmitImprovement}
-                  disabled={
-                    improveIdeaMutation.isPending || !improvementPrompt.trim()
-                  }
-                  className="min-w-32"
-                >
-                  {improveIdeaMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Melhorando...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Melhorar
-                    </>
-                  )}
-                </Button>
-              </div>
+                  {/* Action Buttons */}
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setImprovingIdea(null);
+                        setImprovementPrompt("");
+                        setImprovementStatus("idle");
+                        setImprovementProgress(null);
+                        setImprovementError(null);
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={handleSubmitImprovement}
+                      disabled={
+                        improveIdeaMutation.isPending ||
+                        !improvementPrompt.trim()
+                      }
+                      className="min-w-32"
+                    >
+                      {improveIdeaMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Melhorando...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Melhorar
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </DialogContent>

@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui";
+import { ProgressBar } from "@/components/ui/progress-bar";
 import { api } from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -44,6 +45,17 @@ export const IdeaGenerationDialog = ({
 }: IdeaGenerationDialogProps) => {
   const [generatedIdeas, setGeneratedIdeas] = useState<GeneratedIdea[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] = useState<{
+    percentage: number;
+    currentStep: number;
+    totalSteps: number;
+    currentStepName: string;
+    elapsedTime: number;
+  } | null>(null);
+  const [generationStatus, setGenerationStatus] = useState<
+    "idle" | "generating" | "complete" | "error"
+  >("idle");
+  const [generationError, setGenerationError] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   // Get available options
@@ -55,14 +67,77 @@ export const IdeaGenerationDialog = ({
     },
   });
 
-  // Generate ideas mutation
+  // Generate ideas mutation with progress tracking
   const generateIdeasMutation = useMutation({
     mutationFn: async (data: IdeaGenerationFormData) => {
-      const response = await api.post(
-        "/api/v1/ideabank/campaigns/generate/",
-        data
-      );
-      return response.data;
+      setGenerationStatus("generating");
+      setGenerationError(null);
+
+      // Simulate progress updates (since backend doesn't stream)
+      const progressInterval = setInterval(() => {
+        setGenerationProgress((prev) => {
+          if (!prev) {
+            return {
+              percentage: 0,
+              currentStep: 0,
+              totalSteps: 8,
+              currentStepName: "Iniciando geração...",
+              elapsedTime: 0,
+            };
+          }
+
+          const newStep = Math.min(prev.currentStep + 1, prev.totalSteps);
+          const newPercentage = Math.round((newStep / prev.totalSteps) * 100);
+
+          const stepNames = [
+            "Iniciando geração...",
+            "Analisando parâmetros da campanha...",
+            "Criando estrutura da campanha...",
+            "Gerando primeira ideia (A)...",
+            "Gerando segunda ideia (B)...",
+            "Gerando terceira ideia (C)...",
+            "Finalizando e salvando...",
+            "Concluído!",
+          ];
+
+          return {
+            percentage: newPercentage,
+            currentStep: newStep,
+            totalSteps: prev.totalSteps,
+            currentStepName: stepNames[newStep - 1] || "Processando...",
+            elapsedTime: prev.elapsedTime + 1,
+          };
+        });
+      }, 800);
+
+      try {
+        const response = await api.post(
+          "/api/v1/ideabank/campaigns/generate/",
+          data
+        );
+
+        clearInterval(progressInterval);
+        setGenerationStatus("complete");
+        setGenerationProgress((prev) =>
+          prev
+            ? {
+                ...prev,
+                percentage: 100,
+                currentStep: prev.totalSteps,
+                currentStepName: "Concluído!",
+              }
+            : null
+        );
+
+        return response.data;
+      } catch (error) {
+        clearInterval(progressInterval);
+        setGenerationStatus("error");
+        setGenerationError(
+          error instanceof Error ? error.message : "Erro desconhecido"
+        );
+        throw error;
+      }
     },
     onSuccess: (data) => {
       setGeneratedIdeas(data.ideas);
@@ -87,6 +162,9 @@ export const IdeaGenerationDialog = ({
 
   const handleClose = () => {
     setGeneratedIdeas([]);
+    setGenerationStatus("idle");
+    setGenerationProgress(null);
+    setGenerationError(null);
     onClose();
   };
 
@@ -108,11 +186,25 @@ export const IdeaGenerationDialog = ({
 
         <div className="flex-1 overflow-y-auto pr-2">
           {generatedIdeas.length === 0 ? (
-            <IdeaGenerationForm
-              options={options}
-              onSubmit={handleGenerateIdeas}
-              isGenerating={isGenerating}
-            />
+            generationStatus === "generating" ? (
+              <div className="space-y-4">
+                <ProgressBar
+                  percentage={generationProgress?.percentage || 0}
+                  currentStep={generationProgress?.currentStep || 0}
+                  totalSteps={generationProgress?.totalSteps || 8}
+                  currentStepName={generationProgress?.currentStepName || ""}
+                  elapsedTime={generationProgress?.elapsedTime || 0}
+                  status={generationStatus}
+                  error={generationError || undefined}
+                />
+              </div>
+            ) : (
+              <IdeaGenerationForm
+                options={options}
+                onSubmit={handleGenerateIdeas}
+                isGenerating={isGenerating}
+              />
+            )
           ) : (
             <IdeaEditor
               ideas={generatedIdeas}

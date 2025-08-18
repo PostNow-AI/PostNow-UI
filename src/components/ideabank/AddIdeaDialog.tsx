@@ -1,308 +1,372 @@
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { ProgressBar } from "../ui/progress-bar";
+import { Textarea } from "../ui/textarea";
+
+interface AddIdeaDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (data: FormData) => Promise<CampaignIdea>;
+  onEditIdea: (idea: CampaignIdea) => void;
+  campaignId: number;
+}
+
+interface FormData {
+  title: string;
+  description: string;
+  content: string;
+  platform: string;
+  content_type: string;
+  variation_type: string;
+}
+
+import type { CampaignIdea } from "@/hooks/useIdeaBank";
+import { api } from "@/lib/api";
 import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Textarea,
-} from "@/components/ui";
-import type { Campaign, CampaignIdea } from "@/hooks/useIdeaBank";
-import { api } from "@/lib/api";
-import { Loader2, Sparkles } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+} from "../ui";
 
-interface AddIdeaDialogProps {
-  campaign: Campaign | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (ideaData: {
-    title: string;
-    description: string;
-    content: string;
-    platform: string;
-    content_type: string;
-    variation_type: string;
-  }) => Promise<CampaignIdea>;
-  onEditIdea?: (idea: CampaignIdea) => void;
+interface GenerationProgress {
+  percentage: number;
+  currentStep: number;
+  totalSteps: number;
+  currentStepName: string;
+  elapsedTime: number;
 }
 
-export const AddIdeaDialog = ({
-  campaign,
+const AddIdeaDialog: React.FC<AddIdeaDialogProps> = ({
   isOpen,
   onClose,
   onSave,
   onEditIdea,
-}: AddIdeaDialogProps) => {
-  const [formData, setFormData] = useState({
+  campaignId,
+}) => {
+  const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
     content: "",
-    platform: "",
-    content_type: "",
+    platform: "instagram",
+    content_type: "post",
     variation_type: "a",
   });
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationProgress, setGenerationProgress] =
+    useState<GenerationProgress | null>(null);
+  const [generationStatus, setGenerationStatus] = useState<
+    "idle" | "generating" | "complete" | "error"
+  >("idle");
+  const [generationError, setGenerationError] = useState<string>("");
+
+  const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.platform && formData.content_type) {
-      setIsSubmitting(true);
-      try {
-        const createdIdea = await onSave(formData);
-
-        // Reset form
-        setFormData({
-          title: "",
-          description: "",
-          content: "",
-          platform: "",
-          content_type: "",
-          variation_type: "a",
-        });
-
-        // Close dialog
-        onClose();
-
-        // Show success message
-        toast.success("Ideia criada com sucesso!");
-
-        // Open the created idea in edit mode directly
-        if (createdIdea && onEditIdea) {
-          onEditIdea(createdIdea);
-        }
-      } catch (error) {
-        console.error("Error saving idea:", error);
-        toast.error("Erro ao criar ideia. Tente novamente.");
-      } finally {
-        setIsSubmitting(false);
-      }
-    }
-  };
-
   const handleGenerateWithAI = async () => {
-    if (!campaign || !formData.platform || !formData.content_type) {
+    if (!formData.platform || !formData.content_type) {
+      toast.error(
+        "Selecione a plataforma e tipo de conteúdo antes de gerar com IA"
+      );
       return;
     }
 
     setIsGenerating(true);
+    setGenerationStatus("generating");
+    setGenerationProgress({
+      percentage: 0,
+      currentStep: 0,
+      totalSteps: 10,
+      currentStepName: "Inicializando...",
+      elapsedTime: 0,
+    });
+
     try {
-      // Debug logging
-      console.log("=== DEBUG: Sending data to AI ===");
-      console.log("Form data:", formData);
-      console.log("Campaign ID:", campaign.id);
+      // Simulate progress updates (in real implementation, this would come from backend)
+      const progressInterval = setInterval(() => {
+        setGenerationProgress((prev: GenerationProgress | null) => {
+          if (!prev || prev.percentage >= 100) {
+            clearInterval(progressInterval);
+            return prev;
+          }
+          return {
+            ...prev,
+            percentage: Math.min(prev.percentage + 10, 100),
+            currentStep: Math.min(prev.currentStep + 1, prev.totalSteps),
+            currentStepName: getStepName(prev.currentStep + 1),
+            elapsedTime: prev.elapsedTime + 1,
+          };
+        });
+      }, 1000);
 
-      const requestData = {
-        title: formData.title,
-        description: formData.description,
-        content: formData.content,
-        platform: formData.platform,
-        content_type: formData.content_type,
-        variation_type: formData.variation_type || "a",
-      };
-
-      console.log("Request data:", requestData);
-      console.log("================================");
-
-      // Call the AI generation endpoint
+      // Call the backend to generate idea
       const response = await api.post(
-        `/api/v1/ideabank/campaigns/${campaign.id}/generate-idea/`,
-        requestData
+        `/api/v1/ideabank/campaigns/${campaignId}/generate-idea/`,
+        {
+          platform: formData.platform,
+          content_type: formData.content_type,
+          variation_type: formData.variation_type,
+          title: formData.title,
+          description: formData.description,
+          content: formData.content,
+        }
       );
 
-      const generatedIdea = response.data;
-      console.log("=== DEBUG: AI Response ===", generatedIdea);
+      clearInterval(progressInterval);
 
-      // Update form with AI-generated content
-      setFormData((prev) => ({
-        ...prev,
-        title: generatedIdea.title || prev.title,
-        description: generatedIdea.description || prev.description,
-        content: generatedIdea.content || prev.content,
-      }));
+      const result = response.data;
+      setGenerationStatus("complete");
+      setGenerationProgress((prev: GenerationProgress | null) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          percentage: 100,
+          currentStep: prev.totalSteps,
+          currentStepName: "Geração concluída!",
+          elapsedTime: prev.elapsedTime,
+        };
+      });
 
-      toast.success(
-        "Ideia gerada com IA com sucesso! Revise e ajuste conforme necessário."
-      );
+      // Auto-fill form with generated content
+      if (result.idea) {
+        setFormData((prev) => ({
+          ...prev,
+          title: result.idea.title || prev.title,
+          description: result.idea.description || prev.description,
+          content: result.idea.content || prev.content,
+        }));
+        if (result.idea && onEditIdea) {
+          onEditIdea(result.idea);
+        }
+      }
+
+      toast.success("Ideia gerada com sucesso!");
     } catch (error) {
-      console.error("Error generating idea:", error);
-      toast.error("Erro ao conectar com o servidor");
+      setGenerationStatus("error");
+      setGenerationError(
+        error instanceof Error ? error.message : "Erro desconhecido"
+      );
+      toast.error("Erro ao gerar ideia com IA");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleClose = () => {
-    // Only allow closing if not in the middle of an operation
-    if (!isGenerating && !isSubmitting) {
+  const getStepName = (step: number): string => {
+    const steps = [
+      "Inicializando geração de ideia...",
+      "Analisando campanha existente...",
+      "Processando parâmetros da ideia...",
+      "Construindo prompt específico...",
+      "Conectando com Gemini AI...",
+      "Gerando conteúdo da ideia...",
+      "Processando resposta da IA...",
+      "Validando formato JSON...",
+      "Estruturando dados finais...",
+      "Finalizando geração...",
+    ];
+    return steps[step - 1] || "Processando...";
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const createdIdea = await onSave(formData);
+
+      // Close dialog and show success message
       onClose();
+      toast.success("Ideia criada com sucesso!");
+
+      // Open the created idea in edit mode directly
+      onEditIdea(createdIdea);
+    } catch {
+      toast.error("Erro ao criar ideia");
     }
   };
 
-  const platformOptions = [
-    { value: "instagram", label: "Instagram" },
-    { value: "tiktok", label: "TikTok" },
-    { value: "youtube", label: "YouTube" },
-    { value: "linkedin", label: "LinkedIn" },
-    { value: "facebook", label: "Facebook" },
-    { value: "twitter", label: "Twitter" },
-  ];
+  const handleClose = () => {
+    if (isGenerating) {
+      toast.error("Aguarde a geração terminar antes de fechar");
+      return;
+    }
+    onClose();
+  };
 
-  const contentTypeOptions = [
-    { value: "post", label: "Post" },
-    { value: "story", label: "Story" },
-    { value: "reel", label: "Reel" },
-    { value: "video", label: "Vídeo" },
-    { value: "live", label: "Live" },
-    { value: "carousel", label: "Carrossel" },
-    { value: "custom", label: "Custom" },
-  ];
-
-  if (!campaign) return null;
+  const resetGeneration = () => {
+    setGenerationStatus("idle");
+    setGenerationProgress(null);
+    setGenerationError("");
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent
-        className="max-w-6xl"
-        style={{ width: "50vw", maxWidth: "1400px" }}
-      >
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Adicionar Nova Ideia</DialogTitle>
-          <DialogDescription>
-            Crie uma nova ideia para a campanha "{campaign.title}"
-          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Título da Ideia</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => handleInputChange("title", e.target.value)}
-              placeholder="Digite o título da ideia (opcional - será gerado pela IA)"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Descreva a ideia (opcional - será gerada pela IA)"
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="content">Conteúdo</Label>
-            <Textarea
-              id="content"
-              value={formData.content}
-              onChange={(e) => handleInputChange("content", e.target.value)}
-              placeholder="Descreva o conteúdo da ideia (opcional - será gerado pela IA)"
-              rows={4}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="platform">Plataforma *</Label>
-              <Select
-                value={formData.platform}
-                onValueChange={(value) => handleInputChange("platform", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar plataforma" />
-                </SelectTrigger>
-                <SelectContent>
-                  {platformOptions.map((platform) => (
-                    <SelectItem key={platform.value} value={platform.value}>
-                      {platform.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        {generationStatus === "idle" ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Título (opcional)
+              </label>
+              <Input
+                value={formData.title}
+                onChange={(e) => handleInputChange("title", e.target.value)}
+                placeholder="Deixe vazio para gerar automaticamente"
+              />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="content_type">Tipo de Conteúdo *</Label>
-              <Select
-                value={formData.content_type}
-                onValueChange={(value) =>
-                  handleInputChange("content_type", value)
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Descrição (opcional)
+              </label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
                 }
+                placeholder="Deixe vazio para gerar automaticamente"
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Conteúdo (opcional)
+              </label>
+              <Textarea
+                value={formData.content}
+                onChange={(e) => handleInputChange("content", e.target.value)}
+                placeholder="Deixe vazio para gerar automaticamente"
+                rows={4}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Plataforma
+                </label>
+                <Select
+                  value={formData.platform}
+                  onValueChange={(value) =>
+                    handleInputChange("platform", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                    <SelectItem value="tiktok">TikTok</SelectItem>
+                    <SelectItem value="youtube">YouTube</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Tipo de Conteúdo
+                </label>
+                <Select
+                  value={formData.content_type}
+                  onValueChange={(value) =>
+                    handleInputChange("content_type", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="post">Post</SelectItem>
+                    <SelectItem value="story">Story</SelectItem>
+                    <SelectItem value="reel">Reel</SelectItem>
+                    <SelectItem value="video">Vídeo</SelectItem>
+                    <SelectItem value="carousel">Carrossel</SelectItem>
+                    <SelectItem value="live">Live</SelectItem>
+                    <SelectItem value="custom">Customizado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex space-x-3">
+              <Button
+                type="button"
+                onClick={handleGenerateWithAI}
+                disabled={
+                  isGenerating || !formData.platform || !formData.content_type
+                }
+                className="flex-1"
+                variant="outline"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {contentTypeOptions.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                {isGenerating ? "Gerando..." : "Gerar Ideia com IA"}
+              </Button>
             </div>
-          </div>
+          </form>
+        ) : (
+          <div className="space-y-4">
+            <ProgressBar
+              percentage={generationProgress?.percentage || 0}
+              currentStep={generationProgress?.currentStep || 0}
+              totalSteps={generationProgress?.totalSteps || 10}
+              currentStepName={generationProgress?.currentStepName || ""}
+              elapsedTime={generationProgress?.elapsedTime || 0}
+              status={generationStatus}
+              error={generationError}
+            />
 
-          {/* AI Generation Section */}
-          <div className="bg-muted/50 p-4 rounded-lg border">
-            <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <Label className="text-sm font-medium">Geração com IA</Label>
-            </div>
-            <p className="text-sm text-muted-foreground mb-3">
-              A IA irá gerar automaticamente o título, descrição e conteúdo da
-              ideia baseado na campanha e nos parâmetros selecionados.
-            </p>
-          </div>
+            {generationStatus === "complete" && (
+              <div className="flex space-x-3">
+                <Button
+                  onClick={resetGeneration}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Gerar Nova Ideia
+                </Button>
+                <Button
+                  onClick={() => setGenerationStatus("idle")}
+                  className="flex-1"
+                >
+                  Voltar ao Formulário
+                </Button>
+              </div>
+            )}
 
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isGenerating || isSubmitting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={
-                isGenerating ||
-                isSubmitting ||
-                !formData.platform ||
-                !formData.content_type
-              }
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Criando...
-                </>
-              ) : (
-                "Gerar Ideia com IA"
-              )}
-            </Button>
+            {generationStatus === "error" && (
+              <div className="flex space-x-3">
+                <Button
+                  onClick={resetGeneration}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Tentar Novamente
+                </Button>
+                <Button
+                  onClick={() => setGenerationStatus("idle")}
+                  className="flex-1"
+                >
+                  Voltar ao Formulário
+                </Button>
+              </div>
+            )}
           </div>
-        </form>
+        )}
       </DialogContent>
     </Dialog>
   );
 };
+
+export { AddIdeaDialog };

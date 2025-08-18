@@ -330,11 +330,11 @@ export const CampaignIdeaList = ({
         onClose={handleCloseEditDialog}
       />
       <AddIdeaDialog
-        campaign={addingIdea}
         isOpen={addingIdea !== null}
         onSave={handleAddIdea}
         onClose={handleCloseAddIdeaDialog}
-        onEditIdea={onEditIdea}
+        onEditIdea={onEditIdea || (() => {})}
+        campaignId={addingIdea?.id || 0}
       />
     </div>
   );
