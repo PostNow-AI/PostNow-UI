@@ -69,21 +69,6 @@ export const RegisterPage = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="username">Nome de Usuário</Label>
-              <Input
-                {...register("username")}
-                type="text"
-                id="username"
-                placeholder="Escolha um nome de usuário"
-              />
-              {errors.username && (
-                <p className="text-destructive text-sm">
-                  {errors.username.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="email">Endereço de Email</Label>
               <Input
                 {...register("email")}

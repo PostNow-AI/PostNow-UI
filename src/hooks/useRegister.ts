@@ -10,14 +10,6 @@ const registerSchema = z
   .object({
     firstName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
     lastName: z.string().min(2, "Sobrenome deve ter pelo menos 2 caracteres"),
-    username: z
-      .string()
-      .min(3, "Nome de usuário deve ter pelo menos 3 caracteres")
-      .max(20, "Nome de usuário deve ter no máximo 20 caracteres")
-      .regex(
-        /^[a-zA-Z0-9_]+$/,
-        "Nome de usuário pode conter apenas letras, números e underscore"
-      ),
     email: z.string().email("Por favor, digite um endereço de email válido"),
     password: z
       .string()
@@ -66,7 +58,6 @@ export function useRegister() {
   const onSubmit = async (data: RegisterFormData) => {
     registerMutation.mutate({
       email: data.email,
-      username: data.username,
       firstName: data.firstName,
       lastName: data.lastName,
       password: data.password,
