@@ -10,7 +10,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui";
-import type { Campaign, CampaignIdea } from "@/hooks/useIdeaBank";
+import type { Campaign, CampaignIdea } from "@/lib/services/ideaBankService";
 import {
   Calendar,
   ChevronDown,
@@ -21,7 +21,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import { AddIdeaDialog } from "./AddIdeaDialog";
+import AddIdeaDialog from "./AddIdeaDialog";
 import { CampaignEditDialog } from "./CampaignEditDialog";
 
 interface CampaignIdeaListProps {
@@ -31,17 +31,7 @@ interface CampaignIdeaListProps {
   onDeleteIdea?: (idea: CampaignIdea) => void;
   onEditCampaign?: (campaign: Campaign, updatedData: Partial<Campaign>) => void;
   onDeleteCampaign?: (campaign: Campaign) => void;
-  onAddIdea?: (
-    campaignId: number,
-    ideaData: {
-      title: string;
-      description: string;
-      content: string;
-      platform: string;
-      content_type: string;
-      variation_type: string;
-    }
-  ) => Promise<CampaignIdea>;
+
   handleNewIdeaClick: () => void;
 }
 
@@ -52,7 +42,6 @@ export const CampaignIdeaList = ({
   onDeleteIdea,
   onEditCampaign,
   onDeleteCampaign,
-  onAddIdea,
   handleNewIdeaClick,
 }: CampaignIdeaListProps) => {
   const [expandedCampaigns, setExpandedCampaigns] = useState<Set<number>>(
@@ -85,29 +74,6 @@ export const CampaignIdeaList = ({
 
   const handleCloseEditDialog = () => {
     setEditingCampaign(null);
-  };
-
-  const handleAddIdea = async (ideaData: {
-    title: string;
-    description: string;
-    content: string;
-    platform: string;
-    content_type: string;
-    variation_type: string;
-  }): Promise<CampaignIdea> => {
-    if (onAddIdea && addingIdea) {
-      try {
-        const createdIdea = await onAddIdea(addingIdea.id, ideaData);
-        // Only close dialog after successful save
-        setAddingIdea(null);
-        return createdIdea;
-      } catch (error) {
-        console.error("Error adding idea:", error);
-        // Don't close dialog on error
-        throw error;
-      }
-    }
-    throw new Error("No campaign selected or onAddIdea not provided");
   };
 
   const handleCloseAddIdeaDialog = () => {
@@ -252,16 +218,14 @@ export const CampaignIdeaList = ({
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
-                  {onAddIdea && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setAddingIdea(campaign)}
-                      title="Adicionar Ideia"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setAddingIdea(campaign)}
+                    title="Adicionar Ideia"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -339,7 +303,6 @@ export const CampaignIdeaList = ({
       />
       <AddIdeaDialog
         isOpen={addingIdea !== null}
-        onSave={handleAddIdea}
         onClose={handleCloseAddIdeaDialog}
         onEditIdea={onEditIdea || (() => {})}
         campaignId={addingIdea?.id || 0}

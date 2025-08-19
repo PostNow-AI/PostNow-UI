@@ -1,4 +1,4 @@
-export { AddIdeaDialog } from "./AddIdeaDialog";
+export { default as AddIdeaDialog } from "./AddIdeaDialog";
 export { CampaignEditDialog } from "./CampaignEditDialog";
 export { CampaignEditForm } from "./CampaignEditForm";
 export { CampaignIdeaList } from "./CampaignIdeaList";

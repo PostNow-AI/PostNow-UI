@@ -21,7 +21,6 @@ interface BasicUserInfoProps {
   user: User | null;
   userName: string;
   userInitials: string;
-  onSaveProfile: () => void;
   avatar?: string;
   onAvatarChange?: (avatar: string) => void;
 }
@@ -40,7 +39,6 @@ export const BasicUserInfo = ({
   user,
   userName,
   userInitials,
-  onSaveProfile,
   avatar,
   onAvatarChange,
 }: BasicUserInfoProps) => {
@@ -66,9 +64,7 @@ export const BasicUserInfo = ({
     user,
     onSubmit: (data) => {
       updateUserProfile(data, {
-        onSuccess: () => {
-          onSaveProfile();
-        },
+        onSuccess: () => {},
       });
     },
   });

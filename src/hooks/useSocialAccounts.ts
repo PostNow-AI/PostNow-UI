@@ -1,72 +1,74 @@
-import { authApi } from "@/lib/auth";
-import { initiateGoogleOAuth } from "@/lib/google-oauth";
-import type { SocialAccount } from "@/types/auth";
+import { socialAccountsService } from "@/lib/services/socialAccountsService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
+import type { SocialAccount } from "./useDashboardLayout";
 
-export function useSocialAccounts() {
+export const useSocialAccounts = (userId?: string) => {
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch social accounts
-  const socialAccountsQuery = useQuery({
-    queryKey: ["auth", "socialAccounts"],
-    queryFn: authApi.getSocialAccounts,
+  const { data: socialAccounts = [], isLoading } = useQuery({
+    queryKey: ["social-accounts", userId],
+    queryFn: async (): Promise<SocialAccount[]> => {
+      const response = await socialAccountsService.getSocialAccounts();
+      return response.social_accounts || [];
+    },
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
+
+  // Find Google account
+  const googleAccount = socialAccounts.find(
+    (acc: SocialAccount) => acc.provider === "google"
+  );
 
   // Disconnect social account mutation
   const disconnectMutation = useMutation({
-    mutationFn: authApi.disconnectSocialAccount,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["auth", "socialAccounts"] });
-      toast.success(
-        `Conta ${data.disconnected_provider} desconectada com sucesso`
-      );
+    mutationFn: async (accountId: number) => {
+      await socialAccountsService.disconnectAccount(accountId);
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Falha ao desconectar conta");
+    onSuccess: () => {
+      toast.success("Conta desconectada com sucesso!");
+      // Invalidate social accounts query
+      queryClient.invalidateQueries({ queryKey: ["social-accounts"] });
+      // Also invalidate user picture query since it depends on social accounts
+      queryClient.invalidateQueries({ queryKey: ["user-picture"] });
+    },
+    onError: (error: unknown) => {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao desconectar conta";
+      toast.error(errorMessage);
+    },
+    onSettled: () => {
+      setIsDisconnecting(false);
     },
   });
 
-  const handleDisconnect = (account: SocialAccount) => {
-    if (
-      confirm(
-        `Tem certeza de que deseja desconectar sua conta ${account.provider}?`
-      )
-    ) {
-      disconnectMutation.mutate(account.id);
-    }
-  };
-
   const handleConnectGoogle = () => {
-    try {
-      initiateGoogleOAuth();
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Falha na conexão com Google"
-      );
-    }
+    // Implement Google connection logic
+    toast.info("Funcionalidade em desenvolvimento", {
+      description: "A conexão com Google será implementada em breve.",
+    });
   };
 
-  const getGoogleAccount = () => {
-    return socialAccountsQuery.data?.social_accounts.find(
-      (acc) => acc.provider === "google"
-    );
+  const handleDisconnect = async (account: SocialAccount) => {
+    setIsDisconnecting(true);
+    disconnectMutation.mutate(account.id);
   };
 
   return {
-    // Data
-    socialAccountsData: socialAccountsQuery.data,
-    isLoading: socialAccountsQuery.isLoading,
-    error: socialAccountsQuery.error,
-
-    // Actions
-    handleDisconnect,
+    socialAccountsData: {
+      social_accounts: socialAccounts,
+      total_count: socialAccounts.length,
+    },
+    isLoading,
+    error: null, // No error handling in this hook currently
+    isDisconnecting,
     handleConnectGoogle,
-
-    // Helpers
-    getGoogleAccount,
-
-    // Mutation states
-    isDisconnecting: disconnectMutation.isPending,
+    handleDisconnect,
+    getGoogleAccount: () => googleAccount,
   };
-}
+};

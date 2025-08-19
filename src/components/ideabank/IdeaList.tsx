@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui";
-import type { CampaignIdea } from "@/hooks/useIdeaBank";
+import type { CampaignIdea } from "@/lib/services/ideaBankService";
 import { Calendar, Edit, Eye, Trash2 } from "lucide-react";
 
 interface IdeaListProps {

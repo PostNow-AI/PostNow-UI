@@ -8,40 +8,24 @@ import {
   Input,
   Label,
 } from "@/components/ui";
-import { geminiKeyApi } from "@/lib/gemini-key-api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useGeminiKeyOverlay } from "@/hooks/useGeminiKeyOverlay";
 import { AlertCircle, ExternalLink, Key, Shield } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface GeminiKeyOverlayProps {
   onClose: () => void;
 }
 
 export const GeminiKeyOverlay = ({ onClose }: GeminiKeyOverlayProps) => {
-  const queryClient = useQueryClient();
-  const [apiKey, setApiKey] = useState("");
-  const [showTutorial, setShowTutorial] = useState(false);
-
-  const saveMutation = useMutation({
-    mutationFn: async () => geminiKeyApi.setKey(apiKey.trim()),
-    onSuccess: (data) => {
-      toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["gemini-key-status"] });
-      onClose();
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.error || "Erro ao salvar chave da API");
-    },
-  });
-
-  const handleSave = () => {
-    if (!apiKey.trim()) {
-      toast.error("Por favor, insira sua chave da API");
-      return;
-    }
-    saveMutation.mutate();
-  };
+  const {
+    apiKey,
+    showTutorial,
+    saveMutation,
+    handleSave,
+    handleClose,
+    handleShowTutorial,
+    handleHideTutorial,
+    setApiKey,
+  } = useGeminiKeyOverlay(onClose);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -90,7 +74,7 @@ export const GeminiKeyOverlay = ({ onClose }: GeminiKeyOverlayProps) => {
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={handleClose}>
               Cancelar
             </Button>
             <Button
@@ -111,7 +95,7 @@ export const GeminiKeyOverlay = ({ onClose }: GeminiKeyOverlayProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowTutorial(!showTutorial)}
+                onClick={showTutorial ? handleHideTutorial : handleShowTutorial}
               >
                 {showTutorial ? "Ocultar" : "Mostrar"} Tutorial
               </Button>

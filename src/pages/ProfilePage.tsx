@@ -32,7 +32,6 @@ export const ProfilePage = () => {
     userName,
     userInitials,
     statusConfig,
-    handleSaveProfile,
     formatDate,
   } = useProfilePage();
 
@@ -95,7 +94,6 @@ export const ProfilePage = () => {
             user={user}
             userName={userName}
             userInitials={userInitials}
-            onSaveProfile={handleSaveProfile}
             avatar={profile?.avatar}
             onAvatarChange={(avatar) => {
               // Update the profile data in the hook

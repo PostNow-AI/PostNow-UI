@@ -13,10 +13,9 @@ import {
   ThemeToggle,
 } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
-import { api } from "@/lib/api";
+import { useDashboardLayout } from "@/hooks/useDashboardLayout";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 // Icons (using simple SVG icons since we don't have an icon library)
 
@@ -77,16 +76,6 @@ const navigationItems = [
   },
 ];
 
-interface SocialAccount {
-  id: number;
-  provider: string;
-  extra_data: {
-    email?: string;
-    name?: string;
-    picture?: string;
-  };
-}
-
 interface NavLinkProps {
   href: string;
   children: React.ReactNode;
@@ -108,55 +97,16 @@ const NavLink = ({ href, children, icon: Icon, isActive }: NavLinkProps) => (
 );
 
 export const DashboardLayout = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [userPicture, setUserPicture] = useState<string | null>(null);
-
-  // Buscar foto do usuário das contas sociais
-  useEffect(() => {
-    const fetchUserPicture = async () => {
-      try {
-        const response = await api.get("/api/v1/auth/social-accounts/");
-        const socialAccounts = response.data.social_accounts || [];
-        const googleAccount = socialAccounts.find(
-          (acc: SocialAccount) => acc.provider === "google"
-        );
-
-        if (googleAccount?.extra_data?.picture) {
-          setUserPicture(googleAccount.extra_data.picture);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar foto do usuário:", error);
-      }
-    };
-
-    if (user) {
-      fetchUserPicture();
-    }
-  }, [user]);
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
-  const getUserInitials = () => {
-    if (!user) return "U";
-    const firstName = user.first_name || "";
-    const lastName = user.last_name || "";
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || "U";
-  };
-
-  const getUserName = () => {
-    if (!user) return "Usuário";
-    return (
-      `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-      user.email ||
-      "Usuário"
-    );
-  };
+  const {
+    userPicture,
+    isMobileMenuOpen,
+    getUserInitials,
+    getUserName,
+    handleLogout,
+    toggleMobileMenu,
+  } = useDashboardLayout();
 
   const SidebarContent = () => (
     <>
@@ -238,7 +188,7 @@ export const DashboardLayout = () => {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header */}
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden flex-shrink-0">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+          <Sheet open={isMobileMenuOpen} onOpenChange={toggleMobileMenu}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="shrink-0">
                 <MenuIcon />

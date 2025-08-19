@@ -17,16 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { api } from "@/lib/api";
-import type { Specialization } from "@/lib/global-options-api";
-import { globalOptionsApi } from "@/lib/global-options-api";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { Loader2, Palette, Share2, Type, User } from "lucide-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 const onboardingSchema = z.object({
@@ -111,301 +105,36 @@ interface OnboardingFormProps {
   onSkip?: () => void;
 }
 
-interface ApiError {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-}
-
 export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const queryClient = useQueryClient();
+  const form = useForm<OnboardingFormData>({
+    resolver: zodResolver(onboardingSchema),
+  });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     setValue,
-  } = useForm<OnboardingFormData>({
-    resolver: zodResolver(onboardingSchema),
-  });
+  } = form;
 
-  const watchedValues = watch();
-  const selectedProfession = watchedValues.profession;
-  const selectedSpecialization = watchedValues.specialization;
-  const customProfessionInput = watchedValues.custom_profession;
-
-  // Buscar dados da API
-  const { data: professions = [] } = useQuery({
-    queryKey: ["professions"],
-    queryFn: globalOptionsApi.getProfessions,
-  });
-
-  const { data: fonts = { predefined: [], custom: [] } } = useQuery({
-    queryKey: ["fonts"],
-    queryFn: globalOptionsApi.getFonts,
-  });
-
-  const { data: specializations } = useQuery({
-    queryKey: ["specializations", selectedProfession],
-    queryFn: async () => {
-      if (selectedProfession && selectedProfession !== "Outro") {
-        const profession = professions.find(
-          (p) => p.name === selectedProfession
-        );
-        if (profession) {
-          const result = await globalOptionsApi.getProfessionSpecializations(
-            profession.id
-          );
-          return result;
-        }
-      }
-      return { profession: null, specializations: [] };
-    },
-    enabled: !!selectedProfession && selectedProfession !== "Outro",
-  });
-
-  const allAvailableFonts = [
-    ...fonts.predefined.map((f: { name: string }) => f.name),
-    ...fonts.custom.map((f: { name: string }) => f.name),
-  ].sort((a, b) => a.localeCompare(b, "pt-BR"));
-
-  // Verificar se deve mostrar campo de especialização customizada
-  const shouldShowCustomSpecializationField =
-    selectedProfession === "Outro" &&
-    customProfessionInput &&
-    customProfessionInput.trim() &&
-    !professions.some((p) => p.name === customProfessionInput.trim());
-
-  // Obter todas as profissões disponíveis
-  const allAvailableProfessions = [...professions.map((p) => p.name), "Outro"];
-
-  // Obter especializações disponíveis para a profissão selecionada
-  const availableSpecializations = specializations?.specializations || [];
-
-  // Debug: Log das especializações
-  // Mutations para criar opções customizadas
-  const createProfessionMutation = useMutation({
-    mutationFn: globalOptionsApi.createCustomProfession,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["professions"] });
-      toast.success("Profissão criada com sucesso!");
-      setValue("custom_profession", "");
-    },
-    onError: (error: ApiError) => {
-      toast.error(error.response?.data?.message || "Erro ao criar profissão");
-    },
-  });
-
-  const createSpecializationMutation = useMutation({
-    mutationFn: globalOptionsApi.createCustomSpecialization,
-    onSuccess: () => {
-      // Invalidar queries de especializações e profissões para garantir atualização
-      queryClient.invalidateQueries({ queryKey: ["specializations"] });
-      queryClient.invalidateQueries({ queryKey: ["professions"] });
-
-      // Forçar refetch das especializações
-      if (selectedProfession && selectedProfession !== "Outro") {
-        const profession = professions.find(
-          (p) => p.name === selectedProfession
-        );
-        if (profession) {
-          queryClient.refetchQueries({
-            queryKey: ["specializations", selectedProfession],
-          });
-        }
-      }
-
-      toast.success("Especialização criada com sucesso!");
-      setValue("custom_specialization", "");
-    },
-    onError: (error: ApiError) => {
-      toast.error(
-        error.response?.data?.message || "Erro ao criar especialização"
-      );
-    },
-  });
-
-  // const createFontMutation = useMutation({
-  //   mutationFn: globalOptionsApi.createCustomFont,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["fonts"] });
-  //     toast.success("Fonte criada com sucesso!");
-  //   },
-  //   onError: (error: ApiError) => {
-  //     toast.error(error.response?.data?.message || "Erro ao criar fonte");
-  //   },
-  // });
-
-  // Handlers para criar opções customizadas
-  const handleAddCustomProfession = () => {
-    const customValue = watchedValues.custom_profession;
-    if (customValue && customValue.trim()) {
-      createProfessionMutation.mutate({ name: customValue.trim() });
-    }
-  };
-
-  const handleAddCustomSpecialization = () => {
-    const customValue = watchedValues.custom_specialization;
-    if (customValue && customValue.trim()) {
-      // Se é uma profissão customizada, precisamos criar a profissão primeiro
-      if (selectedProfession === "Outro" && customProfessionInput) {
-        // Criar profissão e depois especialização
-        createProfessionMutation.mutate(
-          { name: customProfessionInput.trim() },
-          {
-            onSuccess: (newProfession) => {
-              // Agora criar a especialização
-              createSpecializationMutation.mutate({
-                name: customValue.trim(),
-                profession: newProfession.id,
-              });
-            },
-          }
-        );
-      } else {
-        // Profissão já existe, criar apenas a especialização
-        const profession = professions.find(
-          (p) => p.name === selectedProfession
-        );
-        if (profession) {
-          // Usar a nova API para criar especialização para qualquer profissão
-          globalOptionsApi
-            .createCustomSpecializationForProfession({
-              name: customValue.trim(),
-              profession: profession.id,
-            })
-            .then(() => {
-              // Invalidar queries para atualizar a lista
-              queryClient.invalidateQueries({ queryKey: ["specializations"] });
-              queryClient.invalidateQueries({ queryKey: ["professions"] });
-
-              // Forçar refetch das especializações
-              if (selectedProfession && selectedProfession !== "Outro") {
-                queryClient.refetchQueries({
-                  queryKey: ["specializations", selectedProfession],
-                });
-              }
-
-              toast.success("Especialização criada com sucesso!");
-              setValue("custom_specialization", "");
-            })
-            .catch((error) => {
-              toast.error(
-                error.response?.data?.message || "Erro ao criar especialização"
-              );
-            });
-        }
-      }
-    }
-  };
-
-  // const handleAddCustomFont = (fontType: "primary" | "secondary") => {
-  //   const customValue =
-  //     watchedValues[
-  //       fontType === "primary" ? "custom_primary_font" : "custom_secondary_font"
-  //     ];
-  //   if (customValue && customValue.trim()) {
-  //     createFontMutation.mutate({ name: customValue.trim() });
-  //     setValue(
-  //       fontType === "primary"
-  //         ? "custom_primary_font"
-  //         : "custom_secondary_font",
-  //       ""
-  //     );
-  //   }
-  // };
-
-  const onboardingMutation = useMutation({
-    mutationFn: async (data: OnboardingFormData) => {
-      // Preparar dados para envio
-      const submitData = {
-        ...data,
-        profession:
-          data.profession === "Outro"
-            ? data.custom_profession
-            : data.profession,
-        specialization:
-          data.specialization === "Outro"
-            ? data.custom_specialization
-            : data.specialization,
-        primary_font:
-          data.primary_font === "Outro"
-            ? data.custom_primary_font
-            : data.primary_font,
-        secondary_font:
-          data.secondary_font === "Outro"
-            ? data.custom_secondary_font
-            : data.secondary_font,
-      };
-
-      const response = await api.post(
-        "/api/v1/creator-profile/onboarding/",
-        submitData
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
-      toast.success("Dados salvos com sucesso!");
-      onComplete?.();
-    },
-    onError: (error: unknown) => {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Erro ao salvar dados");
-      } else {
-        toast.error("Erro ao salvar dados");
-      }
-    },
-  });
-
-  const skipMutation = useMutation({
-    mutationFn: async () => {
-      const response = await api.post(
-        "/api/v1/creator-profile/onboarding/skip/"
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
-      toast.success("Onboarding pulado com sucesso!");
-      onSkip?.();
-    },
-    onError: (error: unknown) => {
-      if (error instanceof AxiosError) {
-        toast.error(
-          error.response?.data?.message || "Erro ao pular onboarding"
-        );
-      } else {
-        toast.error("Erro ao pular onboarding");
-      }
-    },
-  });
-
-  const handleFormSubmit = async (data: OnboardingFormData) => {
-    setIsSubmitting(true);
-    try {
-      await onboardingMutation.mutateAsync(data);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleSkip = async () => {
-    setIsSubmitting(true);
-    try {
-      await skipMutation.mutateAsync();
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const hasAnyData = Object.values(watchedValues).some(
-    (value) => value && value.toString().trim()
-  );
+  const {
+    isSubmitting,
+    watchedValues,
+    selectedProfession,
+    selectedSpecialization,
+    customProfessionInput,
+    allAvailableFonts,
+    shouldShowCustomSpecializationField,
+    allAvailableProfessions,
+    availableSpecializations,
+    createProfessionMutation,
+    createSpecializationMutation,
+    handleAddCustomProfession,
+    handleAddCustomSpecialization,
+    handleFormSubmit,
+    handleSkip,
+    hasAnyData,
+  } = useOnboarding(form, { onComplete, onSkip });
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -482,7 +211,7 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
                   </SelectTrigger>
                   <SelectContent>
                     {availableSpecializations.map(
-                      (specialization: Specialization) => (
+                      (specialization: { id: number; name: string }) => (
                         <SelectItem
                           key={specialization.id}
                           value={specialization.name}
@@ -846,84 +575,6 @@ export const OnboardingForm = ({ onComplete, onSkip }: OnboardingFormProps) => {
               </div>
             </div>
 
-            {/* Campos condicionais para fontes personalizadas
-            {selectedPrimaryFont === "Outro" && (
-              <div className="space-y-2">
-                <Label htmlFor="custom_primary_font">
-                  Qual é sua fonte primária?
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="custom_primary_font"
-                    placeholder="Nome da fonte"
-                    {...register("custom_primary_font")}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => handleAddCustomFont("primary")}
-                    disabled={
-                      !watchedValues.custom_primary_font?.trim() ||
-                      createFontMutation.isPending
-                    }
-                  >
-                    {createFontMutation.isPending ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      "Adicionar"
-                    )}
-                  </Button>
-                </div>
-                {errors.custom_primary_font && (
-                  <p className="text-sm text-destructive">
-                    {errors.custom_primary_font.message}
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Sua fonte será salva para referência futura de outros
-                  usuários.
-                </p>
-              </div>
-            )} */}
-
-            {/* {selectedSecondaryFont === "Outro" && (
-              <div className="text-xs text-muted-foreground">
-                <Label htmlFor="custom_secondary_font">
-                  Qual é sua fonte secundária?
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="custom_secondary_font"
-                    placeholder="Nome da fonte"
-                    {...register("custom_secondary_font")}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => handleAddCustomFont("secondary")}
-                    disabled={
-                      !watchedValues.custom_secondary_font?.trim() ||
-                      createFontMutation.isPending
-                    }
-                  >
-                    {createFontMutation.isPending ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      "Adicionar"
-                    )}
-                  </Button>
-                </div>
-                {errors.custom_secondary_font && (
-                  <p className="text-sm text-destructive">
-                    {errors.custom_secondary_font.message}
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Sua fonte será salva para referência futura de outros
-                  usuários.
-                </p>
-              </div>
-            )} */}
           </CardContent>
         </Card>
 

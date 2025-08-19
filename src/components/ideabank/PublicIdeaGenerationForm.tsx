@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { usePublicIdeaGeneration } from "@/hooks/usePublicIdeaGeneration";
 import {
   AlertCircle,
   Loader2,
@@ -28,40 +28,8 @@ import {
   Users,
   Volume2,
 } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
-const ideaGenerationSchema = z.object({
-  // Campaign info
-  title: z.string().min(3, "Título deve ter pelo menos 3 caracteres"),
-  description: z.string().optional(),
-
-  // Campaign objective
-  objectives: z.array(z.string()).min(1, "Selecione pelo menos um objetivo"),
-
-  // Target persona
-  persona_age: z.string().optional(),
-  persona_location: z.string().optional(),
-  persona_income: z.string().optional(),
-  persona_interests: z.string().optional(),
-  persona_behavior: z.string().optional(),
-  persona_pain_points: z.string().optional(),
-
-  // Social platforms and content types
-  platforms: z.array(z.string()).min(1, "Selecione pelo menos uma plataforma"),
-  content_types: z.record(z.string(), z.array(z.string())).optional(),
-
-  // Voice tone
-  voice_tone: z.string(),
-
-  // Campaign details for AI generation
-  product_description: z.string().optional(),
-  value_proposition: z.string().optional(),
-  campaign_urgency: z.string().optional(),
-});
-
-export type PublicIdeaGenerationFormData = z.infer<typeof ideaGenerationSchema>;
+import type { PublicIdeaGenerationFormData } from "@/hooks/usePublicIdeaGeneration";
 
 interface OptionItem {
   value: string;
@@ -70,7 +38,7 @@ interface OptionItem {
 
 interface PublicIdeaGenerationOptions {
   objectives: OptionItem[];
-  content_types: Record<string, string[]>; // {platform: [content_types]}
+  content_types: Record<string, string[]>;
   platforms: OptionItem[];
   voice_tones: OptionItem[];
 }
@@ -86,90 +54,18 @@ export const PublicIdeaGenerationForm = ({
   onSubmit,
   isGenerating,
 }: PublicIdeaGenerationFormProps) => {
-  // Helper function to get content type labels
-  const getContentTypeLabel = (contentType: string): string => {
-    const contentTypeLabels: Record<string, string> = {
-      post: "Post",
-      story: "Story",
-      reel: "Reel",
-      video: "Vídeo",
-      carousel: "Carrossel",
-      live: "Live",
-      custom: "Custom",
-    };
-    return contentTypeLabels[contentType] || contentType;
-  };
-  const form = useForm<PublicIdeaGenerationFormData>({
-    resolver: zodResolver(ideaGenerationSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      objectives: [],
-      platforms: [],
-      content_types: {},
-      voice_tone: "professional",
-      product_description: "",
-      value_proposition: "",
-      campaign_urgency: "",
-    },
-  });
-
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [contentTypes, setContentTypes] = useState<Record<string, string[]>>(
-    {}
-  );
-
-  const handleSubmit = (data: PublicIdeaGenerationFormData) => {
-    // The form values are already updated by setValue calls
-    onSubmit(data);
-  };
-
-  const handlePlatformChange = (platform: string, checked: boolean) => {
-    let newPlatforms: string[];
-
-    if (checked) {
-      newPlatforms = [...selectedPlatforms, platform];
-      setSelectedPlatforms(newPlatforms);
-    } else {
-      newPlatforms = selectedPlatforms.filter((p) => p !== platform);
-      setSelectedPlatforms(newPlatforms);
-      setContentTypes((prev) => {
-        const newTypes = { ...prev };
-        delete newTypes[platform];
-        return newTypes;
-      });
-    }
-
-    // Update form value
-    form.setValue("platforms", newPlatforms);
-  };
-
-  const handleContentTypeChange = (
-    platform: string,
-    contentType: string,
-    checked: boolean
-  ) => {
-    setContentTypes((prev) => {
-      const currentTypes = prev[platform] || [];
-      let newContentTypes: Record<string, string[]>;
-
-      if (checked) {
-        newContentTypes = {
-          ...prev,
-          [platform]: [...currentTypes, contentType],
-        };
-      } else {
-        newContentTypes = {
-          ...prev,
-          [platform]: currentTypes.filter((t) => t !== contentType),
-        };
-      }
-
-      // Update form value
-      form.setValue("content_types", newContentTypes);
-      return newContentTypes;
-    });
-  };
+  const {
+    form,
+    selectedPlatforms,
+    contentTypes,
+    getContentTypeLabel,
+    handleSubmit,
+    handlePlatformChange,
+    handleContentTypeChange,
+    handleObjectiveChange,
+    handleVoiceToneChange,
+    handleCampaignUrgencyChange,
+  } = usePublicIdeaGeneration(options, onSubmit);
 
   return (
     <div className="space-y-6">
@@ -210,20 +106,9 @@ export const PublicIdeaGenerationForm = ({
                   <Checkbox
                     id={objective.value}
                     checked={form.watch("objectives").includes(objective.value)}
-                    onCheckedChange={(checked) => {
-                      const current = form.watch("objectives");
-                      if (checked) {
-                        form.setValue("objectives", [
-                          ...current,
-                          objective.value,
-                        ]);
-                      } else {
-                        form.setValue(
-                          "objectives",
-                          current.filter((o) => o !== objective.value)
-                        );
-                      }
-                    }}
+                    onCheckedChange={(checked) =>
+                      handleObjectiveChange(objective.value, checked as boolean)
+                    }
                   />
                   <Label
                     htmlFor={objective.value}
@@ -420,7 +305,7 @@ export const PublicIdeaGenerationForm = ({
           </CardHeader>
           <CardContent className="space-y-4">
             <Select
-              onValueChange={(value) => form.setValue("voice_tone", value)}
+              onValueChange={handleVoiceToneChange}
               value={form.watch("voice_tone")}
             >
               <SelectTrigger className="w-full">
@@ -493,9 +378,7 @@ export const PublicIdeaGenerationForm = ({
             <div className="space-y-2">
               <Label htmlFor="campaign_urgency">Urgência da Campanha</Label>
               <Select
-                onValueChange={(value) =>
-                  form.setValue("campaign_urgency", value)
-                }
+                onValueChange={handleCampaignUrgencyChange}
                 value={form.watch("campaign_urgency")}
               >
                 <SelectTrigger className="w-full">

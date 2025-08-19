@@ -10,9 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { Campaign } from "@/hooks/useIdeaBank";
+import { useCampaignEditForm } from "@/hooks/useCampaignEditForm";
+import type { Campaign } from "@/lib/services/ideaBankService";
 import { X } from "lucide-react";
-import { useState } from "react";
 
 interface CampaignEditFormProps {
   campaign: Campaign;
@@ -27,82 +27,26 @@ export const CampaignEditForm = ({
   onCancel,
   isLoading = false,
 }: CampaignEditFormProps) => {
-  const [formData, setFormData] = useState({
-    title: campaign.title || "",
-    description: campaign.description || "",
-    objectives: Array.isArray(campaign.objectives) ? campaign.objectives : [],
-    platforms: Array.isArray(campaign.platforms) ? campaign.platforms : [],
-    content_types: campaign.content_types || {},
-    voice_tone: campaign.voice_tone || "professional",
-    product_description: campaign.product_description || "",
-    value_proposition: campaign.value_proposition || "",
-    campaign_urgency: campaign.campaign_urgency || "",
-    persona_age: campaign.persona_age || "",
-    persona_location: campaign.persona_location || "",
-    persona_income: campaign.persona_income || "",
-    persona_interests: campaign.persona_interests || "",
-    persona_behavior: campaign.persona_behavior || "",
-    persona_pain_points: campaign.persona_pain_points || "",
-  });
+  const {
+    formData,
+    newObjective,
+    newPlatform,
+    voiceToneOptions,
+    objectiveOptions,
+    platformOptions,
+    handleInputChange,
+    addObjective,
+    removeObjective,
+    addPlatform,
+    removePlatform,
+    setNewObjective,
+    setNewPlatform,
+  } = useCampaignEditForm(campaign);
 
-  const [newObjective, setNewObjective] = useState("");
-  const [newPlatform, setNewPlatform] = useState("");
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleArrayChange = (field: string, value: string[]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const addObjective = (objective: string) => {
-    if (objective && !formData.objectives.includes(objective)) {
-      handleArrayChange("objectives", [...formData.objectives, objective]);
-    }
-  };
-
-  const removeObjective = (index: number) => {
-    const updated = formData.objectives.filter((_, i) => i !== index);
-    handleArrayChange("objectives", updated);
-  };
-
-  const addPlatform = (platform: string) => {
-    if (platform && !formData.platforms.includes(platform)) {
-      handleArrayChange("platforms", [...formData.platforms, platform]);
-    }
-  };
-
-  const removePlatform = (index: number) => {
-    const updated = formData.platforms.filter((_, i) => i !== index);
-    handleArrayChange("platforms", updated);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
   };
-
-  const voiceToneOptions = [
-    { value: "professional", label: "Profissional" },
-    { value: "casual", label: "Casual" },
-    { value: "inspirational", label: "Inspirador" },
-    { value: "urgent", label: "Urgente" },
-    { value: "educational", label: "Educativo" },
-  ];
-
-  const objectiveOptions = [
-    "sales", // Vendas
-    "branding", // Branding
-    "engagement", // Engajamento
-  ];
-
-  const platformOptions = [
-    "instagram", // Instagram
-    "tiktok", // TikTok
-    "youtube", // YouTube
-    "linkedin", // LinkedIn
-  ];
 
   // Helper function to get display names
   const getObjectiveDisplayName = (value: string) => {
@@ -138,7 +82,7 @@ export const CampaignEditForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Informações Básicas */}
         <div className="space-y-4">

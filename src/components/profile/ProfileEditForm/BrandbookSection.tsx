@@ -14,12 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { globalOptionsApi } from "@/lib/global-options-api";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useBrandbook } from "@/hooks/useBrandbook";
 import { Loader2, Palette, Type } from "lucide-react";
-import { useState } from "react";
 import { type UseFormReturn } from "react-hook-form";
-import { toast } from "sonner";
 
 interface BrandbookFormData {
   primary_color?: string | null;
@@ -44,66 +41,16 @@ export const BrandbookSection = ({ form }: BrandbookSectionProps) => {
     formState: { errors },
   } = form;
   const watchedValues = watch();
-  const queryClient = useQueryClient();
-  const [customPrimaryFontInput, setCustomPrimaryFontInput] = useState("");
-  const [customSecondaryFontInput, setCustomSecondaryFontInput] = useState("");
 
-  // Buscar fontes da API
-  const { data: fonts = { predefined: [], custom: [] } } = useQuery({
-    queryKey: ["fonts"],
-    queryFn: globalOptionsApi.getFonts,
-  });
-
-  // Mutation para criar fontes customizadas
-  const createFontMutation = useMutation({
-    mutationFn: globalOptionsApi.createCustomFont,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fonts"] });
-      toast.success("Fonte criada com sucesso!");
-    },
-    onError: (error: unknown) => {
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { data?: { message?: string } };
-        };
-        toast.error(
-          axiosError.response?.data?.message || "Erro ao criar fonte"
-        );
-      } else {
-        toast.error("Erro ao criar fonte");
-      }
-    },
-  });
-
-  // Handlers para criar fontes customizadas
-  const handleAddCustomFont = (fontType: "primary" | "secondary") => {
-    const customValue =
-      fontType === "primary"
-        ? customPrimaryFontInput
-        : customSecondaryFontInput;
-    if (customValue.trim()) {
-      createFontMutation.mutate(
-        { name: customValue.trim() },
-        {
-          onSuccess: () => {
-            if (fontType === "primary") {
-              setCustomPrimaryFontInput("");
-              setValue("primary_font", customValue.trim());
-            } else {
-              setCustomSecondaryFontInput("");
-              setValue("secondary_font", customValue.trim());
-            }
-          },
-        }
-      );
-    }
-  };
-
-  // Obter todas as fontes disponíveis
-  const allAvailableFonts = [
-    ...fonts.predefined.map((f: { name: string }) => f.name),
-    ...fonts.custom.map((f: { name: string }) => f.name),
-  ].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const {
+    customPrimaryFontInput,
+    setCustomPrimaryFontInput,
+    customSecondaryFontInput,
+    setCustomSecondaryFontInput,
+    allAvailableFonts,
+    createFontMutation,
+    handleAddCustomFont,
+  } = useBrandbook(form);
 
   return (
     <>
