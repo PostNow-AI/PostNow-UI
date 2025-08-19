@@ -10,7 +10,7 @@ O plugin Tally.so foi integrado à aplicação Sonora UI para permitir a criaç�
 
 ```bash
 # No arquivo .env.local
-VITE_TALLY_ID=mBqMK1
+VITE_TALLY_ID=<teste>
 ```
 
 ### 2. Script Incluído
