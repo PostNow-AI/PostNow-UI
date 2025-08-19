@@ -7,6 +7,7 @@ import {
   Input,
   Label,
 } from "@/components/ui";
+import { useSocialMedia } from "@/hooks/useSocialMedia";
 import { Share2 } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 
@@ -24,8 +25,8 @@ interface SocialMediaSectionProps {
 export const SocialMediaSection = ({ form }: SocialMediaSectionProps) => {
   const {
     register,
-    formState: { errors },
-  } = form;
+    errors,
+  } = useSocialMedia(form);
 
   return (
     <Card>

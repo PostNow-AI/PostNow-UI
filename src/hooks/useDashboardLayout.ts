@@ -9,6 +9,7 @@ export interface SocialAccount {
   provider: string;
   extra_data?: {
     picture?: string;
+    email?: string;
   };
 }
 

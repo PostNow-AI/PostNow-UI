@@ -49,6 +49,8 @@ export interface CampaignIdea {
   generated_at: string;
   created_at: string;
   updated_at: string;
+  campaign_id: number;
+  user_id: number;
 }
 
 export interface CampaignStats {
@@ -93,6 +95,21 @@ export interface IdeaOptions {
 export interface GeneratedIdeasResponse {
   ideas: CampaignIdea[];
   campaign: Campaign;
+}
+
+export interface ImprovementProgress {
+  percentage: number;
+  current_step: number;
+  total_steps: number;
+  current_step_name: string;
+}
+
+export interface ImprovementResponse {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  improved_idea(arg0: string, improved_idea: any): unknown;
+  idea: CampaignIdea;
+  message: string;
+  progress: ImprovementProgress;
 }
 
 export const ideaBankService = {
@@ -156,7 +173,7 @@ export const ideaBankService = {
   improveIdea: async (
     id: number,
     prompt: string
-  ): Promise<{ improved_idea: CampaignIdea }> => {
+  ): Promise<ImprovementResponse> => {
     const response = await api.post(`/api/v1/ideabank/ideas/${id}/improve/`, {
       improvement_prompt: prompt,
     });

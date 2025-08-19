@@ -129,7 +129,8 @@ export function AccountSettingsPage() {
                                 Google
                               </p>
                               <p className="text-sm text-gray-600">
-                                {googleAccount.extra_data.email}
+                                {googleAccount.extra_data?.email ??
+                                  "E-mail não disponível"}
                               </p>
                             </div>
                           ) : (

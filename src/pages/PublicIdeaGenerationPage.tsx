@@ -281,7 +281,7 @@ export const PublicIdeaGenerationPage = () => {
             <PublicIdeaGenerationForm
               options={options || undefined}
               onSubmit={handleGenerateIdeas}
-              isGenerating={isGenerating}
+              isGenerating={generateIdeasMutation.isPending}
             />
           )}
         </div>

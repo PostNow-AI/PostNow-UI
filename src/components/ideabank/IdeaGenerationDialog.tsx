@@ -7,6 +7,7 @@ import {
 } from "@/components/ui";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { useIdeaGeneration } from "@/hooks/useIdeaGeneration";
+import type { CampaignIdea } from "@/lib/services/ideaBankService";
 import { Loader2 } from "lucide-react";
 import { IdeaEditor } from "./IdeaEditor";
 import { IdeaGenerationForm } from "./IdeaGenerationForm";
@@ -74,7 +75,10 @@ export const IdeaGenerationDialog = ({
               />
             )
           ) : (
-            <IdeaEditor ideas={generationState.ideas} onBack={handleBack} />
+            <IdeaEditor
+              ideas={generationState.ideas as unknown as CampaignIdea[]}
+              onBack={handleBack}
+            />
           )}
         </div>
       </DialogContent>

@@ -196,9 +196,14 @@ export const useIdeaEditor = (ideas: CampaignIdea[]) => {
       queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
       toast.success("Ideia melhorada com sucesso!");
 
+      // Debug: Log the response data
+      console.log("Improvement response:", data);
+      console.log("Original idea:", improvingIdea);
+      console.log("Improved idea:", data.improved_idea);
+
       // Store original and improved versions for comparison
       setOriginalIdea(improvingIdea ? { ...improvingIdea } : null);
-      setImprovedIdea(data.improved_idea ? { ...data.improved_idea } : null);
+      setImprovedIdea(data.idea ? { ...data.idea } : null);
 
       // Update local state with improved idea
       setEditingIdeas((prev) =>

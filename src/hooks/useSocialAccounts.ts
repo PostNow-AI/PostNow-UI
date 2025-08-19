@@ -60,11 +60,15 @@ export const useSocialAccounts = (userId?: string) => {
   };
 
   return {
-    socialAccounts,
-    googleAccount,
+    socialAccountsData: {
+      social_accounts: socialAccounts,
+      total_count: socialAccounts.length,
+    },
     isLoading,
+    error: null, // No error handling in this hook currently
     isDisconnecting,
     handleConnectGoogle,
     handleDisconnect,
+    getGoogleAccount: () => googleAccount,
   };
 };

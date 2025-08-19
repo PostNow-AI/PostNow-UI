@@ -12,14 +12,14 @@ import { JsonContentViewer } from "../ideabank/JsonContentViewer";
 
 interface IdeaDiffViewerProps {
   originalIdea: {
-    title: string;
-    description: string;
-    content: string;
+    title?: string | null;
+    description?: string | null;
+    content?: string | null;
   };
   improvedIdea: {
-    title: string;
-    description: string;
-    content: string;
+    title?: string | null;
+    description?: string | null;
+    content?: string | null;
   };
   className?: string;
 }
@@ -29,8 +29,13 @@ export const IdeaDiffViewer = ({
   improvedIdea,
   className,
 }: IdeaDiffViewerProps) => {
-  const hasChanges = (original: string, improved: string) => {
-    return original.trim() !== improved.trim();
+  const hasChanges = (
+    original: string | null | undefined,
+    improved: string | null | undefined
+  ) => {
+    const originalStr = (original || "").trim();
+    const improvedStr = (improved || "").trim();
+    return originalStr !== improvedStr;
   };
 
   const ChangeIndicator = ({ changed }: { changed: boolean }) => (
@@ -79,7 +84,7 @@ export const IdeaDiffViewer = ({
                 Original
               </CardDescription>
               <div className="p-3 bg-muted/50 rounded-md border">
-                <p className="text-sm">{originalIdea.title}</p>
+                <p className="text-sm">{originalIdea.title || "Sem título"}</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -87,7 +92,7 @@ export const IdeaDiffViewer = ({
                 Melhorado
               </CardDescription>
               <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-md border border-blue-200 dark:border-blue-800">
-                <p className="text-sm">{improvedIdea.title}</p>
+                <p className="text-sm">{improvedIdea.title || "Sem título"}</p>
               </div>
             </div>
           </div>
@@ -115,7 +120,7 @@ export const IdeaDiffViewer = ({
               </CardDescription>
               <div className="p-3 bg-muted/50 rounded-md border min-h-[100px]">
                 <p className="text-sm whitespace-pre-wrap">
-                  {originalIdea.description}
+                  {originalIdea.description || "Sem descrição"}
                 </p>
               </div>
             </div>
@@ -125,7 +130,7 @@ export const IdeaDiffViewer = ({
               </CardDescription>
               <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-md border border-blue-200 dark:border-blue-800 min-h-[100px]">
                 <p className="text-sm whitespace-pre-wrap">
-                  {improvedIdea.description}
+                  {improvedIdea.description || "Sem descrição"}
                 </p>
               </div>
             </div>
@@ -150,10 +155,16 @@ export const IdeaDiffViewer = ({
                 Original
               </CardDescription>
               <div className="border border-muted rounded-lg overflow-hidden">
-                <JsonContentViewer
-                  content={originalIdea.content}
-                  readOnly={true}
-                />
+                {originalIdea.content ? (
+                  <JsonContentViewer
+                    content={originalIdea.content}
+                    readOnly={true}
+                  />
+                ) : (
+                  <div className="p-4 text-center text-muted-foreground">
+                    Sem conteúdo estruturado
+                  </div>
+                )}
               </div>
             </div>
             <div className="space-y-2">
@@ -161,10 +172,16 @@ export const IdeaDiffViewer = ({
                 Melhorado
               </CardDescription>
               <div className="border border-blue-200 dark:border-blue-800 rounded-lg overflow-hidden bg-blue-50/50 dark:bg-blue-950/10">
-                <JsonContentViewer
-                  content={improvedIdea.content}
-                  readOnly={true}
-                />
+                {improvedIdea.content ? (
+                  <JsonContentViewer
+                    content={improvedIdea.content}
+                    readOnly={true}
+                  />
+                ) : (
+                  <div className="p-4 text-center text-muted-foreground">
+                    Sem conteúdo estruturado
+                  </div>
+                )}
               </div>
             </div>
           </div>
