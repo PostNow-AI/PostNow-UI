@@ -12,6 +12,10 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ["workable-wealthy-haddock.ngrok-free.app"],
+    allowedHosts: ["workable-wealthy-haddock.ngrok-free.app", "localhost", "*"],
+  },
+  define: {
+    // Substituir variáveis de ambiente no código
+    __CLARITY_ID__: JSON.stringify(process.env.VITE_CLARITY_ID || ""),
   },
 });

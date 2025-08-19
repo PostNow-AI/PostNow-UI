@@ -12,54 +12,133 @@ import { ProfessionalInfoSection } from "./profile/ProfileEditForm/ProfessionalI
 import { SocialMediaSection } from "./profile/ProfileEditForm/SocialMediaSection";
 
 const profileEditSchema = z.object({
-  professional_name: z.string().optional().or(z.literal("")),
-  profession: z.string().optional().or(z.literal("")),
-  specialization: z.string().optional().or(z.literal("")),
-  linkedin_url: z
+  professional_name: z
     .string()
-    .url("URL do LinkedIn deve ser válida")
     .optional()
-    .or(z.literal("")),
-  instagram_username: z.string().optional().or(z.literal("")),
-  youtube_channel: z.string().optional().or(z.literal("")),
-  tiktok_username: z.string().optional().or(z.literal("")),
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length >= 2;
+    }, "Nome profissional deve ter pelo menos 2 caracteres"),
+  profession: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length >= 2;
+    }, "Profissão deve ter pelo menos 2 caracteres"),
+  specialization: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length >= 2;
+    }, "Especialização deve ter pelo menos 2 caracteres"),
+  custom_specialization: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length >= 2;
+    }, "Especialização personalizada deve ter pelo menos 2 caracteres"),
+  linkedin_url: z.string().optional().or(z.literal("")).or(z.literal(null)),
+  instagram_username: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length >= 1;
+    }, "Username do Instagram deve ter pelo menos 1 caractere"),
+  youtube_channel: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length >= 1;
+    }, "Nome do canal do YouTube deve ter pelo menos 1 caractere"),
+  tiktok_username: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length >= 1;
+    }, "Username do TikTok deve ter pelo menos 1 caractere"),
   primary_color: z
     .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
     .optional()
     .or(z.literal(""))
-    .or(z.literal(undefined))
-    .or(z.literal(null)),
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return /^#[0-9A-F]{6}$/i.test(val);
+    }, "Cor deve estar no formato #FFFFFF"),
   secondary_color: z
     .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
     .optional()
     .or(z.literal(""))
-    .or(z.literal(undefined))
-    .or(z.literal(null)),
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return /^#[0-9A-F]{6}$/i.test(val);
+    }, "Cor deve estar no formato #FFFFFF"),
   accent_color_1: z
     .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
     .optional()
     .or(z.literal(""))
-    .or(z.literal(undefined))
-    .or(z.literal(null)),
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return /^#[0-9A-F]{6}$/i.test(val);
+    }, "Cor deve estar no formato #FFFFFF"),
   accent_color_2: z
     .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
     .optional()
     .or(z.literal(""))
-    .or(z.literal(undefined))
-    .or(z.literal(null)),
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return /^#[0-9A-F]{6}$/i.test(val);
+    }, "Cor deve estar no formato #FFFFFF"),
   accent_color_3: z
     .string()
-    .regex(/^#[0-9A-F]{6}$/i, "Cor deve estar no formato #FFFFFF")
     .optional()
     .or(z.literal(""))
-    .or(z.literal(undefined))
-    .or(z.literal(null)),
-  primary_font: z.string().optional().or(z.literal("")),
-  secondary_font: z.string().optional().or(z.literal("")),
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return /^#[0-9A-F]{6}$/i.test(val);
+    }, "Cor deve estar no formato #FFFFFF"),
+  primary_font: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length > 0;
+    }, "Fonte primária deve ter pelo menos 1 caractere"),
+  secondary_font: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .or(z.literal(null))
+    .refine((val) => {
+      if (!val || val === "") return true;
+      return val.trim().length > 0;
+    }, "Fonte secundária deve ter pelo menos 1 caractere"),
 });
 
 type ProfileEditFormData = z.infer<typeof profileEditSchema>;
@@ -104,10 +183,19 @@ export const ProfileEditForm = ({
   const handleFormSubmit = (data: ProfileEditFormData) => {
     // Clean up empty values before sending
     const cleanedData = Object.fromEntries(
-      Object.entries(data).filter(
-        ([, value]) => value !== "" && value !== undefined && value !== null
-      )
+      Object.entries(data).filter(([, value]) => {
+        // Remove campos vazios, null, undefined ou apenas espaços em branco
+        if (value === null || value === undefined) return false;
+        if (typeof value === "string" && value.trim() === "") return false;
+        return true;
+      })
     );
+
+    // Se não há dados para enviar, mostrar mensagem
+    if (Object.keys(cleanedData).length === 0) {
+      toast.info("Nenhuma alteração foi feita no perfil.");
+      return;
+    }
 
     updateProfileMutation.mutate(cleanedData);
   };

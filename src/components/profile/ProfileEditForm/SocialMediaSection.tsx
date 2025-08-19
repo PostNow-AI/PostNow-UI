@@ -11,10 +11,10 @@ import { Share2 } from "lucide-react";
 import { type UseFormReturn } from "react-hook-form";
 
 interface SocialMediaFormData {
-  linkedin_url?: string;
-  instagram_username?: string;
-  youtube_channel?: string;
-  tiktok_username?: string;
+  linkedin_url?: string | null;
+  instagram_username?: string | null;
+  youtube_channel?: string | null;
+  tiktok_username?: string | null;
 }
 
 interface SocialMediaSectionProps {

@@ -17,7 +17,7 @@ import {
 import { globalOptionsApi } from "@/lib/global-options-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -28,11 +28,11 @@ interface Specialization {
 }
 
 interface ProfileFormData {
-  professional_name?: string;
-  profession?: string;
-  specialization?: string;
-  custom_profession?: string;
-  custom_specialization?: string;
+  professional_name?: string | null;
+  profession?: string | null;
+  specialization?: string | null;
+  custom_profession?: string | null;
+  custom_specialization?: string | null;
 }
 
 interface ProfessionalInfoSectionProps {
@@ -58,22 +58,40 @@ export const ProfessionalInfoSection = ({
     queryFn: globalOptionsApi.getProfessions,
   });
 
-  const { data: specializations } = useQuery({
+  const {
+    data: specializations,
+    isLoading: isLoadingSpecializations,
+    error: specializationsError,
+  } = useQuery({
     queryKey: ["specializations", watchedValues.profession],
     queryFn: async () => {
-      if (watchedValues.profession && watchedValues.profession !== "Outro") {
+      if (
+        watchedValues.profession &&
+        watchedValues.profession !== "Outro" &&
+        professions.length > 0
+      ) {
         const profession = professions.find(
           (p) => p.name === watchedValues.profession
         );
+
         if (profession) {
-          return await globalOptionsApi.getProfessionSpecializations(
-            profession.id
-          );
+          try {
+            const result = await globalOptionsApi.getProfessionSpecializations(
+              profession.id
+            );
+            return result;
+          } catch (error) {
+            console.error("Erro na API de especializações:", error);
+            throw error;
+          }
         }
       }
       return { profession: null, specializations: [] };
     },
-    enabled: !!watchedValues.profession && watchedValues.profession !== "Outro",
+    enabled:
+      !!watchedValues.profession &&
+      watchedValues.profession !== "Outro" &&
+      professions.length > 0,
   });
 
   // Mutations para criar opções customizadas
@@ -98,6 +116,41 @@ export const ProfessionalInfoSection = ({
     },
   });
 
+  const createSpecializationMutation = useMutation({
+    mutationFn: globalOptionsApi.createCustomSpecializationForProfession,
+    onSuccess: () => {
+      // Invalidar queries de especializações para garantir atualização
+      queryClient.invalidateQueries({ queryKey: ["specializations"] });
+
+      // Forçar refetch das especializações da profissão atual
+      if (watchedValues.profession && watchedValues.profession !== "Outro") {
+        const profession = professions.find(
+          (p) => p.name === watchedValues.profession
+        );
+        if (profession) {
+          queryClient.refetchQueries({
+            queryKey: ["specializations", watchedValues.profession],
+          });
+        }
+      }
+
+      toast.success("Especialização criada com sucesso!");
+      setValue("custom_specialization", "");
+    },
+    onError: (error: unknown) => {
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
+        toast.error(
+          axiosError.response?.data?.message || "Erro ao criar especialização"
+        );
+      } else {
+        toast.error("Erro ao criar especialização");
+      }
+    },
+  });
+
   const handleAddCustomProfession = async () => {
     if (!customProfessionInput.trim()) return;
 
@@ -110,6 +163,27 @@ export const ProfessionalInfoSection = ({
     }
   };
 
+  const handleAddCustomSpecialization = async () => {
+    const customValue = watchedValues.custom_specialization;
+    if (!customValue?.trim()) return;
+
+    if (watchedValues.profession && watchedValues.profession !== "Outro") {
+      const profession = professions.find(
+        (p) => p.name === watchedValues.profession
+      );
+      if (profession) {
+        try {
+          await createSpecializationMutation.mutateAsync({
+            name: customValue.trim(),
+            profession: profession.id,
+          });
+        } catch {
+          // Error is handled by the mutation
+        }
+      }
+    }
+  };
+
   // Obter todas as profissões disponíveis
   const allAvailableProfessions = [
     ...(professions.map((p) => p.name) || []),
@@ -118,6 +192,11 @@ export const ProfessionalInfoSection = ({
 
   // Obter especializações disponíveis para a profissão selecionada
   const availableSpecializations = specializations?.specializations || [];
+
+  // Monitorar mudanças nas dependências da query
+  useEffect(() => {
+    // Monitoramento silencioso das dependências
+  }, [watchedValues.profession, professions.length]);
 
   return (
     <Card>
@@ -177,21 +256,35 @@ export const ProfessionalInfoSection = ({
               value={watchedValues.specialization || ""}
               disabled={
                 !watchedValues.profession ||
-                watchedValues.profession === "Outro"
+                watchedValues.profession === "Outro" ||
+                isLoadingSpecializations
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione uma especialização" />
+                <SelectValue
+                  placeholder={
+                    isLoadingSpecializations
+                      ? "Carregando especializações..."
+                      : "Selecione uma especialização"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {availableSpecializations.map(
-                  (specialization: Specialization) => (
-                    <SelectItem
-                      key={specialization.id}
-                      value={specialization.name}
-                    >
-                      {specialization.name}
-                    </SelectItem>
+                {isLoadingSpecializations ? (
+                  <div className="flex items-center justify-center p-4">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Carregando...
+                  </div>
+                ) : (
+                  availableSpecializations.map(
+                    (specialization: Specialization) => (
+                      <SelectItem
+                        key={specialization.id}
+                        value={specialization.name}
+                      >
+                        {specialization.name}
+                      </SelectItem>
+                    )
                   )
                 )}
               </SelectContent>
@@ -199,6 +292,11 @@ export const ProfessionalInfoSection = ({
             {errors.specialization && (
               <p className="text-sm text-destructive">
                 {errors.specialization.message}
+              </p>
+            )}
+            {specializationsError && (
+              <p className="text-sm text-destructive">
+                Erro ao carregar especializações: {specializationsError.message}
               </p>
             )}
           </div>
@@ -244,12 +342,35 @@ export const ProfessionalInfoSection = ({
             <Label htmlFor="custom_specialization">
               Especialização Personalizada
             </Label>
-            <Textarea
-              id="custom_specialization"
-              placeholder="Ex: Marketing de influência para nichos específicos, automação de processos de vendas, estratégias de conteúdo para LinkedIn..."
-              rows={3}
-              {...register("custom_specialization")}
-            />
+            <div className="flex gap-2">
+              <Textarea
+                id="custom_specialization"
+                placeholder="Ex: Marketing de influência para nichos específicos, automação de processos de vendas, estratégias de conteúdo para LinkedIn..."
+                rows={3}
+                className="flex-1"
+                {...register("custom_specialization")}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddCustomSpecialization}
+                disabled={
+                  !watchedValues.custom_specialization?.trim() ||
+                  createSpecializationMutation.isPending
+                }
+                className="self-start"
+              >
+                {createSpecializationMutation.isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Adicionar"
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Sua especialização será salva para referência futura de outros
+              usuários.
+            </p>
           </div>
         )}
       </CardContent>

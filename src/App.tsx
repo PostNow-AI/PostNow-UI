@@ -1,3 +1,4 @@
+import { clarity } from "react-microsoft-clarity";
 import {
   Navigate,
   Route,
@@ -19,6 +20,16 @@ import { PublicIdeaGenerationPage } from "./pages/PublicIdeaGenerationPage";
 import { RegisterPage } from "./pages/RegisterPage";
 
 const App = () => {
+  if (process.env.NODE_ENV === "production") {
+    const clarityId = import.meta.env.VITE_CLARITY_ID;
+    if (clarityId && typeof clarityId === "string" && clarityId.trim() !== "") {
+      clarity.init(clarityId);
+      console.log("Microsoft Clarity inicializado com ID:", clarityId);
+    } else {
+      console.warn("VITE_CLARITY_ID não configurado ou inválido");
+    }
+  }
+
   return (
     <ThemeProvider defaultTheme="system" storageKey="sonora-ui-theme">
       <ErrorBoundary>

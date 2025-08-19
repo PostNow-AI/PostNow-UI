@@ -27,10 +27,10 @@ interface BrandbookFormData {
   accent_color_1?: string | null;
   accent_color_2?: string | null;
   accent_color_3?: string | null;
-  primary_font?: string;
-  secondary_font?: string;
-  custom_primary_font?: string;
-  custom_secondary_font?: string;
+  primary_font?: string | null;
+  secondary_font?: string | null;
+  custom_primary_font?: string | null;
+  custom_secondary_font?: string | null;
 }
 
 interface BrandbookSectionProps {
