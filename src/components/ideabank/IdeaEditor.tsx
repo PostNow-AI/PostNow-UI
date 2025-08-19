@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,373 +30,53 @@ import {
   SelectValue,
   Textarea,
 } from "@/components/ui";
-import { api } from "@/lib/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useIdeaEditor } from "@/hooks/useIdeaEditor";
+import type { CampaignIdea } from "@/lib/services/ideaBankService";
+import { ideaToCampaignData } from "@/utils";
 import { ArrowLeft, Edit, Loader2, Save, Sparkles, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { JsonContentViewer } from "./JsonContentViewer";
 
 interface IdeaEditorProps {
-  ideas: any[];
+  ideas: CampaignIdea[];
   onBack: () => void;
 }
 
-// Função para detectar se uma ideia é uma campanha
-const isCampaignIdea = (idea: any): boolean => {
-  try {
-    if (!idea.content) return false;
-    const content = JSON.parse(idea.content);
-    return content.variacao_a && content.variacao_b && content.variacao_c;
-  } catch {
-    return false;
-  }
-};
-
-// Função para converter qualquer ideia em dados de campanha
-const ideaToCampaignData = (idea: any) => {
-  try {
-    // Se já é uma campanha, retorna os dados
-    if (isCampaignIdea(idea)) {
-      const content = JSON.parse(idea.content);
-      return {
-        plataforma: content.plataforma || idea.platform,
-        tipo_conteudo: content.tipo_conteudo || idea.content_type,
-        titulo_principal: content.titulo_principal || idea.title,
-        variacao_a: content.variacao_a || {},
-        variacao_b: content.variacao_b || {},
-        variacao_c: content.variacao_c || {},
-        estrategia_implementacao:
-          content.estrategia_implementacao || idea.description,
-        metricas_sucesso: content.metricas_sucesso || [],
-        proximos_passos: content.proximos_passos || [],
-      };
-    }
-
-    // Se não é uma campanha, cria uma estrutura de campanha a partir da ideia
-    const baseVariation = {
-      headline: idea.headline || idea.title,
-      copy: idea.copy || idea.description,
-      cta: idea.cta || "Clique para saber mais!",
-      hashtags: idea.hashtags || ["#ideia", "#conteudo"],
-      visual_description: idea.visual_description || "Descrição visual padrão",
-      color_composition: idea.color_composition || "Paleta de cores padrão",
-    };
-
-    return {
-      plataforma: idea.platform || "instagram",
-      tipo_conteudo: idea.content_type || "post",
-      titulo_principal: idea.title || "Ideia",
-      variacao_a: { ...baseVariation },
-      variacao_b: { ...baseVariation },
-      variacao_c: { ...baseVariation },
-      estrategia_implementacao:
-        idea.description || "Implementar conforme planejado",
-      metricas_sucesso: ["Engajamento", "Alcance", "Conversões"],
-      proximos_passos: ["Monitorar resultados", "Otimizar campanha"],
-    };
-  } catch {
-    // Fallback para ideias sem conteúdo estruturado
-    const baseVariation = {
-      headline: idea.title || "Ideia",
-      copy: idea.description || "Descrição da ideia",
-      cta: "Clique para saber mais!",
-      hashtags: ["#ideia", "#conteudo"],
-      visual_description: "Descrição visual padrão",
-      color_composition: "Paleta de cores padrão",
-    };
-
-    return {
-      plataforma: idea.platform || "instagram",
-      tipo_conteudo: idea.content_type || "post",
-      titulo_principal: idea.title || "Ideia",
-      variacao_a: { ...baseVariation },
-      variacao_b: { ...baseVariation },
-      variacao_c: { ...baseVariation },
-      estrategia_implementacao:
-        idea.description || "Implementar conforme planejado",
-      metricas_sucesso: ["Engajamento", "Alcance", "Conversões"],
-      proximos_passos: ["Monitorar resultados", "Otimizar campanha"],
-    };
-  }
-};
-
 export const IdeaEditor = ({ ideas, onBack }: IdeaEditorProps) => {
-  const [editingIdeas, setEditingIdeas] = useState(ideas);
-  const [viewingIdea, setViewingIdea] = useState<any>(null);
-  const [editingIdea, setEditingIdea] = useState<any>(null);
-  const [deletingIdea, setDeletingIdea] = useState<any>(null);
-  const [improvingIdea, setImprovingIdea] = useState<any>(null);
-  const [improvementPrompt, setImprovementPrompt] = useState("");
-  const [showDiff, setShowDiff] = useState(false);
-  const [originalIdea, setOriginalIdea] = useState<any>(null);
-  const [improvedIdea, setImprovedIdea] = useState<any>(null);
-  const [improvementProgress, setImprovementProgress] = useState<{
-    percentage: number;
-    currentStep: number;
-    totalSteps: number;
-    currentStepName: string;
-    elapsedTime: number;
-  } | null>(null);
-  const [improvementStatus, setImprovementStatus] = useState<
-    "idle" | "generating" | "complete" | "error"
-  >("idle");
-  const [improvementError, setImprovementError] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-  // Sincronizar o estado local com as props quando elas mudarem
-  useEffect(() => {
-    if (ideas && ideas.length > 0) {
-      setEditingIdeas(ideas);
-    }
-  }, [ideas]);
-
-  // Group ideas by platform
-  const ideasByPlatform = editingIdeas.reduce(
-    (acc: Record<string, any[]>, idea: any) => {
-      const platform = idea.platform_display || idea.platform;
-      if (!acc[platform]) {
-        acc[platform] = [];
-      }
-      acc[platform].push(idea);
-      return acc;
-    },
-    {}
-  );
-
-  const updateIdeaMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: any }) => {
-      const response = await api.patch(`/api/v1/ideabank/ideas/${id}/`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      toast.success("Ideia atualizada com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
-    },
-    onError: (error: any, variables) => {
-      toast.error(error.response?.data?.error || "Erro ao atualizar ideia");
-
-      // Revert local state if backend update fails
-      if (variables.data.status) {
-        const originalIdeas = ideas; // Use original ideas to revert
-        setEditingIdeas([...originalIdeas]);
-      }
-    },
-  });
-
-  const deleteIdeaMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await api.delete(`/api/v1/ideabank/ideas/${id}/`);
-      return response.data;
-    },
-    onSuccess: () => {
-      toast.success("Ideia deletada com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
-      setDeletingIdea(null);
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.error || "Erro ao deletar ideia");
-    },
-  });
-
-  const improveIdeaMutation = useMutation({
-    mutationFn: async ({
-      ideaId,
-      improvementPrompt,
-    }: {
-      ideaId: number;
-      improvementPrompt: string;
-    }) => {
-      setImprovementStatus("generating");
-      setImprovementError(null);
-
-      // Simulate progress updates for improvement
-      const progressInterval = setInterval(() => {
-        setImprovementProgress((prev) => {
-          if (!prev) {
-            return {
-              percentage: 0,
-              currentStep: 0,
-              totalSteps: 6,
-              currentStepName: "Iniciando melhoria...",
-              elapsedTime: 0,
-            };
-          }
-
-          const newStep = Math.min(prev.currentStep + 1, prev.totalSteps);
-          const newPercentage = Math.round((newStep / prev.totalSteps) * 100);
-
-          const stepNames = [
-            "Iniciando melhoria...",
-            "Analisando ideia atual...",
-            "Processando prompt de melhoria...",
-            "Gerando conteúdo melhorado...",
-            "Validando e otimizando...",
-            "Concluído!",
-          ];
-
-          return {
-            percentage: newPercentage,
-            currentStep: newStep,
-            totalSteps: prev.totalSteps,
-            currentStepName: stepNames[newStep - 1] || "Processando...",
-            elapsedTime: prev.elapsedTime + 1,
-          };
-        });
-      }, 600);
-
-      try {
-        const response = await api.post(
-          `/api/v1/ideabank/ideas/${ideaId}/improve/`,
-          {
-            improvement_prompt: improvementPrompt,
-          }
-        );
-
-        clearInterval(progressInterval);
-        setImprovementStatus("complete");
-        setImprovementProgress((prev) =>
-          prev
-            ? {
-                ...prev,
-                percentage: 100,
-                currentStep: prev.totalSteps,
-                currentStepName: "Concluído!",
-              }
-            : null
-        );
-
-        return response.data;
-      } catch (error) {
-        clearInterval(progressInterval);
-        setImprovementStatus("error");
-        setImprovementError(
-          error instanceof Error ? error.message : "Erro desconhecido"
-        );
-        throw error;
-      }
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["campaign-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
-      toast.success("Ideia melhorada com sucesso!");
-
-      // Store original and improved versions for comparison
-      setOriginalIdea({
-        title: improvingIdea?.title,
-        description: improvingIdea?.description,
-        content: improvingIdea?.content,
-      });
-      setImprovedIdea({
-        title: data.idea?.title || data.title,
-        description: data.idea?.description || data.description,
-        content: data.idea?.content || data.content,
-      });
-
-      // Update local state with improved idea
-      setEditingIdeas((prev) =>
-        prev.map((idea) =>
-          idea.id === improvingIdea?.id
-            ? { ...idea, ...(data.idea || data), status: "draft" }
-            : idea
-        )
-      );
-
-      setImprovingIdea(null);
-      setImprovementPrompt("");
-      setShowDiff(true);
-      setImprovementStatus("idle");
-      setImprovementProgress(null);
-      setImprovementError(null);
-    },
-    onError: (error: any) => {
-      const errorMessage =
-        error?.response?.data?.error || "Erro ao melhorar ideia";
-      toast.error(errorMessage);
-      setImprovementStatus("idle");
-      setImprovementProgress(null);
-      setImprovementError(null);
-    },
-  });
-
-  const handleIdeaUpdate = (index: number, field: string, value: string) => {
-    const updatedIdeas = [...editingIdeas];
-    updatedIdeas[index] = { ...updatedIdeas[index], [field]: value };
-    setEditingIdeas(updatedIdeas);
-  };
-
-  const handleSaveIdea = (idea: any) => {
-    updateIdeaMutation.mutate({
-      id: idea.id,
-      data: {
-        title: idea.title,
-        description: idea.description,
-        content: idea.content,
-        status: idea.status,
-      },
-    });
-  };
-
-  const handleStatusChange = (idea: any, status: string) => {
-    // Update local state immediately for better UX
-    const updatedIdeas = editingIdeas.map((item) =>
-      item.id === idea.id ? { ...item, status } : item
-    );
-    setEditingIdeas(updatedIdeas);
-
-    // Then update the backend
-    updateIdeaMutation.mutate({
-      id: idea.id,
-      data: { status },
-    });
-  };
-
-  const handleDeleteIdea = (idea: any) => {
-    deleteIdeaMutation.mutate(idea.id);
-    // Remove from local state immediately
-    const updatedIdeas = editingIdeas.filter((item) => item.id !== idea.id);
-    setEditingIdeas(updatedIdeas);
-  };
-
-  const handleImproveIdea = (idea: any) => {
-    setImprovingIdea(idea);
-    setImprovementPrompt("");
-  };
-
-  const handleSubmitImprovement = () => {
-    if (!improvingIdea || !improvementPrompt.trim()) {
-      toast.error("Por favor, descreva como a IA pode melhorar a ideia");
-      return;
-    }
-
-    improveIdeaMutation.mutate({
-      ideaId: improvingIdea.id,
-      improvementPrompt: improvementPrompt.trim(),
-    });
-  };
-
-  const handleSaveEditIdea = () => {
-    if (!editingIdea) return;
-
-    updateIdeaMutation.mutate({
-      id: editingIdea.id,
-      data: {
-        title: editingIdea.title,
-        description: editingIdea.description,
-        content: editingIdea.content,
-        status: editingIdea.status,
-      },
-    });
-
-    // Update local state
-    const updatedIdeas = editingIdeas.map((item) =>
-      item.id === editingIdea.id ? editingIdea : item
-    );
-    setEditingIdeas(updatedIdeas);
-    setEditingIdea(null);
-  };
+  const {
+    editingIdeas,
+    viewingIdea,
+    editingIdea,
+    deletingIdea,
+    improvingIdea,
+    improvementPrompt,
+    showDiff,
+    originalIdea,
+    improvedIdea,
+    improvementProgress,
+    improvementStatus,
+    improvementError,
+    ideasByPlatform,
+    updateIdeaMutation,
+    improveIdeaMutation,
+    handleIdeaUpdate,
+    handleSaveIdea,
+    handleStatusChange,
+    handleDeleteIdea,
+    handleImproveIdea,
+    handleSubmitImprovement,
+    handleSaveEditIdea,
+    setViewingIdea,
+    setEditingIdea,
+    setDeletingIdea,
+    setImprovingIdea,
+    setImprovementPrompt,
+    setShowDiff,
+    setOriginalIdea,
+    setImprovedIdea,
+    setImprovementProgress,
+    setImprovementStatus,
+    setImprovementError,
+  } = useIdeaEditor(ideas);
 
   return (
     <div className="space-y-6">
@@ -446,7 +125,10 @@ export const IdeaEditor = ({ ideas, onBack }: IdeaEditorProps) => {
                           <Select
                             value={idea.status || "draft"}
                             onValueChange={(value) =>
-                              handleStatusChange(idea, value)
+                              handleStatusChange(
+                                idea,
+                                value as "draft" | "approved" | "archived"
+                              )
                             }
                           >
                             <SelectTrigger className="w-32">
@@ -464,7 +146,13 @@ export const IdeaEditor = ({ ideas, onBack }: IdeaEditorProps) => {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleImproveIdea(idea)}
+                            onClick={() =>
+                              handleImproveIdea({
+                                ...idea,
+                                campaign_id: 0,
+                                user_id: 0,
+                              })
+                            }
                             title="Melhorar com IA"
                           >
                             <Sparkles className="h-4 w-4" />
@@ -674,7 +362,10 @@ export const IdeaEditor = ({ ideas, onBack }: IdeaEditorProps) => {
                 <Select
                   value={editingIdea.status}
                   onValueChange={(value) =>
-                    setEditingIdea({ ...editingIdea, status: value })
+                    setEditingIdea({
+                      ...editingIdea,
+                      status: value as "draft" | "approved" | "archived",
+                    })
                   }
                 >
                   <SelectTrigger>

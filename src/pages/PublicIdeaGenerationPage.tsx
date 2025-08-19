@@ -9,9 +9,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import axios from "axios";
+import { api } from "@/lib/api";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Copy, Download, Lightbulb } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -61,58 +62,40 @@ interface PublicIdeaGenerationFormData {
 
 export const PublicIdeaGenerationPage = () => {
   const [generatedIdeas, setGeneratedIdeas] = useState<GeneratedIdea[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [options, setOptions] = useState<{
-    objectives: { value: string; label: string }[];
-    content_types: Record<string, string[]>;
-    platforms: { value: string; label: string }[];
-    voice_tones: { value: string; label: string }[];
-  } | null>(null);
-  const [isLoadingOptions, setIsLoadingOptions] = useState(true);
 
-  // Fetch options on component mount
-  useEffect(() => {
-    const fetchOptions = async () => {
-      try {
-        const response = await axios.get(
-          `${
-            import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
-          }/api/v1/ideabank/public/options/`
-        );
-        setOptions(response.data);
-      } catch (error) {
-        console.error("Erro ao carregar opções:", error);
-        toast.error("Erro ao carregar opções de geração");
-      } finally {
-        setIsLoadingOptions(false);
-      }
-    };
+  // Fetch options using useQuery
+  const { data: options, isLoading: isLoadingOptions } = useQuery({
+    queryKey: ["public-idea-options"],
+    queryFn: async () => {
+      const response = await api.get("/api/v1/ideabank/public/options/");
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
 
-    fetchOptions();
-  }, []);
-
-  const handleGenerateIdeas = async (
-    formData: PublicIdeaGenerationFormData
-  ) => {
-    setIsGenerating(true);
-    try {
-      const response = await axios.post(
-        `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
-        }/api/v1/ideabank/public/generate/`,
+  // Generate ideas using useMutation
+  const generateIdeasMutation = useMutation({
+    mutationFn: async (formData: PublicIdeaGenerationFormData) => {
+      const response = await api.post(
+        "/api/v1/ideabank/public/generate/",
         formData
       );
-
-      setGeneratedIdeas(response.data.ideas);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setGeneratedIdeas(data.ideas);
       toast.success("Ideias geradas com sucesso!");
-    } catch (error: unknown) {
-      console.error("Erro ao gerar ideias:", error);
+    },
+    onError: (error: unknown) => {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao gerar ideias";
       toast.error(errorMessage);
-    } finally {
-      setIsGenerating(false);
-    }
+    },
+  });
+
+  const handleGenerateIdeas = (formData: PublicIdeaGenerationFormData) => {
+    generateIdeasMutation.mutate(formData);
   };
 
   const handleCopyIdea = async (idea: GeneratedIdea) => {

@@ -1,7 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { creatorProfileApi } from "@/lib/creator-profile-api";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 export const useProfilePage = () => {
   const { user } = useAuth();
@@ -35,20 +34,6 @@ export const useProfilePage = () => {
       user.email?.charAt(0).toUpperCase() ||
       "U"
     );
-  };
-
-  const handleSaveProfile = () => {
-    toast.info("Em desenvolvimento", {
-      description:
-        "A funcionalidade de edição de perfil será implementada em breve.",
-    });
-  };
-
-  const handleUploadAvatar = () => {
-    toast.info("Em desenvolvimento", {
-      description:
-        "A funcionalidade de upload de avatar será implementada em breve.",
-    });
   };
 
   const formatDate = (dateString: string) => {
@@ -123,8 +108,6 @@ export const useProfilePage = () => {
     completedFieldsCount: getCompletedFieldsCount(),
 
     // Handlers
-    handleSaveProfile,
-    handleUploadAvatar,
     formatDate,
   };
 };

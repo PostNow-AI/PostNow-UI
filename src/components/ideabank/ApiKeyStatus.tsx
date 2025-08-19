@@ -1,30 +1,18 @@
 import { Badge, Button } from "@/components/ui";
-import { geminiKeyApi } from "@/lib/gemini-key-api";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useApiKeyStatus } from "@/hooks/useApiKeyStatus";
 import { Key, Settings, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 import { GeminiKeyOverlay } from "./GeminiKeyOverlay";
 
 export const ApiKeyStatus = () => {
-  const [showKeyOverlay, setShowKeyOverlay] = useState(false);
-  const queryClient = useQueryClient();
-
-  const { data: keyStatus, isLoading } = useQuery({
-    queryKey: ["gemini-key-status"],
-    queryFn: () => geminiKeyApi.getStatus(),
-  });
-
-  const deleteKeyMutation = useMutation({
-    mutationFn: () => geminiKeyApi.deleteKey(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gemini-key-status"] });
-      toast.success("Chave da API removida com sucesso");
-    },
-    onError: () => {
-      toast.error("Erro ao remover chave da API");
-    },
-  });
+  const {
+    showKeyOverlay,
+    keyStatus,
+    isLoading,
+    deleteKeyMutation,
+    handleShowKeyOverlay,
+    handleCloseKeyOverlay,
+    handleDeleteKey,
+  } = useApiKeyStatus();
 
   if (isLoading) {
     return (
@@ -46,7 +34,7 @@ export const ApiKeyStatus = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowKeyOverlay(true)}
+            onClick={handleShowKeyOverlay}
             className="h-8 px-2"
           >
             <Settings className="h-4 w-4" />
@@ -54,7 +42,7 @@ export const ApiKeyStatus = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => deleteKeyMutation.mutate()}
+            onClick={handleDeleteKey}
             className="h-8 px-2 text-destructive hover:text-destructive"
             disabled={deleteKeyMutation.isPending}
           >
@@ -62,9 +50,7 @@ export const ApiKeyStatus = () => {
           </Button>
         </div>
 
-        {showKeyOverlay && (
-          <GeminiKeyOverlay onClose={() => setShowKeyOverlay(false)} />
-        )}
+        {showKeyOverlay && <GeminiKeyOverlay onClose={handleCloseKeyOverlay} />}
       </div>
     );
   }
@@ -77,16 +63,14 @@ export const ApiKeyStatus = () => {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => setShowKeyOverlay(true)}
+        onClick={handleShowKeyOverlay}
         className="h-8"
       >
         <Key className="h-4 w-4 mr-2" />
         Configurar
       </Button>
 
-      {showKeyOverlay && (
-        <GeminiKeyOverlay onClose={() => setShowKeyOverlay(false)} />
-      )}
+      {showKeyOverlay && <GeminiKeyOverlay onClose={handleCloseKeyOverlay} />}
     </div>
   );
 };

@@ -25,13 +25,11 @@ export interface TallyPopupOptions {
   showOnce?: boolean;
   doNotShowAfterSubmit?: boolean;
   customFormUrl?: string;
-  hiddenFields?: {
-    [key: string]: any;
-  };
+  hiddenFields?: Record<string, unknown>;
   onOpen?: () => void;
   onClose?: () => void;
   onPageView?: (page: number) => void;
-  onSubmit?: (payload: any) => void;
+  onSubmit?: (payload: Record<string, unknown>) => void;
 }
 
 // Interface para o objeto Tally global

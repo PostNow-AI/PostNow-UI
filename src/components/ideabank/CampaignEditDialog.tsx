@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { Campaign } from "@/hooks/useIdeaBank";
+import type { Campaign } from "@/lib/services/ideaBankService";
 import { CampaignEditForm } from "./CampaignEditForm";
 
 interface CampaignEditDialogProps {

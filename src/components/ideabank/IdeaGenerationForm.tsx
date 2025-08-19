@@ -15,6 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  CONTENT_TYPE_LABELS,
+  DEFAULT_VOICE_TONE,
+} from "@/constants/ideaGeneration";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Share2, Target, Type, Users, Volume2 } from "lucide-react";
 import { useState } from "react";
@@ -77,16 +81,7 @@ export const IdeaGenerationForm = ({
 }: IdeaGenerationFormProps) => {
   // Helper function to get content type labels
   const getContentTypeLabel = (contentType: string): string => {
-    const contentTypeLabels: Record<string, string> = {
-      post: "Post",
-      story: "Story",
-      reel: "Reel",
-      video: "Vídeo",
-      carousel: "Carrossel",
-      live: "Live",
-      custom: "Custom",
-    };
-    return contentTypeLabels[contentType] || contentType;
+    return CONTENT_TYPE_LABELS[contentType] || contentType;
   };
   const form = useForm<IdeaGenerationFormData>({
     resolver: zodResolver(ideaGenerationSchema),
@@ -96,7 +91,7 @@ export const IdeaGenerationForm = ({
       objectives: [],
       platforms: [],
       content_types: {},
-      voice_tone: "professional",
+      voice_tone: DEFAULT_VOICE_TONE,
       product_description: "",
       value_proposition: "",
       campaign_urgency: "",
