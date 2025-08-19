@@ -9,6 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  TallyButton,
   ThemeToggle,
 } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
@@ -210,6 +211,7 @@ export const DashboardLayout = () => {
             </p>
           </div>
         </Link>
+        <TallyButton variant="feedback" size="sm" className="w-full mb-2" />
         <Button
           variant="ghost"
           size="sm"
@@ -270,7 +272,10 @@ export const DashboardLayout = () => {
               <span className="text-lg">Sonora</span>
             </Link>
             {/* Mobile Theme Toggle */}
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <TallyButton variant="feedback" size="sm" />
+              <ThemeToggle />
+            </div>
           </div>
         </header>
 
