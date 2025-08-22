@@ -5,6 +5,7 @@ export * from "./useAuth";
 export * from "./useAvatarUpload";
 export * from "./useBrandbook";
 export * from "./useCampaignEditForm";
+export * from "./useCredits";
 export * from "./useDashboardLayout";
 export * from "./useGeminiKeyOverlay";
 export * from "./useGoogleCallback";
