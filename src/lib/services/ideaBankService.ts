@@ -83,6 +83,8 @@ export interface IdeaGenerationFormData {
   product_description?: string;
   value_proposition?: string;
   campaign_urgency?: string;
+  preferred_provider?: string;
+  preferred_model?: string;
 }
 
 export interface IdeaOptions {

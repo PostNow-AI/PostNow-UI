@@ -22,5 +22,6 @@ export interface IdeaGenerationConfig {
   campaign_objective: string;
   brand_voice: string;
   preferred_provider?: string;
+  preferred_model?: string;
   max_cost?: number;
 }

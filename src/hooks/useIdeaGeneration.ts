@@ -144,7 +144,7 @@ export const useIdeaGeneration = () => {
         ideas: data.ideas,
         isGenerating: false,
       }));
-      toast.success("Campanha e 3 ideias geradas com sucesso!");
+      toast.success("Campanha e ideia com 3 variações gerada com sucesso!");
       // Refresh credits after successful generation
       refetchCredits();
       // Refresh the campaigns-with-ideas query to show the new campaign

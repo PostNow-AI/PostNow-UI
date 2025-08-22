@@ -1,7 +1,8 @@
 import { useAddIdeaDialog } from "@/hooks/useAddIdeaDialog";
 import { useUserCredits } from "@/hooks/useCredits";
 import type { CampaignIdea } from "@/lib/services/ideaBankService";
-import React from "react";
+import { getModelsByProvider } from "@/lib/utils/aiModels";
+import React, { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -43,6 +44,30 @@ const AddIdeaDialog: React.FC<AddIdeaDialogProps> = ({
   } = useAddIdeaDialog(campaignId, onEditIdea);
 
   const { data: userCredits } = useUserCredits();
+
+  // Get available models for the selected provider
+  const availableModels = getModelsByProvider(
+    formData.preferred_provider || ""
+  );
+
+  // Reset model when provider changes
+  useEffect(() => {
+    if (formData.preferred_provider && formData.preferred_model) {
+      const providerFromModel = getModelsByProvider(
+        formData.preferred_provider
+      );
+      const modelExists = providerFromModel.some(
+        (m) => m.value === formData.preferred_model
+      );
+      if (!modelExists) {
+        handleInputChange("preferred_model", "");
+      }
+    }
+  }, [
+    formData.preferred_provider,
+    formData.preferred_model,
+    handleInputChange,
+  ]);
 
   const handleCloseDialog = () => {
     handleClose();
@@ -190,6 +215,66 @@ const AddIdeaDialog: React.FC<AddIdeaDialogProps> = ({
                   <p className="text-sm text-red-600">{generationError}</p>
                 </div>
               )}
+
+              {/* AI Model Selection */}
+              <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Provedor de IA
+                  </label>
+                  <Select
+                    value={formData.preferred_provider || ""}
+                    onValueChange={(value) =>
+                      handleInputChange("preferred_provider", value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o provedor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Google">Google (Gemini)</SelectItem>
+                      <SelectItem value="OpenAI">OpenAI (GPT)</SelectItem>
+                      <SelectItem value="Anthropic">
+                        Anthropic (Claude)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 ">
+                    Modelo de IA
+                  </label>
+                  <Select
+                    value={formData.preferred_model || ""}
+                    onValueChange={(value) =>
+                      handleInputChange("preferred_model", value)
+                    }
+                    disabled={!formData.preferred_provider}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          formData.preferred_provider
+                            ? "Selecione o modelo"
+                            : "Selecione um provedor primeiro"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableModels.map((model) => (
+                        <SelectItem key={model.value} value={model.value}>
+                          {model.label}
+                        </SelectItem>
+                      ))}
+                      {availableModels.length === 0 && (
+                        <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                          Nenhum modelo disponível
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
               {/* Action Buttons */}
               <div className="flex justify-between pt-4">

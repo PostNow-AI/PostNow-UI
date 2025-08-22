@@ -15,6 +15,8 @@ export interface FormData {
   platform: string;
   content_type: string;
   variation_type: string;
+  preferred_provider?: string;
+  preferred_model?: string;
 }
 
 export interface AddIdeaGenerationProgress {
@@ -219,6 +221,8 @@ export const useAddIdeaDialog = (
         target_audience: "",
         campaign_objective: "",
         brand_voice: "",
+        preferred_provider: formData.preferred_provider,
+        preferred_model: formData.preferred_model,
       });
 
       // Check if user has enough credits
@@ -232,7 +236,7 @@ export const useAddIdeaDialog = (
       }
 
       generateIdeaMutation.mutate();
-    } catch (error) {
+    } catch {
       toast.error("Erro ao estimar custo. Tente novamente.");
     }
   };
