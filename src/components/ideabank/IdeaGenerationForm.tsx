@@ -14,13 +14,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
   CONTENT_TYPE_LABELS,
   DEFAULT_VOICE_TONE,
 } from "@/constants/ideaGeneration";
+import { useUserCredits } from "@/hooks/useCredits";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Share2, Target, Type, Users, Volume2 } from "lucide-react";
+import {
+  Cpu,
+  Loader2,
+  Share2,
+  Target,
+  Type,
+  Users,
+  Volume2,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -83,6 +93,8 @@ export const IdeaGenerationForm = ({
   const getContentTypeLabel = (contentType: string): string => {
     return CONTENT_TYPE_LABELS[contentType] || contentType;
   };
+
+  const { data: userCredits } = useUserCredits();
   const form = useForm<IdeaGenerationFormData>({
     resolver: zodResolver(ideaGenerationSchema),
     defaultValues: {
@@ -92,6 +104,7 @@ export const IdeaGenerationForm = ({
       platforms: [],
       content_types: {},
       voice_tone: DEFAULT_VOICE_TONE,
+
       product_description: "",
       value_proposition: "",
       campaign_urgency: "",
@@ -389,6 +402,26 @@ export const IdeaGenerationForm = ({
                 </div>
               </div>
             ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Credit Balance Display */}
+      {userCredits && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Cpu className="h-5 w-5" />
+              Saldo de Créditos
+            </CardTitle>
+            <CardDescription>
+              Seu saldo atual para geração de conteúdo
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Badge variant="secondary" className="text-lg font-bold">
+              {userCredits.balance.toFixed(2)} créditos
+            </Badge>
           </CardContent>
         </Card>
       )}

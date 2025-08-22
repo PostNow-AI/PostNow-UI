@@ -5,6 +5,8 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useCostEstimate } from "./useAIModels";
+import { useUserCredits } from "./useCredits";
 
 export interface FormData {
   title: string;
@@ -60,6 +62,9 @@ export const useAddIdeaDialog = (
 
   // Ref to store progress interval for cleanup
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const estimateCost = useCostEstimate();
+  const { data: userCredits } = useUserCredits();
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {
@@ -206,8 +211,30 @@ export const useAddIdeaDialog = (
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleGenerateWithAI = () => {
-    generateIdeaMutation.mutate();
+  const handleGenerateWithAI = async () => {
+    try {
+      // Estimate cost before generating
+      const costEstimate = await estimateCost.mutateAsync({
+        platforms: [formData.platform],
+        target_audience: "",
+        campaign_objective: "",
+        brand_voice: "",
+      });
+
+      // Check if user has enough credits
+      if (userCredits && userCredits.balance < costEstimate.estimated_cost) {
+        toast.error(
+          `Créditos insuficientes. Necessário: ${costEstimate.estimated_cost.toFixed(
+            2
+          )}, Disponível: ${userCredits.balance.toFixed(2)}`
+        );
+        return;
+      }
+
+      generateIdeaMutation.mutate();
+    } catch (error) {
+      toast.error("Erro ao estimar custo. Tente novamente.");
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

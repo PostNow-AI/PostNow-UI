@@ -1,7 +1,12 @@
 import { ideaBankService } from "@/lib/services/ideaBankService";
 import { useQuery } from "@tanstack/react-query";
+import { useCostEstimate } from "./useAIModels";
+import { useUserCredits } from "./useCredits";
 
 export const useIdeaBank = () => {
+  const { data: userCredits } = useUserCredits();
+  const estimateCost = useCostEstimate();
+
   const {
     data: campaignsWithIdeas = [],
     isLoading: campaignsLoading,
@@ -33,5 +38,7 @@ export const useIdeaBank = () => {
     isLoading: campaignsLoading || statsLoading,
     error: campaignsError || statsError,
     refetchCampaigns,
+    userCredits,
+    estimateCost,
   };
 };

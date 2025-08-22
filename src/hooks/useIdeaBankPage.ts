@@ -21,7 +21,8 @@ export const useIdeaBankPage = () => {
   const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
   const [showSubscriptionOverlay, setShowSubscriptionOverlay] = useState(false);
 
-  const { campaigns, isLoading, refetchCampaigns } = useIdeaBank();
+  const { campaigns, isLoading, refetchCampaigns, userCredits, estimateCost } =
+    useIdeaBank();
   const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
   const queryClient = useQueryClient();
 
@@ -82,12 +83,39 @@ export const useIdeaBankPage = () => {
         variation_type: string;
       };
     }) => {
-      // Use the AI generation endpoint instead of the basic add endpoint
-      const response = await ideaBankService.generateSingleIdea(
-        campaignId,
-        ideaData
-      );
-      return response;
+      // Estimate cost before generating
+      try {
+        const costEstimate = await estimateCost.mutateAsync({
+          platforms: [ideaData.platform],
+          target_audience: "",
+          campaign_objective: "",
+          brand_voice: "",
+        });
+
+        // Check if user has enough credits
+        if (userCredits && userCredits.balance < costEstimate.estimated_cost) {
+          throw new Error(
+            `Créditos insuficientes. Necessário: ${costEstimate.estimated_cost.toFixed(
+              2
+            )}, Disponível: ${userCredits.balance.toFixed(2)}`
+          );
+        }
+
+        // Use the AI generation endpoint instead of the basic add endpoint
+        const response = await ideaBankService.generateSingleIdea(
+          campaignId,
+          ideaData
+        );
+        return response;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes("Créditos insuficientes")
+        ) {
+          throw error;
+        }
+        throw new Error("Erro ao estimar custo. Tente novamente.");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
