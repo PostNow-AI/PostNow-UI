@@ -67,12 +67,33 @@ const LightbulbIcon = () => (
   </svg>
 );
 
+const CreditCardIcon = () => (
+  <svg
+    className="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M3 10h18M7 15h1m2 0h5m-9 2h9a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v8a2 2 0 002 2z"
+    />
+  </svg>
+);
+
 // Navigation items
 const navigationItems = [
   {
     name: "Banco de Ideias",
     href: "/ideabank",
     icon: LightbulbIcon,
+  },
+  {
+    name: "Créditos",
+    href: "/credits",
+    icon: CreditCardIcon,
   },
 ];
 

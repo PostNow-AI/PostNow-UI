@@ -14,14 +14,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
   CONTENT_TYPE_LABELS,
   DEFAULT_VOICE_TONE,
 } from "@/constants/ideaGeneration";
+import { useUserCredits } from "@/hooks/useCredits";
+import { getModelsByProvider } from "@/lib/utils/aiModels";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Share2, Target, Type, Users, Volume2 } from "lucide-react";
-import { useState } from "react";
+import {
+  Cpu,
+  Loader2,
+  Share2,
+  Target,
+  Type,
+  Users,
+  Volume2,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -52,6 +63,10 @@ const ideaGenerationSchema = z.object({
   product_description: z.string().optional(),
   value_proposition: z.string().optional(),
   campaign_urgency: z.string().optional(),
+
+  // AI model preferences (optional)
+  preferred_provider: z.string().optional(),
+  preferred_model: z.string().optional(),
 });
 
 export type IdeaGenerationFormData = z.infer<typeof ideaGenerationSchema>;
@@ -83,6 +98,13 @@ export const IdeaGenerationForm = ({
   const getContentTypeLabel = (contentType: string): string => {
     return CONTENT_TYPE_LABELS[contentType] || contentType;
   };
+
+  // Get available models for the selected provider
+  const getAvailableModels = (provider: string) => {
+    return getModelsByProvider(provider);
+  };
+
+  const { data: userCredits } = useUserCredits();
   const form = useForm<IdeaGenerationFormData>({
     resolver: zodResolver(ideaGenerationSchema),
     defaultValues: {
@@ -92,11 +114,34 @@ export const IdeaGenerationForm = ({
       platforms: [],
       content_types: {},
       voice_tone: DEFAULT_VOICE_TONE,
+
       product_description: "",
       value_proposition: "",
       campaign_urgency: "",
+
+      preferred_provider: "",
+      preferred_model: "",
     },
   });
+
+  // Reset model when provider changes
+  useEffect(() => {
+    const currentProvider = form.watch("preferred_provider");
+    const currentModel = form.watch("preferred_model");
+
+    if (currentProvider && currentModel) {
+      const availableModels = getAvailableModels(currentProvider);
+      const modelExists = availableModels.some((m) => m.value === currentModel);
+      if (!modelExists) {
+        form.setValue("preferred_model", "");
+      }
+    }
+  }, [
+    form.watch("preferred_provider"),
+    form.watch("preferred_model"),
+    form.setValue,
+  ]);
+
   const {
     formState: { errors },
   } = form;
@@ -159,6 +204,25 @@ export const IdeaGenerationForm = ({
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      {/* Credit Balance Display */}
+      {userCredits && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Cpu className="h-5 w-5" />
+              Saldo de Créditos
+            </CardTitle>
+            <CardDescription>
+              Seu saldo atual para geração de conteúdo
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Badge variant="secondary" className="text-lg font-bold">
+              {userCredits.balance.toFixed(2)} créditos
+            </Badge>
+          </CardContent>
+        </Card>
+      )}
       {/* Campaign Objectives */}
       <Card>
         <CardHeader>
@@ -519,6 +583,77 @@ export const IdeaGenerationForm = ({
                 <SelectItem value="low">Baixa</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* AI Model Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Cpu className="h-5 w-5" />
+            Modelo de IA
+            <span className="text-muted-foreground">(opcional)</span>
+          </CardTitle>
+          <CardDescription>
+            Escolha o modelo de IA para geração de conteúdo
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="preferred_provider">Provedor Preferido</Label>
+              <Select
+                onValueChange={(value) =>
+                  form.setValue("preferred_provider", value)
+                }
+                value={form.watch("preferred_provider")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione o provedor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Google">Google (Gemini)</SelectItem>
+                  <SelectItem value="OpenAI">OpenAI (GPT)</SelectItem>
+                  <SelectItem value="Anthropic">Anthropic (Claude)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="preferred_model">Modelo Específico</Label>
+              <Select
+                onValueChange={(value) =>
+                  form.setValue("preferred_model", value)
+                }
+                value={form.watch("preferred_model")}
+                disabled={!form.watch("preferred_provider")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue
+                    placeholder={
+                      form.watch("preferred_provider")
+                        ? "Selecione o modelo"
+                        : "Selecione um provedor primeiro"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {getAvailableModels(
+                    form.watch("preferred_provider") || ""
+                  ).map((model) => (
+                    <SelectItem key={model.value} value={model.value}>
+                      {model.label}
+                    </SelectItem>
+                  ))}
+                  {getAvailableModels(form.watch("preferred_provider") || "")
+                    .length === 0 && (
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                      Nenhum modelo disponível
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>

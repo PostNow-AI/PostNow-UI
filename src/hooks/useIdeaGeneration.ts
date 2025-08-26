@@ -6,6 +6,8 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useCostEstimate } from "./useAIModels";
+import { useUserCredits } from "./useCredits";
 
 export interface GeneratedIdea {
   id: number;
@@ -52,6 +54,8 @@ export const useIdeaGeneration = () => {
   const [generationState, setGenerationState] =
     useState<GenerationState>(INITIAL_STATE);
   const queryClient = useQueryClient();
+  const estimateCost = useCostEstimate();
+  const { data: userCredits, refetch: refetchCredits } = useUserCredits();
 
   // Get available options
   const { data: options } = useQuery({
@@ -140,7 +144,9 @@ export const useIdeaGeneration = () => {
         ideas: data.ideas,
         isGenerating: false,
       }));
-      toast.success("Campanha e 3 ideias geradas com sucesso!");
+      toast.success("Campanha e ideia com 3 variações gerada com sucesso!");
+      // Refresh credits after successful generation
+      refetchCredits();
       // Refresh the campaigns-with-ideas query to show the new campaign
       queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
       queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
@@ -156,9 +162,31 @@ export const useIdeaGeneration = () => {
     },
   });
 
-  const handleGenerateIdeas = (formData: IdeaGenerationFormData) => {
-    setGenerationState((prev) => ({ ...prev, isGenerating: true }));
-    generateIdeasMutation.mutate(formData);
+  const handleGenerateIdeas = async (formData: IdeaGenerationFormData) => {
+    try {
+      // Estimate cost before generating
+      const costEstimate = await estimateCost.mutateAsync({
+        platforms: formData.platforms,
+        target_audience: "",
+        campaign_objective: "",
+        brand_voice: "",
+      });
+
+      // Check if user has enough credits
+      if (userCredits && userCredits.balance < costEstimate.estimated_cost) {
+        toast.error(
+          `Créditos insuficientes. Necessário: ${costEstimate.estimated_cost.toFixed(
+            2
+          )}, Disponível: ${userCredits.balance.toFixed(2)}`
+        );
+        return;
+      }
+
+      setGenerationState((prev) => ({ ...prev, isGenerating: true }));
+      generateIdeasMutation.mutate(formData);
+    } catch {
+      toast.error("Erro ao estimar custo. Tente novamente.");
+    }
   };
 
   const handleClose = () => {

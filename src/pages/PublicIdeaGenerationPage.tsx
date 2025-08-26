@@ -67,7 +67,7 @@ export const PublicIdeaGenerationPage = () => {
   const { data: options, isLoading: isLoadingOptions } = useQuery({
     queryKey: ["public-idea-options"],
     queryFn: async () => {
-      const response = await api.get("/api/v1/ideabank/public/options/");
+      const response = await api.get("/api/v1/ideabank/options/");
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -78,7 +78,7 @@ export const PublicIdeaGenerationPage = () => {
   const generateIdeasMutation = useMutation({
     mutationFn: async (formData: PublicIdeaGenerationFormData) => {
       const response = await api.post(
-        "/api/v1/ideabank/public/generate/",
+        "/api/v1/ideabank/generate-ideas/",
         formData
       );
       return response.data;

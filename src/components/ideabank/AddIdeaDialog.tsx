@@ -1,6 +1,8 @@
 import { useAddIdeaDialog } from "@/hooks/useAddIdeaDialog";
+import { useUserCredits } from "@/hooks/useCredits";
 import type { CampaignIdea } from "@/lib/services/ideaBankService";
-import React from "react";
+import { getModelsByProvider } from "@/lib/utils/aiModels";
+import React, { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -8,7 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { ProgressBar } from "../ui/progress-bar";
@@ -38,6 +42,32 @@ const AddIdeaDialog: React.FC<AddIdeaDialogProps> = ({
     handleSubmit,
     handleClose,
   } = useAddIdeaDialog(campaignId, onEditIdea);
+
+  const { data: userCredits } = useUserCredits();
+
+  // Get available models for the selected provider
+  const availableModels = getModelsByProvider(
+    formData.preferred_provider || ""
+  );
+
+  // Reset model when provider changes
+  useEffect(() => {
+    if (formData.preferred_provider && formData.preferred_model) {
+      const providerFromModel = getModelsByProvider(
+        formData.preferred_provider
+      );
+      const modelExists = providerFromModel.some(
+        (m) => m.value === formData.preferred_model
+      );
+      if (!modelExists) {
+        handleInputChange("preferred_model", "");
+      }
+    }
+  }, [
+    formData.preferred_provider,
+    formData.preferred_model,
+    handleInputChange,
+  ]);
 
   const handleCloseDialog = () => {
     handleClose();
@@ -72,120 +102,207 @@ const AddIdeaDialog: React.FC<AddIdeaDialogProps> = ({
             />
           </div>
         ) : (
-          <form onSubmit={handleSubmitForm} className="space-y-4">
-            {/* Platform Selection */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Plataforma
-              </label>
-              <Select
-                value={formData.platform}
-                onValueChange={(value) => handleInputChange("platform", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione a plataforma" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="instagram">Instagram</SelectItem>
-                  <SelectItem value="tiktok">TikTok</SelectItem>
-                  <SelectItem value="youtube">YouTube</SelectItem>
-                  <SelectItem value="linkedin">LinkedIn</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Content Type Selection */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Tipo de Conteúdo
-              </label>
-              <Select
-                value={formData.content_type}
-                onValueChange={(value) =>
-                  handleInputChange("content_type", value)
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo de conteúdo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="post">Post</SelectItem>
-                  <SelectItem value="story">Story</SelectItem>
-                  <SelectItem value="reel">Reel</SelectItem>
-                  <SelectItem value="video">Vídeo</SelectItem>
-                  <SelectItem value="carousel">Carrossel</SelectItem>
-                  <SelectItem value="ad">Anúncio</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Título</label>
-              <Input
-                value={formData.title}
-                onChange={(e) => handleInputChange("title", e.target.value)}
-                placeholder="Digite o título da ideia"
-              />
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Descrição
-              </label>
-              <Textarea
-                value={formData.description}
-                onChange={(e) =>
-                  handleInputChange("description", e.target.value)
-                }
-                placeholder="Digite a descrição da ideia"
-                rows={3}
-              />
-            </div>
-
-            {/* Content */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Conteúdo</label>
-              <Textarea
-                value={formData.content}
-                onChange={(e) => handleInputChange("content", e.target.value)}
-                placeholder="Digite o conteúdo da ideia"
-                rows={5}
-              />
-            </div>
-
-            {/* Error Display */}
-            {generationStatus === "error" && generationError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-600">{generationError}</p>
+          <>
+            {/* Credit Balance Display */}
+            {userCredits && (
+              <div className="space-y-4 mb-6">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-medium">Saldo de Créditos</h3>
+                      <Badge variant="secondary">
+                        {userCredits.balance.toFixed(2)} créditos
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Seu saldo atual para geração de conteúdo
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex justify-between pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCloseDialog}
-                disabled={isGenerating}
-              >
-                Cancelar
-              </Button>
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleGenerateWithAI}
-                  disabled={
-                    isGenerating || !formData.platform || !formData.content_type
+            <form onSubmit={handleSubmitForm} className="space-y-4">
+              {/* Platform Selection */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Plataforma
+                </label>
+                <Select
+                  value={formData.platform}
+                  onValueChange={(value) =>
+                    handleInputChange("platform", value)
                   }
                 >
-                  {isGenerating ? "Gerando..." : "Gerar com IA"}
-                </Button>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a plataforma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                    <SelectItem value="tiktok">TikTok</SelectItem>
+                    <SelectItem value="youtube">YouTube</SelectItem>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-          </form>
+
+              {/* Content Type Selection */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Tipo de Conteúdo
+                </label>
+                <Select
+                  value={formData.content_type}
+                  onValueChange={(value) =>
+                    handleInputChange("content_type", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo de conteúdo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="post">Post</SelectItem>
+                    <SelectItem value="story">Story</SelectItem>
+                    <SelectItem value="reel">Reel</SelectItem>
+                    <SelectItem value="video">Vídeo</SelectItem>
+                    <SelectItem value="carousel">Carrossel</SelectItem>
+                    <SelectItem value="ad">Anúncio</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Título</label>
+                <Input
+                  value={formData.title}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
+                  placeholder="Digite o título da ideia"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Descrição
+                </label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                  placeholder="Digite a descrição da ideia"
+                  rows={3}
+                />
+              </div>
+
+              {/* Content */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Conteúdo
+                </label>
+                <Textarea
+                  value={formData.content}
+                  onChange={(e) => handleInputChange("content", e.target.value)}
+                  placeholder="Digite o conteúdo da ideia"
+                  rows={5}
+                />
+              </div>
+
+              {/* Error Display */}
+              {generationStatus === "error" && generationError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-sm text-red-600">{generationError}</p>
+                </div>
+              )}
+
+              {/* AI Model Selection */}
+              <div className="grid grid-cols-1 lg:grid-cols-1 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Provedor de IA
+                  </label>
+                  <Select
+                    value={formData.preferred_provider || ""}
+                    onValueChange={(value) =>
+                      handleInputChange("preferred_provider", value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o provedor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Google">Google (Gemini)</SelectItem>
+                      <SelectItem value="OpenAI">OpenAI (GPT)</SelectItem>
+                      <SelectItem value="Anthropic">
+                        Anthropic (Claude)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 ">
+                    Modelo de IA
+                  </label>
+                  <Select
+                    value={formData.preferred_model || ""}
+                    onValueChange={(value) =>
+                      handleInputChange("preferred_model", value)
+                    }
+                    disabled={!formData.preferred_provider}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          formData.preferred_provider
+                            ? "Selecione o modelo"
+                            : "Selecione um provedor primeiro"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableModels.map((model) => (
+                        <SelectItem key={model.value} value={model.value}>
+                          {model.label}
+                        </SelectItem>
+                      ))}
+                      {availableModels.length === 0 && (
+                        <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                          Nenhum modelo disponível
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseDialog}
+                  disabled={isGenerating}
+                >
+                  Cancelar
+                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleGenerateWithAI}
+                    disabled={
+                      isGenerating ||
+                      !formData.platform ||
+                      !formData.content_type
+                    }
+                  >
+                    {isGenerating ? "Gerando..." : "Gerar com IA"}
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </>
         )}
       </DialogContent>
     </Dialog>

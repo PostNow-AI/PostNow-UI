@@ -1,14 +1,12 @@
-import { geminiKeyApi } from "@/lib/gemini-key-api";
 import {
   ideaBankService,
   type Campaign,
   type CampaignIdea,
 } from "@/lib/services/ideaBankService";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useIdeaBank } from "./useIdeaBank";
-import { useSubscription } from "./useSubscription";
 
 export const useIdeaBankPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -19,24 +17,11 @@ export const useIdeaBankPage = () => {
   );
   const [showEditor, setShowEditor] = useState(false);
   const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
-  const [showSubscriptionOverlay, setShowSubscriptionOverlay] = useState(false);
 
-  const { campaigns, isLoading, refetchCampaigns } = useIdeaBank();
-  const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
+  const { campaigns, isLoading, refetchCampaigns, userCredits, estimateCost } =
+    useIdeaBank();
+
   const queryClient = useQueryClient();
-
-  // Get API key status
-  const { data: keyStatus, isLoading: isLoadingApiKeyStatus } = useQuery({
-    queryKey: ["gemini-key-status"],
-    queryFn: () => geminiKeyApi.getStatus(),
-  });
-
-  // Show subscription overlay if user is not subscribed
-  useEffect(() => {
-    if (!subscriptionLoading && !isSubscribed) {
-      setShowSubscriptionOverlay(true);
-    }
-  }, [isSubscribed, subscriptionLoading]);
 
   // Delete idea mutation
   const deleteIdeaMutation = useMutation({
@@ -82,12 +67,39 @@ export const useIdeaBankPage = () => {
         variation_type: string;
       };
     }) => {
-      // Use the AI generation endpoint instead of the basic add endpoint
-      const response = await ideaBankService.generateSingleIdea(
-        campaignId,
-        ideaData
-      );
-      return response;
+      // Estimate cost before generating
+      try {
+        const costEstimate = await estimateCost.mutateAsync({
+          platforms: [ideaData.platform],
+          target_audience: "",
+          campaign_objective: "",
+          brand_voice: "",
+        });
+
+        // Check if user has enough credits
+        if (userCredits && userCredits.balance < costEstimate.estimated_cost) {
+          throw new Error(
+            `Créditos insuficientes. Necessário: ${costEstimate.estimated_cost.toFixed(
+              2
+            )}, Disponível: ${userCredits.balance.toFixed(2)}`
+          );
+        }
+
+        // Use the AI generation endpoint instead of the basic add endpoint
+        const response = await ideaBankService.generateSingleIdea(
+          campaignId,
+          ideaData
+        );
+        return response;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes("Créditos insuficientes")
+        ) {
+          throw error;
+        }
+        throw new Error("Erro ao estimar custo. Tente novamente.");
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
@@ -124,10 +136,6 @@ export const useIdeaBankPage = () => {
 
   // Handlers
   const handleNewIdeaClick = () => {
-    if (!isSubscribed) {
-      setShowSubscriptionOverlay(true);
-      return;
-    }
     setIsDialogOpen(true);
   };
 
@@ -185,10 +193,6 @@ export const useIdeaBankPage = () => {
     }
   };
 
-  const handleCloseSubscriptionOverlay = () => {
-    setShowSubscriptionOverlay(false);
-  };
-
   return {
     // State
     isDialogOpen,
@@ -197,15 +201,10 @@ export const useIdeaBankPage = () => {
     deletingCampaign,
     showEditor,
     editorIdeas,
-    showSubscriptionOverlay,
 
     // Data
     campaigns,
     isLoading,
-    keyStatus,
-    isLoadingApiKeyStatus,
-    isSubscribed,
-    subscriptionLoading,
 
     // Mutations
     deleteIdeaMutation,
@@ -222,7 +221,6 @@ export const useIdeaBankPage = () => {
     handleAddIdea,
     handleConfirmDeleteIdea,
     handleConfirmDeleteCampaign,
-    handleCloseSubscriptionOverlay,
 
     // Setters
     setIsDialogOpen,

@@ -83,6 +83,8 @@ export interface IdeaGenerationFormData {
   product_description?: string;
   value_proposition?: string;
   campaign_urgency?: string;
+  preferred_provider?: string;
+  preferred_model?: string;
 }
 
 export interface IdeaOptions {
@@ -121,13 +123,13 @@ export const ideaBankService = {
 
   // Get campaign statistics
   getCampaignStats: async (): Promise<CampaignStats> => {
-    const response = await api.get("/api/v1/ideabank/campaigns/stats/");
+    const response = await api.get("/api/v1/ideabank/stats/");
     return response.data;
   },
 
   // Get idea generation options
   getIdeaOptions: async (): Promise<IdeaOptions> => {
-    const response = await api.get("/api/v1/ideabank/public/options/");
+    const response = await api.get("/api/v1/ideabank/options/");
     return response.data;
   },
 
@@ -135,10 +137,7 @@ export const ideaBankService = {
   generateIdeas: async (
     data: IdeaGenerationFormData
   ): Promise<GeneratedIdeasResponse> => {
-    const response = await api.post(
-      "/api/v1/ideabank/campaigns/generate/",
-      data
-    );
+    const response = await api.post("/api/v1/ideabank/generate-ideas/", data);
     return response.data;
   },
 
@@ -146,7 +145,7 @@ export const ideaBankService = {
   generatePublicIdeas: async (
     data: IdeaGenerationFormData
   ): Promise<GeneratedIdeasResponse> => {
-    const response = await api.post("/api/v1/ideabank/public/generate/", data);
+    const response = await api.post("/api/v1/ideabank/generate-ideas/", data);
     return response.data;
   },
 
@@ -190,12 +189,14 @@ export const ideaBankService = {
       platform: string;
       content_type: string;
       variation_type: string;
+      preferred_provider?: string;
+      preferred_model?: string;
     }
   ): Promise<CampaignIdea> => {
-    const response = await api.post(
-      `/api/v1/ideabank/campaigns/${campaignId}/generate-idea/`,
-      ideaData
-    );
+    const response = await api.post(`/api/v1/ideabank/generate-single-idea/`, {
+      ...ideaData,
+      campaign_id: campaignId,
+    });
     return response.data.idea;
   },
 

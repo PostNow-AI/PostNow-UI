@@ -12,6 +12,9 @@ import { PublicRoute } from "./components/PublicRoute";
 import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AccountSettingsPage } from "./pages/AccountSettingsPage";
+import CreditCancelPage from "./pages/CreditCancelPage";
+import CreditsPage from "./pages/CreditsPage";
+import CreditSuccessPage from "./pages/CreditSuccessPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -65,6 +68,10 @@ const App = () => {
                 element={<PublicIdeaGenerationPage />}
               />
 
+              {/* Credit system routes */}
+              <Route path="/credits/success" element={<CreditSuccessPage />} />
+              <Route path="/credits/cancel" element={<CreditCancelPage />} />
+
               {/* Protected routes with shared layout */}
               <Route
                 element={
@@ -81,6 +88,7 @@ const App = () => {
                   path="/account-settings"
                   element={<AccountSettingsPage />}
                 />
+                <Route path="/credits" element={<CreditsPage />} />
               </Route>
             </Routes>
             <Toaster />
