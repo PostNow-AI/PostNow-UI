@@ -1,9 +1,8 @@
-import { ApiKeyStatus } from "@/components/ideabank/ApiKeyStatus";
 import { CampaignIdeaList } from "@/components/ideabank/CampaignIdeaList";
-import { GeminiKeyOverlay } from "@/components/ideabank/GeminiKeyOverlay";
+
 import { IdeaEditor } from "@/components/ideabank/IdeaEditor";
 import { IdeaGenerationDialog } from "@/components/ideabank/IdeaGenerationDialog";
-import { SubscriptionOverlay } from "@/components/subscription/SubscriptionOverlay";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,14 +35,10 @@ export const IdeaBankPage = () => {
     deletingCampaign,
     showEditor,
     editorIdeas,
-    showSubscriptionOverlay,
 
     // Data
     campaigns,
     isLoading,
-    isLoadingApiKeyStatus,
-    subscriptionLoading,
-    keyStatus,
 
     // Handlers
     handleNewIdeaClick,
@@ -53,7 +48,6 @@ export const IdeaBankPage = () => {
     handleDeleteCampaign,
     handleConfirmDeleteIdea,
     handleConfirmDeleteCampaign,
-    handleCloseSubscriptionOverlay,
 
     // Setters
     setIsDialogOpen,
@@ -69,24 +63,6 @@ export const IdeaBankPage = () => {
     setEditorIdeas([]);
   };
 
-  // Se estiver carregando, mostrar loading
-  if (subscriptionLoading || isLoadingApiKeyStatus) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Carregando...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!keyStatus?.has_key) {
-    return <GeminiKeyOverlay onClose={handleCloseSubscriptionOverlay} />;
-  }
-
   return (
     <div className="container mx-auto p-6">
       {/* Header */}
@@ -98,7 +74,6 @@ export const IdeaBankPage = () => {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <ApiKeyStatus />
           {campaigns.length > 0 && (
             <Button
               onClick={handleNewIdeaClick}
@@ -240,11 +215,6 @@ export const IdeaBankPage = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Subscription Overlay */}
-      {showSubscriptionOverlay && (
-        <SubscriptionOverlay onClose={handleCloseSubscriptionOverlay} />
-      )}
     </div>
   );
 };

@@ -244,10 +244,16 @@ export const useAddIdeaDialog = (
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const createdIdea = await ideaBankService.generateSingleIdea(
-        campaignId,
-        formData
-      );
+      const createdIdea = await ideaBankService.generateSingleIdea(campaignId, {
+        title: formData.title,
+        description: formData.description,
+        content: formData.content,
+        platform: formData.platform,
+        content_type: formData.content_type,
+        variation_type: formData.variation_type,
+        preferred_provider: formData.preferred_provider,
+        preferred_model: formData.preferred_model,
+      });
       toast.success("Ideia criada com sucesso!");
       onEditIdea(createdIdea);
       return createdIdea;

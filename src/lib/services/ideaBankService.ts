@@ -189,6 +189,8 @@ export const ideaBankService = {
       platform: string;
       content_type: string;
       variation_type: string;
+      preferred_provider?: string;
+      preferred_model?: string;
     }
   ): Promise<CampaignIdea> => {
     const response = await api.post(`/api/v1/ideabank/generate-single-idea/`, {

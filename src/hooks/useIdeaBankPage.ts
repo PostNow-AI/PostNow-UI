@@ -1,14 +1,12 @@
-import { geminiKeyApi } from "@/lib/gemini-key-api";
 import {
   ideaBankService,
   type Campaign,
   type CampaignIdea,
 } from "@/lib/services/ideaBankService";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 import { useIdeaBank } from "./useIdeaBank";
-import { useSubscription } from "./useSubscription";
 
 export const useIdeaBankPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -19,25 +17,11 @@ export const useIdeaBankPage = () => {
   );
   const [showEditor, setShowEditor] = useState(false);
   const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
-  const [showSubscriptionOverlay, setShowSubscriptionOverlay] = useState(false);
 
   const { campaigns, isLoading, refetchCampaigns, userCredits, estimateCost } =
     useIdeaBank();
-  const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
+
   const queryClient = useQueryClient();
-
-  // Get API key status
-  const { data: keyStatus, isLoading: isLoadingApiKeyStatus } = useQuery({
-    queryKey: ["gemini-key-status"],
-    queryFn: () => geminiKeyApi.getStatus(),
-  });
-
-  // Show subscription overlay if user is not subscribed
-  useEffect(() => {
-    if (!subscriptionLoading && !isSubscribed) {
-      setShowSubscriptionOverlay(true);
-    }
-  }, [isSubscribed, subscriptionLoading]);
 
   // Delete idea mutation
   const deleteIdeaMutation = useMutation({
@@ -152,10 +136,6 @@ export const useIdeaBankPage = () => {
 
   // Handlers
   const handleNewIdeaClick = () => {
-    if (!isSubscribed) {
-      setShowSubscriptionOverlay(true);
-      return;
-    }
     setIsDialogOpen(true);
   };
 
@@ -213,10 +193,6 @@ export const useIdeaBankPage = () => {
     }
   };
 
-  const handleCloseSubscriptionOverlay = () => {
-    setShowSubscriptionOverlay(false);
-  };
-
   return {
     // State
     isDialogOpen,
@@ -225,15 +201,10 @@ export const useIdeaBankPage = () => {
     deletingCampaign,
     showEditor,
     editorIdeas,
-    showSubscriptionOverlay,
 
     // Data
     campaigns,
     isLoading,
-    keyStatus,
-    isLoadingApiKeyStatus,
-    isSubscribed,
-    subscriptionLoading,
 
     // Mutations
     deleteIdeaMutation,
@@ -250,7 +221,6 @@ export const useIdeaBankPage = () => {
     handleAddIdea,
     handleConfirmDeleteIdea,
     handleConfirmDeleteCampaign,
-    handleCloseSubscriptionOverlay,
 
     // Setters
     setIsDialogOpen,
