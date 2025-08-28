@@ -1,11 +1,6 @@
 import { AxiosError } from "axios";
 
 export interface ApiError {
-  message: string;
-  errors?: Record<string, string[]>;
-}
-
-export interface ApiError {
   message?: string; // Old format for backward compatibility
   error?: string; // New format from backend
   error_type?: string; // New field for error categorization
