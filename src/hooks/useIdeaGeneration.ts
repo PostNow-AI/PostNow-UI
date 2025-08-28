@@ -6,7 +6,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useCostEstimate } from "./useAIModels";
+import { useCostEstimate } from "./useAIOperations";
 import { useUserCredits } from "./useCredits";
 
 export interface GeneratedIdea {
@@ -167,9 +167,7 @@ export const useIdeaGeneration = () => {
       // Estimate cost before generating
       const costEstimate = await estimateCost.mutateAsync({
         platforms: formData.platforms,
-        target_audience: "",
-        campaign_objective: "",
-        brand_voice: "",
+        content_complexity: "medium",
       });
 
       // Check if user has enough credits
