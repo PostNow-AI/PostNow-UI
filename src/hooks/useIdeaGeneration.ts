@@ -3,6 +3,7 @@ import {
   ideaBankService,
   type IdeaGenerationFormData,
 } from "@/lib/services/ideaBankService";
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -133,7 +134,7 @@ export const useIdeaGeneration = () => {
         setGenerationState((prev) => ({
           ...prev,
           status: "error",
-          error: error instanceof Error ? error.message : "Erro desconhecido",
+          error: handleApiError(error, "Erro desconhecido durante a geração"),
         }));
         throw error;
       }
@@ -156,8 +157,7 @@ export const useIdeaGeneration = () => {
         ...prev,
         isGenerating: false,
       }));
-      const errorMessage =
-        error instanceof Error ? error.message : "Erro ao gerar ideias";
+      const errorMessage = handleApiError(error, "Erro ao gerar ideias");
       toast.error(errorMessage);
     },
   });

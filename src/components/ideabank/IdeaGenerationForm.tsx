@@ -21,7 +21,7 @@ import {
   DEFAULT_VOICE_TONE,
 } from "@/constants/ideaGeneration";
 import { useUserCredits } from "@/hooks/useCredits";
-import { getModelsByProvider } from "@/lib/utils/aiModels";
+import { useWorkingModels } from "@/hooks/useWorkingModels";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Cpu,
@@ -32,7 +32,7 @@ import {
   Users,
   Volume2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -99,12 +99,9 @@ export const IdeaGenerationForm = ({
     return CONTENT_TYPE_LABELS[contentType] || contentType;
   };
 
-  // Get available models for the selected provider
-  const getAvailableModels = (provider: string) => {
-    return getModelsByProvider(provider);
-  };
-
   const { data: userCredits } = useUserCredits();
+  const { data: workingModels } = useWorkingModels();
+
   const form = useForm<IdeaGenerationFormData>({
     resolver: zodResolver(ideaGenerationSchema),
     defaultValues: {
@@ -124,22 +121,65 @@ export const IdeaGenerationForm = ({
     },
   });
 
+  // Get available providers from working models
+  const getAvailableProviders = useCallback(() => {
+    if (!workingModels?.available_models) return [];
+
+    const providers = Array.from(
+      new Set(workingModels.available_models.map((model) => model.provider))
+    );
+
+    return providers.map((provider) => ({
+      value: provider,
+      label:
+        workingModels.available_models.find((m) => m.provider === provider)
+          ?.provider_name || provider,
+    }));
+  }, [workingModels]);
+
+  // Get available models for the selected provider
+  const getAvailableModels = useCallback(
+    (provider: string) => {
+      if (!workingModels?.available_models || !provider) return [];
+
+      return workingModels.available_models
+        .filter(
+          (model) => model.provider.toLowerCase() === provider.toLowerCase()
+        )
+        .map((model) => ({
+          value: model.model,
+          label: model.display_name || model.model,
+          description: model.description,
+          cost: model.estimated_cost_per_1k_tokens || "N/A",
+          recommended:
+            model.recommended ||
+            model.model.includes("pro") ||
+            model.model.includes("4o"),
+        }));
+    },
+    [workingModels]
+  );
+
+  // Watch form values for model validation
+  const watchedProvider = form.watch("preferred_provider");
+  const watchedModel = form.watch("preferred_model");
+
   // Reset model when provider changes
   useEffect(() => {
-    const currentProvider = form.watch("preferred_provider");
-    const currentModel = form.watch("preferred_model");
-
-    if (currentProvider && currentModel) {
-      const availableModels = getAvailableModels(currentProvider);
-      const modelExists = availableModels.some((m) => m.value === currentModel);
+    if (watchedProvider && watchedModel) {
+      const availableModels = getAvailableModels(watchedProvider);
+      const modelExists = availableModels.some((m) => m.value === watchedModel);
       if (!modelExists) {
         form.setValue("preferred_model", "");
       }
     }
   }, [
-    form.watch("preferred_provider"),
-    form.watch("preferred_model"),
-    form.setValue,
+    watchedProvider,
+    watchedModel,
+    form,
+    workingModels,
+    getAvailableModels,
+    getAvailableProviders,
   ]);
 
   const {
@@ -597,6 +637,11 @@ export const IdeaGenerationForm = ({
           </CardTitle>
           <CardDescription>
             Escolha o modelo de IA para geração de conteúdo
+            {workingModels && workingModels.available_models.length > 0 && (
+              <span className="block mt-1 text-sm">
+                {workingModels.total_available} modelos disponíveis
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -608,14 +653,33 @@ export const IdeaGenerationForm = ({
                   form.setValue("preferred_provider", value)
                 }
                 value={form.watch("preferred_provider")}
+                disabled={
+                  !workingModels || workingModels.available_models.length === 0
+                }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione o provedor" />
+                  <SelectValue
+                    placeholder={
+                      workingModels
+                        ? "Selecione o provedor"
+                        : "Carregando modelos..."
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Google">Google (Gemini)</SelectItem>
-                  <SelectItem value="OpenAI">OpenAI (GPT)</SelectItem>
-                  <SelectItem value="Anthropic">Anthropic (Claude)</SelectItem>
+                  {getAvailableProviders().map((provider) => (
+                    <SelectItem key={provider.value} value={provider.value}>
+                      {provider.label}
+                    </SelectItem>
+                  ))}
+                  {(!workingModels ||
+                    workingModels.available_models.length === 0) && (
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                      {workingModels
+                        ? "Nenhum modelo disponível"
+                        : "Carregando..."}
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -626,7 +690,7 @@ export const IdeaGenerationForm = ({
                   form.setValue("preferred_model", value)
                 }
                 value={form.watch("preferred_model")}
-                disabled={!form.watch("preferred_provider")}
+                disabled={!form.watch("preferred_provider") || !workingModels}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue
@@ -642,17 +706,47 @@ export const IdeaGenerationForm = ({
                     form.watch("preferred_provider") || ""
                   ).map((model) => (
                     <SelectItem key={model.value} value={model.value}>
-                      {model.label}
+                      <div className="flex items-center gap-2">
+                        <span>{model.label}</span>
+                        {model.recommended && (
+                          <Badge variant="secondary" className="text-xs">
+                            ⭐ Recomendado
+                          </Badge>
+                        )}
+                      </div>
                     </SelectItem>
                   ))}
                   {getAvailableModels(form.watch("preferred_provider") || "")
-                    .length === 0 && (
-                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                      Nenhum modelo disponível
-                    </div>
-                  )}
+                    .length === 0 &&
+                    form.watch("preferred_provider") && (
+                      <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                        Nenhum modelo disponível para este provedor
+                      </div>
+                    )}
                 </SelectContent>
               </Select>
+              {/* Show model details */}
+              {form.watch("preferred_model") && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  {(() => {
+                    const selectedModel = getAvailableModels(
+                      form.watch("preferred_provider") || ""
+                    ).find((m) => m.value === form.watch("preferred_model"));
+                    if (selectedModel) {
+                      return (
+                        <div className="space-y-1">
+                          <p>{selectedModel.description}</p>
+                          <p className="font-medium">
+                            Custo estimado: {selectedModel.cost} créditos por 1K
+                            tokens
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
