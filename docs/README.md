@@ -1,32 +1,38 @@
-# Sonora UI - Frontend React
+# Sonora UI - Documentação Frontend
 
-Um frontend React moderno construído com TypeScript, Vite e sistema de autenticação abrangente.
+Frontend React moderno construído com TypeScript, Vite e sistema de autenticação abrangente.
 
-## Funcionalidades
+## 📚 **Documentação Organizada**
 
-- ✅ **Sistema de Autenticação Completo**
-  - Login e cadastro por email/senha
-  - Integração com Google OAuth
-  - Gerenciamento de tokens JWT com cookies
-  - Atualização automática de tokens
-- ✅ **Dashboard Layout Responsivo**
-  - Sidebar de navegação para desktop
-  - Menu hambúrguer para mobile
-  - Navegação consistente entre páginas
-  - Avatar do usuário e informações de perfil
-- ✅ **Sistema de Tema Dark/Light**
-  - Alternância entre modo claro, escuro e sistema
-  - Persistência da preferência do usuário
-  - Adaptação automática ao tema do sistema
-  - Componentes totalmente compatíveis com ambos os temas
-- ✅ **Rotas Protegidas & Guardas de Rota**
-- ✅ **Gerenciamento de Estado Global** com React Context
-- ✅ **Manipulação Moderna de Formulários** com react-hook-form e validação zod
-- ✅ **Integração de API** com Axios e TanStack Query
-- ✅ **Componentes UI** com shadcn/ui e Tailwind CSS
-- ✅ **Boundaries de Erro** e tratamento abrangente de erros
-- ✅ **Estados de Carregamento** e feedback do usuário com toasts
-- ✅ **Sistema de Toast Colorido** para feedback visual aprimorado
+### �� **Início Rápido**
+
+- **[Configuração](inicio-rapido/configuracao.md)** - Primeiros passos e instalação
+- **[Variáveis de Ambiente](inicio-rapido/variaveis-ambiente.md)** - Configurações necessárias
+- **[Estrutura do Projeto](inicio-rapido/estrutura.md)** - Organização dos arquivos
+
+### 🎨 **Sistema de Tema**
+
+- **[Configuração](sistema-tema/configuracao.md)** - Como funciona o sistema
+- **[Uso](sistema-tema/uso.md)** - Como usar nos componentes
+- **[Personalização](sistema-tema/personalizacao.md)** - Cores e estilos
+
+### 🔐 **Autenticação**
+
+- **[Google OAuth](autenticacao/google-oauth.md)** - Integração com Google
+
+### 🧩 **Componentes**
+
+- **[Dashboard Layout](componentes/dashboard-layout.md)** - Layout principal responsivo
+
+### 💡 **IdeaBank**
+
+- **[Geração de Ideias](ideabank/geracao-ideias.md)** - Como funciona o sistema
+
+### 💳 **Sistema de Créditos**
+
+- **[Compra de Créditos](creditos/compra.md)** - Pacotes e pagamentos
+
+---
 
 ## 🚀 **Início Rápido**
 
