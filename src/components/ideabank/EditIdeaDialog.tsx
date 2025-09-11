@@ -116,6 +116,7 @@ export const EditIdeaDialog = ({
             <div className="space-y-2">
               <Label htmlFor="edit-content">Conteúdo </Label>
               <JsonContentViewer
+                image={editingIdea.image_url || undefined}
                 content={editingIdea.content || ""}
                 readOnly={false}
                 onContentChange={(newContent) =>

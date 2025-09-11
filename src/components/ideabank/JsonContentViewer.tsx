@@ -9,10 +9,12 @@ interface JsonContentViewerProps {
   content: string;
   readOnly?: boolean;
   onContentChange?: (newContent: string) => void;
+  image?: string;
 }
 
 export const JsonContentViewer = ({
   content,
+  image,
   readOnly = true,
   onContentChange,
 }: JsonContentViewerProps) => {
@@ -28,6 +30,7 @@ export const JsonContentViewer = ({
     createEmptyStructure,
     tryFixAndParse,
   } = useJsonParser(content, readOnly, onContentChange);
+  console.log({ image });
 
   // Se há erro, mostrar o estado de erro
   if (error) {
@@ -69,6 +72,7 @@ export const JsonContentViewer = ({
           {Object.entries(parsedContent).map(([key, value]) => (
             <JsonFieldRenderer
               key={key}
+              image={image}
               path={[key]}
               value={value}
               depth={0}

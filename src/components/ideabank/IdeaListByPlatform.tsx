@@ -201,6 +201,7 @@ export const IdeaListByPlatform = ({
                     <div className="space-y-2">
                       <Label htmlFor={`content-${globalIndex}`}>Conteúdo</Label>
                       <JsonContentViewer
+                        image={idea.image_url || undefined}
                         content={idea.content || ""}
                         readOnly={false}
                         onContentChange={(newContent) =>

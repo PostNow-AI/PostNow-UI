@@ -9,6 +9,7 @@ interface JsonFieldRendererProps {
   value: unknown;
   depth: number;
   readOnly: boolean;
+  image?: string;
   translateKey: (key: string) => string;
   translateValue: (key: string, value: unknown) => unknown;
   handleStringFieldChange: (path: string[], key: string, value: string) => void;
@@ -22,6 +23,7 @@ export const JsonFieldRenderer = ({
   value,
   depth,
   readOnly,
+  image,
   translateKey,
   translateValue,
   handleFieldChange,
@@ -39,8 +41,42 @@ export const JsonFieldRenderer = ({
   if (typeof value === "string") {
     const displayValue = translateValue(key, value) as string;
     const isLong = displayValue.length > 100;
+    const isImageUrl = image;
+    console.log({ key, value, displayValue });
 
-    if (isLong) {
+    if (isImageUrl) {
+      return (
+        <div key={path.join(".")} style={{ marginLeft: indent }}>
+          <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+            {translatedKey}
+            {isEmpty && (
+              <Badge variant="outline" className="ml-2 text-xs">
+                Vazio
+              </Badge>
+            )}
+          </Label>
+          <div className="space-y-3">
+            <div className="rounded-lg border p-2 bg-background">
+              <img
+                src={image}
+                alt={`Imagem gerada: ${translatedKey}`}
+                className="max-w-full h-auto rounded shadow-sm max-h-64 object-cover"
+                style={{ maxWidth: "300px" }}
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  const errorDiv = img.nextElementSibling as HTMLElement;
+                  img.style.display = "none";
+                  if (errorDiv) errorDiv.style.display = "block";
+                }}
+              />
+              <div className="hidden text-sm text-muted-foreground mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                ❌ Erro ao carregar imagem
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    } else if (isLong) {
       return (
         <div key={path.join(".")} style={{ marginLeft: indent }}>
           <Label className="text-sm font-medium text-muted-foreground mb-2 block">

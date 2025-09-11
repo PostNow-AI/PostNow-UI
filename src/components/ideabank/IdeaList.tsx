@@ -23,10 +23,24 @@ export const IdeaList = ({
   onEdit,
   onDelete,
 }: IdeaListProps) => {
+  // Aviso sobre geração de imagens
+  const imageWarning = (
+    <div
+      className="mb-4 p-3 rounded bg-yellow-100 border border-yellow-300 text-yellow-900 text-sm"
+      role="alert"
+      aria-label="Aviso sobre geração de imagens"
+    >
+      <strong>Aviso:</strong> A geração de imagens funciona melhor com o modelo{" "}
+      <span className="font-semibold">OpenAI (DALL-E)</span>. Outros modelos
+      podem não suportar geração de imagens ou estar em versão experimental.
+    </div>
+  );
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="text-center">
+          {imageWarning}
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Carregando ideias...</p>
         </div>
@@ -37,6 +51,7 @@ export const IdeaList = ({
   if (ideas.length === 0) {
     return (
       <div className="text-center py-8">
+        {imageWarning}
         <div className="text-muted-foreground mb-4">
           <Eye className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <h3 className="text-lg font-semibold mb-2">
@@ -74,6 +89,7 @@ export const IdeaList = ({
 
   return (
     <div className="space-y-4">
+      {imageWarning}
       {ideas.map((idea) => (
         <Card key={idea.id} className="hover:shadow-md transition-shadow">
           <CardHeader>
@@ -116,6 +132,14 @@ export const IdeaList = ({
             <p className="text-sm text-muted-foreground line-clamp-3">
               {idea.description}
             </p>
+            {idea.image_url && (
+              <img
+                src={idea.image_url}
+                alt="Imagem gerada pela IA"
+                className="mt-4 rounded shadow max-w-xs w-full"
+                style={{ maxHeight: 300, objectFit: "cover" }}
+              />
+            )}
           </CardContent>
         </Card>
       ))}

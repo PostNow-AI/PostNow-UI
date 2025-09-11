@@ -13,6 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Switch,
 } from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +26,7 @@ import { useWorkingModels } from "@/hooks/useWorkingModels";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Cpu,
+  Image,
   Loader2,
   Share2,
   Target,
@@ -67,6 +69,9 @@ const ideaGenerationSchema = z.object({
   // AI model preferences (optional)
   preferred_provider: z.string().optional(),
   preferred_model: z.string().optional(),
+
+  // Image generation preference
+  include_image: z.boolean().optional(),
 });
 
 export type IdeaGenerationFormData = z.infer<typeof ideaGenerationSchema>;
@@ -118,6 +123,7 @@ export const IdeaGenerationForm = ({
 
       preferred_provider: "",
       preferred_model: "",
+      include_image: false,
     },
   });
 
@@ -163,6 +169,15 @@ export const IdeaGenerationForm = ({
   // Watch form values for model validation
   const watchedProvider = form.watch("preferred_provider");
   const watchedModel = form.watch("preferred_model");
+  const watchedIncludeImage = form.watch("include_image");
+
+  // Automatically switch to OpenAI when image generation is enabled
+  useEffect(() => {
+    if (watchedIncludeImage && watchedProvider !== "openai") {
+      form.setValue("preferred_provider", "openai");
+      form.setValue("preferred_model", ""); // Reset model to let user choose
+    }
+  }, [watchedIncludeImage, watchedProvider, form]);
 
   // Reset model when provider changes
   useEffect(() => {
@@ -749,6 +764,71 @@ export const IdeaGenerationForm = ({
               )}
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Image Generation Options */}
+      <Card className="bg-background/50 border-border/60">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Image className="h-4 w-4" />
+            Geração de Imagem
+          </CardTitle>
+          <CardDescription>
+            Gere imagens junto com o texto das ideias de campanha
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label htmlFor="include_image" className="text-sm font-medium">
+                Incluir Geração de Imagem
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Automaticamente gera uma imagem ilustrativa para cada ideia
+              </p>
+            </div>
+            <Switch
+              id="include_image"
+              checked={form.watch("include_image")}
+              onCheckedChange={(checked) =>
+                form.setValue("include_image", checked)
+              }
+            />
+          </div>
+
+          {/* Warning when image generation is enabled */}
+          {form.watch("include_image") && (
+            <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="flex items-start gap-2">
+                <div className="text-amber-600 mt-0.5">
+                  <svg
+                    className="h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-medium text-amber-800">
+                    Provedor alterado automaticamente
+                  </h4>
+                  <p className="text-sm text-amber-700 mt-1">
+                    A geração de imagem está disponível apenas com OpenAI. O
+                    provedor foi alterado automaticamente para OpenAI.
+                  </p>
+                  <p className="text-xs text-amber-600 mt-1">
+                    Custo adicional: ~10-15 créditos por imagem gerada
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

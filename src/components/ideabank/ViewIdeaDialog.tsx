@@ -99,6 +99,7 @@ export const ViewIdeaDialog = ({
             <div>
               <h4 className="font-medium mb-2">Conteúdo Estruturado</h4>
               <JsonContentViewer
+                image={viewingIdea.image_url || undefined}
                 content={
                   viewingIdea.content ||
                   JSON.stringify(ideaToCampaignData(viewingIdea), null, 2)

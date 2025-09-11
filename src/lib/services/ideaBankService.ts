@@ -51,6 +51,7 @@ export interface CampaignIdea {
   updated_at: string;
   campaign_id: number;
   user_id: number;
+  image_url?: string;
 }
 
 export interface CampaignStats {
@@ -85,6 +86,7 @@ export interface IdeaGenerationFormData {
   campaign_urgency?: string;
   preferred_provider?: string;
   preferred_model?: string;
+  include_image?: boolean;
 }
 
 export interface IdeaOptions {
