@@ -30,9 +30,9 @@ export const IdeaList = ({
       role="alert"
       aria-label="Aviso sobre geração de imagens"
     >
-      <strong>Aviso:</strong> A geração de imagens funciona melhor com o modelo{" "}
-      <span className="font-semibold">OpenAI (DALL-E)</span>. Outros modelos
-      podem não suportar geração de imagens ou estar em versão experimental.
+      <strong>Aviso:</strong> A geração de imagens está sendo testada com o{" "}
+      <span className="font-semibold">Google Gemini</span>. Esta funcionalidade
+      está em modo experimental e pode ter resultados variados.
     </div>
   );
 

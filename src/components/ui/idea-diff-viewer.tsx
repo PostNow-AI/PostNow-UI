@@ -12,13 +12,13 @@ import { JsonContentViewer } from "../ideabank/JsonContentViewer";
 
 interface IdeaDiffViewerProps {
   originalIdea: {
-    image_url: undefined;
+    image_url?: string;
     title?: string | null;
     description?: string | null;
     content?: string | null;
   };
   improvedIdea: {
-    image_url: undefined;
+    image_url?: string;
     title?: string | null;
     description?: string | null;
     content?: string | null;
@@ -159,7 +159,7 @@ export const IdeaDiffViewer = ({
               <div className="border border-muted rounded-lg overflow-hidden">
                 {originalIdea.content ? (
                   <JsonContentViewer
-                    image={originalIdea?.image_url || undefined}
+                    image={originalIdea.image_url}
                     content={originalIdea.content}
                     readOnly={true}
                   />
@@ -177,7 +177,7 @@ export const IdeaDiffViewer = ({
               <div className="border border-blue-200 dark:border-blue-800 rounded-lg overflow-hidden bg-blue-50/50 dark:bg-blue-950/10">
                 {improvedIdea.content ? (
                   <JsonContentViewer
-                    image={improvedIdea.image_url || undefined}
+                    image={improvedIdea.image_url}
                     content={improvedIdea.content}
                     readOnly={true}
                   />

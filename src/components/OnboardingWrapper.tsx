@@ -13,10 +13,6 @@ export const OnboardingWrapper = ({ children }: OnboardingWrapperProps) => {
     refetch();
   };
 
-  const handleOnboardingSkip = () => {
-    refetch();
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -25,13 +21,9 @@ export const OnboardingWrapper = ({ children }: OnboardingWrapperProps) => {
     );
   }
 
+  // Mandatory onboarding - no skip option
   if (needsOnboarding) {
-    return (
-      <OnboardingForm
-        onComplete={handleOnboardingComplete}
-        onSkip={handleOnboardingSkip}
-      />
-    );
+    return <OnboardingForm onComplete={handleOnboardingComplete} />;
   }
 
   return <>{children}</>;

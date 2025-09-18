@@ -64,17 +64,20 @@ export const ProfilePage = () => {
     profile.professional_name ||
     profile.profession ||
     profile.specialization ||
-    profile.linkedin_url ||
-    profile.instagram_username ||
-    profile.youtube_channel ||
-    profile.tiktok_username ||
-    profile.primary_color ||
-    profile.secondary_color ||
-    profile.accent_color_1 ||
-    profile.accent_color_2 ||
-    profile.accent_color_3 ||
-    profile.primary_font ||
-    profile.secondary_font
+    profile.business_name ||
+    profile.business_instagram_handle ||
+    profile.business_website ||
+    profile.business_city ||
+    profile.business_description ||
+    profile.instagram_handle ||
+    profile.whatsapp_number ||
+    profile.logo ||
+    profile.voice_tone ||
+    profile.color_1 ||
+    profile.color_2 ||
+    profile.color_3 ||
+    profile.color_4 ||
+    profile.color_5
   );
 
   return (
@@ -94,12 +97,9 @@ export const ProfilePage = () => {
             user={user}
             userName={userName}
             userInitials={userInitials}
-            avatar={profile?.avatar}
             onAvatarChange={(avatar) => {
-              // Update the profile data in the hook
-              if (profile) {
-                profile.avatar = avatar;
-              }
+              // TODO: Add avatar support to backend
+              console.log("Avatar upload not yet implemented:", avatar);
             }}
           />
           {!hasProfileData && (
@@ -172,56 +172,102 @@ export const ProfilePage = () => {
                     </div>
                   )}
 
-                  {/* Social Media Section */}
-                  {(profile.linkedin_url ||
-                    profile.instagram_username ||
-                    profile.youtube_channel ||
-                    profile.tiktok_username) && (
+                  {/* Business Information Section */}
+                  {(profile.business_name ||
+                    profile.business_city ||
+                    profile.business_website ||
+                    profile.business_description) && (
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         <Label className="text-sm font-semibold text-blue-700 dark:text-blue-400">
-                          Redes Sociais
+                          Informações do Negócio
                         </Label>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">
-                        {profile.linkedin_url && (
+                        {profile.business_name && (
                           <div className="space-y-1">
                             <Label className="text-xs font-medium text-muted-foreground">
-                              LinkedIn
+                              Nome do Negócio
+                            </Label>
+                            <p className="text-sm font-medium">
+                              {profile.business_name}
+                            </p>
+                          </div>
+                        )}
+                        {profile.business_city && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Cidade
+                            </Label>
+                            <p className="text-sm font-medium">
+                              {profile.business_city}
+                            </p>
+                          </div>
+                        )}
+                        {profile.business_website && (
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Website
                             </Label>
                             <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                              {profile.linkedin_url}
+                              {profile.business_website}
                             </p>
                           </div>
                         )}
-                        {profile.instagram_username && (
+                        {profile.business_description && (
+                          <div className="space-y-1 md:col-span-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Descrição do Negócio
+                            </Label>
+                            <p className="text-sm font-medium">
+                              {profile.business_description}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Contact/Social Information Section */}
+                  {(profile.instagram_handle ||
+                    profile.business_instagram_handle ||
+                    profile.whatsapp_number) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <Label className="text-sm font-semibold text-green-700 dark:text-green-400">
+                          Contato e Redes Sociais
+                        </Label>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">
+                        {profile.instagram_handle && (
                           <div className="space-y-1">
                             <Label className="text-xs font-medium text-muted-foreground">
-                              Instagram
+                              Instagram Pessoal
                             </Label>
                             <p className="text-sm font-medium text-pink-600 dark:text-pink-400">
-                              {profile.instagram_username}
+                              @{profile.instagram_handle}
                             </p>
                           </div>
                         )}
-                        {profile.youtube_channel && (
+                        {profile.business_instagram_handle && (
                           <div className="space-y-1">
                             <Label className="text-xs font-medium text-muted-foreground">
-                              YouTube
+                              Instagram do Negócio
                             </Label>
-                            <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                              {profile.youtube_channel}
+                            <p className="text-sm font-medium text-pink-600 dark:text-pink-400">
+                              @{profile.business_instagram_handle}
                             </p>
                           </div>
                         )}
-                        {profile.tiktok_username && (
+                        {profile.whatsapp_number && (
                           <div className="space-y-1">
                             <Label className="text-xs font-medium text-muted-foreground">
-                              TikTok
+                              WhatsApp
                             </Label>
-                            <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                              {profile.tiktok_username}
+                            <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                              {profile.whatsapp_number}
                             </p>
                           </div>
                         )}
@@ -230,13 +276,13 @@ export const ProfilePage = () => {
                   )}
 
                   {/* Brandbook Section */}
-                  {(profile.primary_color ||
-                    profile.secondary_color ||
-                    profile.accent_color_1 ||
-                    profile.accent_color_2 ||
-                    profile.accent_color_3 ||
-                    profile.primary_font ||
-                    profile.secondary_font) && (
+                  {(profile.logo ||
+                    profile.voice_tone ||
+                    profile.color_1 ||
+                    profile.color_2 ||
+                    profile.color_3 ||
+                    profile.color_4 ||
+                    profile.color_5) && (
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
@@ -245,119 +291,112 @@ export const ProfilePage = () => {
                         </Label>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4">
+                        {/* Logo */}
+                        {profile.logo && (
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Logo
+                            </Label>
+                            <div className="flex items-center">
+                              <img
+                                src={profile.logo}
+                                alt="Logo"
+                                className="h-12 w-12 rounded border object-cover"
+                                onError={(e) => {
+                                  // If image fails to load, show fallback
+                                  e.currentTarget.style.display = "none";
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Voice Tone */}
+                        {profile.voice_tone && (
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-muted-foreground">
+                              Tom de Voz
+                            </Label>
+                            <p className="text-sm font-medium">
+                              {profile.voice_tone}
+                            </p>
+                          </div>
+                        )}
+
                         {/* Colors */}
-                        {(profile.primary_color ||
-                          profile.secondary_color ||
-                          profile.accent_color_1 ||
-                          profile.accent_color_2 ||
-                          profile.accent_color_3) && (
+                        {(profile.color_1 ||
+                          profile.color_2 ||
+                          profile.color_3 ||
+                          profile.color_4 ||
+                          profile.color_5) && (
                           <div className="space-y-2">
                             <Label className="text-xs font-medium text-muted-foreground">
                               Paleta de Cores
                             </Label>
                             <div className="flex flex-wrap gap-2">
-                              {profile.primary_color && (
+                              {profile.color_1 && (
                                 <div className="flex items-center gap-2">
                                   <div
                                     className="w-4 h-4 rounded border"
                                     style={{
-                                      backgroundColor: profile.primary_color,
+                                      backgroundColor: profile.color_1,
                                     }}
                                   ></div>
                                   <span className="text-xs text-muted-foreground">
-                                    Primária
+                                    Cor 1
                                   </span>
                                 </div>
                               )}
-                              {profile.secondary_color && (
+                              {profile.color_2 && (
                                 <div className="flex items-center gap-2">
                                   <div
                                     className="w-4 h-4 rounded border"
                                     style={{
-                                      backgroundColor: profile.secondary_color,
+                                      backgroundColor: profile.color_2,
                                     }}
                                   ></div>
                                   <span className="text-xs text-muted-foreground">
-                                    Secundária
+                                    Cor 2
                                   </span>
                                 </div>
                               )}
-                              {profile.accent_color_1 && (
+                              {profile.color_3 && (
                                 <div className="flex items-center gap-2">
                                   <div
                                     className="w-4 h-4 rounded border"
                                     style={{
-                                      backgroundColor: profile.accent_color_1,
+                                      backgroundColor: profile.color_3,
                                     }}
                                   ></div>
                                   <span className="text-xs text-muted-foreground">
-                                    Destaque 1
+                                    Cor 3
                                   </span>
                                 </div>
                               )}
-                              {profile.accent_color_2 && (
+                              {profile.color_4 && (
                                 <div className="flex items-center gap-2">
                                   <div
                                     className="w-4 h-4 rounded border"
                                     style={{
-                                      backgroundColor: profile.accent_color_2,
+                                      backgroundColor: profile.color_4,
                                     }}
                                   ></div>
                                   <span className="text-xs text-muted-foreground">
-                                    Destaque 2
+                                    Cor 4
                                   </span>
                                 </div>
                               )}
-                              {profile.accent_color_3 && (
+                              {profile.color_5 && (
                                 <div className="flex items-center gap-2">
                                   <div
                                     className="w-4 h-4 rounded border"
                                     style={{
-                                      backgroundColor: profile.accent_color_3,
+                                      backgroundColor: profile.color_5,
                                     }}
                                   ></div>
                                   <span className="text-xs text-muted-foreground">
-                                    Destaque 3
+                                    Cor 5
                                   </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Typography */}
-                        {(profile.primary_font || profile.secondary_font) && (
-                          <div className="space-y-2">
-                            <Label className="text-xs font-medium text-muted-foreground">
-                              Tipografia
-                            </Label>
-                            <div className="space-y-1">
-                              {profile.primary_font && (
-                                <div className="space-y-1">
-                                  <Label className="text-xs font-medium text-muted-foreground">
-                                    Fonte Primária
-                                  </Label>
-                                  <p
-                                    className="text-sm font-medium"
-                                    style={{ fontFamily: profile.primary_font }}
-                                  >
-                                    {profile.primary_font}
-                                  </p>
-                                </div>
-                              )}
-                              {profile.secondary_font && (
-                                <div className="space-y-1">
-                                  <Label className="text-xs font-medium text-muted-foreground">
-                                    Fonte Secundária
-                                  </Label>
-                                  <p
-                                    className="text-sm font-medium"
-                                    style={{
-                                      fontFamily: profile.secondary_font,
-                                    }}
-                                  >
-                                    {profile.secondary_font}
-                                  </p>
                                 </div>
                               )}
                             </div>
@@ -402,10 +441,10 @@ export const ProfilePage = () => {
                     </Button>
                   </div>
                 </div>
-              ) : profile.onboarding_skipped ? (
+              ) : !profile.onboarding_completed ? (
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">
-                    Você pulou o onboarding inicial. Para melhorar a
+                    Você ainda não completou o onboarding. Para melhorar a
                     personalização do seu conteúdo, você pode preencher essas
                     informações a qualquer momento.
                   </p>
@@ -444,20 +483,28 @@ export const ProfilePage = () => {
           </DialogHeader>
           <ProfileEditForm
             initialData={{
+              // Step 1: Personal information
               professional_name: profile?.professional_name,
               profession: profile?.profession,
+              instagram_handle: profile?.instagram_handle,
+              whatsapp_number: profile?.whatsapp_number,
+
+              // Step 2: Business information
+              business_name: profile?.business_name,
               specialization: profile?.specialization,
-              linkedin_url: profile?.linkedin_url,
-              instagram_username: profile?.instagram_username,
-              youtube_channel: profile?.youtube_channel,
-              tiktok_username: profile?.tiktok_username,
-              primary_color: profile?.primary_color,
-              secondary_color: profile?.secondary_color,
-              accent_color_1: profile?.accent_color_1,
-              accent_color_2: profile?.accent_color_2,
-              accent_color_3: profile?.accent_color_3,
-              primary_font: profile?.primary_font,
-              secondary_font: profile?.secondary_font,
+              business_instagram_handle: profile?.business_instagram_handle,
+              business_website: profile?.business_website,
+              business_city: profile?.business_city,
+              business_description: profile?.business_description,
+
+              // Step 3: Branding
+              logo: profile?.logo,
+              voice_tone: profile?.voice_tone,
+              color_1: profile?.color_1,
+              color_2: profile?.color_2,
+              color_3: profile?.color_3,
+              color_4: profile?.color_4,
+              color_5: profile?.color_5,
             }}
             onComplete={() => setIsEditMode(false)}
             onCancel={() => setIsEditMode(false)}

@@ -171,7 +171,7 @@ export const IdeaGenerationForm = ({
   const watchedModel = form.watch("preferred_model");
   const watchedIncludeImage = form.watch("include_image");
 
-  // Automatically switch to OpenAI when image generation is enabled
+  // Automatically switch to openai when image generation is enabled
   useEffect(() => {
     if (watchedIncludeImage && watchedProvider !== "openai") {
       form.setValue("preferred_provider", "openai");
@@ -819,11 +819,12 @@ export const IdeaGenerationForm = ({
                     Provedor alterado automaticamente
                   </h4>
                   <p className="text-sm text-amber-700 mt-1">
-                    A geração de imagem está disponível apenas com OpenAI. O
-                    provedor foi alterado automaticamente para OpenAI.
+                    A geração de imagem está sendo testada com Google Gemini. O
+                    provedor foi alterado automaticamente para Google.
                   </p>
                   <p className="text-xs text-amber-600 mt-1">
-                    Custo adicional: ~10-15 créditos por imagem gerada
+                    Modo experimental: testando capacidades de geração de imagem
+                    do Gemini
                   </p>
                 </div>
               </div>

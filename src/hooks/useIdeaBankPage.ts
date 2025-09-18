@@ -3,6 +3,11 @@ import {
   type Campaign,
   type CampaignIdea,
 } from "@/lib/services/ideaBankService";
+import {
+  postService,
+  type Post,
+  type PostIdea,
+} from "@/lib/services/postService";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -10,25 +15,59 @@ import { useIdeaBank } from "./useIdeaBank";
 
 export const useIdeaBankPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [viewingIdea, setViewingIdea] = useState<CampaignIdea | null>(null);
-  const [deletingIdea, setDeletingIdea] = useState<CampaignIdea | null>(null);
+  const [viewingIdea, setViewingIdea] = useState<
+    CampaignIdea | PostIdea | null
+  >(null);
+  const [deletingIdea, setDeletingIdea] = useState<
+    CampaignIdea | PostIdea | null
+  >(null);
   const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(
     null
   );
+  const [deletingPost, setDeletingPost] = useState<Post | null>(null);
   const [showEditor, setShowEditor] = useState(false);
-  const [editorIdeas, setEditorIdeas] = useState<CampaignIdea[]>([]);
+  const [editorIdeas, setEditorIdeas] = useState<(CampaignIdea | PostIdea)[]>(
+    []
+  );
 
-  const { campaigns, isLoading, refetchCampaigns, userCredits, estimateCost } =
-    useIdeaBank();
+  const {
+    campaigns,
+    posts,
+    isLoading,
+    refetchCampaigns,
+    // refetchPosts, // Temporarily commented - unused
+    userCredits,
+    estimateCost,
+  } = useIdeaBank();
+
+  // Helper to refetch all data
+  // const refetchAllData = () => {
+  //   refetch();
+  //   refetchPosts();
+  // };
 
   const queryClient = useQueryClient();
 
-  // Delete idea mutation
+  // Delete campaign idea mutation
   const deleteIdeaMutation = useMutation({
     mutationFn: ideaBankService.deleteIdea,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
       queryClient.invalidateQueries({ queryKey: ["campaign-stats"] });
+      toast.success("Ideia deletada com sucesso!");
+      setDeletingIdea(null);
+    },
+    onError: () => {
+      toast.error("Erro ao deletar ideia");
+    },
+  });
+
+  // Delete post idea mutation
+  const deletePostIdeaMutation = useMutation({
+    mutationFn: postService.deletePostIdea,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
+      queryClient.invalidateQueries({ queryKey: ["post-stats"] });
       toast.success("Ideia deletada com sucesso!");
       setDeletingIdea(null);
     },
@@ -51,7 +90,22 @@ export const useIdeaBankPage = () => {
     },
   });
 
-  // Add idea mutation
+  // Delete post mutation
+  const deletePostMutation = useMutation({
+    mutationFn: postService.deletePost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
+      queryClient.invalidateQueries({ queryKey: ["post-stats"] });
+      toast.success("Post excluído com sucesso!");
+      setDeletingPost(null);
+    },
+    onError: (error) => {
+      toast.error("Erro ao excluir post");
+      console.error("Error deleting post:", error);
+    },
+  });
+
+  // Add campaign idea mutation
   const addIdeaMutation = useMutation({
     mutationFn: async ({
       campaignId,
@@ -134,17 +188,33 @@ export const useIdeaBankPage = () => {
     },
   });
 
+  // Update post mutation
+  const updatePostMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<Post> }) => {
+      const response = await postService.updatePost(id, data);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
+      queryClient.invalidateQueries({ queryKey: ["post-stats"] });
+      toast.success("Post atualizado com sucesso!");
+    },
+    onError: () => {
+      toast.error("Erro ao atualizar post");
+    },
+  });
+
   // Handlers
   const handleNewIdeaClick = () => {
     setIsDialogOpen(true);
   };
 
-  const handleEditIdea = (idea: CampaignIdea) => {
+  const handleEditIdea = (idea: CampaignIdea | PostIdea) => {
     setEditorIdeas([idea]);
     setShowEditor(true);
   };
 
-  const handleDeleteIdea = (idea: CampaignIdea) => {
+  const handleDeleteIdea = (idea: CampaignIdea | PostIdea) => {
     setDeletingIdea(idea);
   };
 
@@ -157,6 +227,14 @@ export const useIdeaBankPage = () => {
 
   const handleDeleteCampaign = (campaign: Campaign) => {
     setDeletingCampaign(campaign);
+  };
+
+  const handleEditPost = (post: Post, updatedData: Partial<Post>) => {
+    updatePostMutation.mutate({ id: post.id, data: updatedData });
+  };
+
+  const handleDeletePost = (post: Post) => {
+    setDeletingPost(post);
   };
 
   const handleAddIdea = async (
@@ -183,7 +261,14 @@ export const useIdeaBankPage = () => {
 
   const handleConfirmDeleteIdea = () => {
     if (deletingIdea) {
-      deleteIdeaMutation.mutate(deletingIdea.id);
+      // Check if it's a campaign idea or post idea
+      if ("campaign_id" in deletingIdea) {
+        // It's a campaign idea
+        deleteIdeaMutation.mutate(deletingIdea.id);
+      } else {
+        // It's a post idea
+        deletePostIdeaMutation.mutate(deletingIdea.id);
+      }
     }
   };
 
@@ -193,24 +278,35 @@ export const useIdeaBankPage = () => {
     }
   };
 
+  const handleConfirmDeletePost = () => {
+    if (deletingPost) {
+      deletePostMutation.mutate(deletingPost.id);
+    }
+  };
+
   return {
     // State
     isDialogOpen,
     viewingIdea,
     deletingIdea,
     deletingCampaign,
+    deletingPost,
     showEditor,
     editorIdeas,
 
     // Data
     campaigns,
+    posts,
     isLoading,
 
     // Mutations
     deleteIdeaMutation,
+    deletePostIdeaMutation,
     deleteCampaignMutation,
+    deletePostMutation,
     addIdeaMutation,
     updateCampaignMutation,
+    updatePostMutation,
 
     // Handlers
     handleNewIdeaClick,
@@ -218,9 +314,12 @@ export const useIdeaBankPage = () => {
     handleDeleteIdea,
     handleEditCampaign,
     handleDeleteCampaign,
+    handleEditPost,
+    handleDeletePost,
     handleAddIdea,
     handleConfirmDeleteIdea,
     handleConfirmDeleteCampaign,
+    handleConfirmDeletePost,
 
     // Setters
     setIsDialogOpen,
@@ -229,5 +328,6 @@ export const useIdeaBankPage = () => {
     setEditorIdeas,
     setDeletingIdea,
     setDeletingCampaign,
+    setDeletingPost,
   };
 };
