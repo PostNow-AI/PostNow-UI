@@ -1,7 +1,14 @@
+import { useState } from "react";
+
 import { CampaignIdeaList } from "@/components/ideabank/CampaignIdeaList";
+import { PostCreationDialog } from "@/components/ideabank/PostCreationDialog";
+import { PostList } from "@/components/ideabank/PostList";
+import { PostViewDialog } from "@/components/ideabank/PostViewDialog";
 
 import { IdeaEditor } from "@/components/ideabank/IdeaEditor";
 import { IdeaGenerationDialog } from "@/components/ideabank/IdeaGenerationDialog";
+import { type CampaignIdea } from "@/lib/services/ideaBankService";
+import { type Post as PostType } from "@/lib/services/postService";
 
 import {
   AlertDialog,
@@ -24,20 +31,79 @@ import {
   DialogTitle,
 } from "@/components/ui";
 import { useIdeaBankPage } from "@/hooks/useIdeaBankPage";
-import { Plus } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
+
+interface IdeaData {
+  id: number;
+  content: string;
+  content_preview: string;
+  image_url?: string;
+  status: string;
+  status_display: string;
+  ai_provider: string;
+  ai_model: string;
+  post_name: string;
+  post_type: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface PostData {
+  id: number;
+  name: string;
+  objective: string;
+  objective_display: string;
+  type: string;
+  type_display: string;
+  target_gender?: string;
+  target_gender_display?: string;
+  target_age?: string;
+  target_location?: string;
+  target_salary?: string;
+  target_interests?: string;
+  has_target_audience: boolean;
+  ideas_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Post {
+  id: number;
+  name: string;
+  objective: string;
+  objective_display: string;
+  type: string;
+  type_display: string;
+  target_gender?: string;
+  target_gender_display?: string;
+  target_age?: string;
+  target_location?: string;
+  target_salary?: string;
+  target_interests?: string;
+  has_target_audience: boolean;
+  ideas_count: number;
+  created_at: string;
+  updated_at: string;
+}
 
 export const IdeaBankPage = () => {
+  const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
+  const [isPostViewDialogOpen, setIsPostViewDialogOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
+
   const {
     // State
     isDialogOpen,
     viewingIdea,
     deletingIdea,
     deletingCampaign,
+    deletingPost,
     showEditor,
     editorIdeas,
 
     // Data
     campaigns,
+    // posts, // Temporarily commented out - unused
     isLoading,
 
     // Handlers
@@ -46,8 +112,11 @@ export const IdeaBankPage = () => {
     handleDeleteIdea,
     handleEditCampaign,
     handleDeleteCampaign,
+    // handleEditPost, // Temporarily commented out - unused
+    // handleDeletePost, // Temporarily commented out - unused
     handleConfirmDeleteIdea,
     handleConfirmDeleteCampaign,
+    handleConfirmDeletePost,
 
     // Setters
     setIsDialogOpen,
@@ -56,11 +125,47 @@ export const IdeaBankPage = () => {
     setEditorIdeas,
     setDeletingIdea,
     setDeletingCampaign,
+    setDeletingPost,
   } = useIdeaBankPage();
 
   const handleEditorBack = () => {
     setShowEditor(false);
     setEditorIdeas([]);
+  };
+
+  const handlePostCreated = (postData: PostData, ideaData: IdeaData) => {
+    console.log("Post criado:", postData);
+    console.log("Ideia gerada:", ideaData);
+
+    // Convert PostData to PostType and add the generated idea
+    const postWithIdeas: PostType = {
+      ...postData,
+      ideas: [
+        {
+          id: ideaData.id,
+          content: ideaData.content,
+          content_preview: ideaData.content.substring(0, 200) + "...",
+          status: "draft" as const,
+          status_display: "Rascunho",
+          ai_provider: "gemini",
+          ai_model: "gemini-1.5-flash",
+          post_name: postData.name,
+          post_type: postData.type,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          post_id: postData.id,
+        },
+      ],
+    };
+
+    // Open the PostViewDialog with the created post
+    setSelectedPost(postWithIdeas);
+    setIsPostViewDialogOpen(true);
+  };
+
+  const handlePostSelect = (post: Post) => {
+    // Here you could navigate to a detailed view or open a modal
+    console.log("Post selecionado:", post);
   };
 
   return (
@@ -70,17 +175,26 @@ export const IdeaBankPage = () => {
         <div>
           <h1 className="text-3xl font-bold">Banco de Ideias</h1>
           <p className="text-muted-foreground">
-            Gerencie suas campanhas e ideias criativas
+            Crie posts e gere ideias criativas com IA
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <Button
+            onClick={() => setIsPostDialogOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            Novo Post com IA
+          </Button>
+
           {campaigns.length > 0 && (
             <Button
               onClick={handleNewIdeaClick}
+              variant="outline"
               className="flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
-              Nova campanha
+              Campanha (Legacy)
             </Button>
           )}
         </div>
@@ -88,20 +202,64 @@ export const IdeaBankPage = () => {
 
       {/* Main Content */}
       {showEditor ? (
-        <IdeaEditor ideas={editorIdeas} onBack={handleEditorBack} />
-      ) : (
-        <CampaignIdeaList
-          campaigns={campaigns}
-          isLoading={isLoading}
-          onEditIdea={handleEditIdea}
-          onDeleteIdea={handleDeleteIdea}
-          onEditCampaign={handleEditCampaign}
-          onDeleteCampaign={handleDeleteCampaign}
-          handleNewIdeaClick={handleNewIdeaClick}
+        <IdeaEditor
+          ideas={
+            editorIdeas.filter(
+              (idea) => "campaign_id" in idea
+            ) as CampaignIdea[]
+          }
+          onBack={handleEditorBack}
         />
+      ) : (
+        <div className="space-y-8">
+          {/* New Post-based System */}
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">Posts</h2>
+            </div>
+            <PostList onPostSelect={handlePostSelect} />
+          </div>
+
+          {/* Legacy Campaign System (if campaigns exist) */}
+          {campaigns.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Plus className="h-5 w-5 text-muted-foreground" />
+                <h2 className="text-xl font-semibold text-muted-foreground">
+                  Campanhas (Legacy)
+                </h2>
+              </div>
+              <CampaignIdeaList
+                campaigns={campaigns}
+                isLoading={isLoading}
+                onEditIdea={handleEditIdea}
+                onDeleteIdea={handleDeleteIdea}
+                onEditCampaign={handleEditCampaign}
+                onDeleteCampaign={handleDeleteCampaign}
+                handleNewIdeaClick={handleNewIdeaClick}
+              />
+            </div>
+          )}
+        </div>
       )}
 
       {/* Dialogs */}
+      <PostCreationDialog
+        isOpen={isPostDialogOpen}
+        onClose={() => setIsPostDialogOpen(false)}
+        onSuccess={handlePostCreated}
+      />
+
+      <PostViewDialog
+        isOpen={isPostViewDialogOpen}
+        onClose={() => {
+          setIsPostViewDialogOpen(false);
+          setSelectedPost(null);
+        }}
+        post={selectedPost}
+      />
+
       <IdeaGenerationDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
@@ -116,14 +274,46 @@ export const IdeaBankPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir a ideia "{deletingIdea?.title}"?
-              Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir a ideia "
+              {(deletingIdea &&
+                "title" in deletingIdea &&
+                deletingIdea.title) ||
+                (deletingIdea &&
+                  "post_name" in deletingIdea &&
+                  deletingIdea.post_name) ||
+                "esta ideia"}
+              "? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDeleteIdea}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Post Confirmation */}
+      <AlertDialog
+        open={!!deletingPost}
+        onOpenChange={() => setDeletingPost(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o post "{deletingPost?.name}"? Esta
+              ação não pode ser desfeita e excluirá todas as ideias associadas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDeletePost}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Excluir
@@ -162,8 +352,22 @@ export const IdeaBankPage = () => {
       <Dialog open={!!viewingIdea} onOpenChange={() => setViewingIdea(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{viewingIdea?.title}</DialogTitle>
-            <DialogDescription>{viewingIdea?.description}</DialogDescription>
+            <DialogTitle>
+              {(viewingIdea && "title" in viewingIdea && viewingIdea.title) ||
+                (viewingIdea &&
+                  "post_name" in viewingIdea &&
+                  viewingIdea.post_name) ||
+                "Ideia"}
+            </DialogTitle>
+            <DialogDescription>
+              {(viewingIdea &&
+                "description" in viewingIdea &&
+                viewingIdea.description) ||
+                (viewingIdea &&
+                  "post_type" in viewingIdea &&
+                  `Post do tipo: ${viewingIdea.post_type}`) ||
+                "Detalhes da ideia"}
+            </DialogDescription>
           </DialogHeader>
           <div className="mt-4">
             <Card>
@@ -172,15 +376,38 @@ export const IdeaBankPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div>
-                    <strong>Plataforma:</strong>{" "}
-                    {viewingIdea?.platform_display || viewingIdea?.platform}
-                  </div>
-                  <div>
-                    <strong>Tipo de Conteúdo:</strong>{" "}
-                    {viewingIdea?.content_type_display ||
-                      viewingIdea?.content_type}
-                  </div>
+                  {/* Platform - only for CampaignIdea */}
+                  {viewingIdea && "platform" in viewingIdea && (
+                    <div>
+                      <strong>Plataforma:</strong>{" "}
+                      {viewingIdea.platform_display || viewingIdea.platform}
+                    </div>
+                  )}
+                  {/* Content Type - only for CampaignIdea */}
+                  {viewingIdea && "content_type" in viewingIdea && (
+                    <div>
+                      <strong>Tipo de Conteúdo:</strong>{" "}
+                      {viewingIdea.content_type_display ||
+                        viewingIdea.content_type}
+                    </div>
+                  )}
+                  {/* Post info - only for PostIdea */}
+                  {viewingIdea && "post_name" in viewingIdea && (
+                    <>
+                      <div>
+                        <strong>Post:</strong> {viewingIdea.post_name}
+                      </div>
+                      <div>
+                        <strong>Tipo:</strong> {viewingIdea.post_type}
+                      </div>
+                      <div>
+                        <strong>Provedor IA:</strong> {viewingIdea.ai_provider}
+                      </div>
+                      <div>
+                        <strong>Modelo IA:</strong> {viewingIdea.ai_model}
+                      </div>
+                    </>
+                  )}
                   <div>
                     <strong>Status:</strong>{" "}
                     <span

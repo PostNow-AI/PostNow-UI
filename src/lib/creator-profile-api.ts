@@ -9,53 +9,67 @@ export interface CreatorProfile {
     last_name: string;
     email: string;
   };
-  // Basic user info
-  avatar?: string;
-  // Professional information
+
+  // Step 1: Personal information
   professional_name?: string;
   profession?: string;
+  instagram_handle?: string;
+  whatsapp_number?: string;
+
+  // Step 2: Business information
+  business_name?: string;
   specialization?: string;
+  business_instagram_handle?: string;
+  business_website?: string;
+  business_city?: string;
+  business_description?: string;
 
-  // Social media
-  linkedin_url?: string;
-  instagram_username?: string;
-  youtube_channel?: string;
-  tiktok_username?: string;
+  // Step 3: Branding
+  logo?: string;
+  voice_tone?: string;
+  color_1?: string;
+  color_2?: string;
+  color_3?: string;
+  color_4?: string;
+  color_5?: string;
+  color_palette?: string[]; // Read-only computed field
 
-  // Brandbook - Colors
-  primary_color?: string;
-  secondary_color?: string;
-  accent_color_1?: string;
-  accent_color_2?: string;
-  accent_color_3?: string;
-
-  // Brandbook - Typography
-  primary_font?: string;
-  secondary_font?: string;
+  // Onboarding status
+  step_1_completed: boolean;
+  step_2_completed: boolean;
+  step_3_completed: boolean;
+  onboarding_completed: boolean;
+  current_step: number; // Read-only computed field
 
   // Metadata
-  onboarding_completed: boolean;
-  onboarding_skipped: boolean;
   created_at: string;
   updated_at: string;
   onboarding_completed_at?: string;
 }
 
 export interface OnboardingData {
+  // Step 1: Personal information
   professional_name?: string;
   profession?: string;
+  instagram_handle?: string;
+  whatsapp_number?: string;
+
+  // Step 2: Business information
+  business_name?: string;
   specialization?: string;
-  linkedin_url?: string;
-  instagram_username?: string;
-  youtube_channel?: string;
-  tiktok_username?: string;
-  primary_color?: string;
-  secondary_color?: string;
-  accent_color_1?: string;
-  accent_color_2?: string;
-  accent_color_3?: string;
-  primary_font?: string;
-  secondary_font?: string;
+  business_instagram_handle?: string;
+  business_website?: string;
+  business_city?: string;
+  business_description?: string;
+
+  // Step 3: Branding
+  logo?: string;
+  voice_tone?: string;
+  color_1?: string;
+  color_2?: string;
+  color_3?: string;
+  color_4?: string;
+  color_5?: string;
 }
 
 export interface OnboardingStatus {
@@ -106,23 +120,79 @@ export const creatorProfileApi = {
     return response.data;
   },
 
-  // Submit onboarding form
-  submitOnboarding: async (
-    data: OnboardingData
-  ): Promise<{ message: string; profile: CreatorProfile }> => {
-    const response = await api.post(
-      "/api/v1/creator-profile/onboarding/",
+  // Step-based onboarding endpoints
+  updateStep1: async (
+    data: Partial<
+      Pick<
+        OnboardingData,
+        | "professional_name"
+        | "profession"
+        | "instagram_handle"
+        | "whatsapp_number"
+      >
+    >
+  ): Promise<{
+    message: string;
+    profile: CreatorProfile;
+    step_completed: boolean;
+    current_step: number;
+  }> => {
+    const response = await api.patch(
+      "/api/v1/creator-profile/onboarding/step1/",
       data
     );
     return response.data;
   },
 
-  // Skip onboarding
-  skipOnboarding: async (): Promise<{
+  updateStep2: async (
+    data: Partial<
+      Pick<
+        OnboardingData,
+        | "business_name"
+        | "specialization"
+        | "business_instagram_handle"
+        | "business_website"
+        | "business_city"
+        | "business_description"
+      >
+    >
+  ): Promise<{
     message: string;
-    skipped: boolean;
+    profile: CreatorProfile;
+    step_completed: boolean;
+    current_step: number;
   }> => {
-    const response = await api.post("/api/v1/creator-profile/onboarding/skip/");
+    const response = await api.patch(
+      "/api/v1/creator-profile/onboarding/step2/",
+      data
+    );
+    return response.data;
+  },
+
+  updateStep3: async (
+    data: Partial<
+      Pick<
+        OnboardingData,
+        | "logo"
+        | "voice_tone"
+        | "color_1"
+        | "color_2"
+        | "color_3"
+        | "color_4"
+        | "color_5"
+      >
+    >
+  ): Promise<{
+    message: string;
+    profile: CreatorProfile;
+    step_completed: boolean;
+    current_step: number;
+    onboarding_completed?: boolean;
+  }> => {
+    const response = await api.patch(
+      "/api/v1/creator-profile/onboarding/step3/",
+      data
+    );
     return response.data;
   },
 
@@ -134,17 +204,7 @@ export const creatorProfileApi = {
 
   // Update profile (partial updates supported)
   updateProfile: async (
-    data: Partial<
-      Omit<
-        CreatorProfile,
-        | "user"
-        | "onboarding_completed"
-        | "onboarding_skipped"
-        | "created_at"
-        | "updated_at"
-        | "onboarding_completed_at"
-      >
-    >
+    data: Partial<OnboardingData>
   ): Promise<{ message: string; profile: CreatorProfile }> => {
     const response = await api.patch("/api/v1/creator-profile/profile/", data);
     return response.data;
@@ -152,7 +212,7 @@ export const creatorProfileApi = {
 
   // Reset profile (for testing)
   resetProfile: async (): Promise<{ message: string; reset: boolean }> => {
-    const response = await api.delete("/api/v1/creator-profile/profile/reset/");
+    const response = await api.post("/api/v1/creator-profile/profile/reset/");
     return response.data;
   },
 
@@ -160,6 +220,22 @@ export const creatorProfileApi = {
   getOnboardingSuggestions: async (): Promise<OnboardingSuggestions> => {
     const response = await api.get(
       "/api/v1/creator-profile/onboarding/suggestions/"
+    );
+    return response.data;
+  },
+
+  // Generate random colors
+  generateRandomColors: async (): Promise<{
+    colors: {
+      color_1: string;
+      color_2: string;
+      color_3: string;
+      color_4: string;
+      color_5: string;
+    };
+  }> => {
+    const response = await api.get(
+      "/api/v1/creator-profile/onboarding/colors/"
     );
     return response.data;
   },

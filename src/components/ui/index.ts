@@ -9,6 +9,7 @@ export * from "./checkbox";
 export * from "./collapsible";
 export * from "./color-picker";
 export * from "./dialog";
+export * from "./form";
 export * from "./idea-diff-viewer";
 export * from "./image-picker";
 export * from "./input";

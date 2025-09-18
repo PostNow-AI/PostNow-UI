@@ -53,15 +53,15 @@ export const CreatorProfileOverview = ({
           </div>
 
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Redes sociais</span>
+            <span className="text-muted-foreground">Contato/Social</span>
             <span className="font-medium">
               {[
-                profile.linkedin_url,
-                profile.instagram_username,
-                profile.youtube_channel,
-                profile.tiktok_username,
+                profile.instagram_handle,
+                profile.business_instagram_handle,
+                profile.whatsapp_number,
+                profile.business_website,
               ].filter(Boolean).length || 0}{" "}
-              configuradas
+              configurados
             </span>
           </div>
 
@@ -69,10 +69,12 @@ export const CreatorProfileOverview = ({
             <span className="text-muted-foreground">Brandbook</span>
             <span className="font-medium">
               {[
-                profile.primary_color,
-                profile.secondary_color,
-                profile.primary_font,
-                profile.secondary_font,
+                profile.voice_tone,
+                profile.color_1,
+                profile.color_2,
+                profile.color_3,
+                profile.color_4,
+                profile.color_5,
               ].filter(Boolean).length || 0}{" "}
               elementos
             </span>

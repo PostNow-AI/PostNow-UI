@@ -7,4 +7,7 @@ export { IdeaGenerationDialog } from "./IdeaGenerationDialog";
 export { IdeaGenerationForm } from "./IdeaGenerationForm";
 export { IdeaList } from "./IdeaList";
 export { JsonContentViewer } from "./JsonContentViewer";
+export { PostCreationDialog } from "./PostCreationDialog";
+export { PostList } from "./PostList";
+export { PostViewDialog } from "./PostViewDialog";
 export { PublicIdeaGenerationForm } from "./PublicIdeaGenerationForm";
