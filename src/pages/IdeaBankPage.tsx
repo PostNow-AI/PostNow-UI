@@ -29,9 +29,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  Separator,
 } from "@/components/ui";
+import { useUserCredits } from "@/hooks/useCredits";
 import { useIdeaBankPage } from "@/hooks/useIdeaBankPage";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, SidebarClose, Sparkles } from "lucide-react";
 
 interface IdeaData {
   id: number;
@@ -165,39 +167,28 @@ export const IdeaBankPage = () => {
     console.log("Post selecionado:", post);
   };
 
-  return (
-    <div className="container mx-auto p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Banco de Ideias</h1>
-          <p className="text-muted-foreground">
-            Crie posts e gere ideias criativas com IA
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button
-            onClick={() => setIsPostDialogOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Sparkles className="h-4 w-4" />
-            Novo Post com IA
-          </Button>
+  const { data: userCredits } = useUserCredits();
+  const balance = Number(userCredits?.balance) || 0;
 
-          {campaigns.length > 0 && (
-            <Button
-              onClick={handleNewIdeaClick}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Campanha (Legacy)
-            </Button>
-          )}
+  return (
+    <div className="container p-4 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <SidebarClose className="h-4 w-4" />
+            <span>Posts</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <span className="text-muted-foreground text-sm">
+              {balance} créditos restantes
+            </span>
+          </div>
         </div>
+        <Separator />
       </div>
 
-      {/* Main Content */}
       {showEditor ? (
         <IdeaEditor
           ideas={
@@ -211,9 +202,36 @@ export const IdeaBankPage = () => {
         <div className="space-y-8">
           {/* New Post-based System */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Posts</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-600">
+                  Biblioteca de posts
+                </h2>
+                <span className="text-muted-foreground">
+                  Gerencie todos os conteúdos de Instagram gerados por IA
+                </span>
+              </div>
+              {/* Main Content */}
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={() => setIsPostDialogOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Novo Post
+                </Button>
+
+                {campaigns.length > 0 && (
+                  <Button
+                    onClick={handleNewIdeaClick}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Campanha (Legacy)
+                  </Button>
+                )}
+              </div>
             </div>
             <PostList onPostSelect={handlePostSelect} />
           </div>

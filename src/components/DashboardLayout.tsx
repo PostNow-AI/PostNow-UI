@@ -15,92 +15,34 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardLayout } from "@/hooks/useDashboardLayout";
 import { cn } from "@/lib/utils";
+import {
+  ClipboardList,
+  Coins,
+  LogOut,
+  Menu,
+  type LucideIcon,
+} from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-
-// Icons (using simple SVG icons since we don't have an icon library)
-
-const MenuIcon = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M4 6h16M4 12h16M4 18h16"
-    />
-  </svg>
-);
-
-const LogoutIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-    />
-  </svg>
-);
-
-const LightbulbIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-    />
-  </svg>
-);
-
-const CreditCardIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M3 10h18M7 15h1m2 0h5m-9 2h9a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v8a2 2 0 002 2z"
-    />
-  </svg>
-);
+import { ScrollArea } from "./ui/scroll-area";
 
 // Navigation items
 const navigationItems = [
   {
-    name: "Banco de Ideias",
+    name: "Posts",
     href: "/ideabank",
-    icon: LightbulbIcon,
+    icon: ClipboardList,
   },
   {
     name: "Créditos",
     href: "/credits",
-    icon: CreditCardIcon,
+    icon: Coins,
   },
 ];
 
 interface NavLinkProps {
   href: string;
   children: React.ReactNode;
-  icon: React.ComponentType;
+  icon: LucideIcon;
   isActive: boolean;
 }
 
@@ -109,10 +51,12 @@ const NavLink = ({ href, children, icon: Icon, isActive }: NavLinkProps) => (
     to={href}
     className={cn(
       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all hover:bg-accent hover:text-accent-foreground",
-      isActive ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+      isActive
+        ? "bg-primary/10 text-accent-foreground"
+        : "text-muted-foreground"
     )}
   >
-    <Icon />
+    <Icon className="w-4 h-4" />
     {children}
   </Link>
 );
@@ -132,12 +76,9 @@ export const DashboardLayout = () => {
   const SidebarContent = () => (
     <>
       {/* Logo/Brand */}
-      <div className="flex h-14 items-center justify-between border-b px-4 lg:h-[60px] lg:px-6">
+      <div className="flex items-center justify-between">
         <Link to="/ideabank" className="flex items-center gap-2 font-semibold">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">S</span>
-          </div>
-          <span className="text-lg">Sonora</span>
+          <img src="/Logo-sonoria.svg" alt="Sonora Logo" />
         </Link>
         {/* Desktop Theme Toggle */}
         <div className="hidden md:block">
@@ -146,7 +87,7 @@ export const DashboardLayout = () => {
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 px-3 py-4">
+      <div className="flex-1 mt-6">
         <nav className="grid items-start gap-2">
           {navigationItems.map((item) => (
             <NavLink
@@ -162,10 +103,10 @@ export const DashboardLayout = () => {
       </div>
 
       {/* User section */}
-      <div className="mt-auto mb-1 border-t pt-4 px-3">
+      <div className="space-y-6">
         <Link
           to="/profile"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-all cursor-pointer"
+          className="flex items-center gap-3 rounded-lg hover:bg-accent hover:text-accent-foreground transition-all cursor-pointer"
         >
           <Avatar className="h-8 w-8">
             <AvatarImage src={userPicture || ""} alt={getUserName()} />
@@ -182,14 +123,14 @@ export const DashboardLayout = () => {
             </p>
           </div>
         </Link>
-        <TallyButton variant="feedback" size="sm" className="w-full mb-2" />
+        <TallyButton variant="feedback" size="sm" className="w-full" />
         <Button
           variant="ghost"
           size="sm"
           onClick={handleLogout}
-          className="w-full justify-start gap-3 my-2 text-muted-foreground hover:text-foreground"
+          className="w-full justify-start gap-3  text-muted-foreground hover:text-foreground"
         >
-          <LogoutIcon />
+          <LogOut className="w-4 h-4" />
           Sair
         </Button>
       </div>
@@ -197,22 +138,22 @@ export const DashboardLayout = () => {
   );
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden bg-card">
       {/* Desktop Sidebar - Fixed */}
-      <div className="hidden w-[220px] lg:w-[280px] border-r bg-muted/40 md:block flex-shrink-0">
+      <div className="hidden w-[220px] lg:w-[280px]   pl-4 pr-2 py-6  md:block flex-shrink-0">
         <div className="h-full flex flex-col">
           <SidebarContent />
         </div>
       </div>
 
       {/* Main Content Area - Scrollable */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 p-2">
         {/* Mobile Header */}
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden flex-shrink-0">
+        <header className="flex h-14 items-center gap-4 px-2 py-4 lg:h-[60px] lg:px-6 md:hidden flex-shrink-0">
           <Sheet open={isMobileMenuOpen} onOpenChange={toggleMobileMenu}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="shrink-0">
-                <MenuIcon />
+                <Menu />
                 <span className="sr-only">Alternar menu de navegação</span>
               </Button>
             </SheetTrigger>
@@ -223,24 +164,19 @@ export const DashboardLayout = () => {
                   Navegue pelas páginas do dashboard
                 </SheetDescription>
               </SheetHeader>
-              <div className="flex h-full flex-col">
+              <div className="flex h-full flex-col px-4 py-6">
                 <SidebarContent />
               </div>
             </SheetContent>
           </Sheet>
 
           {/* Mobile brand and theme toggle */}
-          <div className="flex items-center justify-between flex-1">
+          <div className="flex items-center justify-between flex-1  px-4 py-6">
             <Link
               to="/ideabank"
               className="flex items-center gap-2 font-semibold"
             >
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">
-                  S
-                </span>
-              </div>
-              <span className="text-lg">Sonora</span>
+              <img src="/Logo-sonoria.svg" alt="Sonora Logo" />
             </Link>
             {/* Mobile Theme Toggle */}
             <div className="flex items-center gap-2">
@@ -251,9 +187,11 @@ export const DashboardLayout = () => {
         </header>
 
         {/* Page Content - Scrollable */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+        <main className="flex-1 bg-background rounded-md drop-shadow-sm ">
           <div className="max-w-none">
-            <Outlet />
+            <ScrollArea className="h-[98vh] w-full">
+              <Outlet />
+            </ScrollArea>
           </div>
         </main>
       </div>
