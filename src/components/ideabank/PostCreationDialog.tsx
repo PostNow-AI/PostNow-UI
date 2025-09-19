@@ -142,7 +142,7 @@ export const PostCreationDialog = ({
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className="space-y-6 mt-4 flex flex-col justify-center">
               {/* Basic Information */}
-              <Card className="max-w-160 w-160 self-center">
+              <Card className="max-w-160  self-center">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <ClipboardList className="text-primary" />
