@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
 import { ClipboardList, Coins, LogOut, User } from "lucide-react";
@@ -27,9 +28,12 @@ import { SiteHeader } from "./ui/site-header";
 
 export function AppSidebar() {
   const location = useLocation();
+  const { state } = useSidebar();
   const { userPicture, getUserInitials, getUserName, handleLogout } =
     useDashboardLayout();
   const { user } = useAuth();
+
+  const isCollapsed = state === "collapsed";
 
   const menuItems = [
     {
@@ -56,18 +60,28 @@ export function AppSidebar() {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <div className="flex items-center justify-between">
-                <Link
-                  to="/ideabank"
-                  className="flex items-center gap-2 font-semibold"
-                >
-                  <img src="/Logo-sonoria.svg" alt="Sonora Logo" />
-                </Link>
-                {/* Desktop Theme Toggle */}
-                <div className="hidden md:block">
-                  <ThemeToggle />
+              {isCollapsed ? (
+                // Collapsed state - show compact logo
+                <div className="flex items-center justify-center p-2">
+                  <Link to="/ideabank" className="flex items-center">
+                    <img src="/logo.svg" alt="Sonora Logo" />
+                  </Link>
                 </div>
-              </div>
+              ) : (
+                // Expanded state - show full logo with theme toggle
+                <div className="flex items-center justify-between">
+                  <Link
+                    to="/ideabank"
+                    className="flex items-center gap-2 font-semibold"
+                  >
+                    <img src="/Logo-sonoria.svg" alt="Sonora Logo" />
+                  </Link>
+                  {/* Desktop Theme Toggle */}
+                  <div className="hidden md:block">
+                    <ThemeToggle />
+                  </div>
+                </div>
+              )}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
