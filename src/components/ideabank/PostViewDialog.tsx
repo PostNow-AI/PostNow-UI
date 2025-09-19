@@ -458,14 +458,14 @@ export const PostViewDialog = ({
                     </div>
                   )}
                   <Button
-                    onClick={handleRegenerateIdea}
+                    onClick={handleImageGeneration}
                     disabled={regeneratingIdea || !currentIdea}
                     className="w-full"
                     variant={currentIdea?.image_url ? "outline" : "default"}
                   >
                     <Sparkles
                       className={`h-4 w-4 mr-2 ${
-                        regeneratingIdea ? "animate-spin" : ""
+                        generatingImage ? "animate-spin" : ""
                       }`}
                     />
                     {generatingImage
@@ -503,7 +503,7 @@ export const PostViewDialog = ({
                       >
                         <Sparkles
                           className={`h-4 w-4 mr-2 ${
-                            generatingImage ? "animate-pulse" : ""
+                            generatingImage ? "animate-spin" : ""
                           }`}
                         />
                         {generatingImage

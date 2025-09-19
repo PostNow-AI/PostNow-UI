@@ -139,156 +139,59 @@ export const PostCreationDialog = ({
           <Separator className="absolute left-0 right-0 top-13 w-full" />
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6 my-4 flex flex-col justify-center"
-          >
-            {/* Basic Information */}
-            <Card className="max-w-160 w-160 self-center">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <ClipboardList className="text-primary" />
-                  Detalhes do post
-                </CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  Configure as especificações do seu post.
-                </CardDescription>
-                <Separator className="mt-2" />
-              </CardHeader>
-              <CardContent className="space-y-6 overflow-auto max-h-[60vh]">
-                {/* TODO: Botão para gerar dados do post com IA */}
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome do Post *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ex: Promoção de Natal 2024, Conscientização da marca"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Título ou nome identificador do post
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="objective"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Objetivo do post *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Selecione o objetivo principal do seu post" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {postObjectiveOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo do post *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Selecione o tipo do post" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {postTypeOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="include_image"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel>Conteúdo * </FormLabel>
-
-                      <FormControl>
-                        <RadioGroup
-                          defaultValue="option-one"
-                          className="flex items-center space-x-2"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem
-                              value="option-one"
-                              id="option-one"
-                              onChange={() => field.onChange(false)}
-                            />
-                            <Label htmlFor="option-one">Texto</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem
-                              value="option-two"
-                              id="option-two"
-                              onChange={() => field.onChange(true)}
-                            />
-                            <Label htmlFor="option-two">Texto e imagem</Label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <CardTitle>Público-Alvo</CardTitle>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <div className="space-y-6 mt-4 flex flex-col justify-center">
+              {/* Basic Information */}
+              <Card className="max-w-160 w-160 self-center">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <ClipboardList className="text-primary" />
+                    Detalhes do post
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    Configure as especificações do seu post.
+                  </CardDescription>
+                  <Separator className="mt-2" />
+                </CardHeader>
+                <CardContent className="space-y-6 overflow-auto max-h-[60vh]">
+                  {/* TODO: Botão para gerar dados do post com IA */}
                   <FormField
                     control={form.control}
-                    name="target_gender"
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Gênero</FormLabel>
+                        <FormLabel>Nome do Post *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Ex: Promoção de Natal 2024, Conscientização da marca"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Título ou nome identificador do post
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="objective"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Objetivo do post *</FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          value={field.value || ""}
+                          value={field.value}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Selecione o gênero" />
+                              <SelectValue placeholder="Selecione o objetivo principal do seu post" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {genderOptions.map((option) => (
+                            {postObjectiveOptions.map((option) => (
                               <SelectItem
                                 key={option.value}
                                 value={option.value}
@@ -298,6 +201,7 @@ export const PostCreationDialog = ({
                             ))}
                           </SelectContent>
                         </Select>
+
                         <FormMessage />
                       </FormItem>
                     )}
@@ -305,37 +209,31 @@ export const PostCreationDialog = ({
 
                   <FormField
                     control={form.control}
-                    name="target_age"
+                    name="type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Idade</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Ex: 18-25, 25-35, 35+"
-                            {...field}
-                            value={field.value || ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                        <FormLabel>Tipo do post *</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Selecione o tipo do post" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {postTypeOptions.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="target_location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Localização</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Ex: São Paulo, Brasil, região Sul..."
-                            {...field}
-                            value={field.value || ""}
-                          />
-                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -343,62 +241,170 @@ export const PostCreationDialog = ({
 
                   <FormField
                     control={form.control}
-                    name="target_salary"
+                    name="include_image"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2">
+                        <FormLabel>Conteúdo * </FormLabel>
+
+                        <FormControl>
+                          <RadioGroup
+                            value={field.value ? "option-two" : "option-one"}
+                            onValueChange={(value) =>
+                              field.onChange(value === "option-two")
+                            }
+                            className="flex items-center space-x-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem
+                                value="option-one"
+                                id="option-one"
+                              />
+                              <Label htmlFor="option-one">Texto</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem
+                                value="option-two"
+                                id="option-two"
+                              />
+                              <Label htmlFor="option-two">Texto e imagem</Label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <CardTitle>Público-Alvo</CardTitle>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="target_gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gênero</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value || ""}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Selecione o gênero" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {genderOptions.map((option) => (
+                                <SelectItem
+                                  key={option.value}
+                                  value={option.value}
+                                >
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="target_age"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Idade</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Ex: 18-25, 25-35, 35+"
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="target_location"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Localização</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Ex: São Paulo, Brasil, região Sul..."
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="target_salary"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Renda Mensal</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Ex: R$ 2.000-5.000, classe média..."
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="target_interests"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Renda Mensal</FormLabel>
+                        <FormLabel>Interesses</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Ex: R$ 2.000-5.000, classe média..."
+                          <Textarea
+                            placeholder="Descreve os interesses, hobbies, problemas e comportamentos do seu público (ex: entusiastas de fitness, profissionais ocupados, consumidores conscientes)"
+                            rows={3}
                             {...field}
                             value={field.value || ""}
                           />
                         </FormControl>
+
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="target_interests"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Interesses</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Descreve os interesses, hobbies, problemas e comportamentos do seu público (ex: entusiastas de fitness, profissionais ocupados, consumidores conscientes)"
-                          rows={3}
-                          {...field}
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-
-                      <FormMessage />
-                    </FormItem>
+                </CardContent>
+              </Card>
+              <Separator className="absolute left-0 right-0 bottom-9 w-full" />
+              <div className="flex justify-end gap-3">
+                <Button type="submit" disabled={isLoading} className="min-w-32">
+                  {isLoading ? (
+                    <>
+                      Gerando...
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      Gerar Ideia
+                      <ChevronRight className="h-4 w-4" />
+                    </>
                   )}
-                />
-              </CardContent>
-            </Card>
+                </Button>
+              </div>
+            </div>
           </form>
         </Form>
-        <Separator className="absolute left-0 right-0 bottom-17 w-full" />
-        <div className="flex justify-end gap-3">
-          <Button type="submit" disabled={isLoading} className="min-w-32">
-            {isLoading ? (
-              <>
-                Gerando...
-                <Loader2 className="h-4 w-4 animate-spin" />
-              </>
-            ) : (
-              <>
-                Gerar Ideia
-                <ChevronRight className="h-4 w-4" />
-              </>
-            )}
-          </Button>
-        </div>
       </DialogContent>
     </Dialog>
   );
