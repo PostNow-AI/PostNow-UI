@@ -20,17 +20,19 @@ import {
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ArrowLeft,
-  ArrowRight,
+  Building,
   Building2,
-  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   Palette,
   User,
+  Verified,
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Separator } from "./ui";
 
 // Updated schema focused on essential fields for post-based system
 const onboardingSchema = z.object({
@@ -79,20 +81,6 @@ const onboardingSchema = z.object({
 
 type OnboardingFormData = z.infer<typeof onboardingSchema>;
 
-const STEPS = [
-  { id: 1, title: "Informações Pessoais", description: "Conte-nos sobre você" },
-  {
-    id: 2,
-    title: "Informações de Negócio",
-    description: "Defina seu público-alvo",
-  },
-  {
-    id: 3,
-    title: "Identidade Visual",
-    description: "Crie sua identidade de marca",
-  },
-];
-
 interface OnboardingFormProps {
   onComplete: () => void;
 }
@@ -117,11 +105,11 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
       business_description: "",
       voice_tone_personality: "",
       logo_image_url: "",
-      color_1: "",
-      color_2: "",
-      color_3: "",
-      color_4: "",
-      color_5: "",
+      color_1: "#FF6B6B", // Soft Red
+      color_2: "#4ECDC4", // Turquoise
+      color_3: "#45B7D1", // Sky Blue
+      color_4: "#96CEB4", // Sage Green
+      color_5: "#FFBE0B", // Golden Yellow
     },
     mode: "onChange",
   });
@@ -175,7 +163,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
 
   const handleNextStep = async () => {
     const isStepValid = await validateCurrentStep();
-    if (isStepValid && currentStep < 3) {
+    if (isStepValid && currentStep < 4) {
       // Debug: Log current form values when moving to next step
       console.log(
         "Form values when moving to step",
@@ -201,23 +189,159 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
         return renderBusinessInfoStep();
       case 3:
         return renderBrandingStep();
+      case 4:
+        return reviewStep();
       default:
         return null;
     }
   };
 
-  const renderPersonalInfoStep = () => (
-    <Card>
+  const reviewStep = () => (
+    <>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="h-5 w-5" />
-          Informações Pessoais
-        </CardTitle>
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <Verified className="text-lime-600 h-6 w-6" />
+          Revise as informações de negócio{" "}
+        </CardTitle>{" "}
         <CardDescription>
-          Como você gostaria de ser conhecido profissionalmente?
+          Se estiver tudo certo, estamos prontos para começar o trabalho.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6 px-0 overflow-auto">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <User className="text-primary h-5 w-5" />
+            Informações do usuário
+          </CardTitle>
+          <Separator />
+        </CardHeader>{" "}
+        <CardContent className="space-y-6 ">
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Nome Profissional</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.professional_name}
+            </span>
+          </div>
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Profissão</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.profession}
+            </span>
+          </div>
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Instagram</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.instagram_username || "Não fornecido"}
+            </span>
+          </div>
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Número de celular do WhatsApp</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.whatsapp_number}
+            </span>
+          </div>{" "}
+        </CardContent>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Building className="text-primary h-5 w-5" />
+            Informações do negócio
+          </CardTitle>
+          <Separator />
+        </CardHeader>{" "}
+        <CardContent className="space-y-6">
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Nome do negócio</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.business_name}
+            </span>
+          </div>
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Setor/Nicho</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.specialization}
+            </span>
+          </div>
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Site</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.business_website || "Não fornecido"}
+            </span>
+          </div>
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Instagram do negócio</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.business_instagram || "Não fornecido"}
+            </span>
+          </div>{" "}
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Localização do negócio</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.business_location}
+            </span>
+          </div>{" "}
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Descrição do negócio</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.business_description}
+            </span>
+          </div>{" "}
+        </CardContent>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Palette className="text-primary h-5 w-5" />
+            Manual da marca do negócio
+          </CardTitle>
+          <Separator />
+        </CardHeader>{" "}
+        <CardContent className="space-y-6 ">
+          {watchedValues.logo_image_url && (
+            <div className="space-y-2 flex flex-col">
+              <span className="text-sm">Logo Marca</span>
+              <img
+                className="text-sm text-muted-foreground max-w-[163px]"
+                src={watchedValues.logo_image_url}
+                alt="Logo Marca"
+              />
+            </div>
+          )}
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Tom de voz e personalidade da marca</span>
+            <span className="text-sm text-muted-foreground">
+              {watchedValues.voice_tone_personality}
+            </span>
+          </div>
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Cores da marca</span>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((num) => (
+                <ColorPicker
+                  key={num}
+                  value={
+                    (watchedValues[
+                      `color_${num}` as keyof typeof watchedValues
+                    ] as string) || "#ffffff"
+                  }
+                  disabled
+                  placeholder="#ffffff"
+                />
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </CardContent>
+    </>
+  );
+
+  const renderPersonalInfoStep = () => (
+    <>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <User className="text-primary h-5 w-5" />
+          Informações do usuário
+        </CardTitle>
+        <Separator />
+      </CardHeader>
+      <CardContent className="space-y-6 overflow-auto">
         <div className="space-y-2">
           <Label htmlFor="professional_name">Nome Profissional *</Label>
           <Input
@@ -225,6 +349,9 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
             placeholder="Ex: Dr. João Silva"
             {...register("professional_name")}
           />
+          <span className="text-muted-foreground text-sm">
+            Como as pessoas te chamam?
+          </span>
           {errors.professional_name && (
             <p className="text-sm text-destructive">
               {errors.professional_name.message}
@@ -237,7 +364,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
             onValueChange={(value) => setValue("profession", value)}
             value={watchedValues.profession || ""}
           >
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecione uma profissão" />
             </SelectTrigger>
             <SelectContent>
@@ -255,67 +382,85 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="instagram_username">Instagram</Label>
-            <Input
-              id="instagram_username"
-              placeholder="@seu_usuario"
-              {...register("instagram_username")}
-            />
-            {errors.instagram_username && (
-              <p className="text-sm text-destructive">
-                {errors.instagram_username.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="whatsapp_number">WhatsApp *</Label>
-            <Input
-              id="whatsapp_number"
-              placeholder="5511999999999"
-              {...register("whatsapp_number")}
-            />
-            <p className="text-xs text-muted-foreground">
-              Digite apenas números, incluindo código do país (ex:
-              5511999999999)
+        <div className="space-y-2">
+          <Label htmlFor="instagram_username">Instagram</Label>
+          <Input
+            id="instagram_username"
+            placeholder="@seu_usuario"
+            {...register("instagram_username")}
+          />
+          {errors.instagram_username && (
+            <p className="text-sm text-destructive">
+              {errors.instagram_username.message}
             </p>
-            {errors.whatsapp_number && (
-              <p className="text-sm text-destructive">
-                {errors.whatsapp_number.message}
-              </p>
-            )}
-          </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="whatsapp_number">WhatsApp *</Label>
+          <Input
+            id="whatsapp_number"
+            placeholder="+55 99 99999-9999"
+            {...register("whatsapp_number")}
+          />
+          <p className="text-sm text-muted-foreground">
+            Você receberá suas ideais de post por esse número{" "}
+          </p>
+          {errors.whatsapp_number && (
+            <p className="text-sm text-destructive">
+              {errors.whatsapp_number.message}
+            </p>
+          )}
         </div>
       </CardContent>
-    </Card>
+    </>
   );
 
   const renderBusinessInfoStep = () => (
-    <Card>
+    <>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Building2 className="h-5 w-5" />
+          <Building2 className="h-5 w-5 text-primary" />
           Informações de Negócio
         </CardTitle>
-        <CardDescription>Conte-nos sobre seu negócio</CardDescription>
+        <CardDescription>
+          Utilizaremos essa informações para criar ideias de posts mais precisas
+          e customizadas para seu negócio. Quanto mais detalhes fornecer,
+          melhores serão os resultados.
+        </CardDescription>
+        <Separator />
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6 overflow-auto">
+        {" "}
+        <div className="space-y-2">
+          <Label htmlFor="business_website">Site</Label>
+          <Input
+            id="business_website"
+            placeholder="Ex: https://seusite.com.br"
+            {...register("business_website")}
+          />
+          {errors.business_website && (
+            <p className="text-sm text-destructive">
+              {errors.business_website.message}
+            </p>
+          )}
+        </div>
         <div className="space-y-2">
           <Label htmlFor="business_name">Nome do Negócio *</Label>
           <Input
             id="business_name"
-            placeholder="Ex: Consultório Dr. Silva"
+            placeholder="Digite o nome do seu negócio"
             {...register("business_name")}
-          />
+          />{" "}
+          <p className="text-sm text-muted-foreground">
+            Caso seja autônomo, digite seu nome profissional{" "}
+          </p>
           {errors.business_name && (
             <p className="text-sm text-destructive">
               {errors.business_name.message}
             </p>
           )}
         </div>
-
         <div className="space-y-2">
           <Label htmlFor="specialization">Setor/Nicho *</Label>
           <Select
@@ -323,8 +468,8 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
             value={watchedValues.specialization || ""}
             disabled={!selectedProfession}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione um setor/nicho" />
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione o nicho de negócio" />
             </SelectTrigger>
             <SelectContent>
               {availableSpecializations.map(
@@ -345,44 +490,24 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
             </p>
           )}
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="business_instagram">Instagram do Negócio</Label>
-            <Input
-              id="business_instagram"
-              placeholder="@seu_negocio"
-              {...register("business_instagram")}
-            />
-            {errors.business_instagram && (
-              <p className="text-sm text-destructive">
-                {errors.business_instagram.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="business_website">Website do Negócio</Label>
-            <Input
-              id="business_website"
-              placeholder="https://seunegocio.com.br"
-              {...register("business_website")}
-            />
-            {errors.business_website && (
-              <p className="text-sm text-destructive">
-                {errors.business_website.message}
-              </p>
-            )}
-          </div>
-        </div>
-
         <div className="space-y-2">
-          <Label htmlFor="business_location">
-            Localização do Negócio (Cidade) *
-          </Label>
+          <Label htmlFor="business_instagram">Instagram do Negócio</Label>
+          <Input
+            id="business_instagram"
+            placeholder="@seu_negocio"
+            {...register("business_instagram")}
+          />
+          {errors.business_instagram && (
+            <p className="text-sm text-destructive">
+              {errors.business_instagram.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="business_location">Localização do negócio * </Label>
           <Input
             id="business_location"
-            placeholder="Ex: São Paulo, SP"
+            placeholder="Ex: Brasília/DF"
             {...register("business_location")}
           />
           {errors.business_location && (
@@ -391,16 +516,16 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
             </p>
           )}
         </div>
-
         <div className="space-y-2">
           <Label htmlFor="business_description">Descrição do Negócio *</Label>
           <Input
             id="business_description"
-            placeholder="Descreva brevemente seu negócio e o que você oferece"
+            placeholder="Descreva o que seu negócio faz, seus produtos/serviços, mercado alvo e o que o torna único."
             {...register("business_description")}
           />
           <p className="text-xs text-muted-foreground">
-            Descreva os serviços ou produtos que seu negócio oferece
+            Quanto mais detalhes fornecer, mais precisos serão as ideais
+            geradas.{" "}
           </p>
           {errors.business_description && (
             <p className="text-sm text-destructive">
@@ -409,67 +534,26 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
           )}
         </div>
       </CardContent>
-    </Card>
+    </>
   );
 
   const renderBrandingStep = () => (
-    <Card>
+    <>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Palette className="h-5 w-5" />
-          Identidade da Marca
+          <Palette className="h-5 w-5 text-primary" />
+          Manual de marca{" "}
         </CardTitle>
         <CardDescription>
-          Defina o tom de voz, logo e cores que representam sua marca
+          Utilizaremos essa informações para criar ideias de posts mais precisas
+          e customizadas para seu negócio. Quanto mais detalhes fornecer,
+          melhores serão os resultados.{" "}
         </CardDescription>
+        <Separator />
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <h4 className="font-medium">Tom de Voz e Personalidade</h4>
-          <div className="space-y-2">
-            <Label htmlFor="voice_tone_personality">
-              Como você se comunica com seu público? *
-            </Label>
-            <Select
-              value={watchedValues.voice_tone_personality || ""}
-              onValueChange={(value) =>
-                setValue("voice_tone_personality", value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o tom de voz..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="formal">Formal e Profissional</SelectItem>
-                <SelectItem value="casual">Casual e Amigável</SelectItem>
-                <SelectItem value="inspirador">
-                  Inspirador e Motivacional
-                </SelectItem>
-                <SelectItem value="educativo">Educativo e Didático</SelectItem>
-                <SelectItem value="engraçado">
-                  Descontraído e Engraçado
-                </SelectItem>
-                <SelectItem value="autoridade">
-                  Autoridade no Assunto
-                </SelectItem>
-                <SelectItem value="empático">
-                  Empático e Compreensivo
-                </SelectItem>
-                <SelectItem value="minimalista">
-                  Direto e Minimalista
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.voice_tone_personality && (
-              <p className="text-sm text-destructive">
-                {errors.voice_tone_personality.message}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <h4 className="font-medium">Logo (Opcional)</h4>
+        <div className="space-y-2">
+          <Label>Logo Marca</Label>
           <ImagePicker
             value={watchedValues.logo_image_url || ""}
             onChange={(value) => setValue("logo_image_url", value)}
@@ -485,23 +569,55 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
               "image/webp",
             ]}
           />
+          <span className="text-sm text-muted-foreground">
+            Adicione uma imagem da sua logomarca
+          </span>
           {errors.logo_image_url && (
             <p className="text-sm text-destructive">
               {errors.logo_image_url.message}
             </p>
           )}
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="voice_tone_personality">
+            Tom de voz e personalidade da marca *{" "}
+          </Label>
+          <Select
+            value={watchedValues.voice_tone_personality || ""}
+            onValueChange={(value) => setValue("voice_tone_personality", value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione o tom de voz..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="formal">Formal e Profissional</SelectItem>
+              <SelectItem value="casual">Casual e Amigável</SelectItem>
+              <SelectItem value="inspirador">
+                Inspirador e Motivacional
+              </SelectItem>
+              <SelectItem value="educativo">Educativo e Didático</SelectItem>
+              <SelectItem value="engraçado">
+                Descontraído e Engraçado
+              </SelectItem>
+              <SelectItem value="autoridade">Autoridade no Assunto</SelectItem>
+              <SelectItem value="empático">Empático e Compreensivo</SelectItem>
+              <SelectItem value="minimalista">Direto e Minimalista</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.voice_tone_personality && (
+            <p className="text-sm text-destructive">
+              {errors.voice_tone_personality.message}
+            </p>
+          )}
+        </div>
 
         <div className="space-y-4">
-          <h4 className="font-medium">Paleta de Cores (Opcional)</h4>
-          <p className="text-sm text-muted-foreground">
-            Selecione até 5 cores para representar sua marca
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Label>Cores da marca</Label>
+
+          <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((num) => (
               <ColorPicker
                 key={num}
-                label={`Cor ${num}`}
                 value={
                   (watchedValues[
                     `color_${num}` as keyof typeof watchedValues
@@ -522,9 +638,12 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
               />
             ))}
           </div>
+          <span className="text-sm text-muted-foreground">
+            Escolha as cores que representam a sua marca{" "}
+          </span>
         </div>
       </CardContent>
-    </Card>
+    </>
   );
 
   return (
@@ -532,88 +651,79 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
       <div className="max-w-2xl w-full space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold">Configure seu Perfil</h1>
-          <p className="text-muted-foreground">
-            Complete as informações abaixo para personalizar sua experiência
-          </p>
+          <img src="Logo-sonoria.svg" alt="Logo" className="mx-auto mb-4" />
+
+          <h1 className="text-2xl font-bold">
+            Vamos começar, me fale um pouco{" "}
+            <span className="text-primary">sobre você</span>
+          </h1>
         </div>
 
         {/* Progress Indicator */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Etapa {currentStep} de 3</span>
-            <span>{Math.round((currentStep / 3) * 100)}%</span>
+        {currentStep <= 3 && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Etapa {currentStep} de 3</span>
+            </div>
+            <div className="w-full bg-secondary rounded-full h-2">
+              <div
+                className="bg-primary h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(currentStep / 3) * 100}%` }}
+              />
+            </div>
           </div>
-          <div className="w-full bg-secondary rounded-full h-2">
-            <div
-              className="bg-primary h-2 rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / 3) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Step Title */}
-        <div className="text-center space-y-2">
-          <h2 className="text-xl font-semibold">
-            {STEPS[currentStep - 1].title}
-          </h2>
-          <p className="text-muted-foreground">
-            {STEPS[currentStep - 1].description}
-          </p>
-        </div>
+        )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-          {renderStepContent()}
+        <form className="space-y-6">
+          <Card className={"max-h-[70vh]"}>
+            {renderStepContent()}
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handlePrevStep}
-              disabled={currentStep === 1}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Anterior
-            </Button>
-
-            {currentStep < 3 ? (
+            {/* Navigation Buttons */}
+            <div className="px-6 self-end flex gap-2">
               <Button
                 type="button"
-                onClick={handleNextStep}
+                variant="outline"
+                onClick={handlePrevStep}
+                disabled={currentStep === 1}
                 className="flex items-center gap-2"
               >
-                Próximo
-                <ArrowRight className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" />
+                Voltar
               </Button>
-            ) : (
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex items-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Salvando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4" />
-                    Finalizar
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-        </form>
 
-        {/* Required Fields Note */}
-        <p className="text-center text-xs text-muted-foreground">
-          * Campos obrigatórios
-        </p>
+              {currentStep < 4 ? (
+                <Button
+                  type="button"
+                  onClick={handleNextStep}
+                  className="flex items-center gap-2"
+                >
+                  Próximo
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleSubmit(handleFormSubmit)}
+                  disabled={isSubmitting}
+                  className="flex items-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      Finalizar
+                      <ChevronRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </Card>
+        </form>
       </div>
     </div>
   );

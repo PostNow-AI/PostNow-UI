@@ -21,7 +21,6 @@ export const OnboardingWrapper = ({ children }: OnboardingWrapperProps) => {
     );
   }
 
-  // Mandatory onboarding - no skip option
   if (needsOnboarding) {
     return <OnboardingForm onComplete={handleOnboardingComplete} />;
   }

@@ -14,6 +14,7 @@ export * from "./idea-diff-viewer";
 export * from "./image-picker";
 export * from "./input";
 export * from "./label";
+export * from "./loader";
 export * from "./loading";
 export * from "./navigation-menu";
 export * from "./popover";

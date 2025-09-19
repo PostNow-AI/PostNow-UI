@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Camera, Upload, X } from "lucide-react";
 import { useRef, useState } from "react";
@@ -114,8 +113,6 @@ export const ImagePicker = ({
 
   return (
     <div className={cn("space-y-4", className)}>
-      <Label>Imagem de Perfil</Label>
-
       {/* Image Preview */}
       {value && (
         <div className="relative inline-block">

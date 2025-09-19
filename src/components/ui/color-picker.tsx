@@ -7,9 +7,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 interface ColorPickerProps {
   value?: string;
-  onChange: (color: string) => void;
+  onChange?: (color: string) => void;
   label?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 const predefinedColors = [
@@ -37,6 +38,7 @@ export const ColorPicker = ({
   onChange,
   label,
   placeholder,
+  disabled = false,
 }: ColorPickerProps) => {
   const [customColor, setCustomColor] = useState(value || "#3B82F6");
   const [isOpen, setIsOpen] = useState(false);
@@ -65,12 +67,14 @@ export const ColorPicker = ({
   }, [value]);
 
   const handleColorSelect = (color: string) => {
+    if (!onChange) return;
     onChange(color);
     setCustomColor(color);
     setIsOpen(false);
   };
 
   const handleCustomColorChange = (color: string) => {
+    if (!onChange) return;
     setCustomColor(color);
     if (color.match(/^#[0-9A-F]{6}$/i)) {
       onChange(color);
@@ -78,54 +82,55 @@ export const ColorPicker = ({
   };
 
   return (
-    <div className="space-y-2">
-      {label && <Label>{label}</Label>}
-      <div className="flex gap-2">
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-10 h-10 p-0 border-2"
-              style={{ backgroundColor: value || "#f3f4f6" }}
-            >
-              <span className="sr-only">Selecionar cor</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-4">
-            <div className="space-y-4">
-              {/* Controle de Matiz */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Matiz (Hue)</Label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="range"
-                    min="0"
-                    max="360"
-                    value={hue}
-                    onChange={(e) => {
-                      const newHue = parseInt(e.target.value);
-                      setHue(newHue);
-                      const color = hslToHex(newHue, saturation, lightness);
-                      onChange(color);
-                      setCustomColor(color);
-                    }}
-                    className="flex-1 h-2 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-purple-500 to-red-500 rounded-lg appearance-none cursor-pointer"
-                    style={{
-                      background: `linear-gradient(to right, hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%), hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%))`,
-                    }}
-                  />
-                  <span className="text-sm w-12 text-center">{hue}°</span>
-                </div>
+    <div className="flex flex-col w-[40px]">
+      {label && <Label className="mb-2">{label}</Label>}
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            disabled={disabled}
+            className="w-[40px] h-10 p-0 border-0 rounded-4xl"
+            style={{ backgroundColor: value || "#f3f4f6" }}
+          >
+            <span className="sr-only">Selecionar cor</span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-4">
+          <div className="space-y-4">
+            {/* Controle de Matiz */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Matiz (Hue)</Label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  value={hue}
+                  onChange={(e) => {
+                    if (!onChange) return;
+                    const newHue = parseInt(e.target.value);
+                    setHue(newHue);
+                    const color = hslToHex(newHue, saturation, lightness);
+                    onChange(color);
+                    setCustomColor(color);
+                  }}
+                  className="flex-1 h-2 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-purple-500 to-red-500 rounded-lg appearance-none cursor-pointer"
+                  style={{
+                    background: `linear-gradient(to right, hsl(0,100%,50%), hsl(60,100%,50%), hsl(120,100%,50%), hsl(180,100%,50%), hsl(240,100%,50%), hsl(300,100%,50%), hsl(360,100%,50%))`,
+                  }}
+                />
+                <span className="text-sm w-12 text-center">{hue}°</span>
               </div>
+            </div>
 
-              {/* Espectro de Cores */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Espectro de Cores</Label>
-                <div className="relative">
-                  <div
-                    className="w-full h-32 rounded border cursor-crosshair relative overflow-hidden"
-                    style={{
-                      background: `linear-gradient(to right, 
+            {/* Espectro de Cores */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Espectro de Cores</Label>
+              <div className="relative">
+                <div
+                  className="w-full h-32 rounded border cursor-crosshair relative overflow-hidden"
+                  style={{
+                    background: `linear-gradient(to right, 
                         hsl(${hue}, 0%, 50%), 
                         hsl(${hue}, 100%, 50%)
                       ), linear-gradient(to top, 
@@ -133,95 +138,89 @@ export const ColorPicker = ({
                         hsl(${hue}, 100%, 50%), 
                         hsl(${hue}, 100%, 100%)
                       )`,
-                    }}
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const x = e.clientX - rect.left;
-                      const y = e.clientY - rect.top;
+                  }}
+                  onClick={(e) => {
+                    if (!onChange) return;
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
 
-                      // Calcular saturação e luminosidade baseado na posição
-                      const s = Math.max(
-                        0,
-                        Math.min(100, (x / rect.width) * 100)
-                      );
-                      const l = Math.max(
-                        0,
-                        Math.min(100, ((rect.height - y) / rect.height) * 100)
-                      );
+                    // Calcular saturação e luminosidade baseado na posição
+                    const s = Math.max(
+                      0,
+                      Math.min(100, (x / rect.width) * 100)
+                    );
+                    const l = Math.max(
+                      0,
+                      Math.min(100, ((rect.height - y) / rect.height) * 100)
+                    );
 
-                      // Atualizar estados
-                      setSaturation(s);
-                      setLightness(l);
+                    // Atualizar estados
+                    setSaturation(s);
+                    setLightness(l);
 
-                      // Gerar nova cor
-                      const color = hslToHex(hue, s, l);
-                      onChange(color);
-                      setCustomColor(color);
-                    }}
-                    title="Clique para selecionar uma cor"
-                  >
-                    {/* Indicador de posição */}
-                    <div
-                      className="absolute w-3 h-3 border-2 border-white rounded-full pointer-events-none shadow-lg"
-                      style={{
-                        left: `${(saturation / 100) * 100}%`,
-                        top: `${((100 - lightness) / 100) * 100}%`,
-                        transform: "translate(-50%, -50%)",
-                        zIndex: 10,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Cores Predefinidas */}
-              <div>
-                <Label className="text-sm font-medium mb-2 block">
-                  Cores Predefinidas
-                </Label>
-                <div className="grid grid-cols-8 gap-2">
-                  {predefinedColors.map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      className={cn(
-                        "w-8 h-8 rounded border-2 transition-all hover:scale-110",
-                        value === color ? "border-foreground" : "border-border"
-                      )}
-                      style={{ backgroundColor: color }}
-                      onClick={() => handleColorSelect(color)}
-                      title={color}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Cor Personalizada */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Cor Personalizada</Label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={placeholder || "#FFFFFF"}
-                    value={customColor}
-                    onChange={(e) => handleCustomColorChange(e.target.value)}
-                    className="flex-1"
-                  />
+                    // Gerar nova cor
+                    const color = hslToHex(hue, s, l);
+                    onChange(color);
+                    setCustomColor(color);
+                  }}
+                  title="Clique para selecionar uma cor"
+                >
+                  {/* Indicador de posição */}
                   <div
-                    className="w-10 h-10 rounded border"
-                    style={{ backgroundColor: customColor || "#f3f4f6" }}
+                    className="absolute w-3 h-3 border-2 border-white rounded-full pointer-events-none shadow-lg"
+                    style={{
+                      left: `${(saturation / 100) * 100}%`,
+                      top: `${((100 - lightness) / 100) * 100}%`,
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 10,
+                    }}
                   />
                 </div>
               </div>
             </div>
-          </PopoverContent>
-        </Popover>
-        <Input
-          placeholder={placeholder || "#FFFFFF"}
-          value={value || ""}
-          onChange={(e) => onChange(e.target.value)}
-          className="flex-1"
-        />
-      </div>
+
+            {/* Cores Predefinidas */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">
+                Cores Predefinidas
+              </Label>
+              <div className="grid grid-cols-8 gap-2">
+                {predefinedColors.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    className={cn(
+                      "w-10 h-10 rounded-full border-2 transition-all hover:scale-110",
+                      value === color ? "border-foreground" : "border-border"
+                    )}
+                    style={{ backgroundColor: color }}
+                    onClick={() => handleColorSelect(color)}
+                    title={color}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Cor Personalizada */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Cor Personalizada</Label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder={placeholder || "#FFFFFF"}
+                  value={customColor}
+                  onChange={(e) => handleCustomColorChange(e.target.value)}
+                  className="flex-1"
+                />
+                <div
+                  className="w-10 h-10 rounded border"
+                  style={{ backgroundColor: customColor || "#f3f4f6" }}
+                />
+              </div>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

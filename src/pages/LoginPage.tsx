@@ -8,6 +8,7 @@ import {
   CardTitle,
   Input,
   Label,
+  Loader,
   ThemeToggle,
 } from "@/components/ui";
 import { useLogin } from "@/hooks/useLogin";
@@ -22,7 +23,7 @@ export const LoginPage = () => {
   } = form;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 bg-gradient-to-br from-background to-muted">
+    <div className="relative flex min-h-screen items-center justify-center px-4 bg-white from-background to-muted">
       {/* Theme Toggle in top right */}
       <div className="absolute top-4 right-4">
         <ThemeToggle />
@@ -30,10 +31,11 @@ export const LoginPage = () => {
 
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">
-            Bem-vindo de Volta
-          </CardTitle>
-          <CardDescription>Entre na sua conta</CardDescription>
+          <img src="Logo-sonoria.svg" alt="Logo" className="mx-auto mb-4" />
+          <CardTitle className="text-3xl font-bold">Faça seu login </CardTitle>
+          <CardDescription>
+            Digite seu email e senha para entrar em sua conta
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -69,11 +71,11 @@ export const LoginPage = () => {
             </div>
 
             <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? "Entrando..." : "Entrar"}
+              {isLoading ? <Loader /> : "Entrar"}
             </Button>
           </form>
 
-          <div className="mt-8 space-y-4">
+          <div className="mt-6 space-y-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border" />
@@ -90,7 +92,7 @@ export const LoginPage = () => {
             </GoogleOAuthButton>
           </div>
 
-          <div className="mt-8 space-y-4">
+          <div className="mt-6">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 Não tem uma conta?{" "}
@@ -101,29 +103,6 @@ export const LoginPage = () => {
                   Cadastre-se
                 </Link>
               </p>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-background text-muted-foreground">
-                  Ou experimente
-                </span>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-2">
-                Quer gerar ideias sem criar conta?
-              </p>
-              <Link
-                to="/public/ideas"
-                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-primary border border-primary rounded-md hover:bg-primary hover:text-primary-foreground transition-colors"
-              >
-                Gerador Público de Ideias
-              </Link>
             </div>
           </div>
         </CardContent>

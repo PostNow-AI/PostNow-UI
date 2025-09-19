@@ -134,9 +134,6 @@ export const IdeaBankPage = () => {
   };
 
   const handlePostCreated = (postData: PostData, ideaData: IdeaData) => {
-    console.log("Post criado:", postData);
-    console.log("Ideia gerada:", ideaData);
-
     // Convert PostData to PostType and add the generated idea
     const postWithIdeas: PostType = {
       ...postData,
