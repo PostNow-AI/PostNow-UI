@@ -32,7 +32,7 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Separator } from "./ui";
+import { Loader, Separator } from "./ui";
 
 // Updated schema focused on essential fields for post-based system
 const onboardingSchema = z.object({
@@ -130,6 +130,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
     allAvailableProfessions,
     availableSpecializations,
     handleFormSubmit,
+    isLoadingSpecializations,
   } = useOnboarding(form, { onComplete });
 
   // Step validation functions
@@ -463,27 +464,31 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
         </div>
         <div className="space-y-2">
           <Label htmlFor="specialization">Setor/Nicho *</Label>
-          <Select
-            onValueChange={(value) => setValue("specialization", value)}
-            value={watchedValues.specialization || ""}
-            disabled={!selectedProfession}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecione o nicho de negócio" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableSpecializations.map(
-                (specialization: { id: number; name: string }) => (
-                  <SelectItem
-                    key={specialization.id}
-                    value={specialization.name}
-                  >
-                    {specialization.name}
-                  </SelectItem>
-                )
-              )}
-            </SelectContent>
-          </Select>
+          {isLoadingSpecializations ? (
+            <Loader />
+          ) : (
+            <Select
+              onValueChange={(value) => setValue("specialization", value)}
+              value={watchedValues.specialization || ""}
+              disabled={!selectedProfession}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione o nicho de negócio" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableSpecializations.map(
+                  (specialization: { id: number; name: string }) => (
+                    <SelectItem
+                      key={specialization.id}
+                      value={specialization.name}
+                    >
+                      {specialization.name}
+                    </SelectItem>
+                  )
+                )}
+              </SelectContent>
+            </Select>
+          )}
           {errors.specialization && (
             <p className="text-sm text-destructive">
               {errors.specialization.message}

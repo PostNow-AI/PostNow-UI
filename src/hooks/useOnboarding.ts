@@ -59,24 +59,25 @@ export const useOnboarding = (
     queryFn: globalOptionsApi.getProfessions,
   });
 
-  const { data: specializations } = useQuery({
-    queryKey: ["specializations", selectedProfession],
-    queryFn: async () => {
-      if (selectedProfession && selectedProfession !== "Outro") {
-        const profession = professions.find(
-          (p) => p.name === selectedProfession
-        );
-        if (profession) {
-          const result = await globalOptionsApi.getProfessionSpecializations(
-            profession.id
+  const { data: specializations, isLoading: isLoadingSpecializations } =
+    useQuery({
+      queryKey: ["specializations", selectedProfession],
+      queryFn: async () => {
+        if (selectedProfession && selectedProfession !== "Outro") {
+          const profession = professions.find(
+            (p) => p.name === selectedProfession
           );
-          return result;
+          if (profession) {
+            const result = await globalOptionsApi.getProfessionSpecializations(
+              profession.id
+            );
+            return result;
+          }
         }
-      }
-      return { profession: null, specializations: [] };
-    },
-    enabled: !!selectedProfession && selectedProfession !== "Outro",
-  });
+        return { profession: null, specializations: [] };
+      },
+      enabled: !!selectedProfession && selectedProfession !== "Outro",
+    });
 
   // Check if should show custom specialization field
   const shouldShowCustomSpecializationField =
@@ -86,7 +87,7 @@ export const useOnboarding = (
     !professions.some((p) => p.name === customProfessionInput.trim());
 
   // Get all available professions
-  const allAvailableProfessions = [...professions.map((p) => p.name), "Outro"];
+  const allAvailableProfessions = [...professions.map((p) => p.name)];
 
   // Get available specializations for selected profession
   const availableSpecializations = specializations?.specializations || [];
@@ -288,7 +289,7 @@ export const useOnboarding = (
     createProfessionMutation,
     createSpecializationMutation,
     onboardingMutation,
-
+    isLoadingSpecializations,
     // Handlers
     handleAddCustomProfession,
     handleAddCustomSpecialization,
