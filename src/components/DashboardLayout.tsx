@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { ClipboardList, Coins, LogOut, User } from "lucide-react";
+import { ClipboardList, Coins, LogOut } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import {
@@ -41,11 +41,7 @@ export function AppSidebar() {
       icon: ClipboardList,
       url: "/ideabank",
     },
-    {
-      title: "Perfil",
-      icon: User,
-      url: "/profile",
-    },
+
     {
       title: "Creditos",
       icon: Coins,
@@ -143,7 +139,9 @@ export function AppSidebar() {
                 </p>
               </div>
             </Link>
-            <TallyButton variant="feedback" size="sm" className="w-full" />
+            {!isCollapsed && (
+              <TallyButton variant="feedback" size="sm" className="w-full" />
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -151,7 +149,7 @@ export function AppSidebar() {
               className="w-full justify-start gap-3  text-muted-foreground hover:text-foreground"
             >
               <LogOut className="w-4 h-4" />
-              Sair
+              {!isCollapsed && "Sair"}
             </Button>
           </div>
         </SidebarFooter>
