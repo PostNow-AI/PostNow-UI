@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { ChevronRight, ClipboardList, Loader2 } from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 
 import {
@@ -12,7 +11,6 @@ import {
   CardTitle,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   Form,
@@ -23,25 +21,24 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
   Separator,
-  Switch,
   Textarea,
 } from "@/components/ui";
 import { usePostGeneration } from "@/hooks/usePostGeneration";
 import type { PostCreationFormData } from "@/schemas/postSchema";
 import {
-  aiModelOptions,
-  aiProviderOptions,
   genderOptions,
   postCreationSchema,
   postObjectiveOptions,
   postTypeOptions,
 } from "@/schemas/postSchema";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 interface PostData {
   id: number;
@@ -88,7 +85,6 @@ export const PostCreationDialog = ({
   onClose,
   onSuccess,
 }: PostCreationDialogProps) => {
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const { generatePost, isLoading } = usePostGeneration();
 
   const form = useForm<PostCreationFormData>({
@@ -108,8 +104,6 @@ export const PostCreationDialog = ({
     },
   });
 
-  const selectedProvider = form.watch("preferred_provider");
-
   const handleSubmit: SubmitHandler<PostCreationFormData> = async (data) => {
     try {
       const result = await generatePost(data);
@@ -128,37 +122,41 @@ export const PostCreationDialog = ({
   const handleClose = () => {
     if (!isLoading) {
       form.reset();
-      setShowAdvanced(false);
       onClose();
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent
+        className="max-w-6xl max-h-[95vh]"
+        style={{ width: "95vw", maxWidth: "1400px" }}
+      >
+        <DialogHeader className="px-0">
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Criar Novo Post com IA
+            Crie uma <span className="text-primary">ideia de post</span>{" "}
           </DialogTitle>
-          <DialogDescription>
-            Preencha as informações do post e deixe a IA gerar o conteúdo para
-            você
-          </DialogDescription>
+          <Separator className="absolute left-0 right-0 top-13 w-full" />
         </DialogHeader>
-
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
-            className="space-y-6"
+            className="space-y-6 my-4 flex flex-col justify-center"
           >
             {/* Basic Information */}
-            <Card>
+            <Card className="max-w-160 w-160 self-center">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Informações Básicas</CardTitle>
-                <CardDescription>Dados essenciais do seu post</CardDescription>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <ClipboardList className="text-primary" />
+                  Detalhes do post
+                </CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  Configure as especificações do seu post.
+                </CardDescription>
+                <Separator className="mt-2" />
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6 overflow-auto max-h-[60vh]">
+                {/* TODO: Botão para gerar dados do post com IA */}
                 <FormField
                   control={form.control}
                   name="name"
@@ -167,7 +165,7 @@ export const PostCreationDialog = ({
                       <FormLabel>Nome do Post *</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Ex: Promoção de verão, Lançamento do produto..."
+                          placeholder="Ex: Promoção de Natal 2024, Conscientização da marca"
                           {...field}
                         />
                       </FormControl>
@@ -179,111 +177,100 @@ export const PostCreationDialog = ({
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="objective"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Objetivo *</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o objetivo" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {postObjectiveOptions.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Qual o objetivo principal do post?
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <FormField
+                  control={form.control}
+                  name="objective"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Objetivo do post *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Selecione o objetivo principal do seu post" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {postObjectiveOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tipo de Conteúdo *</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o tipo" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {postTypeOptions.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Formato do conteúdo desejado
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo do post *</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Selecione o tipo do post" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {postTypeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="include_image"
                   render={({ field }) => (
-                    <FormItem className="flex items-center justify-between space-y-0 p-4 border rounded-lg">
-                      <div>
-                        <FormLabel className="text-sm font-medium">
-                          Gerar imagem automaticamente
-                        </FormLabel>
-                        <FormDescription className="text-xs text-muted-foreground">
-                          A IA criará uma imagem personalizada para o post
-                        </FormDescription>
-                      </div>
+                    <FormItem className="space-y-2">
+                      <FormLabel>Conteúdo * </FormLabel>
+
                       <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <RadioGroup
+                          defaultValue="option-one"
+                          className="flex items-center space-x-2"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="option-one"
+                              id="option-one"
+                              onChange={() => field.onChange(false)}
+                            />
+                            <Label htmlFor="option-one">Texto</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem
+                              value="option-two"
+                              id="option-two"
+                              onChange={() => field.onChange(true)}
+                            />
+                            <Label htmlFor="option-two">Texto e imagem</Label>
+                          </div>
+                        </RadioGroup>
                       </FormControl>
                     </FormItem>
                   )}
                 />
-              </CardContent>
-            </Card>
 
-            {/* Target Audience */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">
-                  Público-Alvo (Opcional)
-                </CardTitle>
-                <CardDescription>
-                  Defina seu público para conteúdo mais direcionado
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                <CardTitle>Público-Alvo</CardTitle>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -296,7 +283,7 @@ export const PostCreationDialog = ({
                           value={field.value || ""}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                               <SelectValue placeholder="Selecione o gênero" />
                             </SelectTrigger>
                           </FormControl>
@@ -321,7 +308,7 @@ export const PostCreationDialog = ({
                     name="target_age"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Faixa Etária</FormLabel>
+                        <FormLabel>Idade</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Ex: 18-25, 25-35, 35+"
@@ -381,163 +368,37 @@ export const PostCreationDialog = ({
                       <FormLabel>Interesses</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Ex: tecnologia, moda, esportes, alimentação saudável..."
+                          placeholder="Descreve os interesses, hobbies, problemas e comportamentos do seu público (ex: entusiastas de fitness, profissionais ocupados, consumidores conscientes)"
                           rows={3}
                           {...field}
                           value={field.value || ""}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Descreva os principais interesses do seu público
-                      </FormDescription>
+
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </CardContent>
             </Card>
-
-            {/* AI Configuration */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">
-                  Configurações de IA
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="ml-2 h-6 px-2 text-xs"
-                    onClick={() => setShowAdvanced(!showAdvanced)}
-                  >
-                    {showAdvanced ? "Ocultar" : "Mostrar"} Avançado
-                  </Button>
-                </CardTitle>
-                <CardDescription>
-                  Personalize como a IA irá gerar seu conteúdo
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {showAdvanced && (
-                  <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="preferred_provider"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Provedor de IA</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {aiProviderOptions.map((option) => (
-                                  <SelectItem
-                                    key={option.value}
-                                    value={option.value}
-                                  >
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="preferred_model"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Modelo</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {selectedProvider &&
-                                  aiModelOptions[selectedProvider]?.map(
-                                    (option) => (
-                                      <SelectItem
-                                        key={option.value}
-                                        value={option.value}
-                                      >
-                                        {option.label}
-                                      </SelectItem>
-                                    )
-                                  )}
-                              </SelectContent>
-                            </Select>
-                            <FormDescription>
-                              Modelos mais avançados consomem mais créditos
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <Separator />
-
-                    {/* Image Generation Switch */}
-                  </>
-                )}
-
-                <div className="bg-muted/50 p-4 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <span className="font-medium text-sm">
-                      A IA irá gerar automaticamente:
-                    </span>
-                  </div>
-                  <ul className="text-sm text-muted-foreground space-y-1 ml-6">
-                    <li>• Título impactante e chamativo</li>
-                    <li>• Texto do post otimizado para engajamento</li>
-                    <li>• Call-to-action persuasivo</li>
-                    <li>• Hashtags relevantes (quando aplicável)</li>
-                    <li>• Tom de voz alinhado com o objetivo</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={isLoading}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={isLoading} className="min-w-32">
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Gerando...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Gerar Post
-                  </>
-                )}
-              </Button>
-            </div>
           </form>
         </Form>
+        <Separator className="absolute left-0 right-0 bottom-17 w-full" />
+        <div className="flex justify-end gap-3">
+          <Button type="submit" disabled={isLoading} className="min-w-32">
+            {isLoading ? (
+              <>
+                Gerando...
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </>
+            ) : (
+              <>
+                Gerar Ideia
+                <ChevronRight className="h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

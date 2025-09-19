@@ -1,9 +1,10 @@
 import {
+  ChevronRight,
   Copy,
-  Download,
+  FileText,
   Image,
+  Import,
   MessageSquare,
-  RefreshCw,
   Sparkles,
 } from "lucide-react";
 import { useState } from "react";
@@ -18,9 +19,9 @@ import {
   CardTitle,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  Separator,
   Skeleton,
   Textarea,
 } from "@/components/ui";
@@ -267,23 +268,20 @@ export const PostViewDialog = ({
 
   if (!post) return null;
 
+  console.log(currentIdea);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-h-[90vh] overflow-y-auto flex flex-col"
+        className="max-h-[90vh] flex flex-col"
         style={{ width: "95vw", maxWidth: "1400px" }}
       >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
-            {post.name}
-          </DialogTitle>
-          <DialogDescription>
-            Conteúdo gerado por IA • {post.objective_display} •{" "}
-            {post.type_display}
-          </DialogDescription>
+          <DialogTitle className="flex items-center gap-2 ">
+            Customize <span className="text-primary">sua ideia</span>
+          </DialogTitle>{" "}
+          <Separator className="absolute left-0 right-0 top-13 w-full" />
         </DialogHeader>
-
         {isLoading ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
@@ -304,39 +302,60 @@ export const PostViewDialog = ({
             </Card>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 max-h-[80vh] overflow-y-auto mt-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Content Column */}
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <div>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <MessageSquare className="h-4 w-4" />
-                      Conteúdo do Post
-                    </CardTitle>
-                    <CardDescription>
-                      {currentIdea?.ai_provider} • {currentIdea?.ai_model}
-                    </CardDescription>
+                <CardHeader>
+                  <div className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <FileText className="text-primary h-4 w-4" />
+                        Aqui está sua ideia de texto!{" "}
+                      </CardTitle>
+                      <CardDescription className="text-muted-foreground">
+                        Copie o texto abaixo e cole no seu Instagram ou gere um
+                        novo!
+                      </CardDescription>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopyContent}
+                      disabled={!currentIdea?.content}
+                      className="shrink-0 text-muted-foreground"
+                    >
+                      Copiar
+                      <Copy className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCopyContent}
-                    disabled={!currentIdea?.content}
-                    className="shrink-0"
-                  >
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copiar
-                  </Button>
+                  <Separator />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   {currentIdea?.content ? (
-                    <Textarea
-                      value={currentIdea.content}
-                      readOnly
-                      className="min-h-[400px] resize-none bg-muted/30 font-mono text-sm"
-                      placeholder="Nenhum conteúdo disponível"
-                    />
+                    <>
+                      <Textarea
+                        value={currentIdea.content}
+                        readOnly
+                        className="min-h-[400px] resize-none font-mono text-sm"
+                        placeholder="Nenhum conteúdo disponível"
+                      />
+                      <Button
+                        onClick={handleRegenerateIdea}
+                        disabled={regeneratingIdea || !currentIdea}
+                        className="w-full"
+                        variant={"outline"}
+                      >
+                        <Sparkles
+                          className={`h-4 w-4 mr-2 ${
+                            regeneratingIdea ? "animate-spin" : ""
+                          }`}
+                        />
+                        {regeneratingIdea
+                          ? "Gerando novamente..."
+                          : "Gerar texto novamente"}
+                      </Button>
+                    </>
                   ) : (
                     <div className="min-h-[400px] bg-muted/30 rounded-md flex items-center justify-center text-muted-foreground">
                       <div className="text-center">
@@ -348,34 +367,78 @@ export const PostViewDialog = ({
                       </div>
                     </div>
                   )}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Sparkles className="text-primary h-4 w-4" />
+                        Edição de texto{" "}
+                      </CardTitle>
+                      <CardDescription className="text-muted-foreground">
+                        Nos fale o que quer mudar no texto e nós fazemos para
+                        você!{" "}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <Textarea
+                          value={regeneratePrompt}
+                          onChange={(e) => setRegeneratePrompt(e.target.value)}
+                          placeholder="Ex: Crie um título diferente"
+                          className="min-h-[100px] resize-none"
+                        />
+                      </div>
+                      <Button
+                        onClick={handleRegenerateIdea}
+                        disabled={regeneratingIdea || !currentIdea}
+                        className="w-full"
+                        variant={"outline"}
+                      >
+                        <Sparkles
+                          className={`h-4 w-4 mr-2 ${
+                            regeneratingIdea ? "animate-spin" : ""
+                          }`}
+                        />
+                        {regeneratingIdea
+                          ? "Gerando novamente..."
+                          : "Editar texto"}
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </CardContent>
               </Card>
 
               {/* Image Column */}
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <div>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Image className="h-4 w-4" />
-                      Imagem Gerada
-                    </CardTitle>
-                    <CardDescription>
-                      Criada automaticamente pela IA
-                    </CardDescription>
+                <CardHeader>
+                  <div className="flex flex-row items-center justify-between space-y-0 pb-3">
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Image className="text-primary h-4 w-4" />
+                        Aqui está sua imagem!{" "}
+                      </CardTitle>
+                      <CardDescription className="text-muted-foreground">
+                        {!currentIdea?.image_url
+                          ? "Gere uma imagem para seu post e faça e faça o download."
+                          : "Baixe sua imagem ou gere uma nova"}
+                      </CardDescription>
+                    </div>
+                    {currentIdea?.image_url && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDownloadImage}
+                        disabled={downloadingImage}
+                        className="shrink-0 text-muted-foreground"
+                        title="Tentar download direto. Se falhar, abrirá em nova aba."
+                      >
+                        {downloadingImage ? "Baixando..." : "Baixar"}
+                        <Import className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDownloadImage}
-                    disabled={!currentIdea?.image_url || downloadingImage}
-                    className="shrink-0"
-                    title="Tentar download direto. Se falhar, abrirá em nova aba."
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    {downloadingImage ? "Baixando..." : "Baixar"}
-                  </Button>
+                  <Separator />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                   {currentIdea?.image_url ? (
                     <div className="space-y-3">
                       <img
@@ -385,157 +448,79 @@ export const PostViewDialog = ({
                       />
                     </div>
                   ) : (
-                    <div className="min-h-[400px] bg-muted/30 rounded-md flex items-center justify-center text-muted-foreground">
+                    <div className="min-h-[269px] border border-primary rounded-sm flex items-center justify-center text-muted-foreground">
                       <div className="text-center">
-                        <Image className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Nenhuma imagem disponível</p>
-                        <p className="text-sm mt-1">
-                          Este post foi criado sem imagem
+                        <Image className="h-[67px] w-[67px] mx-auto mb-4 text-primary" />
+                        <p className="font-semibold text-xl text-popover-foreground">
+                          Gere uma imagem para seu post
                         </p>
                       </div>
                     </div>
                   )}
+                  <Button
+                    onClick={handleRegenerateIdea}
+                    disabled={regeneratingIdea || !currentIdea}
+                    className="w-full"
+                    variant={currentIdea?.image_url ? "outline" : "default"}
+                  >
+                    <Sparkles
+                      className={`h-4 w-4 mr-2 ${
+                        regeneratingIdea ? "animate-spin" : ""
+                      }`}
+                    />
+                    {generatingImage
+                      ? "Gerando imagem..."
+                      : currentIdea?.image_url
+                      ? "Gerar imagem novamente"
+                      : "Gerar imagem"}
+                  </Button>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        Edição de imagem
+                      </CardTitle>
+                      <CardDescription>
+                        Nos fale o que quer mudar na imagem e nós fazemos para
+                        você!
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <Textarea
+                          value={imagePrompt}
+                          disabled={!currentIdea?.image_url}
+                          onChange={(e) => setImagePrompt(e.target.value)}
+                          placeholder="Ex: Altere a cor do fundo para azul"
+                          className="min-h-[100px] resize-none"
+                        />
+                      </div>
+                      <Button
+                        onClick={handleImageGeneration}
+                        disabled={generatingImage || !currentIdea}
+                        className="w-full"
+                        variant="outline"
+                      >
+                        <Sparkles
+                          className={`h-4 w-4 mr-2 ${
+                            generatingImage ? "animate-pulse" : ""
+                          }`}
+                        />
+                        {generatingImage
+                          ? "Editando imagem..."
+                          : "Editar imagem..."}
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </CardContent>
               </Card>
             </div>
-
-            {/* Regenerate Idea Card - Full width row */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <RefreshCw className="h-4 w-4" />
-                  Regenerar Conteúdo
-                </CardTitle>
-                <CardDescription>
-                  Ajuste o conteúdo com instruções personalizadas
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Instruções para regeneração (opcional)
-                  </label>
-                  <Textarea
-                    value={regeneratePrompt}
-                    onChange={(e) => setRegeneratePrompt(e.target.value)}
-                    placeholder="Ex: Torne o texto mais formal, adicione mais detalhes sobre o produto, use um tom mais casual..."
-                    className="min-h-[100px] resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Deixe em branco para regenerar com as configurações
-                    originais do post
-                  </p>
-                </div>
-                <Button
-                  onClick={handleRegenerateIdea}
-                  disabled={regeneratingIdea || !currentIdea}
-                  className="w-full"
-                >
-                  <RefreshCw
-                    className={`h-4 w-4 mr-2 ${
-                      regeneratingIdea ? "animate-spin" : ""
-                    }`}
-                  />
-                  {regeneratingIdea
-                    ? "Gerando novamente..."
-                    : "Gerar novamente"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Image Generation/Regeneration Card - Full width row */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
-                  {currentIdea?.image_url ? "Regenerar Imagem" : "Gerar Imagem"}
-                </CardTitle>
-                <CardDescription>
-                  {currentIdea?.image_url
-                    ? "Crie uma nova versão da imagem com instruções personalizadas"
-                    : "Gere uma imagem para este post com instruções personalizadas"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground mb-2 block">
-                    Instruções para a imagem (opcional)
-                  </label>
-                  <Textarea
-                    value={imagePrompt}
-                    onChange={(e) => setImagePrompt(e.target.value)}
-                    placeholder="Ex: Uma foto mais colorida, com fundo azul, estilo minimalista, adicione elementos de tecnologia..."
-                    className="min-h-[100px] resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Deixe em branco para{" "}
-                    {currentIdea?.image_url ? "regenerar" : "gerar"} com base no
-                    conteúdo do post
-                  </p>
-                </div>
-                <Button
-                  onClick={handleImageGeneration}
-                  disabled={generatingImage || !currentIdea}
-                  className="w-full"
-                  variant="outline"
-                >
-                  <Sparkles
-                    className={`h-4 w-4 mr-2 ${
-                      generatingImage ? "animate-pulse" : ""
-                    }`}
-                  />
-                  {generatingImage
-                    ? currentIdea?.image_url
-                      ? "Regenerando imagem..."
-                      : "Gerando imagem..."
-                    : currentIdea?.image_url
-                    ? "Regenerar imagem"
-                    : "Gerar imagem"}
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         )}
-
-        {/* Post Details */}
-        {currentIdea && (
-          <Card className="mt-4">
-            <CardHeader>
-              <CardTitle className="text-base">Informações do Post</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <p className="font-medium text-muted-foreground">Status</p>
-                  <p>{currentIdea.status_display}</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Criado em</p>
-                  <p>
-                    {new Date(currentIdea.created_at).toLocaleDateString(
-                      "pt-BR"
-                    )}
-                  </p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">
-                    IA Utilizada
-                  </p>
-                  <p>{currentIdea.ai_provider}</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Modelo</p>
-                  <p>{currentIdea.ai_model}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Close Button */}
+        <Separator className="absolute left-0 right-0 bottom-17 w-full" />
         <div className="flex justify-end pt-4">
-          <Button variant="outline" onClick={onClose}>
-            Fechar
+          <Button onClick={onClose}>
+            Finalizar post <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </DialogContent>

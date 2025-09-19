@@ -70,9 +70,7 @@ export const postObjectiveOptions = [
 ] as const;
 
 export const postTypeOptions = [
-  { value: "live", label: "Live" },
-  { value: "reel", label: "Reel" },
-  { value: "post", label: "Post" },
+  { value: "post", label: "Feed" },
   { value: "carousel", label: "Carousel" },
   { value: "story", label: "Story" },
 ] as const;
