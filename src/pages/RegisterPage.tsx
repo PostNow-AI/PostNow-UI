@@ -127,7 +127,7 @@ export const RegisterPage = () => {
                 <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 text-muted-foreground">
+                <span className="px-2 bg-card text-muted-foreground">
                   Ou continue com
                 </span>
               </div>
