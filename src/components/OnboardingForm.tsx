@@ -95,7 +95,7 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
       profession: "",
       custom_profession: "",
       instagram_username: "",
-      whatsapp_number: "",
+      whatsapp_number: "+55",
       business_name: "",
       specialization: "",
       custom_specialization: "",

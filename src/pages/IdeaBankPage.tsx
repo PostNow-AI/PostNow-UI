@@ -29,11 +29,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  Separator,
 } from "@/components/ui";
 import { useUserCredits } from "@/hooks/useCredits";
 import { useIdeaBankPage } from "@/hooks/useIdeaBankPage";
-import { Plus, SidebarClose, Sparkles } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 
 interface IdeaData {
   id: number;
@@ -171,24 +170,7 @@ export const IdeaBankPage = () => {
   const balance = Number(userCredits?.balance) || 0;
 
   return (
-    <div className="container p-4 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <SidebarClose className="h-4 w-4" />
-            <span>Posts</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-muted-foreground text-sm">
-              {balance} créditos restantes
-            </span>
-          </div>
-        </div>
-        <Separator />
-      </div>
-
+    <div className="container px-4 pb-4 space-y-6">
       {showEditor ? (
         <IdeaEditor
           ideas={
@@ -213,6 +195,12 @@ export const IdeaBankPage = () => {
               </div>
               {/* Main Content */}
               <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="text-muted-foreground text-sm">
+                    {balance} créditos restantes
+                  </span>
+                </div>
                 <Button
                   onClick={() => setIsPostDialogOpen(true)}
                   className="flex items-center gap-2"

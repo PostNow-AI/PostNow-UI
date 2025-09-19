@@ -81,7 +81,7 @@ export const ProfilePage = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="container px-4 pb-4 space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold">Perfil do Criador</h1>
