@@ -3,6 +3,7 @@ import {
   ideaBankService,
   type IdeaGenerationFormData,
 } from "@/lib/services/ideaBankService";
+import { handleCampaignGenerationError } from "@/lib/utils/aiErrorHandling";
 import { handleApiError } from "@/lib/utils/errorHandling";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -157,8 +158,10 @@ export const useIdeaGeneration = () => {
         ...prev,
         isGenerating: false,
       }));
-      const errorMessage = handleApiError(error, "Erro ao gerar ideias");
-      toast.error(errorMessage);
+      const errorResult = handleCampaignGenerationError(error);
+      toast.error(errorResult.title, {
+        description: errorResult.description,
+      });
     },
   });
 

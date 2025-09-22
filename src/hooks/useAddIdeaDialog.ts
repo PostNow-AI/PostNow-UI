@@ -2,6 +2,7 @@ import {
   ideaBankService,
   type CampaignIdea,
 } from "@/lib/services/ideaBankService";
+import { handleIdeaGenerationError } from "@/lib/utils/aiErrorHandling";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -133,10 +134,11 @@ export const useAddIdeaDialog = (
 
   const handleGenerationError = (error: unknown) => {
     setGenerationStatus("error");
-    setGenerationError(
-      error instanceof Error ? error.message : "Erro desconhecido"
-    );
-    toast.error("Erro ao gerar ideia com IA");
+    const errorResult = handleIdeaGenerationError(error, "generate");
+    setGenerationError(errorResult.description);
+    toast.error(errorResult.title, {
+      description: errorResult.description,
+    });
   };
 
   const updateFormWithGeneratedContent = (response: CampaignIdea) => {

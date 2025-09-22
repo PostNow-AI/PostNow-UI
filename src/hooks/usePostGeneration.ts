@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
+import { handlePostGenerationError } from "@/lib/utils/aiErrorHandling";
 import type { PostCreationFormData } from "@/schemas/postSchema";
 
 interface PostGenerationResponse {
@@ -96,21 +97,11 @@ export const usePostGeneration = () => {
     onError: (error) => {
       console.error("Erro na geração do post:", error);
 
-      // Extract error message
-      let errorMessage = "Erro ao gerar post";
+      // Use the new AI error handler
+      const errorResult = handlePostGenerationError(error, "generate");
 
-      if (error?.error) {
-        errorMessage = error.error;
-      } else if (error?.details) {
-        // Handle validation errors
-        const validationErrors = Object.entries(error.details)
-          .map(([field, errors]) => `${field}: ${errors.join(", ")}`)
-          .join("; ");
-        errorMessage = `Erro de validação: ${validationErrors}`;
-      }
-
-      toast.error(errorMessage, {
-        description: "Verifique os dados inseridos e tente novamente",
+      toast.error(errorResult.title, {
+        description: errorResult.description,
       });
     },
   });

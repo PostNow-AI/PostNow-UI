@@ -218,7 +218,13 @@ export const useOnboarding = (
             ? data.custom_specialization
             : data.specialization,
         business_instagram_handle: data.business_instagram, // Backend expects business_instagram_handle
-        business_website: data.business_website,
+        business_website:
+          data.business_website && data.business_website.trim()
+            ? data.business_website.startsWith("http://") ||
+              data.business_website.startsWith("https://")
+              ? data.business_website
+              : `https://${data.business_website}`
+            : data.business_website,
         business_city: data.business_location, // Backend expects business_city
         business_description: data.business_description,
       };
@@ -241,6 +247,8 @@ export const useOnboarding = (
         "/api/v1/creator-profile/onboarding/step3/",
         step3Data
       );
+
+      window.location.reload();
 
       return step3Response.data;
     },

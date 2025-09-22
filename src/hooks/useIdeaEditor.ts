@@ -2,6 +2,7 @@ import {
   ideaBankService,
   type CampaignIdea,
 } from "@/lib/services/ideaBankService";
+import { handleIdeaGenerationError } from "@/lib/utils/aiErrorHandling";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { useEffect, useRef, useState } from "react";
@@ -222,9 +223,10 @@ export const useIdeaEditor = (ideas: CampaignIdea[]) => {
       setImprovementError(null);
     },
     onError: (error: AxiosError<{ error: string }>) => {
-      const errorMessage =
-        error?.response?.data?.error || "Erro ao melhorar ideia";
-      toast.error(errorMessage);
+      const errorResult = handleIdeaGenerationError(error, "improve");
+      toast.error(errorResult.title, {
+        description: errorResult.description,
+      });
       setImprovementStatus("idle");
       setImprovementProgress(null);
       setImprovementError(null);

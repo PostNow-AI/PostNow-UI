@@ -142,7 +142,7 @@ export const PostCreationDialog = ({
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className="space-y-6 mt-4 flex flex-col justify-center">
               {/* Basic Information */}
-              <Card className="max-w-160  self-center">
+              <Card className="max-w-160 overflow-auto max-h-[60vh] self-center">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <ClipboardList className="text-primary" />
@@ -153,7 +153,7 @@ export const PostCreationDialog = ({
                   </CardDescription>
                   <Separator className="mt-2" />
                 </CardHeader>
-                <CardContent className="space-y-6 overflow-auto max-h-[60vh]">
+                <CardContent className="space-y-6">
                   {/* TODO: Botão para gerar dados do post com IA */}
                   <FormField
                     control={form.control}

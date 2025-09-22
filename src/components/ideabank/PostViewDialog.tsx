@@ -11,6 +11,11 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
+  handleContentGenerationError,
+  handleImageGenerationError,
+} from "@/lib/utils/aiErrorHandling";
+
+import {
   Button,
   Card,
   CardContent,
@@ -93,8 +98,12 @@ export const PostViewDialog = ({
       });
     } catch (error) {
       console.error("Failed to regenerate idea:", error);
-      toast.error("Erro ao regenerar ideia", {
-        description: "Não foi possível regenerar o conteúdo do post",
+
+      // Use the new AI error handler for content regeneration
+      const errorResult = handleContentGenerationError(error, "regenerate");
+
+      toast.error(errorResult.title, {
+        description: errorResult.description,
       });
     } finally {
       setRegeneratingIdea(false);
@@ -131,17 +140,15 @@ export const PostViewDialog = ({
       toast.success(successMessage, {
         description: successDescription,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to generate/regenerate image:", error);
-      const errorMessage = currentIdea.image_url
-        ? "Erro ao regenerar imagem"
-        : "Erro ao gerar imagem";
-      const errorDescription = currentIdea.image_url
-        ? "Não foi possível regenerar a imagem"
-        : "Não foi possível gerar a imagem";
 
-      toast.error(errorMessage, {
-        description: errorDescription,
+      // Use the new AI error handler for image generation
+      const isRegeneration = !!currentIdea.image_url;
+      const errorResult = handleImageGenerationError(error, isRegeneration);
+
+      toast.error(errorResult.title, {
+        description: errorResult.description,
       });
     } finally {
       setGeneratingImage(false);

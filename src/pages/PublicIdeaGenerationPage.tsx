@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 
 import { api } from "@/lib/api";
+import { handleCampaignGenerationError } from "@/lib/utils/aiErrorHandling";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Copy, Download, Lightbulb } from "lucide-react";
 import { useState } from "react";
@@ -88,9 +89,10 @@ export const PublicIdeaGenerationPage = () => {
       toast.success("Ideias geradas com sucesso!");
     },
     onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : "Erro ao gerar ideias";
-      toast.error(errorMessage);
+      const errorResult = handleCampaignGenerationError(error);
+      toast.error(errorResult.title, {
+        description: errorResult.description,
+      });
     },
   });
 

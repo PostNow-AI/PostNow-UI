@@ -68,25 +68,6 @@ interface PostData {
   updated_at: string;
 }
 
-interface Post {
-  id: number;
-  name: string;
-  objective: string;
-  objective_display: string;
-  type: string;
-  type_display: string;
-  target_gender?: string;
-  target_gender_display?: string;
-  target_age?: string;
-  target_location?: string;
-  target_salary?: string;
-  target_interests?: string;
-  has_target_audience: boolean;
-  ideas_count: number;
-  created_at: string;
-  updated_at: string;
-}
-
 export const IdeaBankPage = () => {
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [isPostViewDialogOpen, setIsPostViewDialogOpen] = useState(false);
@@ -161,11 +142,6 @@ export const IdeaBankPage = () => {
     setIsPostViewDialogOpen(true);
   };
 
-  const handlePostSelect = (post: Post) => {
-    // Here you could navigate to a detailed view or open a modal
-    console.log("Post selecionado:", post);
-  };
-
   const { data: userCredits } = useUserCredits();
   const balance = Number(userCredits?.balance) || 0;
 
@@ -221,7 +197,7 @@ export const IdeaBankPage = () => {
                 )}
               </div>
             </div>
-            <PostList onPostSelect={handlePostSelect} />
+            <PostList />
           </div>
 
           {/* Legacy Campaign System (if campaigns exist) */}

@@ -32,7 +32,7 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader, Separator } from "./ui";
+import { Loader, Separator, Textarea } from "./ui";
 
 // Updated schema focused on essential fields for post-based system
 const onboardingSchema = z.object({
@@ -45,9 +45,7 @@ const onboardingSchema = z.object({
   instagram_username: z.string().optional(),
   whatsapp_number: z
     .string()
-    .min(10, "Número de WhatsApp deve ter pelo menos 10 dígitos")
-    .regex(/^\d+$/, "Número de WhatsApp deve conter apenas dígitos"),
-
+    .min(10, "Número de WhatsApp deve ter pelo menos 10 dígitos"),
   // Business Info (Step 2)
   business_name: z
     .string()
@@ -57,7 +55,21 @@ const onboardingSchema = z.object({
   business_instagram: z.string().optional(),
   business_website: z
     .string()
-    .url("URL do website deve ser válida")
+    .refine((val) => {
+      if (!val || val === "") return true; // Allow empty
+      // Check if it's a valid URL with or without protocol
+      try {
+        // If no protocol, add https:// for validation
+        const urlToTest =
+          val.startsWith("http://") || val.startsWith("https://")
+            ? val
+            : `https://${val}`;
+        new URL(urlToTest);
+        return true;
+      } catch {
+        return false;
+      }
+    }, "URL do website deve ser válida (ex: exemplo.com ou https://exemplo.com)")
     .optional()
     .or(z.literal("")),
   business_location: z
@@ -523,7 +535,8 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
         </div>
         <div className="space-y-2">
           <Label htmlFor="business_description">Descrição do Negócio *</Label>
-          <Input
+          <Textarea
+            rows={3}
             id="business_description"
             placeholder="Descreva o que seu negócio faz, seus produtos/serviços, mercado alvo e o que o torna único."
             {...register("business_description")}
@@ -686,17 +699,18 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
 
             {/* Navigation Buttons */}
             <div className="px-6 self-end flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handlePrevStep}
-                disabled={currentStep === 1}
-                className="flex items-center gap-2"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Voltar
-              </Button>
-
+              {currentStep > 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrevStep}
+                  disabled={currentStep === 1}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Voltar
+                </Button>
+              )}
               {currentStep < 4 ? (
                 <Button
                   type="button"

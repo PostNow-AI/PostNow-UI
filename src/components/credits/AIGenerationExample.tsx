@@ -11,6 +11,7 @@ import {
   ideaBankService,
   type IdeaGenerationFormData,
 } from "@/lib/services/ideaBankService";
+import { handleCampaignGenerationError } from "@/lib/utils/aiErrorHandling";
 import { Loader2, Sparkles } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -75,18 +76,24 @@ export const AIGenerationExample: React.FC<AIGenerationExampleProps> = ({
       toast.success("Ideias geradas com sucesso!");
       console.log("Generated ideas:", result);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Erro ao gerar ideias";
+      const errorResult = handleCampaignGenerationError(error);
 
-      if (errorMessage.includes("Créditos insuficientes")) {
-        toast.error("Créditos insuficientes", {
+      // Special handling for credit insufficient errors to show upgrade option
+      if (
+        errorResult.errorType === "api_error" &&
+        errorResult.description.includes("insuficient")
+      ) {
+        toast.error(errorResult.title, {
+          description: errorResult.description,
           action: {
             label: "Comprar Créditos",
             onClick: () => (window.location.href = "/credits"),
           },
         });
       } else {
-        toast.error(errorMessage);
+        toast.error(errorResult.title, {
+          description: errorResult.description,
+        });
       }
     } finally {
       setIsGenerating(false);
