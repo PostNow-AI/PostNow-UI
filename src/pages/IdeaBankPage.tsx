@@ -4,13 +4,10 @@ import { PostCreationDialog } from "@/components/ideabank/PostCreationDialog";
 import { PostList } from "@/components/ideabank/PostList";
 import { PostViewDialog } from "@/components/ideabank/PostViewDialog";
 
-import { IdeaEditor } from "@/components/ideabank/IdeaEditor";
-import { type CampaignIdea } from "@/lib/services/ideaBankService";
 import { type Post as PostType } from "@/lib/services/postService";
 
 import { Button } from "@/components/ui";
 import { useUserCredits } from "@/features/Credits/hooks/useCredits";
-import { useIdeaBankPage } from "@/hooks/useIdeaBankPage";
 import { Plus, Sparkles } from "lucide-react";
 
 interface IdeaData {
@@ -52,22 +49,6 @@ export const IdeaBankPage = () => {
   const [isPostViewDialogOpen, setIsPostViewDialogOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<PostType | null>(null);
 
-  const {
-    // State
-    showEditor,
-    editorIdeas,
-    // Handlers
-
-    // Setters
-    setShowEditor,
-    setEditorIdeas,
-  } = useIdeaBankPage();
-
-  const handleEditorBack = () => {
-    setShowEditor(false);
-    setEditorIdeas([]);
-  };
-
   const handlePostCreated = (postData: PostData, ideaData: IdeaData) => {
     // Convert PostData to PostType and add the generated idea
     const postWithIdeas: PostType = {
@@ -100,49 +81,38 @@ export const IdeaBankPage = () => {
 
   return (
     <div className="px-6 pb-6 space-y-6 w-full h-full">
-      {showEditor ? (
-        <IdeaEditor
-          ideas={
-            editorIdeas.filter(
-              (idea) => "campaign_id" in idea
-            ) as CampaignIdea[]
-          }
-          onBack={handleEditorBack}
-        />
-      ) : (
-        <div className="space-y-8">
-          {/* New Post-based System */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-semibold text-slate-600">
-                  Biblioteca de posts
-                </h2>
-                <span className="text-muted-foreground">
-                  Gerencie todos os conteúdos de Instagram gerados por IA
+      <div className="space-y-8">
+        {/* New Post-based System */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-600">
+                Biblioteca de posts
+              </h2>
+              <span className="text-muted-foreground">
+                Gerencie todos os conteúdos de Instagram gerados por IA
+              </span>
+            </div>
+            {/* Main Content */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-muted-foreground text-sm">
+                  {balance} créditos restantes
                 </span>
               </div>
-              {/* Main Content */}
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground text-sm">
-                    {balance} créditos restantes
-                  </span>
-                </div>
-                <Button
-                  onClick={() => setIsPostDialogOpen(true)}
-                  className="flex items-center gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Novo Post
-                </Button>
-              </div>
+              <Button
+                onClick={() => setIsPostDialogOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Novo Post
+              </Button>
             </div>
-            <PostList />
           </div>
+          <PostList />
         </div>
-      )}
+      </div>
 
       {/* Dialogs */}
       <PostCreationDialog

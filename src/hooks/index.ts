@@ -1,5 +1,4 @@
 export type { AuthContextType } from "../types/auth";
-export * from "./useAddIdeaDialog";
 
 export * from "../features/Credits/hooks/useCredits";
 export * from "./useAuth";

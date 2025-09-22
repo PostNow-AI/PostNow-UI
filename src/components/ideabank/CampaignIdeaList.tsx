@@ -22,7 +22,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import AddIdeaDialog from "./AddIdeaDialog";
 import { CampaignEditDialog } from "./CampaignEditDialog";
 
 interface CampaignIdeaListProps {
@@ -49,7 +48,6 @@ export const CampaignIdeaList = ({
     new Set()
   );
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
-  const [addingIdea, setAddingIdea] = useState<Campaign | null>(null);
 
   const toggleCampaign = (campaignId: number) => {
     setExpandedCampaigns((prev) => {
@@ -75,10 +73,6 @@ export const CampaignIdeaList = ({
 
   const handleCloseEditDialog = () => {
     setEditingCampaign(null);
-  };
-
-  const handleCloseAddIdeaDialog = () => {
-    setAddingIdea(null);
   };
 
   if (isLoading) {
@@ -219,12 +213,7 @@ export const CampaignIdeaList = ({
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setAddingIdea(campaign)}
-                    title="Adicionar Ideia"
-                  >
+                  <Button variant="outline" size="sm" title="Adicionar Ideia">
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
@@ -301,12 +290,6 @@ export const CampaignIdeaList = ({
         isOpen={editingCampaign !== null}
         onSave={handleSaveCampaign}
         onClose={handleCloseEditDialog}
-      />
-      <AddIdeaDialog
-        isOpen={addingIdea !== null}
-        onClose={handleCloseAddIdeaDialog}
-        onEditIdea={onEditIdea || (() => {})}
-        campaignId={addingIdea?.id || 0}
       />
     </div>
   );

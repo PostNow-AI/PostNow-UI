@@ -31,6 +31,7 @@ import {
   Textarea,
 } from "@/components/ui";
 import { usePostGeneration } from "@/hooks/usePostGeneration";
+import { queryClient } from "@/lib/queryClient";
 import type { PostCreationFormData } from "@/schemas/postSchema";
 import {
   genderOptions,
@@ -111,6 +112,9 @@ export const PostCreationDialog = ({
       if (result?.post && result?.idea) {
         onSuccess?.(result.post, result.idea);
         form.reset();
+        queryClient.invalidateQueries({ queryKey: ["user-credits"] });
+        queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
+        queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
         onClose();
       }
     } catch (error) {

@@ -1,26 +1,8 @@
 import { api } from "@/lib/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import type { AIModel, CostEstimate, IdeaGenerationConfig } from "../types";
+import { useMutation } from "@tanstack/react-query";
+import type { CostEstimate, IdeaGenerationConfig } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
-export const useAIModels = () => {
-  const {
-    data: models,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["ai-models"],
-    queryFn: async (): Promise<AIModel[]> => {
-      const response = await api.get(
-        `${API_BASE_URL}/api/v1/ideabank/ai-models/`
-      );
-      return response.data;
-    },
-  });
-
-  return { models, isLoading, error };
-};
 
 export const useCostEstimate = () => {
   const mutation = useMutation({
