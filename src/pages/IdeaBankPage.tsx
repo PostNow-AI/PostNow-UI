@@ -146,7 +146,7 @@ export const IdeaBankPage = () => {
   const balance = Number(userCredits?.balance) || 0;
 
   return (
-    <div className="container px-4 pb-4 space-y-6">
+    <div className="px-6 pb-6 space-y-6 w-full h-full">
       {showEditor ? (
         <IdeaEditor
           ideas={

@@ -162,11 +162,9 @@ export function AppSidebar() {
               "Documents"
             }
           />
-          <div className="flex-1 bg-background rounded-md">
-            <div className="@container/main flex flex-1 flex-col gap-2">
-              <div className="flex flex-col gap-4 md:gap-6 ">
-                <Outlet />
-              </div>
+          <div className="flex-1 bg-background rounded-md flex flex-col">
+            <div className="@container/main w-full flex-1  flex flex-col">
+              <Outlet />
             </div>
           </div>
         </SidebarInset>
