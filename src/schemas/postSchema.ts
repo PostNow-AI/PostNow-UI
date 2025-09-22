@@ -73,6 +73,8 @@ export const postTypeOptions = [
   { value: "reel", label: "Reel" },
   { value: "post", label: "Post" },
   { value: "story", label: "Story" },
+  { value: "carousel", label: "Carrossel" },
+  { value: "live", label: "Live" },
 ] as const;
 
 export const genderOptions = [
