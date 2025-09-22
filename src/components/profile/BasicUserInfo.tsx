@@ -1,4 +1,3 @@
-import { GoogleOAuthButton } from "@/components/GoogleOAuthButton";
 import {
   Button,
   Card,
@@ -7,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui";
+import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
 import { useAuth } from "@/hooks/useAuth";
 import { useAvatarUpload } from "@/hooks/useAvatarUpload";
 import { useProfile } from "@/hooks/useProfile";

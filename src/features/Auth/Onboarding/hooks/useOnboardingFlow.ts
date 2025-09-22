@@ -1,27 +1,15 @@
-import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
-
-interface OnboardingStatus {
-  onboarding_completed: boolean;
-  has_data: boolean;
-  filled_fields_count: number;
-  total_fields_count: number;
-}
+import { fetchOnboardingStatus } from "../services";
+import type { OnboardingStatus } from "../types";
 
 export const useOnboardingFlow = () => {
   const {
     data: onboardingStatus,
     isLoading,
     error,
-    refetch,
   } = useQuery<OnboardingStatus>({
     queryKey: ["onboarding-status"],
-    queryFn: async () => {
-      const response = await api.get(
-        "/api/v1/creator-profile/onboarding/status/"
-      );
-      return response.data;
-    },
+    queryFn: fetchOnboardingStatus,
     retry: 1,
   });
 
@@ -33,6 +21,5 @@ export const useOnboardingFlow = () => {
     isLoading,
     error,
     needsOnboarding,
-    refetch,
   };
 };

@@ -1,4 +1,3 @@
-import { GoogleOAuthButton } from "@/components/GoogleOAuthButton";
 import {
   Alert,
   AlertDescription,
@@ -9,6 +8,7 @@ import {
   CardTitle,
   Loading,
 } from "@/components/ui";
+import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
 import { useAuth } from "@/hooks/useAuth";
 import { useSocialAccounts } from "@/hooks/useSocialAccounts";
 import { Link } from "react-router-dom";
