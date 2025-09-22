@@ -30,7 +30,7 @@ export const JsonContentViewer = ({
     createEmptyStructure,
     tryFixAndParse,
   } = useJsonParser(content, readOnly, onContentChange);
-  console.log({ image });
+  ({ image });
 
   // Se há erro, mostrar o estado de erro
   if (error) {

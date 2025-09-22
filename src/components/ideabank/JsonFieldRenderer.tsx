@@ -42,7 +42,6 @@ export const JsonFieldRenderer = ({
     const displayValue = translateValue(key, value) as string;
     const isLong = displayValue.length > 100;
     const isImageUrl = image;
-    console.log({ key, value, displayValue });
 
     if (isImageUrl) {
       return (

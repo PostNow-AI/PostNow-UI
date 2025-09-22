@@ -31,6 +31,7 @@ import {
   Textarea,
 } from "@/components/ui";
 import { usePostIdeas } from "@/hooks";
+import { queryClient } from "@/lib/queryClient";
 import { type Post } from "@/lib/services/postService";
 
 interface PostViewDialogProps {
@@ -89,6 +90,7 @@ export const PostViewDialog = ({
 
       // Refetch the ideas to get updated content
       await refetch();
+      queryClient.invalidateQueries({ queryKey: ["user-credits"] });
 
       // Clear the prompt
       setRegeneratePrompt("");
@@ -128,6 +130,7 @@ export const PostViewDialog = ({
 
       // Refetch the ideas to get updated image
       await refetch();
+      queryClient.invalidateQueries({ queryKey: ["user-credits"] });
 
       // Clear the prompt
       setImagePrompt("");
@@ -274,8 +277,6 @@ export const PostViewDialog = ({
   };
 
   if (!post) return null;
-
-  console.log(currentIdea);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -451,7 +452,7 @@ export const PostViewDialog = ({
                       <img
                         src={currentIdea.image_url}
                         alt={`Imagem para ${post.name}`}
-                        className="w-full h-[400px] object-cover rounded-md border transition-transform"
+                        className="w-full  object-cover rounded-md border transition-transform"
                       />
                     </div>
                   ) : (

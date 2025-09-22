@@ -178,12 +178,6 @@ export const OnboardingForm = ({ onComplete }: OnboardingFormProps) => {
     const isStepValid = await validateCurrentStep();
     if (isStepValid && currentStep < 4) {
       // Debug: Log current form values when moving to next step
-      console.log(
-        "Form values when moving to step",
-        currentStep + 1,
-        ":",
-        form.getValues()
-      );
       setCurrentStep(currentStep + 1);
     }
   };

@@ -74,7 +74,6 @@ export const AIGenerationExample: React.FC<AIGenerationExampleProps> = ({
       );
 
       toast.success("Ideias geradas com sucesso!");
-      console.log("Generated ideas:", result);
     } catch (error) {
       const errorResult = handleCampaignGenerationError(error);
 

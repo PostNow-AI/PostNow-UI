@@ -27,7 +27,6 @@ const App = () => {
     const clarityId = import.meta.env.VITE_CLARITY_ID;
     if (clarityId && typeof clarityId === "string" && clarityId.trim() !== "") {
       clarity.init(clarityId);
-      console.log("Microsoft Clarity inicializado com ID:", clarityId);
     } else {
       console.warn("VITE_CLARITY_ID não configurado ou inválido");
     }

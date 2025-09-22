@@ -189,7 +189,6 @@ export const useJsonParser = (
       setError(null);
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      console.log("Usando fallback de emergência...");
 
       // Use emergency fallback instead of showing error
       try {

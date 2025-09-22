@@ -5,30 +5,10 @@ import { PostList } from "@/components/ideabank/PostList";
 import { PostViewDialog } from "@/components/ideabank/PostViewDialog";
 
 import { IdeaEditor } from "@/components/ideabank/IdeaEditor";
-import { IdeaGenerationDialog } from "@/components/ideabank/IdeaGenerationDialog";
 import { type CampaignIdea } from "@/lib/services/ideaBankService";
 import { type Post as PostType } from "@/lib/services/postService";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui";
+import { Button } from "@/components/ui";
 import { useUserCredits } from "@/hooks/useCredits";
 import { useIdeaBankPage } from "@/hooks/useIdeaBankPage";
 import { Plus, Sparkles } from "lucide-react";
@@ -74,26 +54,13 @@ export const IdeaBankPage = () => {
 
   const {
     // State
-    isDialogOpen,
-    viewingIdea,
-    deletingIdea,
-    deletingCampaign,
-    deletingPost,
     showEditor,
     editorIdeas,
     // Handlers
-    handleConfirmDeleteIdea,
-    handleConfirmDeleteCampaign,
-    handleConfirmDeletePost,
 
     // Setters
-    setIsDialogOpen,
-    setViewingIdea,
     setShowEditor,
     setEditorIdeas,
-    setDeletingIdea,
-    setDeletingCampaign,
-    setDeletingPost,
   } = useIdeaBankPage();
 
   const handleEditorBack = () => {
@@ -192,189 +159,6 @@ export const IdeaBankPage = () => {
         }}
         post={selectedPost}
       />
-
-      <IdeaGenerationDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-      />
-
-      {/* Delete Idea Confirmation */}
-      <AlertDialog
-        open={!!deletingIdea}
-        onOpenChange={() => setDeletingIdea(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir a ideia "
-              {(deletingIdea &&
-                "title" in deletingIdea &&
-                deletingIdea.title) ||
-                (deletingIdea &&
-                  "post_name" in deletingIdea &&
-                  deletingIdea.post_name) ||
-                "esta ideia"}
-              "? Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDeleteIdea}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Delete Post Confirmation */}
-      <AlertDialog
-        open={!!deletingPost}
-        onOpenChange={() => setDeletingPost(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir o post "{deletingPost?.name}"? Esta
-              ação não pode ser desfeita e excluirá todas as ideias associadas.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDeletePost}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Delete Campaign Confirmation */}
-      <AlertDialog
-        open={!!deletingCampaign}
-        onOpenChange={() => setDeletingCampaign(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir a campanha "
-              {deletingCampaign?.title}"? Esta ação não pode ser desfeita e
-              excluirá todas as ideias associadas.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDeleteCampaign}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* View Idea Dialog */}
-      <Dialog open={!!viewingIdea} onOpenChange={() => setViewingIdea(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {(viewingIdea && "title" in viewingIdea && viewingIdea.title) ||
-                (viewingIdea &&
-                  "post_name" in viewingIdea &&
-                  viewingIdea.post_name) ||
-                "Ideia"}
-            </DialogTitle>
-            <DialogDescription>
-              {(viewingIdea &&
-                "description" in viewingIdea &&
-                viewingIdea.description) ||
-                (viewingIdea &&
-                  "post_type" in viewingIdea &&
-                  `Post do tipo: ${viewingIdea.post_type}`) ||
-                "Detalhes da ideia"}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Detalhes da Ideia</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Platform - only for CampaignIdea */}
-                  {viewingIdea && "platform" in viewingIdea && (
-                    <div>
-                      <strong>Plataforma:</strong>{" "}
-                      {viewingIdea.platform_display || viewingIdea.platform}
-                    </div>
-                  )}
-                  {/* Content Type - only for CampaignIdea */}
-                  {viewingIdea && "content_type" in viewingIdea && (
-                    <div>
-                      <strong>Tipo de Conteúdo:</strong>{" "}
-                      {viewingIdea.content_type_display ||
-                        viewingIdea.content_type}
-                    </div>
-                  )}
-                  {/* Post info - only for PostIdea */}
-                  {viewingIdea && "post_name" in viewingIdea && (
-                    <>
-                      <div>
-                        <strong>Post:</strong> {viewingIdea.post_name}
-                      </div>
-                      <div>
-                        <strong>Tipo:</strong> {viewingIdea.post_type}
-                      </div>
-                      <div>
-                        <strong>Provedor IA:</strong> {viewingIdea.ai_provider}
-                      </div>
-                      <div>
-                        <strong>Modelo IA:</strong> {viewingIdea.ai_model}
-                      </div>
-                    </>
-                  )}
-                  <div>
-                    <strong>Status:</strong>{" "}
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        viewingIdea?.status === "approved"
-                          ? "bg-green-100 text-green-800"
-                          : viewingIdea?.status === "archived"
-                          ? "bg-gray-100 text-gray-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {viewingIdea?.status === "approved"
-                        ? "Aprovada"
-                        : viewingIdea?.status === "archived"
-                        ? "Arquivada"
-                        : "Rascunho"}
-                    </span>
-                  </div>
-                  {viewingIdea?.content && (
-                    <div>
-                      <strong>Conteúdo:</strong>
-                      <div className="mt-2 p-3 bg-muted rounded-md">
-                        <pre className="whitespace-pre-wrap text-sm">
-                          {viewingIdea.content}
-                        </pre>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

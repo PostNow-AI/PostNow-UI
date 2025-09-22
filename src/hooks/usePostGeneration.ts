@@ -74,8 +74,6 @@ export const usePostGeneration = () => {
         }
       });
 
-      console.log("Sending data to API:", cleanData);
-
       const response = await api.post(
         `/api/v1/ideabank/generate/post-idea/`,
         cleanData

@@ -268,8 +268,6 @@ export const useOnboarding = (
   });
 
   const handleFormSubmit = async (data: OnboardingFormData) => {
-    console.log("Form submission triggered with data:", data);
-    console.log("This function should only be called on step 4!");
     setIsSubmitting(true);
     try {
       await onboardingMutation.mutateAsync(data);
