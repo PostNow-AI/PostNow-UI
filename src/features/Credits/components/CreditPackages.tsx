@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { useCreditPackages, useStripeCheckout } from "../../hooks/useCredits";
-import { type CreditPackage } from "../../types/credits";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
+import { type CreditPackage } from "../../../types/credits";
+import { useCreditPackages, useStripeCheckout } from "../hooks/useCredits";
 
-const CreditPackages = () => {
+export const CreditPackages = () => {
   const stripeCheckout = useStripeCheckout();
   const { data: packages, isLoading, error } = useCreditPackages();
   const [selectedPackage, setSelectedPackage] = useState<CreditPackage | null>(
@@ -134,5 +139,3 @@ const CreditPackages = () => {
     </div>
   );
 };
-
-export default CreditPackages;

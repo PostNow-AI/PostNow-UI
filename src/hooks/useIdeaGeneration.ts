@@ -8,8 +8,8 @@ import { handleApiError } from "@/lib/utils/errorHandling";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useUserCredits } from "../features/Credits/hooks/useCredits";
 import { useCostEstimate } from "./useAIOperations";
-import { useUserCredits } from "./useCredits";
 
 export interface GeneratedIdea {
   id: number;

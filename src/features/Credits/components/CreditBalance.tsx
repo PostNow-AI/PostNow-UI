@@ -1,9 +1,14 @@
-import { useUserCredits } from "../../hooks/useCredits";
-import { Badge } from "../ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Progress } from "../ui/progress";
+import { Badge } from "../../../components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
+import { Progress } from "../../../components/ui/progress";
+import { useUserCredits } from "../hooks/useCredits";
 
-const CreditBalance = () => {
+export const CreditBalance = () => {
   const { data: userCredits, isLoading, error } = useUserCredits();
 
   if (isLoading) {
@@ -88,5 +93,3 @@ const CreditBalance = () => {
     </Card>
   );
 };
-
-export default CreditBalance;

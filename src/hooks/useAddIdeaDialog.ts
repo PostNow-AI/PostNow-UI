@@ -6,8 +6,8 @@ import { handleIdeaGenerationError } from "@/lib/utils/aiErrorHandling";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useUserCredits } from "../features/Credits/hooks/useCredits";
 import { useCostEstimate } from "./useAIModels";
-import { useUserCredits } from "./useCredits";
 
 export interface FormData {
   title: string;

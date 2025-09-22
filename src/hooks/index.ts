@@ -1,11 +1,11 @@
 export type { AuthContextType } from "../types/auth";
 export * from "./useAddIdeaDialog";
 
+export * from "../features/Credits/hooks/useCredits";
 export * from "./useAuth";
 export * from "./useAvatarUpload";
 export * from "./useBrandbook";
 export * from "./useCampaignEditForm";
-export * from "./useCredits";
 export * from "./useDashboardLayout";
 
 export * from "./useGoogleCallback";

@@ -8,6 +8,3 @@ export { OnboardingForm } from "./OnboardingForm";
 export { OnboardingWrapper } from "./OnboardingWrapper";
 export { ProtectedRoute } from "./ProtectedRoute";
 export { PublicRoute } from "./PublicRoute";
-
-// Credit System Components
-export * from "./credits";

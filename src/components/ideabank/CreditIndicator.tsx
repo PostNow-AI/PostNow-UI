@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUserCredits } from "@/hooks/useCredits";
+import { useUserCredits } from "@/features/Credits/hooks/useCredits";
 import { Coins } from "lucide-react";
 
 interface CreditIndicatorProps {

@@ -1,7 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
+import {
+  useDeductCredits,
+  useUserCredits,
+} from "../features/Credits/hooks/useCredits";
 import { creditsApiService } from "../lib/credits-api";
 import { useSmartModelSelection } from "./useAIPreferences";
-import { useDeductCredits, useUserCredits } from "./useCredits";
 
 export interface AIOperationRequest {
   ai_model?: string;

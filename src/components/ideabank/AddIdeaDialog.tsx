@@ -1,5 +1,5 @@
+import { useUserCredits } from "@/features/Credits/hooks/useCredits";
 import { useAddIdeaDialog } from "@/hooks/useAddIdeaDialog";
-import { useUserCredits } from "@/hooks/useCredits";
 import type { CampaignIdea } from "@/lib/services/ideaBankService";
 import { getModelsByProvider } from "@/lib/utils/aiModels";
 import React, { useEffect } from "react";

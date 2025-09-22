@@ -21,7 +21,7 @@ import {
   CONTENT_TYPE_LABELS,
   DEFAULT_VOICE_TONE,
 } from "@/constants/ideaGeneration";
-import { useUserCredits } from "@/hooks/useCredits";
+import { useUserCredits } from "@/features/Credits/hooks/useCredits";
 import { useWorkingModels } from "@/hooks/useWorkingModels";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {

@@ -1,7 +1,7 @@
 import { postService } from "@/lib/services/postService";
 import { useQuery } from "@tanstack/react-query";
+import { useUserCredits } from "../features/Credits/hooks/useCredits";
 import { useCostEstimate } from "./useAIModels";
-import { useUserCredits } from "./useCredits";
 
 export const usePostBank = () => {
   const { data: userCredits } = useUserCredits();

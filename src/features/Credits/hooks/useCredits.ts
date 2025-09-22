@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { creditsApiService } from "../lib/credits-api";
+import { creditsApiService } from "../../../lib/credits-api";
 import {
   type CreditUsageRequest,
   type StripeCheckoutRequest,
-} from "../types/credits";
+} from "../../../types/credits";
 
 export const useCreditPackages = () => {
   return useQuery({

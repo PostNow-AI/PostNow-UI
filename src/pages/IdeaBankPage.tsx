@@ -9,7 +9,7 @@ import { type CampaignIdea } from "@/lib/services/ideaBankService";
 import { type Post as PostType } from "@/lib/services/postService";
 
 import { Button } from "@/components/ui";
-import { useUserCredits } from "@/hooks/useCredits";
+import { useUserCredits } from "@/features/Credits/hooks/useCredits";
 import { useIdeaBankPage } from "@/hooks/useIdeaBankPage";
 import { Plus, Sparkles } from "lucide-react";
 

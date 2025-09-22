@@ -1,43 +1,15 @@
-import { useTransactions } from "../../hooks/useCredits";
-import { Badge } from "../ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../../../components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
+import { useTransactions } from "../hooks/useCredits";
+import { getTransactionColor, getTransactionIcon } from "../utils";
 
-const TransactionHistory = () => {
+export const TransactionHistory = () => {
   const { data: transactions, isLoading, error } = useTransactions();
-
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case "purchase":
-        return "💰";
-      case "usage":
-        return "🤖";
-      case "refund":
-        return "↩️";
-      case "bonus":
-        return "🎁";
-      case "adjustment":
-        return "⚙️";
-      default:
-        return "📊";
-    }
-  };
-
-  const getTransactionColor = (type: string) => {
-    switch (type) {
-      case "purchase":
-        return "bg-green-100 text-green-800";
-      case "usage":
-        return "bg-blue-100 text-blue-800";
-      case "refund":
-        return "bg-orange-100 text-orange-800";
-      case "bonus":
-        return "bg-purple-100 text-purple-800";
-      case "adjustment":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   if (isLoading) {
     return (
@@ -173,5 +145,3 @@ const TransactionHistory = () => {
     </Card>
   );
 };
-
-export default TransactionHistory;
