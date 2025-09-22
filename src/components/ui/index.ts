@@ -31,9 +31,9 @@ export * from "./tally-button";
 export * from "./textarea";
 
 // Export custom components
+export { GoogleOAuthButton } from "../../features/Auth/Login/components/GoogleOAuthButton";
 export { DashboardLayout } from "../DashboardLayout";
 export { ErrorBoundary } from "../ErrorBoundary";
-export { GoogleOAuthButton } from "../GoogleOAuthButton";
 export { ProtectedRoute } from "../ProtectedRoute";
 export { PublicRoute } from "../PublicRoute";
 export { ThemeToggle } from "../ThemeToggle";

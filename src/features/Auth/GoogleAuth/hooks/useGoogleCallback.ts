@@ -9,7 +9,7 @@ export function useGoogleCallback() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  useEffect(() => {
+  const handleGoogleAuth = async () => {
     const success = searchParams.get("success");
     const error = searchParams.get("error");
     const errorDescription = searchParams.get("error_description");
@@ -60,5 +60,9 @@ export function useGoogleCallback() {
         navigate("/ideabank", { replace: true });
       }, 2000);
     }
+  };
+
+  useEffect(() => {
+    handleGoogleAuth();
   }, [searchParams, navigate, queryClient]);
 }

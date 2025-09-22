@@ -6,21 +6,21 @@ import {
   Routes,
 } from "react-router-dom";
 import { DashboardLayout } from "./components/DashboardLayout";
-import { OnboardingWrapper } from "./components/OnboardingWrapper";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
 import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
+import { Onboarding } from "./features/Auth/Onboarding";
 import { AccountSettingsPage } from "./pages/AccountSettingsPage";
 import CreditCancelPage from "./pages/CreditCancelPage";
 import CreditsPage from "./pages/CreditsPage";
 import CreditSuccessPage from "./pages/CreditSuccessPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
-import { LoginPage } from "./pages/LoginPage";
+import LoginPage from "./pages/LoginPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { PublicIdeaGenerationPage } from "./pages/PublicIdeaGenerationPage";
-import { RegisterPage } from "./pages/RegisterPage";
+import RegisterPage from "./pages/RegisterPage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -75,9 +75,9 @@ const App = () => {
               <Route
                 element={
                   <ProtectedRoute>
-                    <OnboardingWrapper>
+                    <Onboarding>
                       <DashboardLayout />
-                    </OnboardingWrapper>
+                    </Onboarding>
                   </ProtectedRoute>
                 }
               >
