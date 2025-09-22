@@ -31,10 +31,8 @@ export const useIdeaBankPage = () => {
   );
 
   const {
-    campaigns,
     posts,
     isLoading,
-    refetchCampaigns,
     // refetchPosts, // Temporarily commented - unused
     userCredits,
     estimateCost,
@@ -158,7 +156,6 @@ export const useIdeaBankPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campaigns-with-ideas"] });
       toast.success("Ideia criada com IA com sucesso!");
-      refetchCampaigns();
     },
     onError: (error) => {
       toast.error("Erro ao criar ideia");
@@ -295,7 +292,6 @@ export const useIdeaBankPage = () => {
     editorIdeas,
 
     // Data
-    campaigns,
     posts,
     isLoading,
 

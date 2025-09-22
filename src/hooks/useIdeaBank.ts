@@ -8,17 +8,6 @@ export const useIdeaBank = () => {
   const { data: userCredits } = useUserCredits();
   const estimateCost = useCostEstimate();
 
-  // Fetch legacy campaigns
-  const {
-    data: campaignsWithIdeas = [],
-    isLoading: campaignsLoading,
-    error: campaignsError,
-    refetch: refetchCampaigns,
-  } = useQuery({
-    queryKey: ["campaigns-with-ideas"],
-    queryFn: ideaBankService.getCampaignsWithIdeas,
-  });
-
   // Fetch new posts
   const {
     data: postsWithIdeas = [],
@@ -30,12 +19,8 @@ export const useIdeaBank = () => {
     queryFn: postService.getPostsWithIdeas,
   });
 
-  // Extract all ideas from campaigns and posts for backward compatibility
-  const campaignIdeas = campaignsWithIdeas.flatMap(
-    (campaign) => campaign.ideas || []
-  );
   const postIdeas = postsWithIdeas.flatMap((post) => post.ideas || []);
-  const allIdeas = [...campaignIdeas, ...postIdeas];
+  const allIdeas = [...postIdeas];
 
   const {
     data: stats,
@@ -57,15 +42,12 @@ export const useIdeaBank = () => {
 
   return {
     // Legacy campaign data
-    campaigns: campaignsWithIdeas,
     // New post data
     posts: postsWithIdeas,
     ideas: allIdeas, // Combined ideas for backward compatibility
     stats: stats || postStats, // Use campaign stats if available, otherwise post stats
-    isLoading:
-      campaignsLoading || postsLoading || statsLoading || postStatsLoading,
-    error: campaignsError || postsError || statsError || postStatsError,
-    refetchCampaigns,
+    isLoading: postsLoading || statsLoading || postStatsLoading,
+    error: postsError || statsError || postStatsError,
     refetchPosts,
     userCredits,
     estimateCost,

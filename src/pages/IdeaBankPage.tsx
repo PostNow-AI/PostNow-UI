@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { CampaignIdeaList } from "@/components/ideabank/CampaignIdeaList";
 import { PostCreationDialog } from "@/components/ideabank/PostCreationDialog";
 import { PostList } from "@/components/ideabank/PostList";
 import { PostViewDialog } from "@/components/ideabank/PostViewDialog";
@@ -82,20 +81,7 @@ export const IdeaBankPage = () => {
     deletingPost,
     showEditor,
     editorIdeas,
-
-    // Data
-    campaigns,
-    // posts, // Temporarily commented out - unused
-    isLoading,
-
     // Handlers
-    handleNewIdeaClick,
-    handleEditIdea,
-    handleDeleteIdea,
-    handleEditCampaign,
-    handleDeleteCampaign,
-    // handleEditPost, // Temporarily commented out - unused
-    // handleDeletePost, // Temporarily commented out - unused
     handleConfirmDeleteIdea,
     handleConfirmDeleteCampaign,
     handleConfirmDeletePost,
@@ -184,42 +170,10 @@ export const IdeaBankPage = () => {
                   <Plus className="h-4 w-4" />
                   Novo Post
                 </Button>
-
-                {campaigns.length > 0 && (
-                  <Button
-                    onClick={handleNewIdeaClick}
-                    variant="outline"
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Campanha (Legacy)
-                  </Button>
-                )}
               </div>
             </div>
             <PostList />
           </div>
-
-          {/* Legacy Campaign System (if campaigns exist) */}
-          {campaigns.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Plus className="h-5 w-5 text-muted-foreground" />
-                <h2 className="text-xl font-semibold text-muted-foreground">
-                  Campanhas (Legacy)
-                </h2>
-              </div>
-              <CampaignIdeaList
-                campaigns={campaigns}
-                isLoading={isLoading}
-                onEditIdea={handleEditIdea}
-                onDeleteIdea={handleDeleteIdea}
-                onEditCampaign={handleEditCampaign}
-                onDeleteCampaign={handleDeleteCampaign}
-                handleNewIdeaClick={handleNewIdeaClick}
-              />
-            </div>
-          )}
         </div>
       )}
 
