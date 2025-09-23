@@ -26,32 +26,12 @@ export const AIProviderEnum = z.enum(["google", "openai", "anthropic"]);
 // Post creation schema matching Django Post model
 export const postCreationSchema = z.object({
   // Required fields
-  name: z
-    .string()
-    .min(1, "Nome do post é obrigatório")
-    .max(200, "Nome deve ter no máximo 200 caracteres"),
+  name: z.string().optional(),
   objective: PostObjectiveEnum,
   type: PostTypeEnum,
 
-  // Optional target audience fields
-  target_gender: GenderEnum.optional(),
-  target_age: z
-    .string()
-    .max(50, "Idade deve ter no máximo 50 caracteres")
-    .optional(),
-  target_location: z
-    .string()
-    .max(100, "Localização deve ter no máximo 100 caracteres")
-    .optional(),
-  target_salary: z
-    .string()
-    .max(100, "Salário deve ter no máximo 100 caracteres")
-    .optional(),
-  target_interests: z.string().optional(),
-
-  // AI preferences (required)
-  preferred_provider: AIProviderEnum,
-  preferred_model: z.string().min(1, "Modelo é obrigatório"),
+  // Optional
+  further_details: z.string().optional(),
 
   // Image generation flag (required)
   include_image: z.boolean(),
@@ -71,7 +51,7 @@ export const postObjectiveOptions = [
 
 export const postTypeOptions = [
   { value: "reel", label: "Reel" },
-  { value: "post", label: "Post" },
+  { value: "post", label: "Feed" },
   { value: "story", label: "Story" },
 ] as const;
 

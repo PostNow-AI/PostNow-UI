@@ -1,4 +1,4 @@
-import { Calendar, Download, Edit2, Trash2, Type, Users } from "lucide-react";
+import { Calendar, Download, Edit2, Trash2, Type } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -197,19 +197,6 @@ export const PostList = () => {
                   year: "numeric",
                 })}
               </div>
-              <Users className="h-4 w-4" />
-              {post.has_target_audience ? (
-                <div className="flex items-center gap-1 ">
-                  <span className="line-clamp-1 text-ellipsis">
-                    {post?.target_age + " anos"}, {post?.target_gender}
-                    {post?.target_interests
-                      ? ", " + post?.target_interests
-                      : ""}
-                  </span>
-                </div>
-              ) : (
-                ""
-              )}
             </div>
             <div className="flex items-center gap-2">
               <Button

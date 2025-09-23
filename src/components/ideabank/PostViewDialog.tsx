@@ -90,9 +90,9 @@ export const PostViewDialog = ({
 
       // Refetch the ideas to get updated content
       await refetch();
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
       queryClient.invalidateQueries({ queryKey: ["user-credits"] });
+      queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
+      queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
       // Clear the prompt
       setRegeneratePrompt("");
 
@@ -131,9 +131,9 @@ export const PostViewDialog = ({
 
       // Refetch the ideas to get updated image
       await refetch();
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
       queryClient.invalidateQueries({ queryKey: ["user-credits"] });
+      queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
+      queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
       // Clear the prompt
       setImagePrompt("");
 
