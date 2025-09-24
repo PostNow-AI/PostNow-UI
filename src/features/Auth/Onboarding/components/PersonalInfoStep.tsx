@@ -11,6 +11,7 @@ import {
   SelectValue,
   Separator,
 } from "@/components/ui";
+import { phoneMask } from "@/utils";
 import { User } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 import type { OnboardingFormData } from "../constants/onboardingSchema";
@@ -81,11 +82,17 @@ export const PersonalInfoStep = ({
 
         <div className="space-y-2">
           <Label htmlFor="instagram_username">Instagram</Label>
-          <Input
-            id="instagram_username"
-            placeholder="@seu_usuario"
-            {...register("instagram_username")}
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+              @
+            </span>
+            <Input
+              id="instagram_username"
+              placeholder="seu_usuario"
+              className="pl-8"
+              {...register("instagram_username")}
+            />
+          </div>
           {errors.instagram_username && (
             <p className="text-sm text-destructive">
               {errors.instagram_username.message}
@@ -95,11 +102,22 @@ export const PersonalInfoStep = ({
 
         <div className="space-y-2">
           <Label htmlFor="whatsapp_number">WhatsApp *</Label>
-          <Input
-            id="whatsapp_number"
-            placeholder="+55 99 99999-9999"
-            {...register("whatsapp_number")}
-          />
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+              +55
+            </span>
+            <Input
+              id="whatsapp_number"
+              placeholder="(99) 99999-9999"
+              className="pl-12"
+              {...register("whatsapp_number", {
+                onChange: (e) => {
+                  const value = phoneMask(e.target.value);
+                  setValue("whatsapp_number", value);
+                },
+              })}
+            />
+          </div>
           <p className="text-sm text-muted-foreground">
             Você receberá suas ideais de post por esse número{" "}
           </p>

@@ -242,3 +242,31 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* React Colorful Color Picker Styling */
+.react-colorful {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+}
+
+.react-colorful__saturation {
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.react-colorful__hue {
+  height: 20px;
+  border-radius: 0;
+}
+
+.react-colorful__pointer {
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.react-colorful__hue .react-colorful__pointer {
+  width: 20px;
+  height: 20px;
+}

@@ -10,7 +10,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
 import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
-import { Onboarding } from "./features/Auth/Onboarding";
+import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { AccountSettingsPage } from "./pages/AccountSettingsPage";
 import CreditCancelPage from "./pages/CreditCancelPage";
 import CreditsPage from "./pages/CreditsPage";
@@ -70,9 +70,9 @@ const App = () => {
               <Route
                 element={
                   <ProtectedRoute>
-                    <Onboarding>
+                    <OnboardingProvider>
                       <DashboardLayout />
-                    </Onboarding>
+                    </OnboardingProvider>
                   </ProtectedRoute>
                 }
               >

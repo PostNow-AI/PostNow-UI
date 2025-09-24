@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -12,19 +13,18 @@ import {
   Separator,
   Textarea,
 } from "@/components";
-import { Label } from "@radix-ui/react-label";
-import { Building2, Loader } from "lucide-react";
+import { Building } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
-import type { OnboardingFormData } from "../types";
+import {
+  ageRangeOptions,
+  genderOptions,
+  type OnboardingFormData,
+} from "../constants/onboardingSchema";
 
 export const BusinessInfoStep = ({
   form,
-  isLoadingSpecializations,
-  availableSpecializations,
 }: {
   form: UseFormReturn<OnboardingFormData>;
-  isLoadingSpecializations: boolean;
-  availableSpecializations: { id: number; name: string }[];
 }) => {
   const {
     register,
@@ -32,13 +32,12 @@ export const BusinessInfoStep = ({
     setValue,
     watch,
   } = form;
-  const watchedValues = watch();
 
   return (
     <>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Building2 className="h-5 w-5 text-primary" />
+          <Building className="h-5 w-5 text-primary" />
           Informações de Negócio
         </CardTitle>
         <CardDescription>
@@ -50,19 +49,6 @@ export const BusinessInfoStep = ({
       </CardHeader>
       <CardContent className="space-y-6 overflow-auto">
         {" "}
-        <div className="space-y-2">
-          <Label htmlFor="business_website">Site</Label>
-          <Input
-            id="business_website"
-            placeholder="Ex: https://seusite.com.br"
-            {...register("business_website")}
-          />
-          {errors.business_website && (
-            <p className="text-sm text-destructive">
-              {errors.business_website.message}
-            </p>
-          )}
-        </div>
         <div className="space-y-2">
           <Label htmlFor="business_name">Nome do Negócio *</Label>
           <Input
@@ -80,61 +66,15 @@ export const BusinessInfoStep = ({
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="specialization">Setor/Nicho *</Label>
-          {isLoadingSpecializations ? (
-            <Loader />
-          ) : (
-            <Select
-              onValueChange={(value) => setValue("specialization", value)}
-              value={watchedValues.specialization || ""}
-              disabled={!watchedValues.profession}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione o nicho de negócio" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableSpecializations.map(
-                  (specialization: { id: number; name: string }) => (
-                    <SelectItem
-                      key={specialization.id}
-                      value={specialization.name}
-                    >
-                      {specialization.name}
-                    </SelectItem>
-                  )
-                )}
-              </SelectContent>
-            </Select>
-          )}
+          <Label htmlFor="specialization">Nicho/especialidade</Label>
+          <Input
+            id="specialization"
+            placeholder="Ex: Saúde, Beleza, Tecnologia"
+            {...register("specialization")}
+          />{" "}
           {errors.specialization && (
             <p className="text-sm text-destructive">
               {errors.specialization.message}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="business_instagram">Instagram do Negócio</Label>
-          <Input
-            id="business_instagram"
-            placeholder="@seu_negocio"
-            {...register("business_instagram")}
-          />
-          {errors.business_instagram && (
-            <p className="text-sm text-destructive">
-              {errors.business_instagram.message}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="business_location">Localização do negócio * </Label>
-          <Input
-            id="business_location"
-            placeholder="Ex: Brasília/DF"
-            {...register("business_location")}
-          />
-          {errors.business_location && (
-            <p className="text-sm text-destructive">
-              {errors.business_location.message}
             </p>
           )}
         </div>
@@ -145,6 +85,87 @@ export const BusinessInfoStep = ({
             id="business_description"
             placeholder="Descreva o que seu negócio faz, seus produtos/serviços, mercado alvo e o que o torna único."
             {...register("business_description")}
+          />
+          <p className="text-xs text-muted-foreground">
+            Quanto mais detalhes fornecer, mais precisos serão as ideais
+            geradas.{" "}
+          </p>
+          {errors.business_description && (
+            <p className="text-sm text-destructive">
+              {errors.business_description.message}
+            </p>
+          )}
+        </div>
+        <CardTitle>Público-Alvo</CardTitle>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="target_gender">Gênero *</Label>
+            <Select
+              onValueChange={(value) => setValue("target_gender", value)}
+              value={watch().target_gender || ""}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione um gênero" />
+              </SelectTrigger>
+              <SelectContent>
+                {genderOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.target_gender && (
+              <p className="text-sm text-destructive">
+                {errors.target_gender.message}
+              </p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="target_age_range">Idade *</Label>
+            <Select
+              onValueChange={(value) => setValue("target_age_range", value)}
+              value={watch().target_age_range || ""}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione uma faixa etária" />
+              </SelectTrigger>
+              <SelectContent>
+                {ageRangeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.target_age_range && (
+              <p className="text-sm text-destructive">
+                {errors.target_age_range.message}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="target_location">Localização *</Label>
+          <Input
+            id="target_location"
+            placeholder="Ex: São Paulo, Brasil, região Sul..."
+            {...register("target_location")}
+          />
+
+          {errors.target_location && (
+            <p className="text-sm text-destructive">
+              {errors.target_location.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="target_interests">Interesses</Label>
+          <Textarea
+            rows={3}
+            id="target_interests"
+            placeholder="Descreve os interesses, hobbies, problemas e comportamentos do seu público (ex: entusiastas de fitness, profissionais ocupados, consumidores conscientes)"
+            {...register("target_interests")}
           />
           <p className="text-xs text-muted-foreground">
             Quanto mais detalhes fornecer, mais precisos serão as ideais

@@ -1,3 +1,4 @@
+import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import { api } from "./api";
 
 // ===== INTERFACES =====
@@ -119,6 +120,14 @@ export const creatorProfileApi = {
     );
     return response.data;
   },
+  // Reset onboarding (for editing)
+  resetOnboardingForEdit: async (): Promise<{
+    message: string;
+    reset: boolean;
+  }> => {
+    const response = await api.post("/api/v1/creator-profile/profile/reset/");
+    return response.data;
+  },
 
   // Step-based onboarding endpoints
   updateStep1: async (
@@ -197,7 +206,7 @@ export const creatorProfileApi = {
   },
 
   // Get complete profile
-  getProfile: async (): Promise<CreatorProfile> => {
+  getProfile: async (): Promise<OnboardingFormData> => {
     const response = await api.get("/api/v1/creator-profile/profile/");
     return response.data;
   },

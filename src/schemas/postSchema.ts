@@ -55,13 +55,6 @@ export const postTypeOptions = [
   { value: "story", label: "Story" },
 ] as const;
 
-export const genderOptions = [
-  { value: "male", label: "Masculino" },
-  { value: "female", label: "Feminino" },
-  { value: "all", label: "Todos" },
-  { value: "non_binary", label: "Não Binário" },
-] as const;
-
 export const aiProviderOptions = [
   { value: "google", label: "Google (Gemini)" },
   { value: "openai", label: "OpenAI (GPT)" },

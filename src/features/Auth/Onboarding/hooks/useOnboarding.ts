@@ -1,26 +1,30 @@
+import { useOnboardingContext } from "@/contexts/OnboardingContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { onboardingSchema } from "../constants/onboardingSchema";
+import {
+  onboardingSchema,
+  type OnboardingFormData,
+} from "../constants/onboardingSchema";
 import {
   submitOnboardingStep1,
   submitOnboardingStep2,
   submitOnboardingStep3,
 } from "../services";
-import type { OnboardingFormData } from "../types";
 import { useProfessions } from "./useProfessions";
-import { useSpecializations } from "./useSpecializations";
 
 export const useOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const { setOpenOnboarding } = useOnboardingContext();
 
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
-      whatsapp_number: "+55",
+      target_age_range: "18-24",
+      target_gender: "all",
       color_1: "#FF6B6B", // Soft Red
       color_2: "#4ECDC4", // Turquoise
       color_3: "#45B7D1", // Sky Blue
@@ -47,13 +51,14 @@ export const useOnboarding = () => {
       case 2:
         fieldsToValidate = [
           "business_name",
-          "specialization",
-          "business_location",
           "business_description",
+          "target_gender",
+          "target_age_range",
+          "target_location",
         ];
         break;
       case 3:
-        fieldsToValidate = ["voice_tone_personality"];
+        fieldsToValidate = ["voice_tone"];
         break;
     }
 
@@ -76,24 +81,11 @@ export const useOnboarding = () => {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { watch } = form;
   const queryClient = useQueryClient();
-
-  const watchedValues = watch();
-  const selectedProfession = watchedValues.profession;
 
   const professions = useProfessions();
 
-  const { specializations, isLoadingSpecializations } = useSpecializations(
-    professions,
-    selectedProfession
-  );
-
-  // Get all available professions
   const allAvailableProfessions = [...professions.map((p) => p.name)];
-
-  // Get available specializations for selected profession
-  const availableSpecializations = specializations?.specializations || [];
 
   const onboardingMutation = useMutation({
     mutationFn: async (data: OnboardingFormData) => {
@@ -105,6 +97,7 @@ export const useOnboarding = () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
       toast.success("Perfil configurado com sucesso!");
+      setOpenOnboarding(false);
     },
     onError: (error: unknown) => {
       if (error instanceof AxiosError) {
@@ -127,9 +120,7 @@ export const useOnboarding = () => {
   return {
     isSubmitting,
     allAvailableProfessions,
-    availableSpecializations,
     handleFormSubmit,
-    isLoadingSpecializations,
     form,
     currentStep,
     handleNextStep,

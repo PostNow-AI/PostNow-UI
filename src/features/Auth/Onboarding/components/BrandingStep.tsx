@@ -15,7 +15,7 @@ import {
 } from "@/components";
 import { Palette } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
-import type { OnboardingFormData } from "../types";
+import type { OnboardingFormData } from "../constants/onboardingSchema";
 
 export const BrandingStep = ({
   form,
@@ -48,11 +48,11 @@ export const BrandingStep = ({
         <div className="space-y-2">
           <Label>Logo Marca</Label>
           <ImagePicker
-            value={watchedValues.logo_image_url || ""}
-            onChange={(value) => setValue("logo_image_url", value)}
+            value={watchedValues.logo || ""}
+            onChange={(value) => setValue("logo", value)}
             onError={(error) => {
               // Handle error by setting form error
-              setError("logo_image_url", { type: "manual", message: error });
+              setError("logo", { type: "manual", message: error });
             }}
             maxSize={5 * 1024 * 1024} // 5MB
             acceptedFormats={[
@@ -65,19 +65,17 @@ export const BrandingStep = ({
           <span className="text-sm text-muted-foreground">
             Adicione uma imagem da sua logomarca
           </span>
-          {errors.logo_image_url && (
-            <p className="text-sm text-destructive">
-              {errors.logo_image_url.message}
-            </p>
+          {errors.logo && (
+            <p className="text-sm text-destructive">{errors.logo.message}</p>
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="voice_tone_personality">
+          <Label htmlFor="voice_tone">
             Tom de voz e personalidade da marca *{" "}
           </Label>
           <Select
-            value={watchedValues.voice_tone_personality || ""}
-            onValueChange={(value) => setValue("voice_tone_personality", value)}
+            value={watchedValues.voice_tone || ""}
+            onValueChange={(value) => setValue("voice_tone", value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Selecione o tom de voz..." />
@@ -97,9 +95,9 @@ export const BrandingStep = ({
               <SelectItem value="minimalista">Direto e Minimalista</SelectItem>
             </SelectContent>
           </Select>
-          {errors.voice_tone_personality && (
+          {errors.voice_tone && (
             <p className="text-sm text-destructive">
-              {errors.voice_tone_personality.message}
+              {errors.voice_tone.message}
             </p>
           )}
         </div>

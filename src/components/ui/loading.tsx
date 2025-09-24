@@ -46,7 +46,7 @@ function LoadingPage({ text, className }: LoadingPageProps) {
   return (
     <div
       className={cn(
-        "flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100",
+        "flex min-h-screen flex-col items-center justify-center bg-background from-blue-50 to-indigo-100",
         className
       )}
     >
