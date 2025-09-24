@@ -67,7 +67,7 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
           </div>
           {/* Progress Indicator */}
           {currentStep <= 3 && (
-            <div className="space-y-2 max-w-[640px] w-full">
+            <div className="space-y-2 max-w-[640px] w-full px-6">
               <div className="flex justify-between text-sm text-muted-foreground">
                 <span>Etapa {currentStep} de 3</span>
               </div>
@@ -79,9 +79,11 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
               </div>
             </div>
           )}
-          <form className="flex flex-col w-full pt-0">
+          <form className="flex flex-col w-full">
             <Card
-              className={"w-full self-center overflow-auto max-w-[640px] mb-20"}
+              className={
+                "w-full self-center  overflow-auto max-w-[640px] mb-20"
+              }
             >
               {renderStepContent()}
             </Card>
