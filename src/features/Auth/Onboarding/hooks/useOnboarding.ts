@@ -14,7 +14,6 @@ import {
   submitOnboardingStep2,
   submitOnboardingStep3,
 } from "../services";
-import { useProfessions } from "./useProfessions";
 
 export const useOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -83,10 +82,6 @@ export const useOnboarding = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
-  const professions = useProfessions();
-
-  const allAvailableProfessions = [...professions.map((p) => p.name)];
-
   const onboardingMutation = useMutation({
     mutationFn: async (data: OnboardingFormData) => {
       await submitOnboardingStep1(data);
@@ -119,7 +114,6 @@ export const useOnboarding = () => {
 
   return {
     isSubmitting,
-    allAvailableProfessions,
     handleFormSubmit,
     form,
     currentStep,

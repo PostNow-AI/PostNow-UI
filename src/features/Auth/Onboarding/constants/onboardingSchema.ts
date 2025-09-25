@@ -5,7 +5,7 @@ export const onboardingSchema = z.object({
   professional_name: z
     .string()
     .min(2, "Nome profissional deve ter pelo menos 2 caracteres"),
-  profession: z.string().min(1, "Por favor, selecione uma profissão"),
+  profession: z.string().min(1, "Por favor, insira uma profissão"),
   instagram_username: z.string().optional(),
   whatsapp_number: z
     .string()

@@ -17,7 +17,6 @@ import { ReviewStep } from "./components/ReviewStep";
 export const OnboardingForm = ({ open }: { open: boolean }) => {
   const {
     isSubmitting,
-    allAvailableProfessions,
     handleFormSubmit,
     form,
     currentStep,
@@ -30,9 +29,7 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        return (
-          <PersonalInfoStep professions={allAvailableProfessions} form={form} />
-        );
+        return <PersonalInfoStep form={form} />;
       case 2:
         return <BusinessInfoStep form={form} />;
       case 3:

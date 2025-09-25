@@ -4,11 +4,6 @@ import {
   CardTitle,
   Input,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Separator,
 } from "@/components/ui";
 import { phoneMask } from "@/utils";
@@ -18,16 +13,13 @@ import type { OnboardingFormData } from "../constants/onboardingSchema";
 
 export const PersonalInfoStep = ({
   form,
-  professions,
 }: {
   form: UseFormReturn<OnboardingFormData>;
-  professions: string[];
 }) => {
   const {
     register,
     formState: { errors },
     setValue,
-    watch,
   } = form;
 
   return (
@@ -58,21 +50,11 @@ export const PersonalInfoStep = ({
         </div>
         <div className="space-y-2">
           <Label htmlFor="profession">Profissão *</Label>
-          <Select
-            onValueChange={(value) => setValue("profession", value)}
-            value={watch().profession || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecione uma profissão" />
-            </SelectTrigger>
-            <SelectContent>
-              {professions.map((profession) => (
-                <SelectItem key={profession} value={profession}>
-                  {profession}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            id="profession"
+            placeholder="Ex: Dr. João Silva"
+            {...register("profession")}
+          />
           {errors.profession && (
             <p className="text-sm text-destructive">
               {errors.profession.message}
