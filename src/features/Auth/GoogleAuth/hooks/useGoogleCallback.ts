@@ -45,6 +45,7 @@ export function useGoogleCallback() {
       setTimeout(() => {
         navigate("/ideabank", { replace: true });
       }, 100);
+      window.location.reload();
     } else if (success === "true") {
       // Success but missing tokens
       toast.error("Autenticação bem-sucedida, mas tokens não recebidos");
