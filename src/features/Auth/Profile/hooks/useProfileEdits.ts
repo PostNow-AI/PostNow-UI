@@ -1,10 +1,10 @@
+import { profileApi } from "@/features/Auth/Profile/services";
 import { api } from "@/lib/api";
-import { creatorProfileApi } from "@/lib/creator-profile-api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
 
-export const useProfile = () => {
+export const useProfileEdits = () => {
   const queryClient = useQueryClient();
 
   const {
@@ -13,11 +13,11 @@ export const useProfile = () => {
     error: profileError,
   } = useQuery({
     queryKey: ["creator-profile"],
-    queryFn: creatorProfileApi.getProfile,
+    queryFn: profileApi.getProfile,
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: creatorProfileApi.updateProfile,
+    mutationFn: profileApi.updateProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
@@ -36,11 +36,8 @@ export const useProfile = () => {
 
   const updateUserProfileMutation = useMutation({
     mutationFn: async (data: { first_name?: string; last_name?: string }) => {
-      const response = await api.patch(
-        "/api/v1/creator-profile/user/profile/",
-        data
-      );
-      return response.data;
+      const response = await profileApi.updateProfile(data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });

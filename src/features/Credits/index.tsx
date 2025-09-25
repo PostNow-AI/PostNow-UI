@@ -1,3 +1,4 @@
+import { Container } from "@/components/ui/container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AditionalInfo } from "./components/AditionalInfo";
 import { CreditBalance } from "./components/CreditBalance";
@@ -8,15 +9,10 @@ import { tabs } from "./constants";
 
 export const Credits = () => {
   return (
-    <div className="px-6 pb-6 w-full">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Sistema de Créditos</h1>
-        <p className="text-muted-foreground">
-          Gerencie seus créditos para usar modelos de IA e acompanhe seu consumo
-        </p>
-      </div>
-
+    <Container
+      headerTitle="Sistema de Créditos"
+      headerDescription="Gerencie seus créditos para usar modelos de IA e acompanhe seu consumo"
+    >
       {/* Tabs */}
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
@@ -51,6 +47,6 @@ export const Credits = () => {
           <TransactionHistory />
         </TabsContent>
       </Tabs>
-    </div>
+    </Container>
   );
 };

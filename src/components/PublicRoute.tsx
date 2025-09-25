@@ -16,7 +16,7 @@ export function PublicRoute({
 
   // Show loading spinner while checking authentication
   if (isLoading) {
-    return <LoadingPage text="Checking authentication..." />;
+    return <LoadingPage />;
   }
 
   // Redirect authenticated users to home (or intended destination from login)

@@ -1,5 +1,5 @@
 import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
-import { Building, Edit, Palette, User, Verified } from "lucide-react";
+import { Building, Edit, Palette, User } from "lucide-react";
 import {
   Button,
   CardContent,
@@ -15,24 +15,24 @@ export const OnboardingReview = ({
   values,
   onEdit,
   onLoading,
+  description,
+  title,
 }: {
   values: OnboardingFormData;
   onEdit?: () => void;
   onLoading?: boolean;
+  description?: string | React.ReactNode;
+  title?: string | React.ReactNode;
 }) => {
-  console.log("Review values:", values);
   return (
     <>
       <CardHeader>
         <div className="flex items-center justify-between w-full">
           <div>
             <CardTitle className="flex items-center gap-2 text-xl">
-              <Verified className="text-lime-600 h-6 w-6" />
-              Revise as informações de negócio{" "}
+              {title}
             </CardTitle>
-            <CardDescription>
-              Se estiver tudo certo, estamos prontos para começar o trabalho.
-            </CardDescription>
+            <CardDescription>{description}</CardDescription>
           </div>
           {onEdit && (
             <div className="flex justify-end">

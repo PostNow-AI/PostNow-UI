@@ -90,7 +90,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Show loading screen during initial authentication check
   if (initialLoading) {
-    return <LoadingPage text="Initializing Sonora..." />;
+    return <LoadingPage />;
   }
 
   return (

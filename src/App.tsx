@@ -11,7 +11,6 @@ import { PublicRoute } from "./components/PublicRoute";
 import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
-import { AccountSettingsPage } from "./pages/AccountSettingsPage";
 import CreditCancelPage from "./pages/CreditCancelPage";
 import CreditsPage from "./pages/CreditsPage";
 import CreditSuccessPage from "./pages/CreditSuccessPage";
@@ -78,10 +77,7 @@ const App = () => {
               >
                 <Route path="/ideabank" element={<IdeaBankPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route
-                  path="/account-settings"
-                  element={<AccountSettingsPage />}
-                />
+
                 <Route path="/credits" element={<CreditsPage />} />
               </Route>
             </Routes>

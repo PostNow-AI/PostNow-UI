@@ -7,6 +7,7 @@ import { PostViewDialog } from "@/components/ideabank/PostViewDialog";
 import { type Post as PostType } from "@/lib/services/postService";
 
 import { Button } from "@/components/ui";
+import { Container } from "@/components/ui/container";
 import { useUserCredits } from "@/features/Credits/hooks/useCredits";
 import { Plus, Sparkles } from "lucide-react";
 
@@ -80,39 +81,28 @@ export const IdeaBankPage = () => {
   const balance = Number(userCredits?.balance) || 0;
 
   return (
-    <div className="px-6 pb-6 space-y-6 w-full h-full">
-      <div className="space-y-8">
-        {/* New Post-based System */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-xl font-semibold text-slate-600">
-                Biblioteca de posts
-              </h2>
-              <span className="text-muted-foreground">
-                Gerencie todos os conteúdos de Instagram gerados por IA
-              </span>
-            </div>
-            {/* Main Content */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-muted-foreground text-sm">
-                  {balance} créditos restantes
-                </span>
-              </div>
-              <Button
-                onClick={() => setIsPostDialogOpen(true)}
-                className="flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Novo Post
-              </Button>
-            </div>
+    <Container
+      headerTitle={"Banco de Ideias"}
+      headerDescription={"Gerencie suas ideias e posts gerados por IA  "}
+      containerActions={
+        <div className="flex items-center gap-4">
+          <div className="flex gap-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <span className="text-muted-foreground text-sm">
+              {balance} créditos restantes
+            </span>
           </div>
-          <PostList />
+          <Button
+            onClick={() => setIsPostDialogOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Novo Post
+          </Button>
         </div>
-      </div>
+      }
+    >
+      <PostList />
 
       {/* Dialogs */}
       <PostCreationDialog
@@ -129,6 +119,6 @@ export const IdeaBankPage = () => {
         }}
         post={selectedPost}
       />
-    </div>
+    </Container>
   );
 };

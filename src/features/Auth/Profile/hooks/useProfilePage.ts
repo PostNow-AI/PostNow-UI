@@ -1,6 +1,6 @@
 import { useOnboardingContext } from "@/contexts/OnboardingContext";
+import { profileApi } from "@/features/Auth/Profile/services";
 import { useAuth } from "@/hooks/useAuth";
-import { creatorProfileApi } from "@/lib/creator-profile-api";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -14,29 +14,9 @@ export const useProfilePage = () => {
     error,
   } = useQuery({
     queryKey: ["creator-profile"],
-    queryFn: creatorProfileApi.getProfile,
+    queryFn: profileApi.getProfile,
     retry: false,
   });
-
-  const getUserName = () => {
-    if (!user) return "Usuário";
-    return (
-      `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
-      user.email ||
-      "Usuário"
-    );
-  };
-
-  const getUserInitials = () => {
-    if (!user) return "U";
-    const firstName = user.first_name || "";
-    const lastName = user.last_name || "";
-    return (
-      `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() ||
-      user.email?.charAt(0).toUpperCase() ||
-      "U"
-    );
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("pt-BR");
@@ -44,7 +24,7 @@ export const useProfilePage = () => {
 
   const resetOnboardingForEditMutation = useMutation({
     mutationFn: async () => {
-      await creatorProfileApi.resetOnboardingForEdit();
+      await profileApi.resetOnboardingForEdit();
     },
     onSuccess: () => {
       setOpenOnboarding(true);
@@ -60,11 +40,6 @@ export const useProfilePage = () => {
     profile,
     isLoading,
     error,
-    // Computed values
-    userName: getUserName(),
-    userInitials: getUserInitials(),
-
-    // Handlers
     formatDate,
     resetOnboardingForEditMutation,
   };

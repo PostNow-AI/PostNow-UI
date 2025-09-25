@@ -1,4 +1,4 @@
-import { Loading } from "@/components";
+import { LoadingPage } from "@/components";
 import { OnboardingForm } from "@/features/Auth/Onboarding/OnboardingForm";
 import { useOnboardingFlow } from "@/hooks";
 import React, { createContext, useContext } from "react";
@@ -31,11 +31,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   }, [isLoading, needsOnboarding]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loading />
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   return (

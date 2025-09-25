@@ -12,6 +12,8 @@ import {
 import { Loader } from "@/components/ui/loader";
 import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
 import { useRegister } from "@/features/Auth/Register/hooks/useRegister";
+import { Eye, EyeClosed } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export const Register = () => {
@@ -21,6 +23,8 @@ export const Register = () => {
     handleSubmit,
     formState: { errors },
   } = form;
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
@@ -41,31 +45,31 @@ export const Register = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">Nome</Label>
+                <Label htmlFor="first_name">Nome</Label>
                 <Input
-                  {...register("firstName")}
+                  {...register("first_name")}
                   type="text"
-                  id="firstName"
+                  id="first_name"
                   placeholder="Seu nome"
                 />
-                {errors.firstName && (
+                {errors.first_name && (
                   <p className="text-destructive text-sm">
-                    {errors.firstName.message}
+                    {errors.first_name.message}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="lastName">Sobrenome</Label>
+                <Label htmlFor="last_name">Sobrenome</Label>
                 <Input
-                  {...register("lastName")}
+                  {...register("last_name")}
                   type="text"
-                  id="lastName"
+                  id="last_name"
                   placeholder="Seu sobrenome"
                 />
-                {errors.lastName && (
+                {errors.last_name && (
                   <p className="text-destructive text-sm">
-                    {errors.lastName.message}
+                    {errors.last_name.message}
                   </p>
                 )}
               </div>
@@ -86,34 +90,54 @@ export const Register = () => {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                {...register("password")}
-                type="password"
-                id="password"
-                placeholder="Digite sua senha"
-              />
-              {errors.password && (
-                <p className="text-destructive text-sm">
-                  {errors.password.message}
-                </p>
-              )}
+            <div className="relative">
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="Digite sua senha"
+                />
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-10 -translate-y-1/2 text-muted-foreground text-sm"
+                >
+                  {showPassword ? <EyeClosed /> : <Eye />}
+                </Button>
+                {errors.password && (
+                  <p className="text-destructive text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-              <Input
-                {...register("confirmPassword")}
-                type="password"
-                id="confirmPassword"
-                placeholder="Confirme sua senha"
-              />
-              {errors.confirmPassword && (
-                <p className="text-destructive text-sm">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
+            <div className="relative">
+              <div className="space-y-2">
+                <Label htmlFor="password">Confirmar senha</Label>
+                <Input
+                  {...register("confirmPassword")}
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="confirmPassword"
+                  placeholder="Confirme sua senha"
+                />
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-2 top-10 -translate-y-1/2 text-muted-foreground text-sm"
+                >
+                  {showConfirmPassword ? <EyeClosed /> : <Eye />}
+                </Button>
+                {errors.confirmPassword && (
+                  <p className="text-destructive text-sm">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <Button type="submit" disabled={isLoading} className="w-full">

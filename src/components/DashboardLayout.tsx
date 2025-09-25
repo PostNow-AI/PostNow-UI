@@ -159,11 +159,11 @@ export function AppSidebar() {
           <SiteHeader
             title={
               menuItems.find((item) => item.url === location.pathname)?.title ||
-              "Documents"
+              "Perfil"
             }
           />
           <div className="flex-1 bg-background rounded-md flex flex-col">
-            <div className="@container/main w-full flex-1  flex flex-col">
+            <div className="min-h-[93vh] w-full flex-1  flex flex-col">
               <Outlet />
             </div>
           </div>

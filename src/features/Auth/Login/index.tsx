@@ -12,6 +12,8 @@ import {
   ThemeToggle,
 } from "@/components/ui";
 import { useLogin } from "@/hooks";
+import { Eye, EyeClosed } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export const Login = () => {
@@ -21,6 +23,7 @@ export const Login = () => {
     handleSubmit,
     formState: { errors },
   } = form;
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
@@ -55,19 +58,29 @@ export const Login = () => {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                {...register("password")}
-                type="password"
-                id="password"
-                placeholder="Digite sua senha"
-              />
-              {errors.password && (
-                <p className="text-destructive text-sm">
-                  {errors.password.message}
-                </p>
-              )}
+            <div className="relative">
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="Digite sua senha"
+                />
+                <Button
+                  variant="ghost"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-10 -translate-y-1/2 text-muted-foreground text-sm"
+                >
+                  {showPassword ? <EyeClosed /> : <Eye />}
+                </Button>
+                {errors.password && (
+                  <p className="text-destructive text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <Button type="submit" disabled={isLoading} className="w-full">
