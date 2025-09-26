@@ -26,7 +26,7 @@ export function useLogin() {
     mutationFn: authApi.login,
     onSuccess: async () => {
       // Invalidate and refetch user-related queries
-      queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
+      queryClient.clear();
 
       // Show success toast
       toast.success("Bem-vindo de volta! Você entrou com sucesso.");
