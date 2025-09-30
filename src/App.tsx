@@ -19,7 +19,9 @@ import { IdeaBankPage } from "./pages/IdeaBankPage";
 import LoginPage from "./pages/LoginPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
+import SubscriptionCancelPage from "./pages/SubscriptionCancelPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
+import SubscriptionSuccessPage from "./pages/SubscriptionSuccessPage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -65,6 +67,16 @@ const App = () => {
               {/* Credit system routes */}
               <Route path="/credits/success" element={<CreditSuccessPage />} />
               <Route path="/credits/cancel" element={<CreditCancelPage />} />
+
+              {/* Subscription system routes */}
+              <Route
+                path="/subscription/success"
+                element={<SubscriptionSuccessPage />}
+              />
+              <Route
+                path="/subscription/cancel"
+                element={<SubscriptionCancelPage />}
+              />
 
               {/* Protected routes with shared layout */}
               <Route
