@@ -19,6 +19,7 @@ import { IdeaBankPage } from "./pages/IdeaBankPage";
 import LoginPage from "./pages/LoginPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
+import { SubscriptionPage } from "./pages/SubscriptionPage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -79,6 +80,7 @@ const App = () => {
                 <Route path="/profile" element={<ProfilePage />} />
 
                 <Route path="/credits" element={<CreditsPage />} />
+                <Route path="/subscription" element={<SubscriptionPage />} />
               </Route>
             </Routes>
             <Toaster />

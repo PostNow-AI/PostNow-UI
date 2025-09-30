@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { ClipboardList, Coins, LogOut } from "lucide-react";
+import { ClipboardList, Coins, LogOut, Wallet } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import {
@@ -46,6 +46,11 @@ export function AppSidebar() {
       title: "Creditos",
       icon: Coins,
       url: "/credits",
+    },
+    {
+      title: "Assinatura",
+      icon: Wallet,
+      url: "/subscription",
     },
   ];
 
@@ -155,14 +160,14 @@ export function AppSidebar() {
         </SidebarFooter>
       </Sidebar>
       <main className="flex-1 p-2">
-        <SidebarInset className="rounded-md drop-shadow-sm">
+        <SidebarInset className="bg-card rounded-md drop-shadow-sm">
           <SiteHeader
             title={
               menuItems.find((item) => item.url === location.pathname)?.title ||
               "Perfil"
             }
           />
-          <div className="flex-1 bg-background rounded-md flex flex-col">
+          <div className="flex-1 bg-card rounded-md flex flex-col">
             <div className="min-h-[93vh] w-full flex-1  flex flex-col">
               <Outlet />
             </div>
