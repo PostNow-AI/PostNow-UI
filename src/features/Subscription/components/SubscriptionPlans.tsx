@@ -103,7 +103,8 @@ export const SubscriptionPlans = () => {
       <div>
         <h2 className="text-2xl font-bold mb-2">Planos de Assinatura</h2>
         <p className="text-muted-foreground">
-          Escolha o plano ideal para suas necessidades
+          Escolha o plano ideal para suas necessidades. Planos recorrentes
+          incluem 7 dias grátis!
         </p>
       </div>
 
@@ -140,6 +141,11 @@ export const SubscriptionPlans = () => {
                   {plan.description}
                 </p>
                 <div className="mt-4">
+                  {plan.interval !== "lifetime" && (
+                    <div className="text-sm font-medium text-green-600 mb-2">
+                      7 dias grátis
+                    </div>
+                  )}
                   <div className="text-3xl font-bold text-primary">
                     R$ {Number(plan.price).toFixed(2)}
                   </div>
@@ -148,6 +154,11 @@ export const SubscriptionPlans = () => {
                       ? "Pagamento único"
                       : `por ${plan.interval_display}`}
                   </div>
+                  {plan.interval !== "lifetime" && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Cobrança após o período de teste
+                    </div>
+                  )}
                 </div>
               </CardHeader>
 
@@ -166,13 +177,17 @@ export const SubscriptionPlans = () => {
                     : createCheckout.isPending && selectedPlan?.id === plan.id
                     ? "Processando..."
                     : plan.is_active
-                    ? "Assinar Agora"
+                    ? plan.interval === "lifetime"
+                      ? "Comprar Agora"
+                      : "Iniciar Teste Grátis"
                     : "Indisponível"}
                 </Button>
 
                 <div className="text-xs text-muted-foreground text-center mt-2">
                   {plan.is_active
-                    ? "Pagamento seguro via Stripe"
+                    ? plan.interval === "lifetime"
+                      ? "Pagamento único via Stripe"
+                      : "7 dias grátis • Cancele a qualquer momento"
                     : "Plano temporariamente indisponível"}
                 </div>
               </CardContent>
