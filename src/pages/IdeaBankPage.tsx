@@ -9,7 +9,6 @@ import { type Post as PostType } from "@/lib/services/postService";
 import { Button } from "@/components/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
-import { useUserCredits } from "@/features/Credits/hooks/useCredits";
 import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import { CreditCard, Lock, Plus, Sparkles } from "lucide-react";
 
@@ -79,10 +78,8 @@ export const IdeaBankPage = () => {
     setIsPostViewDialogOpen(true);
   };
 
-  const { data: userCredits } = useUserCredits();
   const { data: userSubscription, isLoading: isSubscriptionLoading } =
     useUserSubscription();
-  const balance = Number(userCredits?.balance) || 0;
 
   // Check if user has an active subscription
   const hasActiveSubscription = userSubscription?.status === "active";
@@ -95,9 +92,6 @@ export const IdeaBankPage = () => {
         <div className="flex items-center gap-4">
           <div className="flex gap-2">
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-muted-foreground text-sm">
-              {balance} créditos restantes
-            </span>
           </div>
           <Button
             onClick={() =>

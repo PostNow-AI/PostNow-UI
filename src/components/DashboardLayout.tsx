@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { ClipboardList, Coins, LogOut, Wallet } from "lucide-react";
+import { ClipboardList, LogOut, Wallet } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import {
@@ -40,12 +40,6 @@ export function AppSidebar() {
       title: "Posts",
       icon: ClipboardList,
       url: "/ideabank",
-    },
-
-    {
-      title: "Creditos",
-      icon: Coins,
-      url: "/credits",
     },
     {
       title: "Assinatura",
