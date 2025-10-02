@@ -41,6 +41,9 @@ export const useCancelSubscription = () => {
     onSuccess: () => {
       // Invalidate user subscription query to refresh the data
       queryClient.invalidateQueries({ queryKey: ["user-subscription"] });
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
     },
   });
 };
