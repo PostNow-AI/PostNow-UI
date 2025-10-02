@@ -85,7 +85,7 @@ export const usePostGeneration = () => {
       // Invalidate and refetch related queries
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["user-credits"] });
+      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
 
       // Show success message
       toast.success(data.message || "Post e ideia gerados com sucesso!", {

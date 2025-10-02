@@ -104,7 +104,7 @@ export const PostCreationDialog = ({
       if (result?.post && result?.idea) {
         onSuccess?.(result.post, result.idea);
         form.reset();
-        queryClient.invalidateQueries({ queryKey: ["user-credits"] });
+        queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
         queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
         queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
         onClose();

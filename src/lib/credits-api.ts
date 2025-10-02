@@ -5,6 +5,7 @@ import {
   type CreditUsageCalculation,
   type CreditUsageRequest,
   type CreditUsageSummary,
+  type MonthlyCreditsData,
   type StripeCheckoutData,
   type StripeCheckoutRequest,
   type UserCredits,
@@ -22,6 +23,12 @@ export const creditsApiService = {
   getUserCredits: async (): Promise<UserCredits> => {
     const response = await api.get("/api/v1/credits/balance/");
     return response.data;
+  },
+
+  // Monthly credits status (new mixed subscription + credit system)
+  getMonthlyCredits: async (): Promise<MonthlyCreditsData> => {
+    const response = await api.get("/api/v1/credits/monthly/");
+    return response.data.data;
   },
 
   // Resumo de uso

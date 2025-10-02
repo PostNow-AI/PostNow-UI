@@ -21,6 +21,15 @@ export const useUserCredits = () => {
   });
 };
 
+// New hook for monthly credits (recommended for the mixed subscription + credit system)
+export const useMonthlyCredits = () => {
+  return useQuery({
+    queryKey: ["monthly-credits"],
+    queryFn: creditsApiService.getMonthlyCredits,
+    staleTime: 30 * 1000, // 30 seconds (more frequent updates for monthly tracking)
+  });
+};
+
 export const useUsageSummary = () => {
   return useQuery({
     queryKey: ["usage-summary"],
@@ -54,6 +63,7 @@ export const useStripeCheckout = () => {
     onSuccess: () => {
       // Invalida queries relacionadas para atualizar dados
       queryClient.invalidateQueries({ queryKey: ["user-credits"] });
+      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
       queryClient.invalidateQueries({ queryKey: ["usage-summary"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },
@@ -76,6 +86,7 @@ export const useDeductCredits = () => {
     onSuccess: () => {
       // Invalida queries relacionadas para atualizar dados
       queryClient.invalidateQueries({ queryKey: ["user-credits"] });
+      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
       queryClient.invalidateQueries({ queryKey: ["usage-summary"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
     },

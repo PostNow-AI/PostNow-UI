@@ -32,7 +32,7 @@ export function useRegister() {
       // Navigate to home page
       navigate("/ideabank");
 
-      queryClient.invalidateQueries({ queryKey: ["user-credits"] });
+      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });

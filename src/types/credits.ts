@@ -70,3 +70,44 @@ export interface CreditUsageRequest {
   estimated_tokens: number;
   description: string;
 }
+
+// New monthly credits types for the mixed subscription + credit system
+export interface MonthlyCreditsStatus {
+  monthly_allocated: number;
+  monthly_used: number;
+  monthly_remaining: number;
+  usage_percentage: number;
+  last_reset: string | null;
+}
+
+export interface SubscriptionInfo {
+  has_active_subscription: boolean;
+  plan_name: string | null;
+  plan_interval: string | null;
+  monthly_credits_allocation: number;
+  allows_extra_purchase: boolean;
+}
+
+export interface PricingInfo {
+  fixed_prices: {
+    text_generation: number;
+    image_generation: number;
+  };
+  capabilities: {
+    text_generations_possible: number;
+    image_generations_possible: number;
+  };
+}
+
+export interface UsageTips {
+  efficient_usage: string;
+  text_operations: string;
+  image_operations: string;
+}
+
+export interface MonthlyCreditsData {
+  monthly_status: MonthlyCreditsStatus;
+  subscription_info: SubscriptionInfo;
+  pricing_info: PricingInfo;
+  usage_tips: UsageTips;
+}
