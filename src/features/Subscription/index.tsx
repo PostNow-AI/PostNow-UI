@@ -1,7 +1,6 @@
 import { Container } from "@/components/ui/container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CurrentSubscription } from "./components/CurrentSubscription";
-import { SubscriptionBenefits } from "./components/SubscriptionBenefits";
 import { SubscriptionManagement } from "./components/SubscriptionManagement";
 import { SubscriptionOverview } from "./components/SubscriptionOverview";
 import { SubscriptionPlans } from "./components/SubscriptionPlans";
@@ -34,8 +33,6 @@ export const Subscription = () => {
               <CurrentSubscription />
               <SubscriptionOverview />
             </div>
-
-            <SubscriptionBenefits />
           </div>
         </TabsContent>
 
