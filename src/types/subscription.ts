@@ -22,6 +22,7 @@ export interface UserSubscription {
 
 export interface StripeCheckoutSessionRequest {
   plan_id: number;
+  upgrade?: boolean;
 }
 
 export interface StripeCheckoutSessionResponse {

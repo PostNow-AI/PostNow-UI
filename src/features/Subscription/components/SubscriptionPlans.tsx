@@ -28,6 +28,7 @@ export const SubscriptionPlans = () => {
     try {
       await createCheckout.mutateAsync({
         plan_id: plan.id,
+        upgrade: currentSubscription ? true : false,
       });
     } catch (error) {
       console.error("Erro ao criar checkout:", error);
