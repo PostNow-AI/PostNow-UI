@@ -10,6 +10,7 @@ import {
   Label,
   Loader,
   ThemeToggle,
+  useTheme,
 } from "@/components/ui";
 import { useLogin } from "@/hooks";
 import { Eye, EyeClosed } from "lucide-react";
@@ -24,6 +25,7 @@ export const Login = () => {
     formState: { errors },
   } = form;
   const [showPassword, setShowPassword] = useState(false);
+  const { actualTheme } = useTheme();
 
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
@@ -34,7 +36,15 @@ export const Login = () => {
 
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <img src="Logo-sonoria.svg" alt="Logo" className="mx-auto mb-4" />
+          <img
+            src={
+              actualTheme === "dark"
+                ? "/postnow_logo_white.svg"
+                : "/postnow_logo_black.svg"
+            }
+            alt="Logo"
+            className="mx-auto mb-4"
+          />
           <CardTitle className="text-3xl font-bold">Faça seu login </CardTitle>
           <CardDescription>
             Digite seu email e senha para entrar em sua conta

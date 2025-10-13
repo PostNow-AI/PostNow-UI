@@ -23,6 +23,7 @@ import {
   Button,
   Separator,
   TallyButton,
+  useTheme,
 } from "./ui";
 import { SiteHeader } from "./ui/site-header";
 
@@ -32,6 +33,7 @@ export function AppSidebar() {
   const { userPicture, getUserInitials, getUserName, handleLogout } =
     useDashboardLayout();
   const { user } = useAuth();
+  const { actualTheme } = useTheme();
 
   const isCollapsed = state === "collapsed";
 
@@ -69,7 +71,14 @@ export function AppSidebar() {
                     to="/ideabank"
                     className="flex items-center gap-2 font-semibold"
                   >
-                    <img src="/Logo-sonoria.svg" alt="Sonora Logo" />
+                    <img
+                      src={
+                        actualTheme === "dark"
+                          ? "/postnow_logo_white.svg"
+                          : "/postnow_logo_black.svg"
+                      }
+                      alt="Sonora Logo"
+                    />
                   </Link>
                   {/* Desktop Theme Toggle */}
                   <div className="hidden md:block">
