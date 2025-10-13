@@ -15,7 +15,6 @@ import {
 import { useAuth, useDashboardLayout } from "@/hooks";
 import { ClipboardList, LogOut, Wallet } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { ThemeToggle } from "./ThemeToggle";
 import {
   Avatar,
   AvatarFallback,
@@ -61,7 +60,12 @@ export function AppSidebar() {
                 // Collapsed state - show compact logo
                 <div className="flex items-center justify-center p-2">
                   <Link to="/ideabank" className="flex items-center">
-                    <img src="/logo.svg" alt="Sonora Logo" />
+                    <img
+                      src={
+                        actualTheme === "dark" ? "/logo-white.svg" : "/logo.svg"
+                      }
+                      alt="Sonora Logo"
+                    />
                   </Link>
                 </div>
               ) : (
@@ -78,12 +82,9 @@ export function AppSidebar() {
                           : "/postnow_logo_black.svg"
                       }
                       alt="Sonora Logo"
+                      className="h-8 w-[114px]"
                     />
                   </Link>
-                  {/* Desktop Theme Toggle */}
-                  <div className="hidden md:block">
-                    <ThemeToggle />
-                  </div>
                 </div>
               )}
             </SidebarMenuItem>
@@ -109,7 +110,11 @@ export function AppSidebar() {
                         }
                         className={`transition-all duration-200 ${
                           isActive
-                            ? "!bg-primary/30  hover:!bg-primary/30 !font-medium"
+                            ? `${
+                                actualTheme === "dark"
+                                  ? "!bg-primary"
+                                  : "!bg-primary/30"
+                              } hover:!bg-primary/30 !font-medium`
                             : "hover:bg-primary/30 hover:text-sidebar-accent-foreground active:bg-sidebar-accent/50"
                         }`}
                       >
@@ -163,14 +168,14 @@ export function AppSidebar() {
         </SidebarFooter>
       </Sidebar>
       <main className="flex-1 p-2">
-        <SidebarInset className="bg-card rounded-md drop-shadow-sm">
+        <SidebarInset className="pt-4 bg-card rounded-2xl drop-shadow-sm">
           <SiteHeader
             title={
               menuItems.find((item) => item.url === location.pathname)?.title ||
               "Perfil"
             }
           />
-          <div className="flex-1 bg-card rounded-md flex flex-col">
+          <div className="flex-1 bg-card rounded-md mt-6 flex flex-col">
             <div className="min-h-[93vh] w-full flex-1  flex flex-col">
               <Outlet />
             </div>

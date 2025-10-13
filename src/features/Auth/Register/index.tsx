@@ -8,6 +8,7 @@ import {
   Input,
   Label,
   ThemeToggle,
+  useTheme,
 } from "@/components/ui";
 import { Loader } from "@/components/ui/loader";
 import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
@@ -25,6 +26,7 @@ export const Register = () => {
   } = form;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { actualTheme } = useTheme();
 
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
@@ -36,7 +38,15 @@ export const Register = () => {
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           {" "}
-          <img src="Logo-sonoria.svg" alt="Logo" className="mx-auto mb-4" />
+          <img
+            src={
+              actualTheme === "dark"
+                ? "/postnow_logo_white.svg"
+                : "/postnow_logo_black.svg"
+            }
+            alt="Logo"
+            className="mx-auto mb-4 w-[138px] h-10"
+          />{" "}
           <CardTitle className="text-3xl font-bold">Criar Conta</CardTitle>
           <CardDescription>Cadastre-se para começar</CardDescription>
         </CardHeader>

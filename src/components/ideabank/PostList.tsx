@@ -133,7 +133,7 @@ export const PostList = () => {
       {posts.map((post) => (
         <Card
           key={post.id}
-          className={`transition-colors rounded-lg p-0 hover:bg-muted/50 relative flex flex-col h-full`}
+          className={`transition-colors rounded-lg bg-background p-0 hover:bg-muted/50 relative flex flex-col h-full`}
         >
           {/* Post Image or Placeholder */}
           <div className="w-full h-full p-0 max-h-[360px] rounded-t-lg overflow-hidden bg-muted">

@@ -43,7 +43,7 @@ export const Login = () => {
                 : "/postnow_logo_black.svg"
             }
             alt="Logo"
-            className="mx-auto mb-4"
+            className="mx-auto mb-4 w-[138px] h-10"
           />
           <CardTitle className="text-3xl font-bold">Faça seu login </CardTitle>
           <CardDescription>

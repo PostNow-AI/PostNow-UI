@@ -60,7 +60,7 @@ interface ThemeToggleProps {
 }
 
 export const ThemeToggle = ({
-  variant = "ghost",
+  variant = "outline",
   size = "icon",
   className = "",
 }: ThemeToggleProps) => {

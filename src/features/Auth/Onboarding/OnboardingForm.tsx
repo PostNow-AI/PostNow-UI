@@ -4,6 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
   Separator,
+  useTheme,
 } from "@/components";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,6 +26,7 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
   } = useOnboarding();
 
   const { handleSubmit } = form;
+  const { actualTheme } = useTheme();
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -55,8 +57,15 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
         </DialogHeader>
         <div className="flex flex-col items-center space-y-6">
           <div className="text-center space-y-2">
-            <img src="Logo-sonoria.svg" alt="Logo" className="mx-auto mb-4" />
-
+            <img
+              src={
+                actualTheme === "dark"
+                  ? "/postnow_logo_white.svg"
+                  : "/postnow_logo_black.svg"
+              }
+              alt="Logo"
+              className="mx-auto mb-4 w-[138px] h-10"
+            />
             <h1 className="text-2xl font-bold">
               Vamos começar, me fale um pouco{" "}
               <span className="text-primary">sobre você</span>
