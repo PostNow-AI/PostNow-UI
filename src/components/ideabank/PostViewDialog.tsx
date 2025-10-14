@@ -1,3 +1,4 @@
+import parse from "html-react-parser";
 import {
   ChevronRight,
   Copy,
@@ -61,11 +62,28 @@ export const PostViewDialog = ({
 
   const currentIdea = ideas?.[0]; // Get the first (or only) idea
 
+  // Helper function to detect if content contains HTML
+  const containsHTML = (content: string) => {
+    const htmlRegex = /<[^>]*>/;
+    return htmlRegex.test(content);
+  };
+
+  // Helper function to get plain text from HTML content for copying
+  const getPlainTextContent = (content: string) => {
+    if (!containsHTML(content)) return content;
+
+    // Create a temporary div to extract text content
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = content;
+    return tempDiv.textContent || tempDiv.innerText || content;
+  };
+
   const handleCopyContent = async () => {
     if (!currentIdea?.content) return;
 
     try {
-      await navigator.clipboard.writeText(currentIdea.content);
+      const textToCopy = getPlainTextContent(currentIdea.content);
+      await navigator.clipboard.writeText(textToCopy);
       toast.success("Conteúdo copiado!", {
         description: "O texto do post foi copiado para a área de transferência",
       });
@@ -344,12 +362,20 @@ export const PostViewDialog = ({
                 <CardContent className="space-y-6">
                   {currentIdea?.content ? (
                     <>
-                      <Textarea
-                        value={currentIdea.content}
-                        readOnly
-                        className="min-h-[400px] resize-none font-mono text-sm"
-                        placeholder="Nenhum conteúdo disponível"
-                      />
+                      {containsHTML(currentIdea.content) ? (
+                        <div className="min-h-[400px] p-4 border rounded-md bg-background overflow-auto">
+                          <div className="prose prose-sm max-w-none text-foreground [&>h1]:text-xl [&>h2]:text-lg [&>h3]:text-base [&>h4]:text-sm [&>strong]:font-semibold [&>em]:italic [&>ul]:list-disc [&>ul]:ml-4 [&>ol]:list-decimal [&>ol]:ml-4 [&>p]:mb-2 [&>br]:mb-2">
+                            {parse(currentIdea.content)}
+                          </div>
+                        </div>
+                      ) : (
+                        <Textarea
+                          value={currentIdea.content}
+                          readOnly
+                          className="min-h-[400px] resize-none font-mono text-sm"
+                          placeholder="Nenhum conteúdo disponível"
+                        />
+                      )}
                       <Button
                         onClick={handleRegenerateIdea}
                         disabled={regeneratingIdea || !currentIdea}
