@@ -55,7 +55,7 @@ export const ThemeProvider = ({
   }, [theme]);
 
   useEffect(() => {
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
+    const handleSystemThemeChange = () => {
       if (theme === "system") {
         const newTheme = "dark";
         setActualTheme(newTheme);
