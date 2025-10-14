@@ -2,7 +2,6 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useMonthlyCredits } from "@/features/Credits/hooks/useCredits";
 import { Sparkles } from "lucide-react";
-import { ThemeToggle } from "../ThemeToggle";
 
 export function SiteHeader({ title }: { title: string }) {
   const { data: userCredits } = useMonthlyCredits();
@@ -23,7 +22,6 @@ export function SiteHeader({ title }: { title: string }) {
                 R${balance} restantes
               </span>
             </div>
-            <ThemeToggle />
           </div>
         </div>
         <Separator />

@@ -31,13 +31,11 @@ export const ThemeProvider = ({
   const [actualTheme, setActualTheme] = useState<"dark" | "light">(() => {
     if (typeof window !== "undefined") {
       if (theme === "system") {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
+        return "dark";
       }
-      return theme === "dark" ? "dark" : "light";
+      return "dark";
     }
-    return "light";
+    return "dark";
   });
 
   useEffect(() => {
@@ -46,10 +44,7 @@ export const ThemeProvider = ({
     root.classList.remove("light", "dark");
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
+      const systemTheme = "dark";
 
       root.classList.add(systemTheme);
       setActualTheme(systemTheme);
@@ -57,13 +52,12 @@ export const ThemeProvider = ({
     }
 
     root.classList.add(theme);
-    setActualTheme(theme);
   }, [theme]);
 
   useEffect(() => {
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
       if (theme === "system") {
-        const newTheme = e.matches ? "dark" : "light";
+        const newTheme = "dark";
         setActualTheme(newTheme);
 
         const root = window.document.documentElement;

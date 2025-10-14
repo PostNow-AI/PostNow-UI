@@ -7,7 +7,6 @@ import {
   CardTitle,
   Input,
   Label,
-  ThemeToggle,
   useTheme,
 } from "@/components/ui";
 import { Loader } from "@/components/ui/loader";
@@ -30,11 +29,6 @@ export const Register = () => {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
-      {/* Theme Toggle in top right */}
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           {" "}
