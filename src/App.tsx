@@ -19,6 +19,8 @@ import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
 import LoginPage from "./pages/LoginPage";
+import PasswordResetConfirmPage from "./pages/PasswordResetConfirmPage";
+import PasswordResetRequestPage from "./pages/PasswordResetRequestPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import SubscriptionCancelPage from "./pages/SubscriptionCancelPage";
@@ -78,6 +80,22 @@ const App = () => {
                 element={
                   <PublicRoute>
                     <EmailSentPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/forgot-password"
+                element={
+                  <PublicRoute>
+                    <PasswordResetRequestPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/reset-password"
+                element={
+                  <PublicRoute>
+                    <PasswordResetConfirmPage />
                   </PublicRoute>
                 }
               />

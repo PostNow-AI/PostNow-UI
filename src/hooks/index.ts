@@ -7,6 +7,7 @@ export * from "./useBrandbook";
 export * from "./useCampaignEditForm";
 export * from "./useDashboardLayout";
 
+export * from "../features/Auth/ForgotPassword/hooks";
 export * from "../features/Auth/GoogleAuth/hooks/useGoogleCallback";
 export * from "../features/Auth/Login/hooks/useLogin";
 export * from "../features/Auth/Onboarding/hooks/useOnboarding";

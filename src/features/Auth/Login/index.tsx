@@ -120,6 +120,14 @@ export const Login = () => {
                   Cadastre-se
                 </Link>
               </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                <Link
+                  to="/forgot-password"
+                  className="font-medium text-primary hover:text-primary/80 transition-colors"
+                >
+                  Esqueci a senha
+                </Link>
+              </p>
             </div>
           </div>
         </CardContent>
