@@ -1,6 +1,6 @@
 import { authApi, authUtils } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -11,7 +11,6 @@ import {
 
 export function useRegister() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -21,21 +20,14 @@ export function useRegister() {
     mutationFn: authApi.register,
     onSuccess: async () => {
       // Invalidate and refetch user-related queries
-      queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
 
       // Show success toast
       toast.success("Conta criada com sucesso! Bem-vindo ao Sonora.");
 
       // Small delay to ensure authentication state propagates
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Navigate to home page
-      navigate("/ideabank");
-
-      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
-      queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
+      navigate("/email-sent");
     },
     onError: (error: Error) => {
       toast.error(error.message || "Falha no cadastro");

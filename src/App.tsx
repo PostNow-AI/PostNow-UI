@@ -14,6 +14,8 @@ import { OnboardingProvider } from "./contexts/OnboardingContext";
 import CreditCancelPage from "./pages/CreditCancelPage";
 import CreditsPage from "./pages/CreditsPage";
 import CreditSuccessPage from "./pages/CreditSuccessPage";
+import EmailSentPage from "./pages/EmailSentPage";
+import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
 import LoginPage from "./pages/LoginPage";
@@ -62,6 +64,22 @@ const App = () => {
               <Route
                 path="/auth/google/callback"
                 element={<GoogleCallbackPage />}
+              />
+              <Route
+                path="/verify-email"
+                element={
+                  <PublicRoute>
+                    <EmailVerificationPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/email-sent"
+                element={
+                  <PublicRoute>
+                    <EmailSentPage />
+                  </PublicRoute>
+                }
               />
 
               {/* Credit system routes */}

@@ -24,18 +24,19 @@ export const authApi = {
       "Login falhou"
     ),
 
-  register: (userData: RegisterRequest) =>
-    authRequest(
-      () =>
-        api.post<AuthResponse>("/api/v1/auth/registration/", {
-          email: userData.email,
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          password1: userData.password,
-          password2: userData.confirmPassword,
-        }),
-      "Registro falhou"
-    ),
+  register: async (userData: RegisterRequest) => {
+    const response = await api.post<AuthResponse>(
+      "/api/v1/auth/registration/",
+      {
+        email: userData.email,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        password1: userData.password,
+        password2: userData.confirmPassword,
+      }
+    );
+    return response.data;
+  },
 
   handleGoogleCallback: (code: string) =>
     authRequest(
