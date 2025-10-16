@@ -85,7 +85,7 @@ export const ColorPicker = ({
             <span className="sr-only">Selecionar cor</span>
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-4">
+        <PopoverContent className="w-80 p-4 z-[9999] pointer-events-auto">
           <div className="space-y-4">
             {/* React Colorful Color Picker */}
             <div className="space-y-2">
