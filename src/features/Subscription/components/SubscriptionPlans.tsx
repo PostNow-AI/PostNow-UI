@@ -192,6 +192,7 @@ export const SubscriptionPlans = () => {
                   <div className="text-3xl font-bold text-primary">
                     R$ {monthlyPrice.toFixed(2)}/mês
                   </div>
+                  <div>Valor cheio: R$ {Number(plan.price).toFixed(2)}</div>
 
                   {plan.interval !== "lifetime" && (
                     <div className="text-xs text-muted-foreground mt-1">
