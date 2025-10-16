@@ -1,7 +1,7 @@
 import { useOnboardingContext } from "@/contexts/OnboardingContext";
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -95,11 +95,12 @@ export const useOnboarding = () => {
       setOpenOnboarding(false);
     },
     onError: (error: unknown) => {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Erro ao salvar dados");
-      } else {
-        toast.error("Erro ao salvar dados");
-      }
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao salvar dados",
+        defaultDescription:
+          "Não foi possível salvar os dados do perfil. Tente novamente.",
+      });
+      toast.error(errorResult.description);
     },
   });
 

@@ -1,5 +1,5 @@
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { PasswordFormData } from "../constants/schemas";
@@ -28,11 +28,12 @@ export const usePasswordEdit = () => {
       toast.success("Senha alterada com sucesso!");
     },
     onError: (error: unknown) => {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Erro ao alterar senha");
-      } else {
-        toast.error("Erro ao alterar senha");
-      }
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao alterar senha",
+        defaultDescription:
+          "Não foi possível alterar a senha. Verifique os dados informados.",
+      });
+      toast.error(errorResult.description);
     },
   });
 

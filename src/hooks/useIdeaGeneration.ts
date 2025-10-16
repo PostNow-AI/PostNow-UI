@@ -4,7 +4,10 @@ import {
   type IdeaGenerationFormData,
 } from "@/lib/services/ideaBankService";
 import { handleCampaignGenerationError } from "@/lib/utils/aiErrorHandling";
-import { handleApiError } from "@/lib/utils/errorHandling";
+import {
+  handleApiError,
+  type ErrorHandlingResult,
+} from "@/lib/utils/errorHandling";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -41,7 +44,7 @@ export interface GenerationState {
   isGenerating: boolean;
   progress: GenerationProgress | null;
   status: "idle" | "generating" | "complete" | "error";
-  error: string | null;
+  error: ErrorHandlingResult | null;
 }
 
 const INITIAL_STATE: GenerationState = {
@@ -135,7 +138,10 @@ export const useIdeaGeneration = () => {
         setGenerationState((prev) => ({
           ...prev,
           status: "error",
-          error: handleApiError(error, "Erro desconhecido durante a geração"),
+          error: handleApiError(error, {
+            defaultTitle: "Erro na geração",
+            defaultDescription: "Erro desconhecido durante a geração",
+          }),
         }));
         throw error;
       }

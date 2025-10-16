@@ -1,4 +1,5 @@
 import { passwordResetService } from "@/lib/services/passwordResetService";
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -45,29 +46,26 @@ export function usePasswordResetConfirm() {
         token: token!,
       }),
     onSuccess: (result) => {
-      if (result.success) {
-        // Clear all cached data
-        queryClient.clear();
+      // Clear all cached data
+      queryClient.clear();
 
-        toast.success("Senha redefinida com sucesso!", {
-          description: result.message || "Você foi automaticamente conectado.",
-          duration: 3000,
-        });
+      toast.success("Senha redefinida com sucesso!", {
+        description: result.message || "Você foi automaticamente conectado.",
+        duration: 3000,
+      });
 
-        // Redirect to dashboard or intended page
-        setTimeout(() => {
-          navigate("/ideabank");
-        }, 2000);
-      } else {
-        toast.error("Erro na redefinição", {
-          description:
-            result.message || "Não foi possível redefinir sua senha.",
-        });
-      }
+      // Redirect to dashboard or intended page
+      setTimeout(() => {
+        navigate("/ideabank");
+      }, 2000);
     },
-    onError: (error: Error) => {
-      toast.error("Erro inesperado", {
-        description: error.message || "Ocorreu um erro ao redefinir sua senha.",
+    onError: (error: unknown) => {
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro na redefinição",
+        defaultDescription: "Ocorreu um erro ao redefinir sua senha.",
+      });
+      toast.error(errorResult.title, {
+        description: errorResult.description,
       });
     },
   });

@@ -1,4 +1,5 @@
 import { emailVerificationService } from "@/lib/services/emailVerificationService";
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -50,11 +51,15 @@ export const useEmailVerification = (): UseEmailVerificationReturn => {
         }
       }
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
       console.error("Erro inesperado na verificação:", error);
-      toast.error("Erro inesperado", {
-        description:
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro na verificação",
+        defaultDescription:
           "Ocorreu um erro ao verificar seu email. Tente novamente mais tarde.",
+      });
+      toast.error(errorResult.title, {
+        description: errorResult.description,
       });
     },
   });

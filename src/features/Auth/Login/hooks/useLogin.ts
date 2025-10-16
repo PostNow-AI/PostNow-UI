@@ -1,4 +1,5 @@
 import { authApi, authUtils } from "@/lib/auth";
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -38,8 +39,13 @@ export function useLogin() {
       const from = location.state?.from?.pathname || "/ideabank";
       navigate(from, { replace: true });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Falha no login");
+    onError: (error: unknown) => {
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro no login",
+        defaultDescription:
+          "Não foi possível fazer login. Verifique suas credenciais.",
+      });
+      toast.error(errorResult.description);
     },
   });
 

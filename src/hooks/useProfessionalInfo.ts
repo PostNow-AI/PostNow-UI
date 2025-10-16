@@ -1,4 +1,5 @@
 import { globalOptionsApi } from "@/lib/global-options-api";
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { type UseFormReturn } from "react-hook-form";
@@ -69,16 +70,12 @@ export const useProfessionalInfo = (form: UseFormReturn<ProfileFormData>) => {
       setCustomProfessionInput("");
     },
     onError: (error: unknown) => {
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { data?: { message?: string } };
-        };
-        toast.error(
-          axiosError.response?.data?.message || "Erro ao criar profissão"
-        );
-      } else {
-        toast.error("Erro ao criar profissão");
-      }
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao criar profissão",
+        defaultDescription:
+          "Não foi possível criar a profissão. Tente novamente.",
+      });
+      toast.error(errorResult.description);
     },
   });
 
@@ -104,16 +101,12 @@ export const useProfessionalInfo = (form: UseFormReturn<ProfileFormData>) => {
       setValue("custom_specialization", "");
     },
     onError: (error: unknown) => {
-      if (error && typeof error === "object" && "response" in error) {
-        const axiosError = error as {
-          response?: { data?: { message?: string } };
-        };
-        toast.error(
-          axiosError.response?.data?.message || "Erro ao criar especialização"
-        );
-      } else {
-        toast.error("Erro ao criar especialização");
-      }
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao criar especialização",
+        defaultDescription:
+          "Não foi possível criar a especialização. Tente novamente.",
+      });
+      toast.error(errorResult.description);
     },
   });
 

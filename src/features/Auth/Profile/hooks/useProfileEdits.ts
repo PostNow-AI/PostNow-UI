@@ -1,7 +1,7 @@
 import { profileApi } from "@/features/Auth/Profile/services";
 import { api } from "@/lib/api";
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { toast } from "sonner";
 
 export const useProfileEdits = () => {
@@ -24,13 +24,12 @@ export const useProfileEdits = () => {
       toast.success("Perfil atualizado com sucesso!");
     },
     onError: (error: unknown) => {
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message || "Erro ao atualizar perfil"
-        );
-      } else {
-        toast.error("Erro ao atualizar perfil");
-      }
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao atualizar perfil",
+        defaultDescription:
+          "Não foi possível atualizar o perfil. Tente novamente.",
+      });
+      toast.error(errorResult.description);
     },
   });
 
@@ -44,13 +43,12 @@ export const useProfileEdits = () => {
       toast.success("Perfil atualizado com sucesso!");
     },
     onError: (error: unknown) => {
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message || "Erro ao atualizar perfil"
-        );
-      } else {
-        toast.error("Erro ao atualizar perfil");
-      }
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao atualizar perfil",
+        defaultDescription:
+          "Não foi possível atualizar o perfil. Tente novamente.",
+      });
+      toast.error(errorResult.description);
     },
   });
 
@@ -66,13 +64,12 @@ export const useProfileEdits = () => {
       toast.success("Avatar atualizado com sucesso!");
     },
     onError: (error: unknown) => {
-      if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message || "Erro ao fazer upload do avatar"
-        );
-      } else {
-        toast.error("Erro ao fazer upload do avatar");
-      }
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao fazer upload do avatar",
+        defaultDescription:
+          "Não foi possível fazer upload do avatar. Tente novamente.",
+      });
+      toast.error(errorResult.description);
     },
   });
 

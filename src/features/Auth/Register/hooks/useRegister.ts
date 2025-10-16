@@ -1,4 +1,5 @@
 import { authApi, authUtils } from "@/lib/auth";
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -29,8 +30,12 @@ export function useRegister() {
 
       navigate("/email-sent");
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Falha no cadastro");
+    onError: (error: unknown) => {
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro no cadastro",
+        defaultDescription: "Não foi possível criar a conta. Tente novamente.",
+      });
+      toast.error(errorResult.description);
     },
   });
 
