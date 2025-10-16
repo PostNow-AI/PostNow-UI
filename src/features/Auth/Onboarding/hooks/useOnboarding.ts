@@ -20,9 +20,8 @@ import {
 export const useOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const { setOpenOnboarding } = useOnboardingContext();
-  const [previouslyCompletedForm, setPreviouslyCompletedForm] = useState<
-    unknown | null
-  >(null);
+  const [previouslyCompletedForm, setPreviouslyCompletedForm] =
+    useState<OnboardingFormData | null>(null);
 
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
@@ -94,12 +93,15 @@ export const useOnboarding = () => {
   });
 
   useEffect(() => {
-    setPreviouslyCompletedForm(profile);
+    setPreviouslyCompletedForm(profile ?? null);
   }, [profile]);
 
   useEffect(() => {
     if (previouslyCompletedForm) {
-      form.reset(previouslyCompletedForm as OnboardingFormData);
+      form.reset({
+        ...previouslyCompletedForm,
+        logo: previouslyCompletedForm.logo || "",
+      } as OnboardingFormData);
     }
   }, [previouslyCompletedForm, form]);
 
@@ -146,6 +148,7 @@ export const useOnboarding = () => {
   });
 
   const handleFormSubmit = async (data: OnboardingFormData) => {
+    console.log("Submitting onboarding form with data:", data);
     setIsSubmitting(true);
     try {
       await onboardingMutation.mutateAsync(data);

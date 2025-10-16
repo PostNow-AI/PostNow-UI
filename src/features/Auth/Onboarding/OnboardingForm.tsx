@@ -143,9 +143,7 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
                 <Button
                   type="button"
                   onClick={handleSubmit(handleFormSubmit)}
-                  disabled={
-                    isSubmitting || completeOnboardingMutation.isPending
-                  }
+                  disabled={isSubmitting}
                   className="flex items-center gap-2"
                 >
                   {isSubmitting ? (

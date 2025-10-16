@@ -38,6 +38,7 @@ import {
   postObjectiveOptions,
   postTypeOptions,
 } from "@/schemas/postSchema";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 interface PostData {
   id: number;
@@ -121,6 +122,9 @@ export const PostCreationDialog = ({
       onClose();
     }
   };
+
+  const { watch } = form;
+  const postType = watch("type");
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -245,106 +249,30 @@ export const PostCreationDialog = ({
                         <FormLabel>Adicionar imagem * </FormLabel>
 
                         <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
+                          <Tooltip>
+                            <TooltipTrigger
+                              className="flex items-start w-fit"
+                              type="button"
+                            >
+                              <Switch
+                                checked={field.value}
+                                disabled={postType !== "post"}
+                                type="button"
+                                onCheckedChange={field.onChange}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {postType !== "post"
+                                ? "A imagem só está disponível para posts do tipo 'Post para Feed'."
+                                : field.value
+                                ? "A imagem será incluída na ideia do post."
+                                : "A imagem não será incluída na ideia do post."}
+                            </TooltipContent>
+                          </Tooltip>
                         </FormControl>
                       </FormItem>
                     )}
                   />
-
-                  {/* <CardTitle>Público-Alvo</CardTitle>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="target_gender"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Gênero</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value || ""}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Selecione o gênero" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {genderOptions.map((option) => (
-                                <SelectItem
-                                  key={option.value}
-                                  value={option.value}
-                                >
-                                  {option.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="target_age"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Idade</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Ex: 18-25, 25-35, 35+"
-                              {...field}
-                              value={field.value || ""}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="target_location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Localização</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Ex: São Paulo, Brasil, região Sul..."
-                              {...field}
-                              value={field.value || ""}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="target_salary"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Renda Mensal</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="Ex: R$ 2.000-5.000, classe média..."
-                              {...field}
-                              value={field.value || ""}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  */}
 
                   <FormField
                     control={form.control}
