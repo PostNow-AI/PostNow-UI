@@ -116,7 +116,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   <summary className="cursor-pointer text-sm font-medium text-gray-700 mb-2">
                     Error Details (Development Only)
                   </summary>
-                  <div className="bg-gray-100 p-4 rounded text-xs overflow-auto max-h-48">
+                  <div className="bg-gray-700 p-4 rounded text-xs overflow-auto max-h-48">
                     <div className="mb-2">
                       <strong>Error:</strong> {this.state.error.toString()}
                     </div>

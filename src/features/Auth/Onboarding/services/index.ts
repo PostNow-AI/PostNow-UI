@@ -6,6 +6,14 @@ export const fetchOnboardingStatus = async () => {
   return response.data;
 };
 
+export const completeOnboarding = async (): Promise<{
+  message: string;
+  completed: boolean;
+}> => {
+  const response = await api.post("/api/v1/creator-profile/profile/complete/");
+  return response.data;
+};
+
 export const submitOnboardingStep1 = async (data: OnboardingFormData) => {
   const payload = {
     professional_name: data.professional_name,

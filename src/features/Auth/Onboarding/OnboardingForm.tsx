@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useOnboarding } from "@/features/Auth/Onboarding/hooks/useOnboarding";
+import { isEmpty } from "lodash";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { BrandingStep } from "./components/BrandingStep";
 import { BusinessInfoStep } from "./components/BusinessInfoStep";
@@ -23,6 +24,8 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
     currentStep,
     handleNextStep,
     handlePrevStep,
+    previouslyCompletedForm,
+    completeOnboardingMutation,
   } = useOnboarding();
 
   const { handleSubmit } = form;
@@ -95,6 +98,26 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
             </Card>
             <Separator className="w-full" />
             <div className="flex justify-end gap-3 w-full px-4 py-4">
+              {!isEmpty(previouslyCompletedForm) && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    completeOnboardingMutation.mutateAsync();
+                  }}
+                  disabled={completeOnboardingMutation.isPending}
+                  className="flex items-center gap-2"
+                >
+                  {completeOnboardingMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    "Manter como está"
+                  )}
+                </Button>
+              )}
               {currentStep > 1 && (
                 <Button
                   type="button"
@@ -120,7 +143,9 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
                 <Button
                   type="button"
                   onClick={handleSubmit(handleFormSubmit)}
-                  disabled={isSubmitting}
+                  disabled={
+                    isSubmitting || completeOnboardingMutation.isPending
+                  }
                   className="flex items-center gap-2"
                 >
                   {isSubmitting ? (

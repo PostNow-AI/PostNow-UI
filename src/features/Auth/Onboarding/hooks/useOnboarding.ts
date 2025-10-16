@@ -1,8 +1,9 @@
 import { useOnboardingContext } from "@/contexts/OnboardingContext";
+import { profileApi } from "@/features/Auth/Profile/services";
 import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -10,6 +11,7 @@ import {
   type OnboardingFormData,
 } from "../constants/onboardingSchema";
 import {
+  completeOnboarding,
   submitOnboardingStep1,
   submitOnboardingStep2,
   submitOnboardingStep3,
@@ -18,6 +20,9 @@ import {
 export const useOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const { setOpenOnboarding } = useOnboardingContext();
+  const [previouslyCompletedForm, setPreviouslyCompletedForm] = useState<
+    unknown | null
+  >(null);
 
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
@@ -82,11 +87,47 @@ export const useOnboarding = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
+  const { data: profile } = useQuery({
+    queryKey: ["creator-profile"],
+    queryFn: profileApi.getProfile,
+    retry: false,
+  });
+
+  useEffect(() => {
+    setPreviouslyCompletedForm(profile);
+  }, [profile]);
+
+  useEffect(() => {
+    if (previouslyCompletedForm) {
+      form.reset(previouslyCompletedForm as OnboardingFormData);
+    }
+  }, [previouslyCompletedForm, form]);
+
   const onboardingMutation = useMutation({
     mutationFn: async (data: OnboardingFormData) => {
       await submitOnboardingStep1(data);
       await submitOnboardingStep2(data);
       await submitOnboardingStep3(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
+      queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
+      toast.success("Perfil configurado com sucesso!");
+      setOpenOnboarding(false);
+    },
+    onError: (error: unknown) => {
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao salvar dados",
+        defaultDescription:
+          "Não foi possível salvar os dados do perfil. Tente novamente.",
+      });
+      toast.error(errorResult.description);
+    },
+  });
+
+  const completeOnboardingMutation = useMutation({
+    mutationFn: async () => {
+      await completeOnboarding();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
@@ -120,5 +161,7 @@ export const useOnboarding = () => {
     currentStep,
     handleNextStep,
     handlePrevStep,
+    previouslyCompletedForm,
+    completeOnboardingMutation,
   };
 };
