@@ -43,6 +43,20 @@ export const SubscriptionPlans = () => {
     );
   };
 
+  const calculateMonthlyPrice = (plan: SubscriptionPlan) => {
+    const basePrice = Number(plan.price);
+    if (plan.interval === "monthly") {
+      return basePrice;
+    } else if (plan.interval === "semester") {
+      const monthlyBase = basePrice / 6;
+      return monthlyBase * 0.75; // 25% discount
+    } else if (plan.interval === "yearly") {
+      const monthlyBase = basePrice / 12;
+      return monthlyBase * 0.5; // 50% discount
+    }
+    return basePrice; // fallback for other intervals
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -112,21 +126,22 @@ export const SubscriptionPlans = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {plans.map((plan) => {
           const isCurrent = isCurrentPlan(plan.id);
-          const isPopular = plan.interval === "monthly"; // You can adjust this logic
+          const bestChoice = plan.interval === "yearly"; // You can adjust this logic
+          const monthlyPrice = calculateMonthlyPrice(plan);
 
           return (
             <Card
               key={plan.id}
               className={`relative ${isCurrent ? "ring-2 ring-primary" : ""} ${
-                isPopular ? "border-primary" : ""
+                bestChoice ? "border-primary" : ""
               }`}
             >
-              {isPopular && (
+              {bestChoice && (
                 <Badge
                   className="absolute -top-2 left-1/2 transform -translate-x-1/2"
                   variant="default"
                 >
-                  Mais Popular
+                  Melhor Escolha
                 </Badge>
               )}
 
@@ -141,20 +156,43 @@ export const SubscriptionPlans = () => {
                 <p className="text-sm text-muted-foreground">
                   {plan.description}
                 </p>
-                <div className="mt-4">
-                  {plan.interval !== "lifetime" && (
-                    <div className="text-sm font-medium text-green-600 mb-2">
-                      7 dias grátis
+                <div className="mt-4 space-y-1 flex flex-col items-start">
+                  {plan.benefits.map((benefit, index) => (
+                    <div
+                      className="flex flex-row items-center gap-2"
+                      key={index}
+                    >
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z"
+                          fill="#8B5CF6"
+                          fill-opacity="0.1"
+                        />
+                        <path
+                          d="M17.3332 8L9.99984 15.3333L6.6665 12"
+                          stroke="#8B5CF6"
+                          stroke-width="1.33333"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                      <p key={index} className="text-sm text-muted-foreground ">
+                        {benefit}
+                      </p>
                     </div>
-                  )}
+                  ))}
+                </div>
+                <div className="mt-4">
                   <div className="text-3xl font-bold text-primary">
-                    R$ {Number(plan.price).toFixed(2)}
+                    R$ {monthlyPrice.toFixed(2)}/mês
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {plan.interval === "lifetime"
-                      ? "Pagamento único"
-                      : `por ${plan.interval_display}`}
-                  </div>
+
                   {plan.interval !== "lifetime" && (
                     <div className="text-xs text-muted-foreground mt-1">
                       Cobrança após o período de teste
@@ -188,7 +226,7 @@ export const SubscriptionPlans = () => {
                   {plan.is_active
                     ? plan.interval === "lifetime"
                       ? "Pagamento único via Stripe"
-                      : "7 dias grátis • Cancele a qualquer momento"
+                      : "Cancele a qualquer momento"
                     : "Plano temporariamente indisponível"}
                 </div>
               </CardContent>

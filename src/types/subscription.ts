@@ -7,6 +7,7 @@ export interface SubscriptionPlan {
   interval_display: string;
   stripe_price_id: string;
   is_active: boolean;
+  benefits: string[];
 }
 
 export interface UserSubscription {
