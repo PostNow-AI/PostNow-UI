@@ -70,11 +70,11 @@ export const OnboardingReview = ({
               {values.profession}
             </span>
           </div>
-          {values?.instagram_username && (
+          {values?.instagram_handle && (
             <div className="space-y-2 flex flex-col">
               <span className="text-sm">Instagram</span>
               <span className="text-sm text-muted-foreground">
-                @{values.instagram_username}
+                @{values.instagram_handle}
               </span>
             </div>
           )}
@@ -149,7 +149,9 @@ export const OnboardingReview = ({
             <div className="space-y-2 flex flex-col">
               <span className="text-sm">Faixa etária</span>
               <span className="text-sm text-muted-foreground">
-                {values.target_age_range}
+                {values.target_age_range === "all"
+                  ? "Todos"
+                  : values.target_age_range}
               </span>
             </div>
           )}

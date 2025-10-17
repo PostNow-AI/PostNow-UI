@@ -6,7 +6,7 @@ export const onboardingSchema = z.object({
     .string()
     .min(2, "Nome profissional deve ter pelo menos 2 caracteres"),
   profession: z.string().min(1, "Por favor, insira uma profissão"),
-  instagram_username: z.string().optional(),
+  instagram_handle: z.string().optional(),
   whatsapp_number: z.string().min(1, "Número de WhatsApp é obrigatório"),
   // Business Info (Step 2)
   business_name: z
@@ -43,6 +43,7 @@ export const genderOptions = [
 ] as const;
 
 export const ageRangeOptions = [
+  { value: "all", label: "Todos" },
   { value: "18-24", label: "18-24" },
   { value: "25-34", label: "25-34" },
   { value: "35-44", label: "35-44" },

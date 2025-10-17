@@ -69,15 +69,15 @@ export const PersonalInfoStep = ({
               @
             </span>
             <Input
-              id="instagram_username"
+              id="instagram_handle"
               placeholder="seu_usuario"
               className="pl-8"
-              {...register("instagram_username")}
+              {...register("instagram_handle")}
             />
           </div>
-          {errors.instagram_username && (
+          {errors.instagram_handle && (
             <p className="text-sm text-destructive">
-              {errors.instagram_username.message}
+              {errors.instagram_handle.message}
             </p>
           )}
         </div>

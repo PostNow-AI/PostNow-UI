@@ -27,7 +27,9 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
     previouslyCompletedForm,
     completeOnboardingMutation,
   } = useOnboarding();
+  const hasCompletedForm = !isEmpty(previouslyCompletedForm?.professional_name);
 
+  console.log({ previouslyCompletedForm });
   const { handleSubmit } = form;
   const { actualTheme } = useTheme();
 
@@ -98,7 +100,7 @@ export const OnboardingForm = ({ open }: { open: boolean }) => {
             </Card>
             <Separator className="w-full" />
             <div className="flex justify-end gap-3 w-full px-4 py-4">
-              {!isEmpty(previouslyCompletedForm) && (
+              {hasCompletedForm && (
                 <Button
                   type="button"
                   variant="outline"

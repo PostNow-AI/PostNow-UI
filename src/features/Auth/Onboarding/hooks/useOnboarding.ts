@@ -109,7 +109,7 @@ export const useOnboarding = () => {
         target_age_range: previouslyCompletedForm.target_age_range || "",
         target_location: previouslyCompletedForm.target_location || "",
         voice_tone: previouslyCompletedForm.voice_tone || "",
-        instagram_username: previouslyCompletedForm.instagram_username || "",
+        instagram_handle: previouslyCompletedForm.instagram_handle || "",
         specialization: previouslyCompletedForm.specialization || "",
         target_interests: previouslyCompletedForm.target_interests || "",
         logo: previouslyCompletedForm.logo || "",
