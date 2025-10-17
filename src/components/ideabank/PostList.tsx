@@ -153,7 +153,7 @@ export const PostList = () => {
                   : "bg-gray-50 text-gray-700 border-gray-200"
               }`}
             >
-              {post.type_display}
+              {post.type_display === "Post" ? "Feed" : post.type_display}
             </Badge>
           </div>
           {post?.ideas && post.ideas.length > 0 && (
