@@ -1,6 +1,7 @@
+import { Button } from "@/components";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "../../../components/ui/badge";
-import { Button } from "../../../components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,10 +10,12 @@ import {
 } from "../../../components/ui/card";
 import { type SubscriptionPlan } from "../../../types/subscription";
 import {
+  useCancelSubscription,
   useCreateCheckoutSession,
   useSubscriptionPlans,
   useUserSubscription,
 } from "../hooks/useSubscription";
+import { CancelSubscription } from "./CancelSubscription";
 
 export const SubscriptionPlans = () => {
   const { data: plans, isLoading, error } = useSubscriptionPlans();
@@ -21,6 +24,26 @@ export const SubscriptionPlans = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(
     null
   );
+  const cancelSubscription = useCancelSubscription();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleCancelSubscription = async () => {
+    try {
+      const result = await cancelSubscription.mutateAsync();
+
+      if (result.success) {
+        toast.success(result.message || "Assinatura cancelada com sucesso!");
+        setIsDialogOpen(false);
+      } else {
+        toast.error(result.message || "Erro ao cancelar assinatura");
+      }
+    } catch (error) {
+      console.error("Erro ao cancelar assinatura:", error);
+      toast.error("Erro inesperado ao cancelar assinatura");
+    }
+  };
+
+  console.log("Current Subscription:", currentSubscription);
 
   const handleSubscribe = async (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
@@ -203,33 +226,45 @@ export const SubscriptionPlans = () => {
               </CardHeader>
 
               <CardContent>
-                <Button
-                  onClick={() => handleSubscribe(plan)}
-                  disabled={
-                    !plan.is_active || createCheckout.isPending || isCurrent
-                  }
-                  className="w-full"
-                  size="lg"
-                  variant={isCurrent ? "secondary" : "default"}
-                >
-                  {isCurrent
-                    ? "Plano Atual"
-                    : createCheckout.isPending && selectedPlan?.id === plan.id
-                    ? "Processando..."
-                    : plan.is_active
-                    ? plan.interval === "lifetime"
-                      ? "Comprar Agora"
-                      : "Iniciar Teste Grátis"
-                    : "Indisponível"}
-                </Button>
-
-                <div className="text-xs text-muted-foreground text-center mt-2">
-                  {plan.is_active
-                    ? plan.interval === "lifetime"
-                      ? "Pagamento único via Stripe"
-                      : "Cancele a qualquer momento"
-                    : "Plano temporariamente indisponível"}
-                </div>
+                {currentSubscription && isCurrent ? (
+                  <>
+                    <CancelSubscription
+                      isDialogOpen={isDialogOpen}
+                      setIsDialogOpen={setIsDialogOpen}
+                      currentSubscription={currentSubscription}
+                      handleCancelSubscription={handleCancelSubscription}
+                      cancelSubscription={cancelSubscription}
+                    />{" "}
+                    <div className="text-xs text-muted-foreground text-center mt-2">
+                      {plan.is_active
+                        ? plan.interval === "lifetime"
+                          ? "Pagamento único via Stripe"
+                          : "Cancele a qualquer momento"
+                        : "Plano temporariamente indisponível"}
+                    </div>
+                  </>
+                ) : null}
+                {!isCurrent && !currentSubscription && (
+                  <Button
+                    onClick={() => handleSubscribe(plan)}
+                    disabled={
+                      !plan.is_active || createCheckout.isPending || isCurrent
+                    }
+                    className="w-full"
+                    size="lg"
+                    variant={isCurrent ? "secondary" : "default"}
+                  >
+                    {isCurrent
+                      ? "Plano Atual"
+                      : createCheckout.isPending && selectedPlan?.id === plan.id
+                      ? "Processando..."
+                      : plan.is_active
+                      ? plan.interval === "lifetime"
+                        ? "Comprar Agora"
+                        : "Iniciar Teste Grátis"
+                      : "Indisponível"}
+                  </Button>
+                )}
               </CardContent>
             </Card>
           );
