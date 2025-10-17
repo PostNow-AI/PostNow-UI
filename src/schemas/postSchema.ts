@@ -44,9 +44,6 @@ export const postObjectiveOptions = [
   { value: "sales", label: "Vendas" },
   { value: "branding", label: "Branding" },
   { value: "engagement", label: "Engajamento" },
-  { value: "awareness", label: "Conscientização" },
-  { value: "lead_generation", label: "Geração de Leads" },
-  { value: "education", label: "Educação" },
 ] as const;
 
 export const postTypeOptions = [
