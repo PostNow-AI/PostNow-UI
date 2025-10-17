@@ -7,37 +7,7 @@ export const onboardingSchema = z.object({
     .min(2, "Nome profissional deve ter pelo menos 2 caracteres"),
   profession: z.string().min(1, "Por favor, insira uma profissão"),
   instagram_username: z.string().optional(),
-  whatsapp_number: z
-    .string()
-    .min(1, "Número de WhatsApp é obrigatório")
-    .refine(
-      (value) => {
-        // Remove all non-digit characters for validation
-        const cleanNumber = value.replace(/\D/g, "");
-
-        // Must have 10 or 11 digits (Brazilian format)
-        if (cleanNumber.length !== 11) {
-          return false;
-        }
-
-        // Must start with valid area code (11-99)
-        const areaCode = parseInt(cleanNumber.substring(0, 2));
-        if (areaCode < 11 || areaCode > 99) {
-          return false;
-        }
-
-        // For 11-digit numbers (mobile), the 3rd digit must be 9
-        if (cleanNumber.length === 11) {
-          return cleanNumber[2] === "9";
-        }
-
-        return true;
-      },
-      {
-        message:
-          "Número de WhatsApp deve ser um número de celular brasileiro válido. Ex: (11) 99999-9999",
-      }
-    ),
+  whatsapp_number: z.string().min(1, "Número de WhatsApp é obrigatório"),
   // Business Info (Step 2)
   business_name: z
     .string()

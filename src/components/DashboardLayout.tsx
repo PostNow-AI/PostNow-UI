@@ -62,7 +62,9 @@ export function AppSidebar() {
                   <Link to="/ideabank" className="flex items-center">
                     <img
                       src={
-                        actualTheme === "dark" ? "/logo-white.svg" : "/logo.svg"
+                        actualTheme === "dark"
+                          ? "/Favicon_postnow.svg"
+                          : "/logo.svg"
                       }
                       alt="Sonora Logo"
                     />

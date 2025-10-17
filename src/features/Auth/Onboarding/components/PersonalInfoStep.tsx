@@ -101,7 +101,8 @@ export const PersonalInfoStep = ({
             />
           </div>
           <p className="text-sm text-muted-foreground">
-            Você receberá suas ideais de post por esse número{" "}
+            Beta: No futuro você poderá receber suas ideias de post por esse
+            número{" "}
           </p>
           {errors.whatsapp_number && (
             <p className="text-sm text-destructive">

@@ -99,9 +99,26 @@ export const useOnboarding = () => {
   useEffect(() => {
     if (previouslyCompletedForm) {
       form.reset({
-        ...previouslyCompletedForm,
+        professional_name: previouslyCompletedForm.professional_name || "",
+        profession: previouslyCompletedForm.profession || "",
+        whatsapp_number: previouslyCompletedForm.whatsapp_number || "",
+        business_name: previouslyCompletedForm.business_name || "",
+        business_description:
+          previouslyCompletedForm.business_description || "",
+        target_gender: previouslyCompletedForm.target_gender || "",
+        target_age_range: previouslyCompletedForm.target_age_range || "",
+        target_location: previouslyCompletedForm.target_location || "",
+        voice_tone: previouslyCompletedForm.voice_tone || "",
+        instagram_username: previouslyCompletedForm.instagram_username || "",
+        specialization: previouslyCompletedForm.specialization || "",
+        target_interests: previouslyCompletedForm.target_interests || "",
         logo: previouslyCompletedForm.logo || "",
-      } as OnboardingFormData);
+        color_1: previouslyCompletedForm.color_1 || "",
+        color_2: previouslyCompletedForm.color_2 || "",
+        color_3: previouslyCompletedForm.color_3 || "",
+        color_4: previouslyCompletedForm.color_4 || "",
+        color_5: previouslyCompletedForm.color_5 || "",
+      });
     }
   }, [previouslyCompletedForm, form]);
 
