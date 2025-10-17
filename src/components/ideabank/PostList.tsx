@@ -1,4 +1,4 @@
-import { Calendar, Download, Edit2, Trash2, Type } from "lucide-react";
+import { Calendar, Edit2, Trash2, Type } from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -28,27 +28,6 @@ export const PostList = () => {
   const handleCloseViewDialog = () => {
     setIsViewDialogOpen(false);
     setSelectedPost(null);
-  };
-
-  const handleDownloadImage = async (post: Post) => {
-    if (!post?.ideas || post.ideas.length === 0 || !post.ideas[0]?.image_url) {
-      return;
-    }
-
-    try {
-      const response = await fetch(post.ideas[0].image_url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `post-${post.id}-image.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error downloading image:", error);
-    }
   };
 
   const handleDeletePost = async (post: Post) => {
@@ -208,26 +187,7 @@ export const PostList = () => {
                 <Edit2 className="h-4 w-4" />
                 Editar
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-[52px]"
-                disabled={
-                  !post?.ideas ||
-                  post.ideas.length === 0 ||
-                  !post.ideas[0]?.image_url
-                }
-                onClick={() => handleDownloadImage(post)}
-                title={
-                  post?.ideas &&
-                  post.ideas.length > 0 &&
-                  post.ideas[0]?.image_url
-                    ? "Download da imagem"
-                    : "Nenhuma imagem disponível"
-                }
-              >
-                <Download className="h-4 w-4" />
-              </Button>
+
               <Button
                 variant="outline"
                 size="lg"
