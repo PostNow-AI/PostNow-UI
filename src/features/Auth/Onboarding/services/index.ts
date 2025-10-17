@@ -18,7 +18,7 @@ export const submitOnboardingStep1 = async (data: OnboardingFormData) => {
   const payload = {
     professional_name: data.professional_name,
     profession: data.profession,
-    instagram_handle: data.instagram_username, // Backend expects instagram_handle
+    instagram_handle: data.instagram_handle, // Backend expects instagram_handle
     whatsapp_number: data.whatsapp_number,
   };
   const response = await api.put(
