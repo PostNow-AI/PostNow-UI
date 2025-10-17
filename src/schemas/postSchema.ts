@@ -42,7 +42,7 @@ export type PostCreationFormData = z.infer<typeof postCreationSchema>;
 // Options for form dropdowns
 export const postObjectiveOptions = [
   { value: "sales", label: "Vendas" },
-  { value: "branding", label: "Branding" },
+  { value: "branding", label: "Autoridade de marca" },
   { value: "engagement", label: "Engajamento" },
 ] as const;
 
