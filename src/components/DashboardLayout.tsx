@@ -19,6 +19,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  Badge,
   Button,
   Separator,
   TallyButton,
@@ -58,17 +59,11 @@ export function AppSidebar() {
             <SidebarMenuItem>
               {isCollapsed ? (
                 // Collapsed state - show compact logo
-                <div className="flex items-center justify-center p-2">
+                <div className="flex flex-col items-center justify-center gap-2 p-2">
                   <Link to="/ideabank" className="flex items-center">
-                    <img
-                      src={
-                        actualTheme === "dark"
-                          ? "/Favicon_postnow.svg"
-                          : "/logo.svg"
-                      }
-                      alt="Sonora Logo"
-                    />
+                    <img src={"/logo-white.svg"} alt="Sonora Logo" />
                   </Link>
+                  <Badge>BETA</Badge>
                 </div>
               ) : (
                 // Expanded state - show full logo with theme toggle
@@ -87,6 +82,7 @@ export function AppSidebar() {
                       className="h-8 w-[114px]"
                     />
                   </Link>
+                  <Badge>BETA</Badge>
                 </div>
               )}
             </SidebarMenuItem>

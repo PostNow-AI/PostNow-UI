@@ -141,8 +141,9 @@ export const SubscriptionPlans = () => {
       <div>
         <h2 className="text-2xl font-bold mb-2">Planos de Assinatura</h2>
         <p className="text-muted-foreground">
-          Escolha o plano ideal para suas necessidades. Planos recorrentes
-          incluem 7 dias grátis!
+          Estamos em fase{" "}
+          <span className="font-semibold text-primary">BETA</span>! Aproveite
+          nossos planos com preços especiais e benefícios exclusivos.
         </p>
       </div>
 
@@ -215,7 +216,6 @@ export const SubscriptionPlans = () => {
                   <div className="text-3xl font-bold text-primary">
                     R$ {monthlyPrice.toFixed(2)}/mês
                   </div>
-                  <div>Valor cheio: R$ {Number(plan.price).toFixed(2)}</div>
 
                   {plan.interval !== "lifetime" && (
                     <div className="text-xs text-muted-foreground mt-1">
