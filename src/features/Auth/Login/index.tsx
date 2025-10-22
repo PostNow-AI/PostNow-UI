@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Card,
   CardContent,
@@ -30,15 +31,18 @@ export const Login = () => {
     <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <img
-            src={
-              actualTheme === "dark"
-                ? "/postnow_logo_white.svg"
-                : "/postnow_logo_black.svg"
-            }
-            alt="Logo"
-            className="mx-auto mb-4 w-[138px] h-10"
-          />
+          <div className="flex flex-col items-center mb-4 gap-2">
+            <img
+              src={
+                actualTheme === "dark"
+                  ? "/postnow_logo_white.svg"
+                  : "/postnow_logo_black.svg"
+              }
+              alt="Logo"
+              className="mx-auto max-w-[138px] h-10"
+            />
+            <Badge>BETA</Badge>
+          </div>
           <CardTitle className="text-3xl font-bold">Faça seu login </CardTitle>
           <CardDescription>
             Digite seu email e senha para entrar em sua conta
