@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "sonner";
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
-      theme="light"
+      theme="dark"
       className="toaster group"
       toastOptions={{
         style: {
@@ -24,7 +24,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
       }}
-      position="top-right"
+      position="bottom-right"
       expand={true}
       richColors={true}
       closeButton={true}

@@ -21,7 +21,6 @@ export const Subscription = () => {
               value={tab.id}
               className="flex items-center space-x-2"
             >
-              <span>{tab.icon}</span>
               <span>{tab.label}</span>
             </TabsTrigger>
           ))}
