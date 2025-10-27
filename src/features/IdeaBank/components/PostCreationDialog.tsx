@@ -30,15 +30,15 @@ import {
   Switch,
   Textarea,
 } from "@/components/ui";
-import { usePostGeneration } from "@/hooks/usePostGeneration";
-import { queryClient } from "@/lib/queryClient";
-import type { PostCreationFormData } from "@/schemas/postSchema";
+import { postCreationSchema } from "@/features/IdeaBank/constants";
+import { usePostCreationForm } from "@/features/IdeaBank/hooks";
+import type { PostCreationData } from "@/features/IdeaBank/types";
+import { postObjectiveOptions, postTypeOptions } from "@/schemas/postSchema";
 import {
-  postCreationSchema,
-  postObjectiveOptions,
-  postTypeOptions,
-} from "@/schemas/postSchema";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../../../components/ui/tooltip";
 
 interface PostData {
   id: number;
@@ -85,9 +85,9 @@ export const PostCreationDialog = ({
   onClose,
   onSuccess,
 }: PostCreationDialogProps) => {
-  const { generatePost, isLoading } = usePostGeneration();
+  const { handleCreatePost, isCreating } = usePostCreationForm(onSuccess);
 
-  const form = useForm<PostCreationFormData>({
+  const form = useForm<PostCreationData>({
     resolver: zodResolver(postCreationSchema),
     defaultValues: {
       name: "",
@@ -98,18 +98,11 @@ export const PostCreationDialog = ({
     },
   });
 
-  const handleSubmit: SubmitHandler<PostCreationFormData> = async (data) => {
+  const handleSubmit: SubmitHandler<PostCreationData> = async (data) => {
     try {
-      const result = await generatePost(data);
-
-      if (result?.post && result?.idea) {
-        onSuccess?.(result.post, result.idea);
-        form.reset();
-        queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
-        queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
-        queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
-        onClose();
-      }
+      await handleCreatePost(data);
+      form.reset();
+      onClose();
     } catch (error) {
       console.error("Erro ao gerar post:", error);
       // Error handling is done in the hook
@@ -117,7 +110,7 @@ export const PostCreationDialog = ({
   };
 
   const handleClose = () => {
-    if (!isLoading) {
+    if (!isCreating) {
       form.reset();
       onClose();
     }
@@ -307,10 +300,10 @@ export const PostCreationDialog = ({
             <Button
               type="button"
               onClick={form.handleSubmit(handleSubmit)}
-              disabled={isLoading}
+              disabled={isCreating}
               className="min-w-32"
             >
-              {isLoading ? (
+              {isCreating ? (
                 <>
                   Gerando...
                   <Loader2 className="h-4 w-4 animate-spin" />

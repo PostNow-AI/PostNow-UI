@@ -9,13 +9,6 @@ import {
   RefreshCw,
   Sparkles,
 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-
-import {
-  handleContentGenerationError,
-  handleImageGenerationError,
-} from "@/lib/utils/aiErrorHandling";
 
 import {
   Button,
@@ -32,9 +25,8 @@ import {
   Skeleton,
   Textarea,
 } from "@/components/ui";
-import { usePostIdeas } from "@/hooks";
-import { queryClient } from "@/lib/queryClient";
-import { type Post } from "@/lib/services/postService";
+import { usePostViewDialog } from "@/features/IdeaBank/hooks";
+import { type Post } from "@/features/IdeaBank/types";
 
 interface PostViewDialogProps {
   isOpen: boolean;
@@ -47,254 +39,26 @@ export const PostViewDialog = ({
   onClose,
   post,
 }: PostViewDialogProps) => {
-  const [downloadingImage, setDownloadingImage] = useState(false);
-  const [regeneratingIdea, setRegeneratingIdea] = useState(false);
-  const [regeneratePrompt, setRegeneratePrompt] = useState("");
-  const [generatingImage, setGeneratingImage] = useState(false);
-  const [imagePrompt, setImagePrompt] = useState("");
-
   const {
-    data: ideas,
+    currentIdea,
     isLoading,
-    refetch,
-  } = usePostIdeas(post?.id || 0, {
-    enabled: !!post?.id && isOpen,
-  });
-
-  const currentIdea = ideas?.[0]; // Get the first (or only) idea
+    regeneratingIdea,
+    generatingImage,
+    downloadingImage,
+    regeneratePrompt,
+    imagePrompt,
+    setRegeneratePrompt,
+    setImagePrompt,
+    handleCopyContent,
+    handleRegenerateIdea,
+    handleImageGeneration,
+    handleDownloadImage,
+  } = usePostViewDialog(post, isOpen);
 
   // Helper function to detect if content contains HTML
   const containsHTML = (content: string) => {
     const htmlRegex = /<[^>]*>/;
     return htmlRegex.test(content);
-  };
-
-  // Helper function to get plain text from HTML content for copying
-  const getPlainTextContent = (content: string) => {
-    if (!containsHTML(content)) return content;
-
-    // Create a temporary div to extract text content
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = content;
-    return tempDiv.textContent || tempDiv.innerText || content;
-  };
-
-  const handleCopyContent = async () => {
-    if (!currentIdea?.content) return;
-
-    try {
-      const textToCopy = getPlainTextContent(currentIdea.content);
-      await navigator.clipboard.writeText(textToCopy);
-      toast.success("Conteúdo copiado!", {
-        description: "O texto do post foi copiado para a área de transferência",
-      });
-    } catch (error) {
-      console.error("Failed to copy text:", error);
-      toast.error("Erro ao copiar", {
-        description: "Não foi possível copiar o conteúdo",
-      });
-    }
-  };
-
-  const handleRegenerateIdea = async () => {
-    if (!currentIdea?.id) return;
-
-    setRegeneratingIdea(true);
-    try {
-      const { api } = await import("@/lib/api");
-
-      await api.post(`/api/v1/ideabank/ideas/${currentIdea.id}/edit/`, {
-        prompt: regeneratePrompt || "",
-      });
-
-      // Refetch the ideas to get updated content
-      await refetch();
-      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
-      queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
-      // Clear the prompt
-      setRegeneratePrompt("");
-
-      toast.success("Ideia regenerada!", {
-        description: "O conteúdo do post foi atualizado com sucesso",
-      });
-    } catch (error) {
-      console.error("Failed to regenerate idea:", error);
-
-      // Use the new AI error handler for content regeneration
-      const errorResult = handleContentGenerationError(error, "regenerate");
-
-      toast.error(errorResult.title, {
-        description: errorResult.description,
-      });
-    } finally {
-      setRegeneratingIdea(false);
-    }
-  };
-
-  const handleImageGeneration = async () => {
-    if (!currentIdea?.id) return;
-
-    setGeneratingImage(true);
-    try {
-      const { api } = await import("@/lib/api");
-
-      const hasImage = !!currentIdea.image_url;
-      const endpoint = hasImage
-        ? `/api/v1/ideabank/ideas/${currentIdea.id}/regenerate-image/`
-        : `/api/v1/ideabank/ideas/${currentIdea.id}/generate-image/`;
-
-      await api.post(endpoint, {
-        prompt: imagePrompt || "",
-      });
-
-      // Refetch the ideas to get updated image
-      await refetch();
-      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
-      queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
-      queryClient.invalidateQueries({ queryKey: ["post-ideas"] });
-      // Clear the prompt
-      setImagePrompt("");
-
-      const successMessage = hasImage ? "Imagem regenerada!" : "Imagem gerada!";
-      const successDescription = hasImage
-        ? "A imagem foi regenerada com sucesso"
-        : "A imagem foi gerada com sucesso";
-
-      toast.success(successMessage, {
-        description: successDescription,
-      });
-    } catch (error: unknown) {
-      console.error("Failed to generate/regenerate image:", error);
-
-      // Use the new AI error handler for image generation
-      const isRegeneration = !!currentIdea.image_url;
-      const errorResult = handleImageGenerationError(error, isRegeneration);
-
-      toast.error(errorResult.title, {
-        description: errorResult.description,
-      });
-    } finally {
-      setGeneratingImage(false);
-    }
-  };
-
-  const handleDownloadImage = async () => {
-    if (!currentIdea?.image_url) return;
-
-    setDownloadingImage(true);
-    try {
-      // Try to fetch with no-cors mode first
-      let response;
-      try {
-        response = await fetch(currentIdea.image_url, {
-          mode: "cors",
-          headers: {
-            Accept: "image/*",
-          },
-        });
-      } catch (corsError) {
-        console.log("CORS failed, trying alternative approach:", corsError);
-        // If CORS fails, use a different approach
-        await downloadImageFallback(
-          currentIdea.image_url,
-          `${post?.name || "post"}-image`
-        );
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${post?.name || "post"}-image.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
-      toast.success("Imagem baixada!", {
-        description: "A imagem foi salva em seus downloads",
-      });
-    } catch (error) {
-      console.error("Failed to download image:", error);
-
-      // Fallback: open image in new tab
-      toast.error("Download direto falhou", {
-        description: "Abrindo imagem em nova aba para download manual",
-      });
-
-      window.open(currentIdea.image_url, "_blank");
-    } finally {
-      setDownloadingImage(false);
-    }
-  };
-
-  const downloadImageFallback = async (imageUrl: string, filename: string) => {
-    try {
-      // Create a canvas to download the image
-      const img = document.createElement("img");
-      img.crossOrigin = "anonymous";
-
-      return new Promise<void>((resolve, reject) => {
-        img.onload = () => {
-          try {
-            const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            const ctx = canvas.getContext("2d");
-            if (!ctx) {
-              reject(new Error("Canvas context not available"));
-              return;
-            }
-
-            ctx.drawImage(img, 0, 0);
-
-            canvas.toBlob((blob) => {
-              if (!blob) {
-                reject(new Error("Failed to create blob"));
-                return;
-              }
-
-              const url = window.URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `${filename}.png`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              window.URL.revokeObjectURL(url);
-
-              toast.success("Imagem baixada!", {
-                description: "A imagem foi salva em seus downloads",
-              });
-              resolve();
-            }, "image/png");
-          } catch (canvasError) {
-            reject(canvasError);
-          }
-        };
-
-        img.onerror = () => {
-          reject(new Error("Failed to load image"));
-        };
-
-        img.src = imageUrl;
-      });
-    } catch (error) {
-      console.error("Canvas fallback failed:", error);
-      // Final fallback: just open in new tab
-      window.open(imageUrl, "_blank");
-      toast.info("Download indireto", {
-        description:
-          "Imagem aberta em nova aba. Use 'Salvar como' do navegador",
-      });
-    }
   };
 
   if (!post) return null;

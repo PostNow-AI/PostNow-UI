@@ -16,8 +16,6 @@ export const useOnboardingFlow = () => {
   // Onboarding is mandatory - only check if completed
   const needsOnboarding = !onboardingStatus?.onboarding_completed;
 
-  console.log("Onboarding Status:", onboardingStatus);
-
   return {
     onboardingStatus,
     isLoading,

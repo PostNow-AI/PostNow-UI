@@ -7,7 +7,6 @@ import {
   Trash2,
   Type,
 } from "lucide-react";
-import { useState } from "react";
 
 import {
   Badge,
@@ -18,57 +17,25 @@ import {
   Loader,
   Skeleton,
 } from "@/components/ui";
+import { usePostList } from "@/features/IdeaBank/hooks";
 import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
-import { usePosts } from "@/hooks/usePosts";
-import { type Post, postService } from "@/lib/services/postService";
 import { PostViewDialog } from "./PostViewDialog";
 
-interface Props {
-  setIsPostDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
+export const PostList = () => {
+  const { data: userSubscription } = useUserSubscription();
+  const {
+    posts,
+    isLoading,
+    error,
+    selectedPost,
+    isViewDialogOpen,
+    handlePostClick,
+    handleCloseViewDialog,
+    handleDeletePost,
+    isDeleting,
+  } = usePostList();
 
-export const PostList = ({ setIsPostDialogOpen }: Props) => {
-  const { data: posts, isLoading, error, refetch } = usePosts();
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
-  const { data: userSubscription, isLoading: isSubscriptionLoading } =
-    useUserSubscription();
-
-  // Check if user has an active subscription
   const hasActiveSubscription = userSubscription?.status === "active";
-  const handlePostClick = (post: Post) => {
-    setSelectedPost(post);
-    setIsViewDialogOpen(true);
-  };
-
-  const handleCloseViewDialog = () => {
-    setIsViewDialogOpen(false);
-    setSelectedPost(null);
-  };
-
-  const handleDeletePost = async (post: Post) => {
-    if (
-      !confirm(
-        `Tem certeza que deseja excluir o post "${
-          post.name || `Post ${post.id}`
-        }"?`
-      )
-    ) {
-      return;
-    }
-
-    setDeletingPostId(post.id);
-    try {
-      await postService.deletePost(post.id);
-      await refetch(); // Refresh the posts list
-    } catch (error) {
-      console.error("Error deleting post:", error);
-      alert("Erro ao excluir o post. Tente novamente.");
-    } finally {
-      setDeletingPostId(null);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -116,15 +83,8 @@ export const PostList = ({ setIsPostDialogOpen }: Props) => {
         <p className="text-sm text-slate-400 mb-6">
           Crie seu primeiro post para começar a gerar ideias com IA
         </p>
-        <Button
-          onClick={() =>
-            hasActiveSubscription ? setIsPostDialogOpen(true) : null
-          }
-          disabled={!hasActiveSubscription || isSubscriptionLoading}
-        >
-          {!hasActiveSubscription && !isSubscriptionLoading && (
-            <Lock className="h-4 w-4" />
-          )}
+        <Button disabled={!hasActiveSubscription}>
+          {!hasActiveSubscription && <Lock className="h-4 w-4" />}
           <Plus className="h-4 w-4" />
           Novo Post
         </Button>
@@ -134,7 +94,7 @@ export const PostList = ({ setIsPostDialogOpen }: Props) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {posts.map((post) => (
+      {posts?.map((post) => (
         <Card
           key={post.id}
           className={`transition-colors rounded-lg bg-background p-0 hover:bg-muted/50 relative flex flex-col h-full`}
@@ -217,10 +177,10 @@ export const PostList = ({ setIsPostDialogOpen }: Props) => {
                 variant="outline"
                 size="lg"
                 onClick={() => handleDeletePost(post)}
-                disabled={deletingPostId === post.id}
+                disabled={isDeleting}
                 title="Excluir post"
               >
-                {deletingPostId === post.id ? (
+                {isDeleting ? (
                   <Loader />
                 ) : (
                   <Trash2 className="text-destructive h-4 w-4" />
