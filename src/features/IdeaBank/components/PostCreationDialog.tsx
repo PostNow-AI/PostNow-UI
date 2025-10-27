@@ -135,7 +135,7 @@ export const PostCreationDialog = ({
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className="space-y-6 flex flex-col justify-center mt-5">
               {/* Basic Information */}
-              <Card className="max-w-160 w-full overflow-auto self-center justify-start">
+              <Card className="max-w-160 w-full overflow-auto self-center justify-start  max-h-[70vh]">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <ClipboardList className="text-primary" />
@@ -305,8 +305,8 @@ export const PostCreationDialog = ({
             >
               {isCreating ? (
                 <>
-                  Gerando...
                   <Loader2 className="h-4 w-4 animate-spin" />
+                  Gerando...
                 </>
               ) : (
                 <>

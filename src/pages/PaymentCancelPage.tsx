@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 
-const CreditCancelPage = () => {
+const PaymentCancelPage = () => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
@@ -63,4 +63,4 @@ const CreditCancelPage = () => {
   );
 };
 
-export default CreditCancelPage;
+export default PaymentCancelPage;

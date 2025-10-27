@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 
-const CreditSuccessPage = () => {
+const PaymentSuccessPage = () => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(10);
 
@@ -78,4 +78,4 @@ const CreditSuccessPage = () => {
   );
 };
 
-export default CreditSuccessPage;
+export default PaymentSuccessPage;

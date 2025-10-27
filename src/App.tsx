@@ -11,9 +11,7 @@ import { PublicRoute } from "./components/PublicRoute";
 import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
-import CreditCancelPage from "./pages/CreditCancelPage";
 import CreditsPage from "./pages/CreditsPage";
-import CreditSuccessPage from "./pages/CreditSuccessPage";
 import EmailSentPage from "./pages/EmailSentPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
@@ -21,11 +19,11 @@ import { IdeaBankPage } from "./pages/IdeaBankPage";
 import LoginPage from "./pages/LoginPage";
 import PasswordResetConfirmPage from "./pages/PasswordResetConfirmPage";
 import PasswordResetRequestPage from "./pages/PasswordResetRequestPage";
+import PaymentCancelPage from "./pages/PaymentCancelPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
-import SubscriptionCancelPage from "./pages/SubscriptionCancelPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
-import SubscriptionSuccessPage from "./pages/SubscriptionSuccessPage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -100,18 +98,14 @@ const App = () => {
                 }
               />
 
-              {/* Credit system routes */}
-              <Route path="/credits/success" element={<CreditSuccessPage />} />
-              <Route path="/credits/cancel" element={<CreditCancelPage />} />
-
               {/* Subscription system routes */}
               <Route
                 path="/subscription/success"
-                element={<SubscriptionSuccessPage />}
+                element={<PaymentSuccessPage />}
               />
               <Route
                 path="/subscription/cancel"
-                element={<SubscriptionCancelPage />}
+                element={<PaymentCancelPage />}
               />
 
               {/* Protected routes with shared layout */}
