@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle, CreditCard, Home } from "lucide-react";
+import { ArrowRight, Home, Verified } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
@@ -17,7 +17,7 @@ const CreditSuccessPage = () => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          navigate("/credits");
+          navigate("/ideabank");
           return 0;
         }
         return prev - 1;
@@ -36,34 +36,24 @@ const CreditSuccessPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md text-center">
-        <CardHeader className="pb-4">
-          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Verified className="w-8 h-8 text-lime-600" />
+            <CardTitle className="text-2xl text-white">
+              Pagamento Confirmado!
+            </CardTitle>
           </div>
-          <CardTitle className="text-2xl text-green-800">
-            Pagamento Confirmado!
-          </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <p className="text-green-700 font-medium">
+            <p className="text-primary-light font-medium">
               Seus créditos foram adicionados com sucesso!
             </p>
             <p className="text-sm text-muted-foreground">
               Você será redirecionado automaticamente em {countdown} segundos
-            </p>
-          </div>
-
-          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-            <div className="flex items-center justify-center space-x-2 text-green-700">
-              <CreditCard className="w-5 h-5" />
-              <span className="font-medium">Créditos Disponíveis</span>
-            </div>
-            <p className="text-sm text-green-600 mt-1">
-              Acesse sua conta para ver o novo saldo
             </p>
           </div>
 
@@ -81,7 +71,6 @@ const CreditSuccessPage = () => {
 
           <div className="text-xs text-muted-foreground">
             <p>Recebemos sua confirmação de pagamento</p>
-            <p>Um email de confirmação foi enviado para você</p>
           </div>
         </CardContent>
       </Card>
