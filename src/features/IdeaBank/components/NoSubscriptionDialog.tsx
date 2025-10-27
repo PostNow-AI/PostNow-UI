@@ -73,7 +73,7 @@ export const NoSubscriptionDialog = () => {
               </>
             ) : (
               <>
-                <Loader2 /> Processando...
+                <Loader2 className="animate-spin" /> Processando...
               </>
             )}
           </Button>

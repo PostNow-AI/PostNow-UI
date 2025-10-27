@@ -1,8 +1,10 @@
 import { LoadingPage } from "@/components";
 import { BlurryBackground } from "@/components/ui/blurry-background";
 import { OnboardingComplete } from "@/features/Auth/Onboarding/components/OnboardingComplete";
+import { useOnboardingFlow } from "@/features/Auth/Onboarding/hooks/useOnboardingFlow";
 import { OnboardingForm } from "@/features/Auth/Onboarding/OnboardingForm";
-import { useOnboardingFlow } from "@/hooks";
+import { NoSubscriptionDialog } from "@/features/IdeaBank/components/NoSubscriptionDialog";
+import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface OnboardingContextType {
@@ -27,6 +29,10 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   const { isLoading, needsOnboarding } = useOnboardingFlow();
   const [openOnboarding, setOpenOnboarding] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const { data: userSubscription, isLoading: isSubscriptionLoading } =
+    useUserSubscription();
+
+  const hasActiveSubscription = userSubscription?.status === "active";
 
   useEffect(() => {
     if (!isLoading && needsOnboarding === true) {
@@ -39,7 +45,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
     setOpenOnboarding(false);
   };
 
-  if (isLoading) {
+  if (isLoading || isSubscriptionLoading) {
     return <LoadingPage />;
   }
 
@@ -54,21 +60,23 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
         setShowSuccessDialog,
       }}
     >
-      {openOnboarding ? (
-        <BlurryBackground variant="2">
+      <BlurryBackground variant="2">
+        {openOnboarding ? (
           <OnboardingForm />
-        </BlurryBackground>
-      ) : (
-        <>
-          {children}
-          {showSuccessDialog && (
-            <OnboardingComplete
-              handleSuccessDialogClose={handleSuccessDialogClose}
-              showSuccessDialog={showSuccessDialog}
-            />
-          )}{" "}
-        </>
-      )}
+        ) : (
+          <>
+            {children}
+            {showSuccessDialog && (
+              <OnboardingComplete
+                handleSuccessDialogClose={handleSuccessDialogClose}
+                showSuccessDialog={showSuccessDialog}
+              />
+            )}{" "}
+          </>
+        )}
+      </BlurryBackground>
+
+      {!hasActiveSubscription && <NoSubscriptionDialog />}
     </OnboardingContext.Provider>
   );
 };

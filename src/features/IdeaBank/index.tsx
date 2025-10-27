@@ -8,21 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import { Lock, Plus } from "lucide-react";
-import { NoSubscriptionDialog } from "./components/NoSubscriptionDialog";
 import { usePostList } from "./hooks";
 
 export const IdeaBank = () => {
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
+  const { isLoading: isPostsLoading } = usePostList();
 
   const { data: userSubscription, isLoading: isSubscriptionLoading } =
     useUserSubscription();
 
-  const { isLoading: isPostsLoading } = usePostList();
-
   const hasActiveSubscription = userSubscription?.status === "active";
 
   const handlePostCreated = () => {
-    // The PostList component will handle showing the view dialog internally
     setIsPostDialogOpen(false);
   };
 
@@ -77,10 +74,8 @@ export const IdeaBank = () => {
             </CardContent>
           </Card>
         </div>
-      ) : hasActiveSubscription ? (
-        <PostList />
       ) : (
-        <NoSubscriptionDialog />
+        <PostList />
       )}
 
       {hasActiveSubscription && (

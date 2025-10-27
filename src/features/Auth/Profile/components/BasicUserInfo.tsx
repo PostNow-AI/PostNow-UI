@@ -8,8 +8,8 @@ import {
 } from "@/components/ui";
 import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
 import { useProfileEdits } from "@/features/Auth/Profile/hooks/useProfileEdits";
+import { useUserForm } from "@/features/Auth/Profile/hooks/useUserForm";
 import { useAuth } from "@/hooks/useAuth";
-import { useUserForm } from "@/hooks/useUserForm";
 import { api } from "@/lib/api";
 import { type User } from "@/types/auth";
 import { useEffect, useState } from "react";

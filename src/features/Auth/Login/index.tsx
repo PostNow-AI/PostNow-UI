@@ -11,10 +11,10 @@ import {
   Loader,
 } from "@/components/ui";
 import { BetaLogo } from "@/components/ui/beta-logo";
-import { useLogin } from "@/hooks";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useLogin } from "./hooks/useLogin";
 
 export const Login = () => {
   const { form, isLoading, onSubmit, handleGoogleLogin } = useLogin();
