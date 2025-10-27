@@ -9,6 +9,7 @@ import {
   Label,
   Loader,
 } from "@/components/ui";
+import { BetaLogo } from "@/components/ui/beta-logo";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -27,14 +28,10 @@ export const PasswordResetConfirm = () => {
 
   if (!isValidParams) {
     return (
-      <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
+      <div className="relative flex min-h-screen items-center justify-center px-4">
         <Card className="max-w-md w-full">
           <CardHeader className="text-center">
-            <img
-              src="/postnow_logo_black.svg"
-              alt="Logo"
-              className="mx-auto mb-4 w-[138px] h-10"
-            />
+            <BetaLogo />
             <CardTitle className="text-3xl font-bold">Link inválido</CardTitle>
             <CardDescription>
               O link de redefinição de senha é inválido ou expirou.
@@ -57,14 +54,10 @@ export const PasswordResetConfirm = () => {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
+    <div className="relative flex min-h-screen items-center justify-center px-4">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <img
-            src="/postnow_logo_white.svg"
-            alt="Logo"
-            className="mx-auto mb-4 w-[138px] h-10"
-          />
+          <BetaLogo />
           <CardTitle className="text-3xl font-bold">Redefinir senha</CardTitle>
           <CardDescription>Digite sua nova senha abaixo</CardDescription>
         </CardHeader>
@@ -84,7 +77,7 @@ export const PasswordResetConfirm = () => {
                   variant="ghost"
                   type="button"
                   onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-2 top-10 -translate-y-1/2 text-muted-foreground text-sm"
+                  className="absolute right-2 top-10.5 -translate-y-1/2 text-muted-foreground text-sm"
                 >
                   {showNewPassword ? <EyeClosed /> : <Eye />}
                 </Button>
@@ -109,7 +102,7 @@ export const PasswordResetConfirm = () => {
                   variant="ghost"
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-2 top-10 -translate-y-1/2 text-muted-foreground text-sm"
+                  className="absolute right-2 top-10.5 -translate-y-1/2 text-muted-foreground text-sm"
                 >
                   {showConfirmPassword ? <EyeClosed /> : <Eye />}
                 </Button>

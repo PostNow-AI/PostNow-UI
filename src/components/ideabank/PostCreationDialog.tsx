@@ -129,8 +129,8 @@ export const PostCreationDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="max-w-6xl max-h-[95vh]"
-        style={{ width: "95vw", maxWidth: "1400px" }}
+        className="max-w-6xl max-h-[90vh] h-[90vh] flex flex-col"
+        style={{ width: "95vw", maxWidth: "1200px" }}
       >
         <DialogHeader className="px-0">
           <DialogTitle className="flex items-center gap-2">
@@ -140,9 +140,9 @@ export const PostCreationDialog = ({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <div className="space-y-6 mt-4 flex flex-col justify-center">
+            <div className="space-y-6 flex flex-col justify-center mt-5">
               {/* Basic Information */}
-              <Card className="max-w-160 w-full overflow-auto max-h-[60vh] self-center">
+              <Card className="max-w-160 w-full overflow-auto self-center justify-start">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <ClipboardList className="text-primary" />
@@ -283,7 +283,7 @@ export const PostCreationDialog = ({
                         <FormControl>
                           <Textarea
                             placeholder="Descreva os interesses, hobbies, problemas e comportamentos do seu público (ex: entusiastas de fitness, profissionais ocupados, consumidores conscientes), adicione observações sobre o tom do post, estilo, voz da marca, ou qualquer outro detalhe relevante que ajude a personalizar a ideia do post."
-                            rows={3}
+                            rows={6}
                             {...field}
                             value={field.value || ""}
                           />
@@ -298,25 +298,32 @@ export const PostCreationDialog = ({
                   />
                 </CardContent>
               </Card>
-              <Separator className="absolute left-0 right-0 bottom-9 w-full" />
-              <div className="flex justify-end gap-3">
-                <Button type="submit" disabled={isLoading} className="min-w-32">
-                  {isLoading ? (
-                    <>
-                      Gerando...
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    </>
-                  ) : (
-                    <>
-                      Gerar Ideia
-                      <ChevronRight className="h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              </div>
             </div>
           </form>
         </Form>
+        <div className="bottom-0 left-0 right-0 absolute flex flex-col">
+          <Separator className="w-full" />
+          <div className="flex justify-end gap-3 m-4">
+            <Button
+              type="button"
+              onClick={form.handleSubmit(handleSubmit)}
+              disabled={isLoading}
+              className="min-w-32"
+            >
+              {isLoading ? (
+                <>
+                  Gerando...
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                <>
+                  Gerar Ideia
+                  <ChevronRight className="h-4 w-4" />
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

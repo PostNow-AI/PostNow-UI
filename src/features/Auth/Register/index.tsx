@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Card,
   CardContent,
@@ -8,8 +7,8 @@ import {
   CardTitle,
   Input,
   Label,
-  useTheme,
 } from "@/components/ui";
+import { BetaLogo } from "@/components/ui/beta-logo";
 import { Loader } from "@/components/ui/loader";
 import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
 import { useRegister } from "@/features/Auth/Register/hooks/useRegister";
@@ -26,24 +25,12 @@ export const Register = () => {
   } = form;
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { actualTheme } = useTheme();
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
+    <div className="relative flex min-h-screen items-center justify-center px-4 ">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <div className="flex flex-col items-center mb-4 gap-2">
-            <img
-              src={
-                actualTheme === "dark"
-                  ? "/postnow_logo_white.svg"
-                  : "/postnow_logo_black.svg"
-              }
-              alt="Logo"
-              className="mx-auto max-w-[138px] h-10"
-            />
-            <Badge>BETA</Badge>
-          </div>
+          <BetaLogo />
           <CardTitle className="text-3xl font-bold">Criar Conta</CardTitle>
           <CardDescription>Cadastre-se para começar</CardDescription>
         </CardHeader>
@@ -110,7 +97,7 @@ export const Register = () => {
                   variant="ghost"
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-10 -translate-y-1/2 text-muted-foreground text-sm"
+                  className="absolute right-2 top-10.5 -translate-y-1/2 text-muted-foreground text-sm"
                 >
                   {showPassword ? <EyeClosed /> : <Eye />}
                 </Button>
@@ -135,7 +122,7 @@ export const Register = () => {
                   variant="ghost"
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-2 top-10 -translate-y-1/2 text-muted-foreground text-sm"
+                  className="absolute right-2 top-10.5 -translate-y-1/2 text-muted-foreground text-sm"
                 >
                   {showConfirmPassword ? <EyeClosed /> : <Eye />}
                 </Button>
@@ -166,7 +153,7 @@ export const Register = () => {
 
             <GoogleOAuthButton
               onClick={handleGoogleRegister}
-              className="w-full"
+              className="w-full mx-auto"
             >
               Continuar com Google
             </GoogleOAuthButton>

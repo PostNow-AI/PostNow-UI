@@ -98,19 +98,11 @@ export function AppSidebar() {
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
                         asChild
-                        style={
-                          isActive
-                            ? {
-                                backgroundColor: "var(--color-primary)",
-                                fontWeight: "500",
-                              }
-                            : {}
-                        }
                         className={`transition-all duration-200 ${
                           isActive
                             ? `${
                                 actualTheme === "dark"
-                                  ? "!bg-primary"
+                                  ? "!bg-gradient-to-r from-primary to-primary-strong"
                                   : "!bg-primary/30"
                               } hover:!bg-primary/30 !font-medium`
                             : "hover:bg-primary/30 hover:text-sidebar-accent-foreground active:bg-sidebar-accent/50"

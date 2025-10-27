@@ -1,4 +1,12 @@
-import { Calendar, Edit2, Trash2, Type } from "lucide-react";
+import {
+  Calendar,
+  ClipboardList,
+  Edit2,
+  Lock,
+  Plus,
+  Trash2,
+  Type,
+} from "lucide-react";
 import { useState } from "react";
 
 import {
@@ -10,16 +18,25 @@ import {
   Loader,
   Skeleton,
 } from "@/components/ui";
+import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import { usePosts } from "@/hooks/usePosts";
 import { type Post, postService } from "@/lib/services/postService";
 import { PostViewDialog } from "./PostViewDialog";
 
-export const PostList = () => {
+interface Props {
+  setIsPostDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const PostList = ({ setIsPostDialogOpen }: Props) => {
   const { data: posts, isLoading, error, refetch } = usePosts();
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [deletingPostId, setDeletingPostId] = useState<number | null>(null);
+  const { data: userSubscription, isLoading: isSubscriptionLoading } =
+    useUserSubscription();
 
+  // Check if user has an active subscription
+  const hasActiveSubscription = userSubscription?.status === "active";
   const handlePostClick = (post: Post) => {
     setSelectedPost(post);
     setIsViewDialogOpen(true);
@@ -93,17 +110,25 @@ export const PostList = () => {
 
   if (!posts || posts.length === 0) {
     return (
-      <Card>
-        <CardContent className="pt-6 text-center">
-          <div className="text-muted-foreground">
-            <Type className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">Nenhum post encontrado</p>
-            <p className="text-sm">
-              Crie seu primeiro post para começar a gerar ideias com IA
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="mt-30 flex-col items-center justify-center text-center p-4">
+        <ClipboardList className="h-12 w-12 mx-auto text-primary-light mb-4" />
+        <p className="text-xl font-bold mb-2">Crie seu primeiro post</p>
+        <p className="text-sm text-slate-400 mb-6">
+          Crie seu primeiro post para começar a gerar ideias com IA
+        </p>
+        <Button
+          onClick={() =>
+            hasActiveSubscription ? setIsPostDialogOpen(true) : null
+          }
+          disabled={!hasActiveSubscription || isSubscriptionLoading}
+        >
+          {!hasActiveSubscription && !isSubscriptionLoading && (
+            <Lock className="h-4 w-4" />
+          )}
+          <Plus className="h-4 w-4" />
+          Novo Post
+        </Button>
+      </div>
     );
   }
 

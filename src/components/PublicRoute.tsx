@@ -1,6 +1,7 @@
 import { LoadingPage } from "@/components/ui/loading";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate, useLocation } from "react-router-dom";
+import { BlurryBackground } from "./ui/blurry-background";
 
 interface PublicRouteProps {
   children: React.ReactNode;
@@ -26,5 +27,5 @@ export function PublicRoute({
   }
 
   // Render the public component if not authenticated
-  return <>{children}</>;
+  return <BlurryBackground variant="1">{children}</BlurryBackground>;
 }

@@ -9,6 +9,7 @@ import {
   Label,
   Loader,
 } from "@/components/ui";
+import { BetaLogo } from "@/components/ui/beta-logo";
 import { Link } from "react-router-dom";
 import { usePasswordResetRequest } from "../hooks";
 
@@ -21,14 +22,10 @@ export const PasswordResetRequest = () => {
   } = form;
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
+    <div className="relative flex min-h-screen items-center justify-center px-4">
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
-          <img
-            src="/postnow_logo_white.svg"
-            alt="Logo"
-            className="mx-auto mb-4 w-[138px] h-10"
-          />
+          <BetaLogo />
           <CardTitle className="text-3xl font-bold">
             Esqueci minha senha
           </CardTitle>

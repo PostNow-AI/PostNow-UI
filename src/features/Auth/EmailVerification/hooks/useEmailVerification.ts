@@ -36,10 +36,10 @@ export const useEmailVerification = (): UseEmailVerificationReturn => {
           duration: 3000,
         });
 
-        // Redirect to login after 2 seconds
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
+        // // Redirect to login after 2 seconds
+        // setTimeout(() => {
+        //   handleNavigateToLogin();
+        // }, 2000);
       } else {
         toast.error("Erro na verificação", {
           description: result.message || "Falha ao verificar o email.",

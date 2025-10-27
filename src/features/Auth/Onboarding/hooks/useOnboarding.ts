@@ -19,9 +19,10 @@ import {
 
 export const useOnboarding = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const { setOpenOnboarding } = useOnboardingContext();
+  const { setOpenOnboarding, setShowSuccessDialog } = useOnboardingContext();
   const [previouslyCompletedForm, setPreviouslyCompletedForm] =
     useState<OnboardingFormData | null>(null);
+  const percentage = (currentStep / 3) * 100;
 
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
@@ -131,8 +132,10 @@ export const useOnboarding = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
-      toast.success("Perfil configurado com sucesso!");
       setOpenOnboarding(false);
+      if (!previouslyCompletedForm) {
+        setShowSuccessDialog(true);
+      }
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
@@ -165,7 +168,6 @@ export const useOnboarding = () => {
   });
 
   const handleFormSubmit = async (data: OnboardingFormData) => {
-    console.log("Submitting onboarding form with data:", data);
     setIsSubmitting(true);
     try {
       await onboardingMutation.mutateAsync(data);
@@ -183,5 +185,6 @@ export const useOnboarding = () => {
     handlePrevStep,
     previouslyCompletedForm,
     completeOnboardingMutation,
+    percentage,
   };
 };

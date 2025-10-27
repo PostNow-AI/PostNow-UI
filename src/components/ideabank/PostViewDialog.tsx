@@ -1,11 +1,12 @@
 import parse from "html-react-parser";
 import {
-  ChevronRight,
+  Check,
   Copy,
   FileText,
   Image,
   Import,
   MessageSquare,
+  RefreshCw,
   Sparkles,
 } from "lucide-react";
 import { useState } from "react";
@@ -302,7 +303,7 @@ export const PostViewDialog = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         className="max-h-[90vh] flex flex-col"
-        style={{ width: "95vw", maxWidth: "1400px" }}
+        style={{ width: "95vw", maxWidth: "1200px" }}
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 ">
@@ -372,7 +373,7 @@ export const PostViewDialog = ({
                         <Textarea
                           value={currentIdea.content}
                           readOnly
-                          className="min-h-[400px] resize-none font-mono text-sm"
+                          className="min-h-[400px] bg-background! resize-none font-mono text-sm"
                           placeholder="Nenhum conteúdo disponível"
                         />
                       )}
@@ -382,7 +383,7 @@ export const PostViewDialog = ({
                         className="w-full"
                         variant={"outline"}
                       >
-                        <Sparkles
+                        <RefreshCw
                           className={`h-4 w-4 mr-2 ${
                             regeneratingIdea ? "animate-spin" : ""
                           }`}
@@ -403,7 +404,7 @@ export const PostViewDialog = ({
                       </div>
                     </div>
                   )}
-                  <Card>
+                  <Card className="bg-background">
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Sparkles className="text-primary h-4 w-4" />
@@ -499,7 +500,7 @@ export const PostViewDialog = ({
                     className="w-full"
                     variant={currentIdea?.image_url ? "outline" : "default"}
                   >
-                    <Sparkles
+                    <RefreshCw
                       className={`h-4 w-4 mr-2 ${
                         generatingImage ? "animate-spin" : ""
                       }`}
@@ -510,7 +511,7 @@ export const PostViewDialog = ({
                       ? "Gerar imagem novamente"
                       : "Gerar imagem"}
                   </Button>
-                  <Card>
+                  <Card className="bg-background">
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Sparkles className="h-4 w-4 text-primary" />
@@ -556,7 +557,7 @@ export const PostViewDialog = ({
         <Separator className="absolute left-0 right-0 bottom-17 w-full" />
         <div className="flex justify-end pt-4">
           <Button onClick={onClose}>
-            Finalizar post <ChevronRight className="h-4 w-4" />
+            Salvar post <Check className="h-4 w-4" />
           </Button>
         </div>
       </DialogContent>

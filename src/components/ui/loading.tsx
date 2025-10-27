@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { BetaLogo } from "./beta-logo";
+import { BlurryBackground } from "./blurry-background";
 
 interface LoadingProps {
   className?: string;
@@ -44,16 +46,19 @@ interface LoadingPageProps {
 
 function LoadingPage({ text, className }: LoadingPageProps) {
   return (
-    <div
-      className={cn(
-        "flex min-h-[93vh] flex-col items-center justify-center bg-background from-blue-50 to-indigo-100",
-        className
-      )}
-    >
-      <div className="max-w-md w-full bg-card rounded-lg shadow-lg p-8 text-center">
-        <Loading size="lg" text={text} />
+    <BlurryBackground variant="1">
+      <div
+        className={cn(
+          "px-4 flex min-h-[93vh] flex-col items-center justify-center",
+          className
+        )}
+      >
+        <div className="max-w-md w-full bg-card rounded-lg space-y-2 shadow-lg p-8 text-center">
+          <BetaLogo />
+          <Loading size="lg" text={text} />
+        </div>
       </div>
-    </div>
+    </BlurryBackground>
   );
 }
 

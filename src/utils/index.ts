@@ -20,3 +20,10 @@ export const phoneMask = (phone: string) => {
 
   return value;
 };
+
+export const formatToBRL = (amount: number) => {
+  return amount.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};

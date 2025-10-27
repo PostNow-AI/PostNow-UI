@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Card,
   CardContent,
@@ -10,8 +9,8 @@ import {
   Input,
   Label,
   Loader,
-  useTheme,
 } from "@/components/ui";
+import { BetaLogo } from "@/components/ui/beta-logo";
 import { useLogin } from "@/hooks";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
@@ -25,24 +24,12 @@ export const Login = () => {
     formState: { errors },
   } = form;
   const [showPassword, setShowPassword] = useState(false);
-  const { actualTheme } = useTheme();
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 bg-primary-foreground from-background to-muted">
-      <Card className="max-w-md w-full">
+    <div className="relative flex min-h-screen items-center justify-center px-4">
+      <Card className="max-w-md w-111">
         <CardHeader className="text-center">
-          <div className="flex flex-col items-center mb-4 gap-2">
-            <img
-              src={
-                actualTheme === "dark"
-                  ? "/postnow_logo_white.svg"
-                  : "/postnow_logo_black.svg"
-              }
-              alt="Logo"
-              className="mx-auto max-w-[138px] h-10"
-            />
-            <Badge>BETA</Badge>
-          </div>
+          <BetaLogo />
           <CardTitle className="text-3xl font-bold">Faça seu login </CardTitle>
           <CardDescription>
             Digite seu email e senha para entrar em sua conta
@@ -51,7 +38,7 @@ export const Login = () => {
 
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="email">Endereço de Email</Label>
               <Input
                 {...register("email")}
@@ -67,7 +54,7 @@ export const Login = () => {
             </div>
 
             <div className="relative">
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="password">Senha</Label>
                 <Input
                   {...register("password")}
@@ -91,12 +78,20 @@ export const Login = () => {
               </div>
             </div>
 
+            <p className="w-full text-sm text-muted-foreground mt-2 text-right">
+              <Link
+                to="/forgot-password"
+                className="font-medium text-primary-light hover:text-primary/80 transition-colors"
+              >
+                Esqueci a senha
+              </Link>
+            </p>
             <Button type="submit" disabled={isLoading} className="w-full">
               {isLoading ? <Loader /> : "Entrar"}
             </Button>
           </form>
 
-          <div className="mt-6 space-y-6">
+          <div className="mt-6 space-y-6 ">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-border" />
@@ -108,7 +103,10 @@ export const Login = () => {
               </div>
             </div>
 
-            <GoogleOAuthButton onClick={handleGoogleLogin} className="w-full">
+            <GoogleOAuthButton
+              onClick={handleGoogleLogin}
+              className="mx-auto w-full"
+            >
               Continuar com Google
             </GoogleOAuthButton>
           </div>
@@ -119,17 +117,9 @@ export const Login = () => {
                 Não tem uma conta?{" "}
                 <Link
                   to="/register"
-                  className="font-medium text-primary hover:text-primary/80 transition-colors"
+                  className="font-medium text-primary-light hover:text-primary/80 transition-colors"
                 >
                   Cadastre-se
-                </Link>
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                <Link
-                  to="/forgot-password"
-                  className="font-medium text-primary hover:text-primary/80 transition-colors"
-                >
-                  Esqueci a senha
                 </Link>
               </p>
             </div>

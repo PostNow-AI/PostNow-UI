@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 interface GoogleOAuthButtonProps {
   onClick: () => void;
   disabled?: boolean;
-  variant?: "default" | "outline";
   className?: string;
   children?: React.ReactNode;
 }
@@ -11,17 +10,18 @@ interface GoogleOAuthButtonProps {
 export function GoogleOAuthButton({
   onClick,
   disabled,
-  variant = "outline",
   className,
   children,
 }: GoogleOAuthButtonProps) {
   return (
     <Button
-      type="button"
-      variant={variant}
+      variant={"white"}
+      size={"sm"}
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center justify-center gap-2 ${className || ""}`}
+      className={`max-w-95 flex items-center bg-white justify-center gap-2 ${
+        className || ""
+      }`}
     >
       <svg className="w-5 h-5" viewBox="0 0 24 24">
         <path

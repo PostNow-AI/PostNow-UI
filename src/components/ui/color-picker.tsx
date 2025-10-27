@@ -79,7 +79,7 @@ export const ColorPicker = ({
           <Button
             variant="outline"
             disabled={disabled}
-            className="w-[40px] h-10 p-0 border-0 rounded-4xl"
+            className="w-[40px] h-10 p-0 border-0 rounded-4xl disabled:opacity-100"
             style={{ backgroundColor: value || "#f3f4f6" }}
           >
             <span className="sr-only">Selecionar cor</span>

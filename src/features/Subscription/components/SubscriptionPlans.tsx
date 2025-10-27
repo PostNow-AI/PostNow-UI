@@ -1,4 +1,5 @@
 import { Button } from "@/components";
+import { formatToBRL } from "@/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "../../../components/ui/badge";
@@ -214,7 +215,7 @@ export const SubscriptionPlans = () => {
                 </div>
                 <div className="mt-4">
                   <div className="text-3xl font-bold text-primary">
-                    R$ {monthlyPrice.toFixed(2)}/mês
+                    {formatToBRL(monthlyPrice)}/mês
                   </div>
 
                   {plan.interval !== "lifetime" && (
