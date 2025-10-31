@@ -143,12 +143,14 @@ export const PostList = () => {
           </div>
           {post?.ideas && post.ideas.length > 0 && (
             <p className="text-sm px-4 text-muted-foreground line-clamp-8 text-ellipsis">
-              {post.ideas[post.ideas.length - 1].content.length > 100
-                ? `${post.ideas[post.ideas.length - 1].content.substring(
-                    0,
-                    200
-                  )}...`
-                : post.ideas[post.ideas.length - 1].content}
+              {(() => {
+                const content = post.ideas[post.ideas.length - 1].content;
+                // Strip HTML tags
+                const strippedContent = content.replace(/<[^>]*>/g, "").trim();
+                return strippedContent.length > 100
+                  ? `${strippedContent.substring(0, 200)}...`
+                  : strippedContent;
+              })()}
             </p>
           )}
           <div className="flex flex-col px-4 pb-4 mt-auto gap-4">

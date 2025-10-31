@@ -34,8 +34,11 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
     if (!currentIdea?.content) return;
 
     try {
-      const textToCopy = currentIdea.content;
-      await navigator.clipboard.writeText(textToCopy);
+      // Strip HTML tags from content before copying
+      const strippedContent = currentIdea.content
+        .replace(/<[^>]*>/g, "")
+        .trim();
+      await navigator.clipboard.writeText(strippedContent);
       toast.success("Conteúdo copiado!", {
         description: "O texto do post foi copiado para a área de transferência",
       });
