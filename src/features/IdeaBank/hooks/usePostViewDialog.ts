@@ -147,7 +147,10 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
         try {
           downloadUrl = await generateCompositeImage(
             currentIdea.image_url,
-            currentIdea.image_text
+            currentIdea?.image_text
+              ? JSON.parse(currentIdea?.image_text as unknown as string)
+                  ?.feed_image_text
+              : undefined
           );
           filename = `${post?.name || "post"}-with-text.png`;
         } catch {
