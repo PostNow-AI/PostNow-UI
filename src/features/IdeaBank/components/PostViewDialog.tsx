@@ -2,6 +2,8 @@ import parse from "html-react-parser";
 import {
   Check,
   Copy,
+  Eye,
+  EyeOff,
   FileText,
   Image,
   Import,
@@ -27,6 +29,7 @@ import {
 } from "@/components/ui";
 import { usePostViewDialog } from "@/features/IdeaBank/hooks";
 import { type Post } from "@/features/IdeaBank/types";
+import { ImageTextOverlay } from "./ImageTextOverlay";
 
 interface PostViewDialogProps {
   isOpen: boolean;
@@ -47,12 +50,14 @@ export const PostViewDialog = ({
     downloadingImage,
     regeneratePrompt,
     imagePrompt,
+    showTextOverlay,
     setRegeneratePrompt,
     setImagePrompt,
     handleCopyContent,
     handleRegenerateIdea,
     handleImageGeneration,
     handleDownloadImage,
+    setShowTextOverlay,
   } = usePostViewDialog(post, isOpen);
 
   // Helper function to detect if content contains HTML
@@ -61,6 +66,16 @@ export const PostViewDialog = ({
     return htmlRegex.test(content);
   };
 
+  // Get the image text data directly - it's already structured JSON
+  const imageText =
+    (currentIdea?.image_text
+      ? JSON.parse(currentIdea?.image_text as unknown as string)
+      : {}) || {};
+  const imageTextData = currentIdea?.image_text
+    ? imageText.feed_image_text
+    : {};
+
+  console.log("Image Text Data:", imageTextData);
   if (!post) return null;
 
   return (
@@ -223,30 +238,63 @@ export const PostViewDialog = ({
                           : "Baixe sua imagem ou gere uma nova"}
                       </CardDescription>
                     </div>
-                    {currentIdea?.image_url && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleDownloadImage}
-                        disabled={downloadingImage}
-                        className="shrink-0 text-muted-foreground"
-                        title="Tentar download direto. Se falhar, abrirá em nova aba."
-                      >
-                        {downloadingImage ? "Baixando..." : "Baixar"}
-                        <Import className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <div className="flex gap-2">
+                      {currentIdea?.image_url && imageTextData && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowTextOverlay(!showTextOverlay)}
+                          className="shrink-0 text-muted-foreground"
+                          title={
+                            showTextOverlay ? "Ocultar texto" : "Mostrar texto"
+                          }
+                        >
+                          {showTextOverlay ? (
+                            <>
+                              <EyeOff className="h-4 w-4" />
+                              Ocultar texto
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="h-4 w-4" />
+                              Mostrar texto
+                            </>
+                          )}
+                        </Button>
+                      )}
+                      {currentIdea?.image_url && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleDownloadImage}
+                          disabled={downloadingImage}
+                          className="shrink-0 text-muted-foreground"
+                          title="Tentar download direto. Se falhar, abrirá em nova aba."
+                        >
+                          {downloadingImage ? "Baixando..." : "Baixar"}
+                          <Import className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   <Separator />
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {currentIdea?.image_url ? (
                     <div className="space-y-3">
-                      <img
-                        src={currentIdea.image_url}
-                        alt={`Imagem para ${post.name}`}
-                        className="w-full  object-cover rounded-md border transition-transform"
-                      />
+                      {imageTextData && showTextOverlay ? (
+                        <ImageTextOverlay
+                          imageUrl={currentIdea.image_url}
+                          imageTextData={imageTextData}
+                          className="w-full object-cover rounded-md border transition-transform h-full"
+                        />
+                      ) : (
+                        <img
+                          src={currentIdea.image_url}
+                          alt={`Imagem para ${post.name}`}
+                          className="w-full object-cover rounded-md border transition-transform"
+                        />
+                      )}
                     </div>
                   ) : (
                     <div className="min-h-[269px] border border-primary rounded-sm flex items-center justify-center text-muted-foreground">

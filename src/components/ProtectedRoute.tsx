@@ -17,7 +17,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Redirect to login if not authenticated, preserving the intended destination
   if (!isAuthenticated) {
-    console.log("aqui");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

@@ -14,6 +14,7 @@ import { OnboardingProvider } from "./contexts/OnboardingContext";
 import CreditsPage from "./pages/CreditsPage";
 import EmailSentPage from "./pages/EmailSentPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
+import { FontTesterPage } from "./pages/FontTesterPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
 import LoginPage from "./pages/LoginPage";
@@ -120,6 +121,7 @@ const App = () => {
               >
                 <Route path="/ideabank" element={<IdeaBankPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/font-tester" element={<FontTesterPage />} />
 
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />

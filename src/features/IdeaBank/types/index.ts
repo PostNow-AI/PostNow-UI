@@ -32,6 +32,46 @@ export interface PostIdea {
   created_at: string;
   updated_at: string;
   post_id: number;
+  image_text: { feed_image_text: ImageTextData | null };
+}
+
+export interface ImageTextElement {
+  text?: string;
+  color?: string;
+  typography?: {
+    font_size?: string;
+    font_family?: string;
+    font_weight?: string;
+    line_height?: string;
+    letter_spacing?: string;
+  };
+  position?: {
+    top?: string;
+    left?: string;
+    right?: string;
+    bottom?: string;
+    padding?: string;
+  };
+  text_align?: "left" | "center" | "right" | "justify";
+  text_transform?: "uppercase" | "lowercase" | "capitalize" | "none";
+  effects?: {
+    text_shadow?: string;
+    background?: string;
+    border?: string;
+    border_radius?: string;
+    backdrop_filter?: string;
+    opacity?: string;
+    padding?: string;
+    box_shadow?: string;
+    hover_effects?: string;
+    gradient?: string;
+  };
+}
+
+export interface ImageTextData {
+  title?: ImageTextElement;
+  subtitle?: ImageTextElement;
+  cta?: ImageTextElement;
 }
 
 export interface PostStats {
