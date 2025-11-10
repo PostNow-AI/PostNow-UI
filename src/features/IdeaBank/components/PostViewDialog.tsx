@@ -66,16 +66,112 @@ export const PostViewDialog = ({
     return htmlRegex.test(content);
   };
 
-  // Get the image text data directly - it's already structured JSON
-  const imageText =
-    (currentIdea?.image_text
-      ? JSON.parse(currentIdea?.image_text as unknown as string)
-      : {}) || {};
-  const imageTextData = currentIdea?.image_text
-    ? imageText.feed_image_text
-    : {};
+  // Get the image text data with proper error handling
+  const parseImageText = () => {
+    try {
+      if (!currentIdea?.image_text) {
+        return {};
+      }
 
-  console.log("Image Text Data:", imageTextData);
+      const imageTextString = currentIdea.image_text as unknown as string;
+
+      // Check if it's already an object
+      if (typeof imageTextString === "object") {
+        return imageTextString;
+      }
+
+      // If it's a string, try to parse it
+      if (typeof imageTextString === "string") {
+        // Clean the string first - remove any trailing commas or malformed JSON
+        const cleanedString = imageTextString
+          .replace(/,(\s*[}\]])/g, "$1") // Remove trailing commas
+          .replace(/[\u0000-\u001f]+/g, "") // Remove control characters
+          .trim();
+
+        return JSON.parse(cleanedString);
+      }
+
+      return {};
+    } catch (error) {
+      console.error("Error parsing image text JSON:", error);
+      console.log("Raw image_text data:", currentIdea?.image_text);
+
+      // Enhanced fallback parsing for truncated JSON
+      if (
+        currentIdea?.image_text &&
+        typeof currentIdea.image_text === "string"
+      ) {
+        const rawString = currentIdea.image_text as string;
+
+        // Try to extract the complete feed_image_text object even from truncated JSON
+        const feedImageTextMatch = rawString.match(
+          /"feed_image_text":\s*(\{[\s\S]*?\})\s*(?:,|\}|$)/
+        );
+
+        if (feedImageTextMatch) {
+          try {
+            const feedImageTextStr = feedImageTextMatch[1];
+            console.log("Extracted feed_image_text string:", feedImageTextStr);
+            return { feed_image_text: JSON.parse(feedImageTextStr) };
+          } catch (feedParseError) {
+            console.error(
+              "Failed to parse extracted feed_image_text:",
+              feedParseError
+            );
+          }
+        }
+
+        // Alternative: try to find and extract individual components
+        const titleMatch = rawString.match(
+          /"title":\s*(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})/
+        );
+        const subtitleMatch = rawString.match(
+          /"subtitle":\s*(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})/
+        );
+        const ctaMatch = rawString.match(
+          /"cta":\s*(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})/
+        );
+
+        if (titleMatch || subtitleMatch || ctaMatch) {
+          const reconstructed: Record<string, unknown> = {};
+
+          if (titleMatch) {
+            try {
+              reconstructed.title = JSON.parse(titleMatch[1]);
+            } catch (e) {
+              console.log("Title parse failed:", e);
+            }
+          }
+          if (subtitleMatch) {
+            try {
+              reconstructed.subtitle = JSON.parse(subtitleMatch[1]);
+            } catch (e) {
+              console.log("Subtitle parse failed:", e);
+            }
+          }
+          if (ctaMatch) {
+            try {
+              reconstructed.cta = JSON.parse(ctaMatch[1]);
+            } catch (e) {
+              console.log("CTA parse failed:", e);
+            }
+          }
+
+          if (Object.keys(reconstructed).length > 0) {
+            console.log("Reconstructed feed_image_text:", reconstructed);
+            return { feed_image_text: reconstructed };
+          }
+        }
+      }
+
+      return {};
+    }
+  };
+
+  const imageText = parseImageText();
+  const imageTextData = imageText?.feed_image_text || {};
+
+  console.log("Parsed Image Text Data:", imageTextData);
   if (!post) return null;
 
   return (
@@ -239,29 +335,33 @@ export const PostViewDialog = ({
                       </CardDescription>
                     </div>
                     <div className="flex gap-2">
-                      {currentIdea?.image_url && imageTextData && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setShowTextOverlay(!showTextOverlay)}
-                          className="shrink-0 text-muted-foreground"
-                          title={
-                            showTextOverlay ? "Ocultar texto" : "Mostrar texto"
-                          }
-                        >
-                          {showTextOverlay ? (
-                            <>
-                              <EyeOff className="h-4 w-4" />
-                              Ocultar texto
-                            </>
-                          ) : (
-                            <>
-                              <Eye className="h-4 w-4" />
-                              Mostrar texto
-                            </>
-                          )}
-                        </Button>
-                      )}
+                      {currentIdea?.image_url &&
+                        imageTextData &&
+                        Object.keys(imageTextData).length > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowTextOverlay(!showTextOverlay)}
+                            className="shrink-0 text-muted-foreground"
+                            title={
+                              showTextOverlay
+                                ? "Ocultar texto"
+                                : "Mostrar texto"
+                            }
+                          >
+                            {showTextOverlay ? (
+                              <>
+                                <EyeOff className="h-4 w-4" />
+                                Ocultar texto
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="h-4 w-4" />
+                                Mostrar texto
+                              </>
+                            )}
+                          </Button>
+                        )}
                       {currentIdea?.image_url && (
                         <Button
                           variant="ghost"
@@ -282,7 +382,9 @@ export const PostViewDialog = ({
                 <CardContent className="space-y-6">
                   {currentIdea?.image_url ? (
                     <div className="space-y-3">
-                      {imageTextData && showTextOverlay ? (
+                      {imageTextData &&
+                      Object.keys(imageTextData).length > 0 &&
+                      showTextOverlay ? (
                         <ImageTextOverlay
                           imageUrl={currentIdea.image_url}
                           imageTextData={imageTextData}
