@@ -23,7 +23,7 @@ const TextElement: React.FC<{
 
   return (
     <div
-      className={cn("absolute whitespace-pre-wrap", className)}
+      className={cn("whitespace-pre-wrap", className)}
       style={buildStyle(element)}
     >
       {element.text}
@@ -59,14 +59,16 @@ export const ImageTextOverlay: React.FC<ImageTextOverlayProps> = ({
       />
 
       <div className="absolute inset-0">
-        {imageTextData.title && (
-          <TextElement element={imageTextData.title} className="z-30" />
-        )}
-        {imageTextData.subtitle && (
-          <TextElement element={imageTextData.subtitle} className="z-20" />
-        )}
-        {imageTextData.cta && (
-          <TextElement element={imageTextData.cta} className="z-10" />
+        {imageTextData.main_container && (
+          <div style={buildStyle(imageTextData.main_container)}>
+            {imageTextData.main_container.children?.map((child, index) => (
+              <TextElement
+                key={child.element || index}
+                element={child}
+                className={`z-${30 - index * 10}`}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -36,42 +36,44 @@ export interface PostIdea {
 }
 
 export interface ImageTextElement {
+  element?: string;
   text?: string;
-  color?: string;
-  typography?: {
-    font_size?: string;
-    font_family?: string;
-    font_weight?: string;
-    line_height?: string;
-    letter_spacing?: string;
-  };
   position?: {
     top?: string;
     left?: string;
     right?: string;
     bottom?: string;
-    padding?: string;
   };
-  text_align?: "left" | "center" | "right" | "justify";
-  text_transform?: "uppercase" | "lowercase" | "capitalize" | "none";
-  effects?: {
-    text_shadow?: string;
+  style?: {
+    display?: string;
+    "flex-direction"?: string;
+    "align-items"?: string;
+    "justify-content"?: string;
+    gap?: string;
+    "align-self"?: string;
+    padding?: string;
+    "margin-top"?: string;
     background?: string;
+    "border-radius"?: string;
     border?: string;
-    border_radius?: string;
-    backdrop_filter?: string;
+    "font-family"?: string;
+    font_size?: string;
+    font_weight?: string;
+    "line-height"?: string;
+    "letter-spacing"?: string;
+    color?: string;
+    "text-align"?: string;
+    "text-transform"?: string;
+    "text-shadow"?: string;
+    "box-shadow"?: string;
     opacity?: string;
-    padding?: string;
-    box_shadow?: string;
-    hover_effects?: string;
-    gradient?: string;
+    "backdrop-filter"?: string;
   };
+  children?: ImageTextElement[];
 }
 
 export interface ImageTextData {
-  title?: ImageTextElement;
-  subtitle?: ImageTextElement;
-  cta?: ImageTextElement;
+  main_container?: ImageTextElement;
 }
 
 export interface PostStats {

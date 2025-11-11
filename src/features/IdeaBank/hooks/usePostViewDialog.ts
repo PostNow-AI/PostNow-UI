@@ -241,8 +241,8 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
 
             // Extract font family (default to Inter if not specified)
             let fontFamily = "Inter";
-            if (element.typography?.font_family) {
-              const cleanFont = element.typography.font_family.replace(
+            if (element.style?.["font-family"]) {
+              const cleanFont = element.style["font-family"].replace(
                 /['"]/g,
                 ""
               );
@@ -296,16 +296,16 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
 
             // Extract font size (default to 32px)
             let fontSize = 32;
-            if (element.typography?.font_size) {
+            if (element.style?.font_size) {
               const sizeMatch =
-                element.typography.font_size.match(/(\d+(?:\.\d+)?)/);
+                element.style.font_size.match(/(\d+(?:\.\d+)?)/);
               if (sizeMatch) fontSize = parseInt(sizeMatch[1]);
             }
 
             // Extract font weight (default to bold)
             let fontWeight = "bold";
-            if (element.typography?.font_weight) {
-              const weight = element.typography.font_weight;
+            if (element.style?.font_weight) {
+              const weight = element.style.font_weight;
               if (weight.includes("100") || weight.includes("thin"))
                 fontWeight = "100";
               else if (weight.includes("200") || weight.includes("extra-light"))
@@ -331,8 +331,8 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
 
             // Extract text color (default to white)
             let textColor = "#ffffff";
-            if (element.color) {
-              const colorMatch = element.color.match(
+            if (element.style?.color) {
+              const colorMatch = element.style.color.match(
                 /#[0-9a-fA-F]{3,6}|rgba?\([^)]+\)/
               );
               if (colorMatch) textColor = colorMatch[0];
@@ -343,7 +343,7 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
             ctx.lineWidth = Math.max(1, fontSize / 16); // Scale stroke with font size
 
             // Text alignment
-            const textAlign = element.text_align;
+            const textAlign = element.style?.["text-align"];
             if (
               textAlign === "left" ||
               textAlign === "center" ||
@@ -355,9 +355,9 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
             }
 
             // Add shadow for better readability
-            if (element.effects?.text_shadow) {
+            if (element.style?.["text-shadow"]) {
               // Parse text shadow if provided
-              const shadowMatch = element.effects.text_shadow.match(
+              const shadowMatch = element.style["text-shadow"].match(
                 /(\d+)px\s+(\d+)px\s+(\d+)px\s+([^,)]+)/
               );
               if (shadowMatch) {
@@ -431,8 +431,8 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
 
             // Apply text transform
             let finalText = element.text;
-            if (element.text_transform) {
-              switch (element.text_transform) {
+            if (element.style?.["text-transform"]) {
+              switch (element.style["text-transform"]) {
                 case "uppercase":
                   finalText = finalText.toUpperCase();
                   break;
@@ -454,11 +454,19 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
           };
 
           // Draw text elements with proper positioning
-          if (imageTextData.title) drawText(imageTextData.title, 100);
-          if (imageTextData.subtitle)
-            drawText(imageTextData.subtitle, canvas.height / 2);
-          if (imageTextData.cta)
-            drawText(imageTextData.cta, canvas.height - 100);
+          if (imageTextData.main_container?.children) {
+            imageTextData.main_container.children.forEach((child, index) => {
+              if (child.text) {
+                const defaultY =
+                  index === 0
+                    ? 100
+                    : index === 1
+                    ? canvas.height / 2
+                    : canvas.height - 100;
+                drawText(child, defaultY);
+              }
+            });
+          }
 
           canvas.toBlob((blob) => {
             if (blob) {
