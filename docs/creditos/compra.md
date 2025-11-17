@@ -49,7 +49,7 @@ const CreditPackage = ({ package: creditPackage, onSelect }) => {
       <p className="text-muted-foreground mb-4">
         {creditPackage.credits} créditos
       </p>
-      <button 
+      <button
         onClick={() => onSelect(creditPackage)}
         className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md"
       >
@@ -65,16 +65,16 @@ const CreditPackage = ({ package: creditPackage, onSelect }) => {
 ```typescript
 const handlePurchase = async (packageId: number) => {
   try {
-    const response = await api.post('/credits/stripe/checkout/', {
+    const response = await api.post("/credits/stripe/checkout/", {
       package_id: packageId,
       success_url: `${window.location.origin}/credits/success`,
-      cancel_url: `${window.location.origin}/credits/cancel`
+      cancel_url: `${window.location.origin}/credits/cancel`,
     });
-    
+
     // Redirecionar para Stripe
     window.location.href = response.data.url;
   } catch (error) {
-    toast.error('Erro ao criar checkout');
+    toast.error("Erro ao criar checkout");
   }
 };
 ```
@@ -84,15 +84,15 @@ const handlePurchase = async (packageId: number) => {
 ```tsx
 const CreditSuccessPage = () => {
   const { searchParams } = useSearchParams();
-  const sessionId = searchParams.get('session_id');
-  
+  const sessionId = searchParams.get("session_id");
+
   useEffect(() => {
     if (sessionId) {
       // Verificar status da transação
       verifyTransaction(sessionId);
     }
   }, [sessionId]);
-  
+
   return (
     <div className="text-center py-12">
       <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
@@ -100,7 +100,7 @@ const CreditSuccessPage = () => {
       <p className="text-muted-foreground mb-6">
         Seus créditos foram adicionados à sua conta
       </p>
-      <Link 
+      <Link
         to="/ideabank"
         className="bg-primary text-primary-foreground px-6 py-2 rounded-md hover:bg-primary/90"
       >
@@ -115,12 +115,12 @@ const CreditSuccessPage = () => {
 
 ### **Estimativa por Modelo**
 
-| Modelo | Custo/Ideia | Créditos Necessários |
-|--------|-------------|---------------------|
-| **Gemini Flash** | ~0.002 créditos | 500 ideias por R$ 1 |
-| **GPT-3.5** | ~0.004 créditos | 250 ideias por R$ 1 |
-| **Claude Sonnet** | ~0.006 créditos | 167 ideias por R$ 1 |
-| **GPT-4** | ~0.06 créditos | 17 ideias por R$ 1 |
+| Modelo            | Custo/Ideia     | Créditos Necessários |
+| ----------------- | --------------- | -------------------- |
+| **Gemini Flash**  | ~0.002 créditos | 500 ideias por R$ 1  |
+| **GPT-3.5**       | ~0.004 créditos | 250 ideias por R$ 1  |
+| **Claude Sonnet** | ~0.006 créditos | 167 ideias por R$ 1  |
+| **GPT-4**         | ~0.06 créditos  | 17 ideias por R$ 1   |
 
 ### **Exemplo de Uso**
 
@@ -130,10 +130,10 @@ const userCredits = 100;
 
 // Ideias possíveis por modelo
 const ideasPossible = {
-  'gemini-1.5-flash': Math.floor(userCredits / 0.002), // ~50.000 ideias
-  'gpt-3.5-turbo': Math.floor(userCredits / 0.004),    // ~25.000 ideias
-  'gpt-4': Math.floor(userCredits / 0.06),             // ~1.667 ideias
-  'claude-3-sonnet': Math.floor(userCredits / 0.006)   // ~16.667 ideias
+  "gemini-2.5-flash": Math.floor(userCredits / 0.002), // ~50.000 ideias
+  "gpt-3.5-turbo": Math.floor(userCredits / 0.004), // ~25.000 ideias
+  "gpt-4": Math.floor(userCredits / 0.06), // ~1.667 ideias
+  "claude-3-sonnet": Math.floor(userCredits / 0.006), // ~16.667 ideias
 };
 ```
 
@@ -160,12 +160,14 @@ const ideasPossible = {
 ```tsx
 const CreditPackagesGrid = ({ packages }) => {
   return (
-    <div className="
+    <div
+      className="
       grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3
       gap-4 md:gap-6 lg:gap-8
       p-4 md:p-6 lg:p-8
-    ">
-      {packages.map(pkg => (
+    "
+    >
+      {packages.map((pkg) => (
         <CreditPackage key={pkg.id} package={pkg} />
       ))}
     </div>

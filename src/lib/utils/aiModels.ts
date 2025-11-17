@@ -6,7 +6,7 @@ export interface AIModel {
 
 export const AI_MODELS: AIModel[] = [
   // Google (Gemini) Models
-  { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash", provider: "Google" },
+  { value: "gemini-2.5-flash", label: "Gemini 1.5 Flash", provider: "Google" },
   { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro", provider: "Google" },
   { value: "gemini-1.0-pro", label: "Gemini 1.0 Pro", provider: "Google" },
 

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ideaBankService } from "../services";
 import type { ImageTextData, ImageTextElement, Post } from "../types";
+import { extractTextElements, isNewStructure } from "../utils";
 
 // Hook for PostViewDialog
 export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
@@ -454,18 +455,57 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
           };
 
           // Draw text elements with proper positioning
-          if (imageTextData.main_container?.children) {
-            imageTextData.main_container.children.forEach((child, index) => {
-              if (child.text) {
+          const useNewStructure = isNewStructure(imageTextData);
+
+          if (useNewStructure) {
+            // New structure: individual title, subtitle, cta elements
+            const textElements = extractTextElements(imageTextData);
+            textElements.forEach(({ type, element }) => {
+              if (element.text) {
+                // Convert TextElement to ImageTextElement format for compatibility with drawText
+                const legacyElement: ImageTextElement = {
+                  text: element.text,
+                  position: element.position,
+                  style: element.style,
+                };
                 const defaultY =
-                  index === 0
+                  type === "title"
                     ? 100
-                    : index === 1
+                    : type === "subtitle"
                     ? canvas.height / 2
                     : canvas.height - 100;
-                drawText(child, defaultY);
+                drawText(legacyElement, defaultY);
               }
             });
+          } else {
+            // Legacy structure: main_container with children
+            if (imageTextData.main_container?.children) {
+              imageTextData.main_container.children.forEach((child, index) => {
+                if (child.text) {
+                  const defaultY =
+                    index === 0
+                      ? 100
+                      : index === 1
+                      ? canvas.height / 2
+                      : canvas.height - 100;
+                  drawText(child, defaultY);
+                }
+              });
+            }
+            // Support for legacy elements array
+            if (imageTextData.elements) {
+              imageTextData.elements.forEach((element, index) => {
+                if (element.text) {
+                  const defaultY =
+                    index === 0
+                      ? 100
+                      : index === 1
+                      ? canvas.height / 2
+                      : canvas.height - 100;
+                  drawText(element, defaultY);
+                }
+              });
+            }
           }
 
           canvas.toBlob((blob) => {

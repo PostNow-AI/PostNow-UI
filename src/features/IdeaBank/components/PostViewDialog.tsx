@@ -1,3 +1,4 @@
+/* eslint-disable no-control-regex */
 import parse from "html-react-parser";
 import {
   Check,
@@ -66,44 +67,60 @@ export const PostViewDialog = ({
     return htmlRegex.test(content);
   };
 
-  // Get the image text data with proper error handling
-  const parseImageText = () => {
-    try {
-      if (!currentIdea?.image_text) {
-        return {};
-      }
+  // Get the image text data with proper error handling - enhanced for robust parsing
+  const parseImageText = (): Record<string, unknown> => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("🎯 PostViewDialog - Parsing image text data");
+      console.log("🔍 Raw currentIdea.image_text:", currentIdea?.image_text);
+    }
 
-      const imageTextString = currentIdea.image_text as unknown as string;
+    if (!currentIdea?.image_text) {
+      console.log("❌ PostViewDialog - No image_text data");
+      return {};
+    }
 
-      // Check if it's already an object
-      if (typeof imageTextString === "object") {
-        return imageTextString;
-      }
+    // Handle if it's already an object
+    if (typeof currentIdea.image_text === "object") {
+      console.log("✅ PostViewDialog - Data already parsed as object");
+      return currentIdea.image_text as Record<string, unknown>;
+    }
 
-      // If it's a string, try to parse it
-      if (typeof imageTextString === "string") {
-        // Clean the string first - remove any trailing commas or malformed JSON
-        const cleanedString = imageTextString
+    // Handle string parsing with enhanced error recovery
+    if (typeof currentIdea.image_text === "string") {
+      const imageTextString = currentIdea.image_text as string;
+
+      try {
+        // Multi-layer JSON sanitization
+        let cleanedString = imageTextString
           .replace(/,(\s*[}\]])/g, "$1") // Remove trailing commas
-          .replace(/[\u0000-\u001f]+/g, "") // Remove control characters
+          .replace(/[\x00-\x1f]+/g, "") // Remove control characters
+          .replace(/}\s*{/g, "},{") // Fix concatenated objects
+          .replace(/"\s*:\s*"/g, '":"') // Fix spaced colons
           .trim();
 
-        return JSON.parse(cleanedString);
-      }
+        // Remove any incomplete trailing structures
+        const lastOpenBrace = cleanedString.lastIndexOf("{");
+        const lastCloseBrace = cleanedString.lastIndexOf("}");
+        if (lastOpenBrace > lastCloseBrace) {
+          cleanedString = cleanedString.substring(0, lastOpenBrace).trim();
+          if (cleanedString.endsWith(",")) {
+            cleanedString = cleanedString.slice(0, -1);
+          }
+        }
 
-      return {};
-    } catch (error) {
-      console.error("Error parsing image text JSON:", error);
-      console.log("Raw image_text data:", currentIdea?.image_text);
+        const parsed = JSON.parse(cleanedString);
+        console.log("✅ PostViewDialog - Successfully parsed JSON");
+        return parsed;
+      } catch (parseError) {
+        console.warn(
+          "⚠️ PostViewDialog - Initial JSON parse failed, attempting recovery",
+          parseError
+        );
 
-      // Enhanced fallback parsing for truncated JSON
-      if (
-        currentIdea?.image_text &&
-        typeof currentIdea.image_text === "string"
-      ) {
-        const rawString = currentIdea.image_text as string;
+        // Enhanced fallback parsing for truncated JSON
+        const rawString = imageTextString;
 
-        // Try to extract the complete feed_image_text object even from truncated JSON
+        // Try to extract the complete feed_image_text object
         const feedImageTextMatch = rawString.match(
           /"feed_image_text":\s*(\{[\s\S]*?\})\s*(?:,|\}|$)/
         );
@@ -111,17 +128,24 @@ export const PostViewDialog = ({
         if (feedImageTextMatch) {
           try {
             const feedImageTextStr = feedImageTextMatch[1];
-            console.log("Extracted feed_image_text string:", feedImageTextStr);
-            return { feed_image_text: JSON.parse(feedImageTextStr) };
+            console.log(
+              "🔧 PostViewDialog - Extracted feed_image_text string:",
+              feedImageTextStr
+            );
+            const parsed = { feed_image_text: JSON.parse(feedImageTextStr) };
+            console.log(
+              "✅ PostViewDialog - Successfully recovered feed_image_text"
+            );
+            return parsed;
           } catch (feedParseError) {
             console.error(
-              "Failed to parse extracted feed_image_text:",
+              "❌ PostViewDialog - Failed to parse extracted feed_image_text:",
               feedParseError
             );
           }
         }
 
-        // Alternative: try to find and extract individual components
+        // Try to reconstruct from individual components
         const titleMatch = rawString.match(
           /"title":\s*(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})/
         );
@@ -138,40 +162,94 @@ export const PostViewDialog = ({
           if (titleMatch) {
             try {
               reconstructed.title = JSON.parse(titleMatch[1]);
+              console.log("🔧 PostViewDialog - Recovered title element");
             } catch (e) {
-              console.log("Title parse failed:", e);
+              console.warn("⚠️ PostViewDialog - Title parse failed:", e);
             }
           }
           if (subtitleMatch) {
             try {
               reconstructed.subtitle = JSON.parse(subtitleMatch[1]);
+              console.log("🔧 PostViewDialog - Recovered subtitle element");
             } catch (e) {
-              console.log("Subtitle parse failed:", e);
+              console.warn("⚠️ PostViewDialog - Subtitle parse failed:", e);
             }
           }
           if (ctaMatch) {
             try {
               reconstructed.cta = JSON.parse(ctaMatch[1]);
+              console.log("🔧 PostViewDialog - Recovered CTA element");
             } catch (e) {
-              console.log("CTA parse failed:", e);
+              console.warn("⚠️ PostViewDialog - CTA parse failed:", e);
             }
           }
 
           if (Object.keys(reconstructed).length > 0) {
-            console.log("Reconstructed feed_image_text:", reconstructed);
+            console.log(
+              "✅ PostViewDialog - Successfully reconstructed feed_image_text from components"
+            );
             return { feed_image_text: reconstructed };
           }
         }
-      }
 
-      return {};
+        console.error("❌ PostViewDialog - All parsing methods failed");
+        return {};
+      }
     }
+
+    console.log(
+      "❌ PostViewDialog - Unexpected data type:",
+      typeof currentIdea.image_text
+    );
+    return {};
   };
 
   const imageText = parseImageText();
-  const imageTextData = imageText?.feed_image_text || {};
 
-  console.log("Parsed Image Text Data:", imageTextData);
+  // Smart data extraction - handle both nested and direct structures
+  let imageTextData = {};
+  if (imageText?.feed_image_text) {
+    // Nested structure: { feed_image_text: { layout_type, title, subtitle, cta } }
+    imageTextData = imageText.feed_image_text;
+  } else if (
+    imageText?.layout_type ||
+    imageText?.title ||
+    imageText?.subtitle ||
+    imageText?.cta
+  ) {
+    // Direct structure: { layout_type, title, subtitle, cta }
+    imageTextData = imageText;
+  }
+
+  // Debug logging for data structure analysis
+  if (process.env.NODE_ENV === "development") {
+    console.log("🔍 PostViewDialog - Parsed Image Text:", imageText);
+    console.log(
+      "🔍 PostViewDialog - Has feed_image_text nested?",
+      !!imageText?.feed_image_text
+    );
+    console.log(
+      "🔍 PostViewDialog - Has direct structure?",
+      !!(
+        imageText?.layout_type ||
+        imageText?.title ||
+        imageText?.subtitle ||
+        imageText?.cta
+      )
+    );
+    console.log(
+      "🔍 PostViewDialog - Final imageTextData for overlay:",
+      imageTextData
+    );
+    console.log(
+      "🔍 PostViewDialog - imageTextData keys:",
+      Object.keys(imageTextData || {})
+    );
+    console.log(
+      "🔍 PostViewDialog - imageTextData type:",
+      typeof imageTextData
+    );
+  }
   if (!post) return null;
 
   return (
@@ -385,11 +463,25 @@ export const PostViewDialog = ({
                       {imageTextData &&
                       Object.keys(imageTextData).length > 0 &&
                       showTextOverlay ? (
-                        <ImageTextOverlay
-                          imageUrl={currentIdea.image_url}
-                          imageTextData={imageTextData}
-                          className="w-full object-cover rounded-md border transition-transform h-full"
-                        />
+                        <>
+                          {/* Additional debugging before rendering */}
+                          {process.env.NODE_ENV === "development" &&
+                            console.log(
+                              "🎯 About to render ImageTextOverlay with:",
+                              {
+                                imageUrl: currentIdea.image_url,
+                                imageTextData,
+                                dataType: typeof imageTextData,
+                                dataKeys: Object.keys(imageTextData || {}),
+                                showTextOverlay,
+                              }
+                            )}
+                          <ImageTextOverlay
+                            imageUrl={currentIdea.image_url}
+                            imageTextData={imageTextData}
+                            className="w-full object-cover rounded-md border transition-transform h-full"
+                          />
+                        </>
                       ) : (
                         <img
                           src={currentIdea.image_url}

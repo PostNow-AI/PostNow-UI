@@ -23,7 +23,7 @@
 
 ### **Google Gemini**
 
-- **gemini-1.5-flash** - Rápido e econômico
+- **gemini-2.5-flash** - Rápido e econômico
 - **gemini-1.5-pro** - Mais capaz, maior contexto
 
 ### **OpenAI GPT**
@@ -45,12 +45,12 @@
 
 ### **Custos por Modelo**
 
-| Modelo | Custo/Token | Contexto |
-|--------|-------------|----------|
-| **gemini-1.5-flash** | R$ 0,000001 | 8.192 tokens |
-| **gpt-3.5-turbo** | R$ 0,000002 | 4.096 tokens |
-| **gpt-4** | R$ 0,00003 | 8.192 tokens |
-| **claude-3-sonnet** | R$ 0,000003 | 200.000 tokens |
+| Modelo               | Custo/Token | Contexto       |
+| -------------------- | ----------- | -------------- |
+| **gemini-2.5-flash** | R$ 0,000001 | 8.192 tokens   |
+| **gpt-3.5-turbo**    | R$ 0,000002 | 4.096 tokens   |
+| **gpt-4**            | R$ 0,00003  | 8.192 tokens   |
+| **claude-3-sonnet**  | R$ 0,000003 | 200.000 tokens |
 
 ## 🔄 **Intercambialidade**
 

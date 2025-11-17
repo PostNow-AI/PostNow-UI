@@ -60,7 +60,7 @@ export const aiProviderOptions = [
 
 export const aiModelOptions = {
   google: [
-    { value: "gemini-1.5-flash", label: "Gemini 1.5 Flash (Rápido)" },
+    { value: "gemini-2.5-flash", label: "Gemini 1.5 Flash (Rápido)" },
     { value: "gemini-1.5-pro", label: "Gemini 1.5 Pro (Avançado)" },
   ],
   openai: [

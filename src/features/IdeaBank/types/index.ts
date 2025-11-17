@@ -35,45 +35,99 @@ export interface PostIdea {
   image_text: { feed_image_text: ImageTextData | null };
 }
 
+export interface Position {
+  top?: string;
+  left?: string;
+  right?: string;
+  bottom?: string;
+  width?: string;
+  height?: string;
+  transform?: string; // For centering with translateX(-50%), etc.
+}
+
+export interface ElementStyle {
+  display?: string;
+  "flex-direction"?: string;
+  "align-items"?: string;
+  "justify-content"?: string;
+  gap?: string;
+  "align-self"?: string;
+  padding?: string;
+  margin?: string;
+  "margin-top"?: string;
+  "margin-bottom"?: string;
+  "margin-left"?: string;
+  "margin-right"?: string;
+  background?: string;
+  "border-radius"?: string;
+  border_radius?: string; // Support underscore version
+  border?: string;
+  "font-family"?: string;
+  font_family?: string; // Support underscore version
+  font_size?: string;
+  "font-size"?: string; // Support hyphenated version
+  font_weight?: string;
+  "font-weight"?: string; // Support hyphenated version
+  "line-height"?: string;
+  "letter-spacing"?: string;
+  color?: string;
+  "text-align"?: string;
+  "text-transform"?: string;
+  "text-shadow"?: string;
+  text_shadow?: string; // Support underscore version
+  "box-shadow"?: string;
+  opacity?: string;
+  "backdrop-filter"?: string;
+  "z-index"?: string;
+  transform?: string;
+  transition?: string;
+}
+
 export interface ImageTextElement {
   element?: string;
   text?: string;
-  position?: {
-    top?: string;
-    left?: string;
-    right?: string;
-    bottom?: string;
-  };
-  style?: {
-    display?: string;
-    "flex-direction"?: string;
-    "align-items"?: string;
-    "justify-content"?: string;
-    gap?: string;
-    "align-self"?: string;
-    padding?: string;
-    "margin-top"?: string;
-    background?: string;
-    "border-radius"?: string;
-    border?: string;
-    "font-family"?: string;
-    font_size?: string;
-    font_weight?: string;
-    "line-height"?: string;
-    "letter-spacing"?: string;
-    color?: string;
-    "text-align"?: string;
-    "text-transform"?: string;
-    "text-shadow"?: string;
-    "box-shadow"?: string;
-    opacity?: string;
-    "backdrop-filter"?: string;
-  };
+  position?: Position;
+  style?: ElementStyle;
   children?: ImageTextElement[];
 }
 
+export interface TextElement {
+  text: string;
+  position?: Position;
+  style?: ElementStyle;
+}
+
+export interface ContainerElement {
+  position: Position;
+  style: ElementStyle;
+  elements: string[]; // Array of element names contained within
+}
+
+export interface OuterBorder {
+  color: string;
+  padding: string;
+  border_radius?: string;
+}
+
 export interface ImageTextData {
-  main_container?: ImageTextElement;
+  // Layout type for new creative system
+  layout_type?: string;
+
+  // Outer border for cafe-style designs
+  outer_border?: OuterBorder;
+
+  // Individual elements (new structure)
+  title?: TextElement;
+  subtitle?: TextElement;
+  cta?: TextElement;
+
+  // Container-based approach
+  main_container?: ImageTextElement & {
+    elements?: string[];
+  };
+
+  // Legacy support for backwards compatibility
+  elements?: ImageTextElement[];
 }
 
 export interface PostStats {
