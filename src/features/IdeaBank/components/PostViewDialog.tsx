@@ -223,31 +223,31 @@ export const PostViewDialog = ({
                           : "Baixe sua imagem ou gere uma nova"}
                       </CardDescription>
                     </div>
-                    {currentIdea?.image_url && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleDownloadImage}
-                        disabled={downloadingImage}
-                        className="shrink-0 text-muted-foreground"
-                        title="Tentar download direto. Se falhar, abrirá em nova aba."
-                      >
-                        {downloadingImage ? "Baixando..." : "Baixar"}
-                        <Import className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <div className="flex gap-2">
+                      {currentIdea?.image_url && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleDownloadImage}
+                          disabled={downloadingImage}
+                          className="shrink-0 text-muted-foreground"
+                          title="Tentar download direto. Se falhar, abrirá em nova aba."
+                        >
+                          {downloadingImage ? "Baixando..." : "Baixar"}
+                          <Import className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   <Separator />
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {currentIdea?.image_url ? (
-                    <div className="space-y-3">
-                      <img
-                        src={currentIdea.image_url}
-                        alt={`Imagem para ${post.name}`}
-                        className="w-full  object-cover rounded-md border transition-transform"
-                      />
-                    </div>
+                    <img
+                      src={currentIdea.image_url}
+                      alt={`Imagem para ${post.name}`}
+                      className="w-full object-cover rounded-md border transition-transform"
+                    />
                   ) : (
                     <div className="min-h-[269px] border border-primary rounded-sm flex items-center justify-center text-muted-foreground">
                       <div className="text-center">

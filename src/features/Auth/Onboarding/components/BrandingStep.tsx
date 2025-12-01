@@ -1,10 +1,12 @@
 import {
+  Button,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
   ColorPicker,
   ImagePicker,
+  Input,
   Label,
   Select,
   SelectContent,
@@ -14,8 +16,10 @@ import {
   Separator,
 } from "@/components";
 import { Palette } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import type { OnboardingFormData } from "../constants/onboardingSchema";
+import { useVisualStylePreferences } from "../hooks/useVisualStylePreferences";
 
 export const BrandingStep = ({
   form,
@@ -29,6 +33,26 @@ export const BrandingStep = ({
     watch,
   } = form;
   const watchedValues = watch();
+
+  const { visualStylePreferences, isLoading, createPreferenceMutation } =
+    useVisualStylePreferences();
+
+  const [showCustom, setShowCustom] = useState(false);
+  const [customName, setCustomName] = useState("");
+  const [customDescription, setCustomDescription] = useState("");
+
+  useEffect(() => {
+    if (createPreferenceMutation.isSuccess && createPreferenceMutation.data) {
+      setValue("visual_style_id", createPreferenceMutation.data.id.toString());
+      setShowCustom(false);
+      setCustomName("");
+      setCustomDescription("");
+    }
+  }, [
+    createPreferenceMutation.isSuccess,
+    createPreferenceMutation.data,
+    setValue,
+  ]);
 
   return (
     <>
@@ -70,9 +94,102 @@ export const BrandingStep = ({
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="voice_tone">
-            Tom de voz e personalidade da marca *{" "}
-          </Label>
+          <Label htmlFor="visual_style_id">Estilo Visual Preferido * </Label>
+
+          <Select
+            value={
+              watchedValues.visual_style_id
+                ? String(watchedValues.visual_style_id)
+                : ""
+            }
+            onValueChange={(value) => setValue("visual_style_id", value)}
+            disabled={isLoading}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione o estilo visual...">
+                {watchedValues.visual_style_id && visualStylePreferences
+                  ? visualStylePreferences.find(
+                      (p: { id: number; name: string }) =>
+                        String(p.id) === String(watchedValues.visual_style_id)
+                    )?.name || `ID: ${watchedValues.visual_style_id}`
+                  : undefined}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {visualStylePreferences?.map(
+                (preference: { id: number; name: string }) => (
+                  <SelectItem key={preference.id} value={String(preference.id)}>
+                    {preference.name}
+                  </SelectItem>
+                )
+              )}
+            </SelectContent>
+          </Select>
+          {!showCustom && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCustom(true)}
+              className="w-full"
+            >
+              Criar Estilo Personalizado
+            </Button>
+          )}
+          {showCustom && (
+            <div className="space-y-2">
+              <Input
+                value={customName}
+                onChange={(e) => setCustomName(e.target.value)}
+                placeholder="Nome do estilo personalizado"
+              />
+              <Input
+                value={customDescription}
+                onChange={(e) => setCustomDescription(e.target.value)}
+                placeholder="Descrição do estilo personalizado"
+              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    if (customName.trim() && customDescription.trim()) {
+                      createPreferenceMutation.mutate({
+                        name: customName.trim(),
+                        description: customDescription.trim(),
+                      });
+                    }
+                  }}
+                  disabled={
+                    createPreferenceMutation.isPending ||
+                    !customName.trim() ||
+                    !customDescription.trim()
+                  }
+                  className="flex-1"
+                >
+                  {createPreferenceMutation.isPending ? "Criando..." : "Criar"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowCustom(false);
+                    setCustomName("");
+                    setCustomDescription("");
+                  }}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
+          {errors.visual_style_id && (
+            <p className="text-sm text-destructive">
+              {errors.visual_style_id.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="voice_tone">Tom de voz * </Label>
           <Select
             value={watchedValues.voice_tone || ""}
             onValueChange={(value) => setValue("voice_tone", value)}

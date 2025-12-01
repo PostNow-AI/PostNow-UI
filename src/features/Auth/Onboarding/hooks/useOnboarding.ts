@@ -14,7 +14,6 @@ import {
   completeOnboarding,
   submitOnboardingStep1,
   submitOnboardingStep2,
-  submitOnboardingStep3,
 } from "../services";
 
 export const useOnboarding = () => {
@@ -27,8 +26,6 @@ export const useOnboarding = () => {
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
-      target_age_range: "18-24",
-      target_gender: "all",
       color_1: "#FF6B6B", // Soft Red
       color_2: "#4ECDC4", // Turquoise
       color_3: "#45B7D1", // Sky Blue
@@ -47,22 +44,20 @@ export const useOnboarding = () => {
     switch (currentStep) {
       case 1:
         fieldsToValidate = [
-          "professional_name",
-          "profession",
-          "whatsapp_number",
+          "business_name",
+          "business_description",
+          "specialization",
+          "business_purpose",
+          "brand_personality",
+          "products_services",
+          "business_location",
+          "target_audience",
+          "business_purpose",
+          "brand_personality",
         ];
         break;
       case 2:
-        fieldsToValidate = [
-          "business_name",
-          "business_description",
-          "target_gender",
-          "target_age_range",
-          "target_location",
-        ];
-        break;
-      case 3:
-        fieldsToValidate = ["voice_tone"];
+        fieldsToValidate = ["voice_tone", "visual_style_id"];
         break;
     }
 
@@ -100,20 +95,26 @@ export const useOnboarding = () => {
   useEffect(() => {
     if (previouslyCompletedForm) {
       form.reset({
-        professional_name: previouslyCompletedForm.professional_name || "",
-        profession: previouslyCompletedForm.profession || "",
-        whatsapp_number: previouslyCompletedForm.whatsapp_number || "",
         business_name: previouslyCompletedForm.business_name || "",
         business_description:
           previouslyCompletedForm.business_description || "",
-        target_gender: previouslyCompletedForm.target_gender || "",
-        target_age_range: previouslyCompletedForm.target_age_range || "",
-        target_location: previouslyCompletedForm.target_location || "",
-        voice_tone: previouslyCompletedForm.voice_tone || "",
-        instagram_handle: previouslyCompletedForm.instagram_handle || "",
-        specialization: previouslyCompletedForm.specialization || "",
+        business_purpose: previouslyCompletedForm.business_purpose || "",
+        brand_personality: previouslyCompletedForm.brand_personality || "",
+        products_services: previouslyCompletedForm.products_services || "",
+        business_phone: previouslyCompletedForm.business_phone || "",
+        business_website: previouslyCompletedForm.business_website || "",
+        business_instagram_handle:
+          previouslyCompletedForm.business_instagram_handle || "",
+        target_audience: previouslyCompletedForm.target_audience || "",
         target_interests: previouslyCompletedForm.target_interests || "",
+        main_competitors: previouslyCompletedForm.main_competitors || "",
+        reference_profiles: previouslyCompletedForm.reference_profiles || "",
+        business_location: previouslyCompletedForm.business_location || "",
+        voice_tone: previouslyCompletedForm.voice_tone || "",
+        specialization: previouslyCompletedForm.specialization || "",
         logo: previouslyCompletedForm.logo || "",
+        visual_style_id:
+          previouslyCompletedForm.visual_style_id?.toString() || "",
         color_1: previouslyCompletedForm.color_1 || "",
         color_2: previouslyCompletedForm.color_2 || "",
         color_3: previouslyCompletedForm.color_3 || "",
@@ -127,7 +128,6 @@ export const useOnboarding = () => {
     mutationFn: async (data: OnboardingFormData) => {
       await submitOnboardingStep1(data);
       await submitOnboardingStep2(data);
-      await submitOnboardingStep3(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
