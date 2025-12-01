@@ -149,20 +149,6 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
     }
   };
 
-  // Check if CORS is supported for the given URL
-  const checkCorsSupport = async (imageUrl: string): Promise<boolean> => {
-    try {
-      const response = await fetch(imageUrl, {
-        method: "HEAD",
-        mode: "cors",
-      });
-      return response.ok;
-    } catch {
-      // CORS error or network error
-      return false;
-    }
-  };
-
   return {
     currentIdea,
     isLoading,
