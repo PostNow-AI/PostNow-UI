@@ -28,14 +28,17 @@ export const OnboardingReview = ({
   const { visualStylePreferences } = useVisualStylePreferences();
 
   interface VisualStyle {
-    id: number;
+    id: string;
     name: string;
   }
 
-  const selectedVisualStyle: VisualStyle | undefined =
-    visualStylePreferences?.find(
-      (style: VisualStyle) => style.id === Number(values.visual_style_id)
-    );
+  const selectedVisualStyles: VisualStyle[] =
+    visualStylePreferences?.filter((style: VisualStyle) =>
+      values.visual_style_ids
+        ?.map((id) => Number(id))
+        ?.includes(Number(style.id))
+    ) || [];
+
   return (
     <>
       <CardHeader>
@@ -203,12 +206,25 @@ export const OnboardingReview = ({
               {values.voice_tone}
             </span>
           </div>
-          {values.visual_style_id && (
+          {values.visual_style_ids && values.visual_style_ids.length > 0 && (
             <div className="space-y-2 flex flex-col">
-              <span className="text-sm">Estilo Visual Preferido</span>
-              <span className="text-sm text-muted-foreground">
-                {selectedVisualStyle?.name || `ID: ${values.visual_style_id}`}
-              </span>
+              <span className="text-sm">Estilos Visuais Preferidos</span>
+              <div className="space-y-1">
+                {selectedVisualStyles.length > 0 ? (
+                  selectedVisualStyles.map((style) => (
+                    <span
+                      key={style.id}
+                      className="text-sm text-muted-foreground block"
+                    >
+                      {style.name}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-sm text-muted-foreground">
+                    IDs: {values.visual_style_ids.join(", ")}
+                  </span>
+                )}
+              </div>
             </div>
           )}
           <div className="space-y-2 flex flex-col">

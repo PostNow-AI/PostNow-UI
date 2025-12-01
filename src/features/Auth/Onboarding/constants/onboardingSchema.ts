@@ -79,7 +79,7 @@ export const onboardingSchema = z.object({
     )
     .optional()
     .or(z.literal("")),
-  visual_style_id: z.string().optional(),
+  visual_style_ids: z.array(z.string()).optional(),
 });
 
 export type OnboardingFormData = z.infer<typeof onboardingSchema>;

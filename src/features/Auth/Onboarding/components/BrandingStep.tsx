@@ -4,6 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Checkbox,
   ColorPicker,
   ImagePicker,
   Input,
@@ -33,6 +34,7 @@ export const BrandingStep = ({
     watch,
   } = form;
   const watchedValues = watch();
+  console.log({ errors });
 
   const { visualStylePreferences, isLoading, createPreferenceMutation } =
     useVisualStylePreferences();
@@ -43,7 +45,12 @@ export const BrandingStep = ({
 
   useEffect(() => {
     if (createPreferenceMutation.isSuccess && createPreferenceMutation.data) {
-      setValue("visual_style_id", createPreferenceMutation.data.id.toString());
+      const currentIds = watchedValues.visual_style_ids || [];
+      const newIds = [
+        ...currentIds,
+        createPreferenceMutation.data.id.toString(),
+      ];
+      setValue("visual_style_ids", newIds);
       setShowCustom(false);
       setCustomName("");
       setCustomDescription("");
@@ -52,6 +59,7 @@ export const BrandingStep = ({
     createPreferenceMutation.isSuccess,
     createPreferenceMutation.data,
     setValue,
+    watchedValues.visual_style_ids,
   ]);
 
   return (
@@ -94,97 +102,120 @@ export const BrandingStep = ({
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="visual_style_id">Estilo Visual Preferido * </Label>
+          <Label>Estilos Visuais Preferidos * </Label>
+          <div className="space-y-3">
+            {visualStylePreferences?.map(
+              (preference: {
+                id: number;
+                name: string;
+                description?: string;
+              }) => {
+                const currentIds = watchedValues.visual_style_ids || [];
+                const isChecked = currentIds.includes(preference.id.toString());
 
-          <Select
-            value={
-              watchedValues.visual_style_id
-                ? String(watchedValues.visual_style_id)
-                : ""
-            }
-            onValueChange={(value) => setValue("visual_style_id", value)}
-            disabled={isLoading}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecione o estilo visual...">
-                {watchedValues.visual_style_id && visualStylePreferences
-                  ? visualStylePreferences.find(
-                      (p: { id: number; name: string }) =>
-                        String(p.id) === String(watchedValues.visual_style_id)
-                    )?.name || `ID: ${watchedValues.visual_style_id}`
-                  : undefined}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {visualStylePreferences?.map(
-                (preference: { id: number; name: string }) => (
-                  <SelectItem key={preference.id} value={String(preference.id)}>
-                    {preference.name}
-                  </SelectItem>
-                )
-              )}
-            </SelectContent>
-          </Select>
-          {!showCustom && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowCustom(true)}
-              className="w-full"
-            >
-              Criar Estilo Personalizado
-            </Button>
-          )}
-          {showCustom && (
-            <div className="space-y-2">
-              <Input
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-                placeholder="Nome do estilo personalizado"
-              />
-              <Input
-                value={customDescription}
-                onChange={(e) => setCustomDescription(e.target.value)}
-                placeholder="Descrição do estilo personalizado"
-              />
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    if (customName.trim() && customDescription.trim()) {
-                      createPreferenceMutation.mutate({
-                        name: customName.trim(),
-                        description: customDescription.trim(),
-                      });
+                return (
+                  <div
+                    key={preference.id}
+                    className="flex items-start space-x-3"
+                  >
+                    <Checkbox
+                      id={`visual_style_${preference.id}`}
+                      checked={isChecked}
+                      onCheckedChange={(checked) => {
+                        let newIds;
+
+                        if (checked) {
+                          newIds = [...currentIds, preference.id.toString()];
+                        } else {
+                          newIds = currentIds.filter(
+                            (id: string) => id !== preference.id.toString()
+                          );
+                        }
+
+                        setValue("visual_style_ids", newIds);
+                      }}
+                      disabled={isLoading}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label
+                        htmlFor={`visual_style_${preference.id}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {preference.name}
+                      </Label>
+                      {preference.description && (
+                        <p className="text-xs text-muted-foreground">
+                          {preference.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+            )}
+            {!showCustom && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCustom(true)}
+                className="w-full"
+              >
+                Criar Estilo Personalizado
+              </Button>
+            )}
+            {showCustom && (
+              <div className="space-y-2">
+                <Input
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  placeholder="Nome do estilo personalizado"
+                />
+                <Input
+                  value={customDescription}
+                  onChange={(e) => setCustomDescription(e.target.value)}
+                  placeholder="Descrição do estilo personalizado"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      if (customName.trim() && customDescription.trim()) {
+                        createPreferenceMutation.mutate({
+                          name: customName.trim(),
+                          description: customDescription.trim(),
+                        });
+                      }
+                    }}
+                    disabled={
+                      createPreferenceMutation.isPending ||
+                      !customName.trim() ||
+                      !customDescription.trim()
                     }
-                  }}
-                  disabled={
-                    createPreferenceMutation.isPending ||
-                    !customName.trim() ||
-                    !customDescription.trim()
-                  }
-                  className="flex-1"
-                >
-                  {createPreferenceMutation.isPending ? "Criando..." : "Criar"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowCustom(false);
-                    setCustomName("");
-                    setCustomDescription("");
-                  }}
-                  className="flex-1"
-                >
-                  Cancelar
-                </Button>
+                    className="flex-1"
+                  >
+                    {createPreferenceMutation.isPending
+                      ? "Criando..."
+                      : "Criar"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowCustom(false);
+                      setCustomName("");
+                      setCustomDescription("");
+                    }}
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
-          {errors.visual_style_id && (
+            )}
+          </div>
+          {errors.visual_style_ids && (
             <p className="text-sm text-destructive">
-              {errors.visual_style_id.message}
+              {errors.visual_style_ids.message}
             </p>
           )}
         </div>

@@ -47,7 +47,7 @@ export const submitOnboardingStep2 = async (data: OnboardingFormData) => {
     color_3: data.color_3,
     color_4: data.color_4,
     color_5: data.color_5,
-    visual_style_id: Number(data.visual_style_id),
+    visual_style_ids: data.visual_style_ids,
   };
   const response = await api.put(
     "/api/v1/creator-profile/onboarding/step2/",

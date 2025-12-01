@@ -57,7 +57,7 @@ export const useOnboarding = () => {
         ];
         break;
       case 2:
-        fieldsToValidate = ["voice_tone", "visual_style_id"];
+        fieldsToValidate = ["voice_tone", "visual_style_ids"];
         break;
     }
 
@@ -113,8 +113,9 @@ export const useOnboarding = () => {
         voice_tone: previouslyCompletedForm.voice_tone || "",
         specialization: previouslyCompletedForm.specialization || "",
         logo: previouslyCompletedForm.logo || "",
-        visual_style_id:
-          previouslyCompletedForm.visual_style_id?.toString() || "",
+        visual_style_ids: previouslyCompletedForm?.visual_style_ids?.map((id) =>
+          id.toString()
+        ) || [""],
         color_1: previouslyCompletedForm.color_1 || "",
         color_2: previouslyCompletedForm.color_2 || "",
         color_3: previouslyCompletedForm.color_3 || "",
