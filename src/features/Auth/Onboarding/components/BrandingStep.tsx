@@ -145,7 +145,7 @@ export const BrandingStep = ({
                       </Label>
                       {preference.description && (
                         <p className="text-xs text-muted-foreground">
-                          {preference.description}
+                          {preference.description.slice(0, 100)}
                         </p>
                       )}
                     </div>
