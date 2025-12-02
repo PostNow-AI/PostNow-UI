@@ -143,11 +143,6 @@ export const BrandingStep = ({
                       >
                         {preference.name}
                       </Label>
-                      {preference.description && (
-                        <p className="text-xs text-muted-foreground">
-                          {preference.description.slice(0, 100)}
-                        </p>
-                      )}
                     </div>
                   </div>
                 );
