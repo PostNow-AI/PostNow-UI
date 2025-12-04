@@ -123,22 +123,22 @@ export const PostList = () => {
             <Badge
               variant="outline"
               className={`flex items-center gap-1 ${
-                post.type_display === "Feed"
+                post.type === "feed"
                   ? "bg-blue-50 text-blue-700 border-blue-200"
-                  : post.type_display === "Live"
-                  ? "bg-red-50 text-red-700 border-red-200"
-                  : post.type_display === "Reel"
-                  ? "bg-purple-50 text-purple-700 border-purple-200"
-                  : post.type_display === "Post"
-                  ? "bg-green-50 text-green-700 border-green-200"
-                  : post.type_display === "Carrossel"
-                  ? "bg-orange-50 text-orange-700 border-orange-200"
-                  : post.type_display === "Story"
-                  ? "bg-pink-50 text-pink-700 border-pink-200"
-                  : "bg-gray-50 text-gray-700 border-gray-200"
+                  : post.type === "live"
+                    ? "bg-red-50 text-red-700 border-red-200"
+                    : post.type === "reels"
+                      ? "bg-purple-50 text-purple-700 border-purple-200"
+                      : post.type === "post"
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : post.type === "carrossel"
+                          ? "bg-orange-50 text-orange-700 border-orange-200"
+                          : post.type === "story"
+                            ? "bg-pink-50 text-pink-700 border-pink-200"
+                            : "bg-gray-50 text-gray-700 border-gray-200"
               }`}
             >
-              {post.type_display === "Post" ? "Feed" : post.type_display}
+              {post.type === "Post" ? "Feed" : post.type}
             </Badge>
           </div>
           {post?.ideas && post.ideas.length > 0 && (

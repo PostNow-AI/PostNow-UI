@@ -5,12 +5,14 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
+import { AdminRoute } from "./components/AdminRoute";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
 import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
+import { AdminDailyPosts } from "./pages/AdminDailyPosts";
 import CreditsPage from "./pages/CreditsPage";
 import EmailSentPage from "./pages/EmailSentPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
@@ -97,6 +99,22 @@ const App = () => {
                   </PublicRoute>
                 }
               />
+
+              {/* ADMIN ROUTES */}
+              <Route
+                element={
+                  <AdminRoute>
+                    <OnboardingProvider>
+                      <DashboardLayout />
+                    </OnboardingProvider>
+                  </AdminRoute>
+                }
+              >
+                <Route
+                  path="/admin/daily-posts"
+                  element={<AdminDailyPosts />}
+                />
+              </Route>
 
               {/* Subscription system routes */}
               <Route

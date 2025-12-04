@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { ClipboardList, LogOut, Wallet } from "lucide-react";
+import { Activity, ClipboardList, LogOut, Wallet } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   Avatar,
@@ -49,6 +49,18 @@ export function AppSidebar() {
       url: "/subscription",
     },
   ];
+
+  const adminMenuItems = [
+    {
+      title: "Posts Diários",
+      icon: Activity,
+      url: "/admin/daily-posts",
+    },
+  ];
+
+  if (user?.is_superuser) {
+    menuItems.push(...adminMenuItems);
+  }
 
   return (
     <>
@@ -102,9 +114,9 @@ export function AppSidebar() {
                           isActive
                             ? `${
                                 actualTheme === "dark"
-                                  ? "!bg-gradient-to-r from-primary to-primary-strong"
-                                  : "!bg-primary/30"
-                              } hover:!bg-primary/30 !font-medium`
+                                  ? "bg-linear-to-r! from-primary to-primary-strong"
+                                  : "bg-primary/30!"
+                              } hover:bg-primary/30! font-medium!`
                             : "hover:bg-primary/30 hover:text-sidebar-accent-foreground active:bg-sidebar-accent/50"
                         }`}
                       >

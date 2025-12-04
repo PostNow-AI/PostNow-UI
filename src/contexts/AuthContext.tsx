@@ -61,6 +61,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
+
   // Clear user data from cache if user becomes unauthenticated
   useEffect(() => {
     // If user becomes unauthenticated but we still have cached data, clear it

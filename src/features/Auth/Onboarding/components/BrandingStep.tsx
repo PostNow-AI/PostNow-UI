@@ -34,7 +34,6 @@ export const BrandingStep = ({
     watch,
   } = form;
   const watchedValues = watch();
-  console.log({ errors });
 
   const { visualStylePreferences, isLoading, createPreferenceMutation } =
     useVisualStylePreferences();
@@ -128,7 +127,7 @@ export const BrandingStep = ({
                           newIds = [...currentIds, preference.id.toString()];
                         } else {
                           newIds = currentIds.filter(
-                            (id: string) => id !== preference.id.toString()
+                            (id: string) => id !== preference.id.toString(),
                           );
                         }
 
@@ -146,7 +145,7 @@ export const BrandingStep = ({
                     </div>
                   </div>
                 );
-              }
+              },
             )}
             {!showCustom && (
               <Button
@@ -265,7 +264,7 @@ export const BrandingStep = ({
                       | "color_3"
                       | "color_4"
                       | "color_5",
-                    color
+                    color,
                   )
                 }
                 placeholder="#ffffff"
