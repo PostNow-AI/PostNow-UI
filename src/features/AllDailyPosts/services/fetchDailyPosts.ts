@@ -4,33 +4,33 @@ export interface DailyPost {
   id: number;
   name: string;
   objective: string;
-  objective_display: string;
   type: string;
-  type_display: string;
   ideas: {
-    id: number;
     content: string;
-    content_preview: string;
     image_url: string;
-    post_name: string;
-    post_type: string;
-    created_at: string;
-    updated_at: string;
   }[];
   further_details: string;
+  is_automatically_generated: boolean;
   include_image: boolean;
   created_at: string;
   updated_at: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-  };
+}
+
+export interface DailyUser {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  posts: DailyPost[];
 }
 
 export interface DailyPostsResponse {
   date: string;
-  posts: DailyPost[];
+  users_with_posts: DailyUser[];
+  user_amount: number;
+  automatic_expected_posts_amount: number;
+  actual_automatic_posts_amount: number;
 }
 
 export const fetchDailyPosts = async (): Promise<DailyPostsResponse> => {

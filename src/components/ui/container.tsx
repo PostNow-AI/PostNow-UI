@@ -6,7 +6,7 @@ export const Container = ({
 }: {
   children: React.ReactNode;
   headerTitle: string;
-  headerDescription: string;
+  headerDescription: string | React.ReactNode;
   containerActions?: React.ReactNode;
 }) => {
   return (
