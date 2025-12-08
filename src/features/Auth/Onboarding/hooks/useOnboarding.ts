@@ -12,6 +12,7 @@ import {
 } from "../constants/onboardingSchema";
 import {
   completeOnboarding,
+  generateSingleClientContext,
   submitOnboardingStep1,
   submitOnboardingStep2,
 } from "../services";
@@ -114,7 +115,7 @@ export const useOnboarding = () => {
         specialization: previouslyCompletedForm.specialization || "",
         logo: previouslyCompletedForm.logo || "",
         visual_style_ids: previouslyCompletedForm?.visual_style_ids?.map((id) =>
-          id.toString()
+          id.toString(),
         ) || [""],
         color_1: previouslyCompletedForm.color_1 || "",
         color_2: previouslyCompletedForm.color_2 || "",
@@ -130,10 +131,14 @@ export const useOnboarding = () => {
       await submitOnboardingStep1(data);
       await submitOnboardingStep2(data);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
       setOpenOnboarding(false);
+      toast.success(
+        "Dados do perfil salvos com sucesso! Já estamos gerando o seu contexto personalizado!",
+      );
+      await generateSingleClientContext();
       if (!previouslyCompletedForm) {
         setShowSuccessDialog(true);
       }

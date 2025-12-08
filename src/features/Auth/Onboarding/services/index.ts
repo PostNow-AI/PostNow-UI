@@ -33,7 +33,7 @@ export const submitOnboardingStep1 = async (data: OnboardingFormData) => {
   };
   const response = await api.put(
     "/api/v1/creator-profile/onboarding/step1/",
-    payload
+    payload,
   );
   return response.data;
 };
@@ -51,21 +51,21 @@ export const submitOnboardingStep2 = async (data: OnboardingFormData) => {
   };
   const response = await api.put(
     "/api/v1/creator-profile/onboarding/step2/",
-    payload
+    payload,
   );
   return response.data;
 };
 
 export const fetchVisualStylePreferences = async () => {
   const response = await api.get(
-    "/api/v1/creator-profile/visual-style-preferences/"
+    "/api/v1/creator-profile/visual-style-preferences/",
   );
   return response.data;
 };
 
 export const createVisualStylePreference = async (
   name: string,
-  description: string
+  description: string,
 ) => {
   const payload = {
     name,
@@ -73,7 +73,14 @@ export const createVisualStylePreference = async (
   };
   const response = await api.post(
     "/api/v1/creator-profile/visual-style-preferences/",
-    payload
+    payload,
+  );
+  return response.data;
+};
+
+export const generateSingleClientContext = async () => {
+  const response = await api.post(
+    "/api/v1/client-context/generate-single-client-context/",
   );
   return response.data;
 };
