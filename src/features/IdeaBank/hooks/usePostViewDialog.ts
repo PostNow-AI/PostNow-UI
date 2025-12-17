@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { ideaBankService } from "../services";
 import type { Post } from "../types";
 
@@ -13,6 +14,8 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
   const [downloadingImage, setDownloadingImage] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const { trackEvent } = useAnalytics();
 
   const {
     data: ideas,
@@ -30,6 +33,19 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
 
   const currentIdea = ideas?.[0];
 
+  useEffect(() => {
+    if (!isOpen || !post?.id || !currentIdea?.id) return;
+    trackEvent({
+      event_name: 'idea_view_opened',
+      resource_type: 'Post',
+      resource_id: String(post.id),
+      context: { post_type: post.type, objective: post.objective },
+      decision_id: (currentIdea as any)?.image_generation_decision_id ?? null,
+      policy_id: (currentIdea as any)?.image_generation_policy_id ?? undefined,
+    });
+  }, [isOpen, post?.id, post?.type, post?.objective, currentIdea?.id]);
+
+
   const handleCopyContent = async () => {
     if (!currentIdea?.content) return;
 
@@ -38,6 +54,14 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
       const strippedContent = currentIdea.content
         .replace(/<[^>]*>/g, "")
         .trim();
+      trackEvent({
+        event_name: 'idea_copy_clicked',
+        resource_type: 'PostIdea',
+        resource_id: String(currentIdea.id),
+        context: { post_type: post?.type, objective: post?.objective },
+        decision_id: (currentIdea as any)?.image_generation_decision_id ?? null,
+        policy_id: (currentIdea as any)?.image_generation_policy_id ?? undefined,
+      });
       await navigator.clipboard.writeText(strippedContent);
       toast.success("Conteúdo copiado!", {
         description: "O texto do post foi copiado para a área de transferência",
@@ -55,6 +79,14 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
 
     setRegeneratingIdea(true);
     try {
+      trackEvent({
+        event_name: 'idea_regenerate_clicked',
+        resource_type: 'PostIdea',
+        resource_id: String(currentIdea.id),
+        context: { post_type: post?.type, objective: post?.objective },
+        decision_id: (currentIdea as any)?.image_generation_decision_id ?? null,
+        policy_id: (currentIdea as any)?.image_generation_policy_id ?? undefined,
+      });
       await ideaBankService.editPostIdea(currentIdea.id, {
         content: currentIdea.content,
         improvement_prompt: regeneratePrompt,
@@ -84,6 +116,14 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
     setGeneratingImage(true);
     try {
       const hasImage = !!currentIdea.image_url;
+      trackEvent({
+        event_name: hasImage ? 'image_regenerate_clicked' : 'image_generate_clicked',
+        resource_type: 'PostIdea',
+        resource_id: String(currentIdea.id),
+        context: { post_type: post?.type, objective: post?.objective },
+        decision_id: (currentIdea as any)?.image_generation_decision_id ?? null,
+        policy_id: (currentIdea as any)?.image_generation_policy_id ?? undefined,
+      });
       if (hasImage) {
         await ideaBankService.regenerateImageForIdea(currentIdea.id, {
           prompt: imagePrompt,
@@ -120,12 +160,28 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
 
     setDownloadingImage(true);
     try {
+      trackEvent({
+        event_name: 'image_download_clicked',
+        resource_type: 'PostIdea',
+        resource_id: String(currentIdea.id),
+        context: { post_type: post?.type, objective: post?.objective },
+        decision_id: (currentIdea as any)?.image_generation_decision_id ?? null,
+        policy_id: (currentIdea as any)?.image_generation_policy_id ?? undefined,
+      });
       const response = await fetch(currentIdea.image_url);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const blob = await response.blob();
+      trackEvent({
+        event_name: 'image_download_succeeded',
+        resource_type: 'PostIdea',
+        resource_id: String(currentIdea.id),
+        context: { post_type: post?.type, objective: post?.objective },
+        decision_id: (currentIdea as any)?.image_generation_decision_id ?? null,
+        policy_id: (currentIdea as any)?.image_generation_policy_id ?? undefined,
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -139,6 +195,14 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
         description: "A imagem foi salva em seus downloads",
       });
     } catch (error) {
+      trackEvent({
+        event_name: 'image_download_failed',
+        resource_type: 'PostIdea',
+        resource_id: String(currentIdea.id),
+        context: { post_type: post?.type, objective: post?.objective },
+        decision_id: (currentIdea as any)?.image_generation_decision_id ?? null,
+        policy_id: (currentIdea as any)?.image_generation_policy_id ?? undefined,
+      });
       console.error("Failed to download image:", error);
       toast.error("Download falhou", {
         description: "Abrindo imagem em nova aba para download manual",
