@@ -8,6 +8,7 @@ export * from "./card";
 export * from "./checkbox";
 export * from "./collapsible";
 export * from "./color-picker";
+export * from "./container";
 export * from "./dialog";
 export * from "./form";
 export * from "./image-picker";
@@ -26,6 +27,7 @@ export * from "./sheet";
 export * from "./skeleton";
 export * from "./sonner";
 export * from "./switch";
+export * from "./tabs";
 export * from "./tally-button";
 export * from "./textarea";
 

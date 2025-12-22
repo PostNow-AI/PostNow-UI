@@ -78,22 +78,27 @@ interface PostCreationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (postData: PostData, ideaData: IdeaData) => void;
+  initialValues?: {
+    name?: string;
+    further_details?: string;
+  };
 }
 
 export const PostCreationDialog = ({
   isOpen,
   onClose,
   onSuccess,
+  initialValues,
 }: PostCreationDialogProps) => {
   const { handleCreatePost, isCreating } = usePostCreationForm(onSuccess);
 
   const form = useForm<PostCreationData>({
     resolver: zodResolver(postCreationSchema),
     defaultValues: {
-      name: "",
+      name: initialValues?.name || "",
       objective: "branding" as const,
       type: "post" as const,
-      further_details: "",
+      further_details: initialValues?.further_details || "",
       include_image: false,
     },
   });

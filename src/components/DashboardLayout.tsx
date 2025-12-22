@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { Activity, ClipboardList, LogOut, Wallet } from "lucide-react";
+import { Activity, ClipboardList, LogOut, Radio, Wallet } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   Avatar,
@@ -55,6 +55,11 @@ export function AppSidebar() {
       title: "Posts Diários",
       icon: Activity,
       url: "/admin/daily-posts",
+    },
+    {
+      title: "Radar Semanal",
+      icon: Radio,
+      url: "/weekly-context",
     },
   ];
 

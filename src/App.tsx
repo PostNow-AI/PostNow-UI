@@ -26,6 +26,7 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
+import { WeeklyContextPage } from "./pages/WeeklyContextPage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -138,6 +139,7 @@ const App = () => {
               >
                 <Route path="/ideabank" element={<IdeaBankPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/weekly-context" element={<WeeklyContextPage />} />
 
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />
