@@ -52,7 +52,12 @@ export const VisualStylePicker = ({ onSelect, onBack }: VisualStylePickerProps) 
   });
 
   const handleContinue = () => {
-    onSelect(selected.map(String)); // Converter para string[]
+    // Se nenhum estilo foi selecionado MAS tem estilos do perfil, usar esses
+    const finalSelection = selected.length > 0 
+      ? selected 
+      : visualStylePreferences?.map((s: any) => s.id) || [];
+    
+    onSelect(finalSelection.map(String)); // Converter para string[]
   };
 
   return (
@@ -205,9 +210,9 @@ export const VisualStylePicker = ({ onSelect, onBack }: VisualStylePickerProps) 
         </Button>
         <Button
           onClick={handleContinue}
-          disabled={selected.length === 0 || selected.length > 3}
+          disabled={(selected.length === 0 && (!visualStylePreferences || visualStylePreferences.length === 0)) || selected.length > 3}
         >
-          Continuar com {selected.length} {selected.length === 1 ? "estilo" : "estilos"} →
+          Continuar com {selected.length > 0 ? selected.length : visualStylePreferences?.length || 0} {(selected.length > 0 ? selected.length : visualStylePreferences?.length || 0) === 1 ? "estilo" : "estilos"} →
         </Button>
       </div>
     </div>

@@ -29,14 +29,14 @@ export const useVisualStyles = () => {
   const [selected, setSelected] = useState<number[]>([]);
 
   useEffect(() => {
-    if (profileStyleIds.length > 0) {
+    if (profileStyleIds.length > 0 && selected.length === 0) {
       // Converter string IDs para numbers se necessário
       const ids = profileStyleIds.map((id) => 
         typeof id === "string" ? parseInt(id) : id
       );
       setSelected(ids);
     }
-  }, [profileStyleIds.length]);
+  }, [profileStyleIds, campaignStyles]); // Aguardar campaignStyles carregar
 
   const toggleStyle = (styleId: number) => {
     setSelected((prev) => {
@@ -71,6 +71,7 @@ export const useVisualStyles = () => {
     visualStylePreferences, // Estilos do onboarding
     campaignStyles, // Estilos do Campaigns (18)
     isLoading: isLoadingOnboarding || isLoadingCampaign,
+    hasProfileStyles: profileStyleIds.length > 0,
   };
 };
 

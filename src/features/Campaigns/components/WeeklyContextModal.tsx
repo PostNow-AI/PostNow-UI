@@ -41,13 +41,20 @@ export const WeeklyContextModal = ({
   const [selected, setSelected] = useState<number[]>([]);
 
   // Buscar oportunidades do Weekly Context
-  const { data: opportunities, isLoading } = useQuery({
+  const { data: opportunities, isLoading, error } = useQuery({
     queryKey: ["weekly-context-opportunities"],
     queryFn: async () => {
-      const response = await api.get("/api/v1/weekly-context/active/");
-      return response.data?.opportunities || [];
+      try {
+        const response = await api.get("/api/v1/weekly-context/active/");
+        return response.data?.opportunities || [];
+      } catch (error: any) {
+        // Se API falhar (404/500), retornar array vazio
+        console.warn("Weekly Context não disponível:", error);
+        return [];
+      }
     },
     enabled: isOpen,
+    retry: false, // Não tentar novamente se falhar
   });
 
   const toggleOpportunity = (id: number) => {
