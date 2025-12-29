@@ -17,6 +17,7 @@ import { StructureSelector } from "@/features/Campaigns/components/wizard/Struct
 import { DurationStep } from "@/features/Campaigns/components/wizard/DurationStep";
 import { VisualStylePicker } from "@/features/Campaigns/components/wizard/VisualStylePicker";
 import { ReviewStep } from "@/features/Campaigns/components/wizard/ReviewStep";
+import { WeeklyContextModal } from "@/features/Campaigns/components/WeeklyContextModal";
 
 export const CampaignCreationPage = () => {
   const navigate = useNavigate();
@@ -30,7 +31,10 @@ export const CampaignCreationPage = () => {
     postCount,
     briefingData,
     percentage,
+    weeklyContextOpportunities,
+    showWeeklyContextModal,
     handleBriefingComplete,
+    handleWeeklyContextSelect,
     handleStructureSelected,
     handleDurationConfirmed,
     handleStylesSelected,
@@ -172,6 +176,14 @@ export const CampaignCreationPage = () => {
             </div>
           )}
         </Card>
+
+        {/* Weekly Context Modal */}
+        <WeeklyContextModal
+          isOpen={showWeeklyContextModal}
+          onClose={() => setShowWeeklyContextModal(false)}
+          onSelect={handleWeeklyContextSelect}
+          briefingData={briefingData}
+        />
       </div>
     </BlurryBackground>
   );

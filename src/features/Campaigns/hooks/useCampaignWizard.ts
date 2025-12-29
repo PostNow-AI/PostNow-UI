@@ -17,6 +17,8 @@ export const useCampaignWizard = () => {
   const [durationDays, setDurationDays] = useState<number>(14);
   const [postCount, setPostCount] = useState<number>(8);
   const [briefingData, setBriefingData] = useState<Partial<BriefingData>>({});
+  const [weeklyContextOpportunities, setWeeklyContextOpportunities] = useState<number[]>([]);
+  const [showWeeklyContextModal, setShowWeeklyContextModal] = useState(false);
 
   // Cálculo de progresso (para progress bar)
   const steps: WizardStep[] = ["briefing", "structure", "duration", "styles", "review"];
@@ -39,6 +41,13 @@ export const useCampaignWizard = () => {
 
   const handleBriefingComplete = (data: BriefingData) => {
     setBriefingData(data);
+    // Mostrar Weekly Context antes de ir para structure
+    setShowWeeklyContextModal(true);
+  };
+
+  const handleWeeklyContextSelect = (opportunityIds: number[]) => {
+    setWeeklyContextOpportunities(opportunityIds);
+    setShowWeeklyContextModal(false);
     setCurrentStep("structure");
   };
 
@@ -83,6 +92,8 @@ export const useCampaignWizard = () => {
     setDurationDays(14);
     setPostCount(8);
     setBriefingData({});
+    setWeeklyContextOpportunities([]);
+    setShowWeeklyContextModal(false);
   };
 
   return {
@@ -96,9 +107,12 @@ export const useCampaignWizard = () => {
     postCount,
     briefingData,
     percentage,
+    weeklyContextOpportunities,
+    showWeeklyContextModal,
     handleNext,
     handleBack,
     handleBriefingComplete,
+    handleWeeklyContextSelect,
     handleStructureSelected,
     handleDurationConfirmed,
     handleStylesSelected,
