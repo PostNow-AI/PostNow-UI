@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -85,6 +86,7 @@ export const GeneratingPostSheet = ({
   onGenerate,
 }: GeneratingPostSheetProps) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<Step>("customize");
   const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState("");
@@ -217,24 +219,30 @@ export const GeneratingPostSheet = ({
     }
   };
 
-  const handleDownloadImage = () => {
+  const handleDownloadImage = async () => {
     if (!generatedPost?.idea.image_url) {
       toast.error("Nenhuma imagem para baixar");
       return;
     }
     
     try {
-      // Create temporary link to download image
+      // Fetch image as blob to force download (bypasses CORS and browser behavior)
+      const response = await fetch(generatedPost.idea.image_url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      
       const link = document.createElement('a');
-      link.href = generatedPost.idea.image_url;
+      link.href = url;
       link.download = `post-imagem-${generatedPost.post.id}.png`;
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast.success("Download iniciado!");
+      window.URL.revokeObjectURL(url);
+      
+      toast.success("Download concluído!");
     } catch (error) {
       toast.error("Erro ao baixar imagem");
+      console.error("Download error:", error);
     }
   };
 
@@ -247,17 +255,16 @@ export const GeneratingPostSheet = ({
     try {
       toast.loading("Regenerando imagem...", { id: "regen-image" });
       
-      const result = await ideaBankService.regenerateImage(
+      const result = await ideaBankService.regenerateImageForIdea(
         generatedPost.idea.id,
-        null  // Sem prompt customizado
+        {}  // Objeto vazio (sem prompt customizado)
       );
       
-      // Atualizar URL da imagem no estado local
-      // Note: O backend já atualizou, mas precisamos refletir na UI
-      toast.success("Imagem regenerada com sucesso!", { id: "regen-image" });
+      toast.success("Imagem regenerada!", { id: "regen-image" });
       
-      // Force refresh para pegar nova imagem
-      window.location.reload();
+      // Fechar sheet - ao abrir IdeaBank verá imagem atualizada
+      handleClose();
+      
     } catch (error) {
       toast.error("Erro ao regenerar imagem", { id: "regen-image" });
       console.error("Error regenerating image:", error);
@@ -267,7 +274,12 @@ export const GeneratingPostSheet = ({
   const handleClose = () => {
     setCurrentStep("customize");
     setProgress(0);
+    setEditableContent("");
     form.reset();
+    
+    // Invalidar cache do IdeaBank para mostrar imagens atualizadas
+    queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
+    
     onClose();
   };
 

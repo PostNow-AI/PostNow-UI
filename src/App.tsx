@@ -18,6 +18,8 @@ import EmailSentPage from "./pages/EmailSentPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
+import { CampaignsPage } from "./pages/CampaignsPage";
+import { CampaignCreationPage } from "./pages/CampaignCreationPage";
 import LoginPage from "./pages/LoginPage";
 import PasswordResetConfirmPage from "./pages/PasswordResetConfirmPage";
 import PasswordResetRequestPage from "./pages/PasswordResetRequestPage";
@@ -138,12 +140,23 @@ const App = () => {
                 }
               >
                 <Route path="/ideabank" element={<IdeaBankPage />} />
+                <Route path="/campaigns" element={<CampaignsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/weekly-context" element={<WeeklyContextPage />} />
 
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />
               </Route>
+
+              {/* Campaign creation - Full page (not in DashboardLayout) */}
+              <Route
+                path="/campaigns/new"
+                element={
+                  <ProtectedRoute>
+                    <CampaignCreationPage />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
             <Toaster />
           </AuthProvider>
