@@ -2,6 +2,7 @@
  * Lista de campanhas em grid.
  */
 
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
 import { Calendar, FileText, CheckCircle2, Clock } from "lucide-react";
 import type { Campaign } from "../types";
@@ -11,6 +12,7 @@ interface CampaignListProps {
 }
 
 export const CampaignList = ({ campaigns }: CampaignListProps) => {
+  const navigate = useNavigate();
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       draft: { variant: "secondary" as const, label: "Rascunho" },
@@ -28,7 +30,10 @@ export const CampaignList = ({ campaigns }: CampaignListProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {campaigns.map((campaign) => (
-        <Card key={campaign.id} className="hover:shadow-md transition-shadow cursor-pointer">
+        <Card 
+          key={campaign.id} 
+          className="hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => navigate(`/campaigns/${campaign.id}`)}
           <CardHeader>
             <div className="flex items-start justify-between">
               <CardTitle className="text-lg line-clamp-2">{campaign.name}</CardTitle>

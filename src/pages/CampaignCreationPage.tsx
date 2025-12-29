@@ -176,12 +176,3 @@ export const CampaignCreationPage = () => {
     </BlurryBackground>
   );
 };
-
-
-
-
-  );
-};
-
-
-

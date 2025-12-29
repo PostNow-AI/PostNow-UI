@@ -20,6 +20,7 @@ import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
 import { CampaignsPage } from "./pages/CampaignsPage";
 import { CampaignCreationPage } from "./pages/CampaignCreationPage";
+import { CampaignDetailPage } from "./pages/CampaignDetailPage";
 import LoginPage from "./pages/LoginPage";
 import PasswordResetConfirmPage from "./pages/PasswordResetConfirmPage";
 import PasswordResetRequestPage from "./pages/PasswordResetRequestPage";
@@ -141,6 +142,7 @@ const App = () => {
               >
                 <Route path="/ideabank" element={<IdeaBankPage />} />
                 <Route path="/campaigns" element={<CampaignsPage />} />
+                <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/weekly-context" element={<WeeklyContextPage />} />
 
