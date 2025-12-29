@@ -11,4 +11,5 @@ export { useCampaignWizard } from "./useCampaignWizard";
 export { useBriefingForm } from "./useBriefingForm";
 export { useVisualStyles } from "./useVisualStyles";
 export { useBriefingSuggestion } from "./useBriefingSuggestion";
+export { useStructureSuggestion } from "./useStructureSuggestion";
 

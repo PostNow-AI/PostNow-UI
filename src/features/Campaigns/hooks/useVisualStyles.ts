@@ -18,10 +18,10 @@ export const useVisualStyles = () => {
   // Buscar detalhes dos estilos do onboarding (VisualStylePreference)
   const { visualStylePreferences, isLoading: isLoadingOnboarding } = useVisualStylePreferences();
   
-  // Buscar estilos de campanhas (VisualStyle do Campaigns app)
+  // Buscar estilos de campanhas RANQUEADOS por IA (Thompson Sampling!)
   const { data: campaignStyles, isLoading: isLoadingCampaign } = useQuery({
-    queryKey: ["campaign-visual-styles"],
-    queryFn: campaignService.getVisualStyles,
+    queryKey: ["campaign-visual-styles-ranked"],
+    queryFn: campaignService.getRankedVisualStyles,
     staleTime: 10 * 60 * 1000, // 10 minutos
   });
 

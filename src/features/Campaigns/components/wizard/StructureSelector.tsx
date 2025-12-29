@@ -5,6 +5,7 @@
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from "@/components/ui";
 import { BookOpen, TrendingUp } from "lucide-react";
 import type { CampaignType, CampaignStructure } from "../../types";
+import { useStructureSuggestion } from "../../hooks/useStructureSuggestion";
 
 interface StructureSelectorProps {
   campaignType: CampaignType;
@@ -17,8 +18,9 @@ export const StructureSelector = ({
   onSelect,
   onBack,
 }: StructureSelectorProps) => {
-  // Sugestão baseada em tipo (será substituído por Thompson Sampling)
-  const suggestedStructure: CampaignStructure = "aida";
+  // Buscar sugestão de Thompson Sampling (IA!)
+  const { data: aiSuggestion } = useStructureSuggestion(campaignType);
+  const suggestedStructure: CampaignStructure = aiSuggestion?.suggested || "aida";
   
   const structures = [
     {

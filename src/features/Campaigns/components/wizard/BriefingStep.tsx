@@ -71,15 +71,27 @@ export const BriefingStep = ({ form, onComplete, onCancel }: BriefingStepProps) 
               name="objective"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    Qual o objetivo específico desta campanha?
+                  <div className="flex items-center justify-between">
+                    <FormLabel>
+                      Qual o objetivo específico desta campanha?
+                    </FormLabel>
                     {suggestedObjective && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => {
+                          // Regenerar sugestão
+                          form.setValue("objective", "");
+                          window.location.reload(); // Força novo fetch de sugestão
+                        }}
+                      >
                         <Sparkles className="h-3 w-3 mr-1" />
-                        Sugestão IA
-                      </Badge>
+                        Sugestão IA - Gerar outra
+                      </Button>
                     )}
-                  </FormLabel>
+                  </div>
                   <FormControl>
                     <Textarea
                       placeholder="Ex: Posicionar minha empresa como autoridade em [nicho], educando o público sobre..."

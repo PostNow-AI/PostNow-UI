@@ -222,6 +222,14 @@ export const campaignService = {
   },
 
   /**
+   * Obter estilos RANQUEADOS por Thompson Sampling (IA!)
+   */
+  async getRankedVisualStyles(): Promise<VisualStyle[]> {
+    const response = await api.get("/api/v1/campaigns/visual-styles/ranked/");
+    return response.data.data;
+  },
+
+  /**
    * Obter sugestão de objetivo (Contextual Bandits)
    */
   async getBriefingSuggestion(): Promise<{ suggestion: string; decision_id: string }> {

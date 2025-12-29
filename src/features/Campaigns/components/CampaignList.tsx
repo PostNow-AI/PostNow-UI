@@ -34,6 +34,7 @@ export const CampaignList = ({ campaigns }: CampaignListProps) => {
           key={campaign.id} 
           className="hover:shadow-md transition-shadow cursor-pointer"
           onClick={() => navigate(`/campaigns/${campaign.id}`)}
+        >
           <CardHeader>
             <div className="flex items-start justify-between">
               <CardTitle className="text-lg line-clamp-2">{campaign.name}</CardTitle>
