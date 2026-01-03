@@ -47,14 +47,36 @@ export const CampaignDetailPage = () => {
       headerDescription={`${campaign.post_count} posts • ${campaign.duration_days} dias`}
     >
       <div className="p-6">
-        {/* Header com status */}
-        <div className="flex items-center gap-4 mb-6">
-          <Badge variant={campaign.status === "active" ? "default" : "secondary"}>
-            {campaign.status}
-          </Badge>
-          <div className="text-sm text-muted-foreground">
-            Criada em {new Date(campaign.created_at).toLocaleDateString("pt-BR")}
+        {/* Header com status e ações */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Badge variant={campaign.status === "active" ? "default" : "secondary"}>
+              {campaign.status}
+            </Badge>
+            <div className="text-sm text-muted-foreground">
+              Criada em {new Date(campaign.created_at).toLocaleDateString("pt-BR")}
+            </div>
           </div>
+          
+          {/* Botões de ação */}
+          {campaign.status === "draft" && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate(`/campaigns/new?draft=${campaign.id}`)}
+              >
+                Continuar Editando
+              </Button>
+              {campaign.campaign_posts?.length === 0 && (
+                <Button onClick={() => {
+                  // TODO: Chamar API de geração
+                  console.log("Gerar posts para campanha", campaign.id);
+                }}>
+                  Gerar Posts
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
