@@ -5,8 +5,9 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Progress } from "@/components/ui";
+import { Card, Progress, Button } from "@/components/ui";
 import { BlurryBackground } from "@/components/ui/blurry-background";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -97,8 +98,21 @@ export const CampaignCreationPage = () => {
   return (
     <BlurryBackground variant="2">
       <div className="flex flex-col items-center space-y-6 px-4 min-h-screen py-8">
+        {/* Botão Voltar */}
+        <div className="w-full max-w-[900px] px-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/campaigns")}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Voltar para Dashboard
+          </Button>
+        </div>
+
         {/* Header */}
-        <div className="text-center space-y-2 mt-8">
+        <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold">
             Criar <span className="text-primary">Nova Campanha</span>
           </h1>
