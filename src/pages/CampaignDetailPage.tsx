@@ -1,12 +1,13 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Container, Tabs, TabsContent, TabsList, TabsTrigger, Card, CardHeader, CardTitle, CardContent, Badge } from "@/components/ui";
+import { Container, Tabs, TabsContent, TabsList, TabsTrigger, Card, CardHeader, CardTitle, CardContent, Badge, Button } from "@/components/ui";
 import { Calendar, FileText, Eye } from "lucide-react";
 import { campaignService } from "@/features/Campaigns/services";
 import type { CampaignWithPosts } from "@/features/Campaigns/types";
 
 export const CampaignDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   
   // Buscar dados da campanha
   const { data: campaign, isLoading } = useQuery({
