@@ -35,7 +35,9 @@ export default function CarouselManualFormPage() {
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
       setGenerationProgress('Iniciando geração...');
-      const response = await api.post('/carousel/generate/', data);
+      const response = await api.post('/api/v1/carousel/generate/', data, {
+        timeout: 180000, // 3 minutos (180 segundos) para processo completo
+      });
       return response.data;
     },
     onSuccess: (response) => {
@@ -97,12 +99,31 @@ export default function CarouselManualFormPage() {
               />
 
               {mutation.isPending && (
-                <Alert>
-                  <Loader className="h-4 w-4" />
-                  <AlertDescription>
-                    {generationProgress || 'Gerando carrossel... Isso pode levar até 60 segundos.'}
-                  </AlertDescription>
-                </Alert>
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md dark:bg-blue-950 dark:border-blue-800">
+                  <div className="flex items-center space-x-3">
+                    <Loader className="h-5 w-5 animate-spin text-blue-600 dark:text-blue-400" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                        Gerando carrossel...
+                      </p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                        Este processo pode levar de 90 a 120 segundos. Por favor, aguarde.
+                      </p>
+                      {generationProgress && (
+                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
+                          {generationProgress}
+                        </p>
+                      )}
+                      <div className="mt-3 space-y-1 text-xs text-blue-600 dark:text-blue-400">
+                        <p>✓ Analisando tema e contexto</p>
+                        <p>✓ Criando design system visual</p>
+                        <p>✓ Estruturando 7 slides</p>
+                        <p>✓ Refinando textos</p>
+                        <p>⏳ Gerando imagens harmônicas...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {mutation.isError && (
