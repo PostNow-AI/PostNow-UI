@@ -1,29 +1,34 @@
 /**
  * Hook de lógica para seleção de estilos visuais.
- * Reutiliza useVisualStylePreferences do Onboarding.
+ * Busca os estilos do perfil do usuário E todos os estilos disponíveis.
  */
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks";
-import { useVisualStylePreferences } from "@/features/Auth/Onboarding/hooks/useVisualStylePreferences";
 import { useQuery } from "@tanstack/react-query";
 import { campaignService } from "../services";
+import { api } from "@/lib/api";
 
 export const useVisualStyles = () => {
   const { user } = useAuth();
   
-  // Estilos que usuário escolheu no onboarding
+  // IDs dos estilos que usuário escolheu no onboarding
   const profileStyleIds = user?.creator_profile?.visual_style_ids || [];
   
-  // Buscar detalhes dos estilos do onboarding (VisualStylePreference)
-  const { visualStylePreferences, isLoading: isLoadingOnboarding } = useVisualStylePreferences();
-  
-  // Buscar estilos de campanhas RANQUEADOS por IA (Thompson Sampling!)
-  const { data: campaignStyles, isLoading: isLoadingCampaign } = useQuery({
-    queryKey: ["campaign-visual-styles-ranked"],
-    queryFn: campaignService.getRankedVisualStyles,
+  // Buscar TODOS os estilos visuais disponíveis (biblioteca de 20)
+  const { data: allStyles, isLoading: isLoadingAll } = useQuery({
+    queryKey: ["all-visual-styles"],
+    queryFn: async () => {
+      const response = await api.get("/api/v1/global-options/visual-styles/");
+      return response.data.data || [];
+    },
     staleTime: 10 * 60 * 1000, // 10 minutos
   });
+  
+  // Estilos do perfil do usuário (filtrar da biblioteca completa)
+  const visualStylePreferences = allStyles?.filter((style: any) => 
+    profileStyleIds.includes(style.id)
+  ) || [];
 
   // Estado de seleção (inicializa com estilos do perfil)
   const [selected, setSelected] = useState<number[]>([]);
@@ -31,12 +36,12 @@ export const useVisualStyles = () => {
   useEffect(() => {
     if (profileStyleIds.length > 0 && selected.length === 0) {
       // Converter string IDs para numbers se necessário
-      const ids = profileStyleIds.map((id) => 
+      const ids = profileStyleIds.map((id: any) => 
         typeof id === "string" ? parseInt(id) : id
       );
       setSelected(ids);
     }
-  }, [profileStyleIds, campaignStyles]); // Aguardar campaignStyles carregar
+  }, [profileStyleIds, allStyles]); // Aguardar allStyles carregar
 
   const toggleStyle = (styleId: number) => {
     setSelected((prev) => {
@@ -55,7 +60,7 @@ export const useVisualStyles = () => {
   const isSelected = (styleId: number) => selected.includes(styleId);
 
   const isFromProfile = (styleId: number) => {
-    const ids = profileStyleIds.map((id) => 
+    const ids = profileStyleIds.map((id: any) => 
       typeof id === "string" ? parseInt(id) : id
     );
     return ids.includes(styleId);
@@ -68,10 +73,11 @@ export const useVisualStyles = () => {
     isSelected,
     isFromProfile,
     profileStyleIds,
-    visualStylePreferences, // Estilos do onboarding
-    campaignStyles, // Estilos do Campaigns (18)
-    isLoading: isLoadingOnboarding || isLoadingCampaign,
+    visualStylePreferences, // Estilos do perfil (filtrados)
+    campaignStyles: allStyles, // Todos os 20 estilos
+    isLoading: isLoadingAll,
     hasProfileStyles: profileStyleIds.length > 0,
   };
 };
+
 

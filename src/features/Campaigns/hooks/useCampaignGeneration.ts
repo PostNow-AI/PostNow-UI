@@ -1,5 +1,6 @@
 /**
  * Hook para gerar conteúdo de campanha (todos os posts).
+ * Agora usa geração assíncrona com Celery.
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,19 +17,21 @@ export const useCampaignGeneration = (campaignId: number) => {
       campaignService.generateContent(campaignId, params),
     
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["campaigns"] });
-      queryClient.invalidateQueries({ queryKey: ["campaign", campaignId] });
-      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
+      // Agora recebemos task_id em vez de resultado imediato
+      toast.success("Geração iniciada! Acompanhe o progresso abaixo.");
       
-      toast.success(
-        `Campanha gerada! ${data.total_generated} posts prontos para revisão.`
-      );
+      // Não invalida mais o cache, pois geração é assíncrona
+      // O polling vai atualizar quando completar
+      
+      // Log para debug
+      console.log("✅ Geração assíncrona iniciada:", data);
     },
     
     onError: (error: unknown) => {
+      console.error("❌ Erro ao iniciar geração:", error);
       const errorResult = handleApiError(error, {
-        defaultTitle: "Erro ao gerar campanha",
-        defaultDescription: "Não foi possível gerar o conteúdo. Tente novamente.",
+        defaultTitle: "Erro ao iniciar geração",
+        defaultDescription: "Não foi possível iniciar a geração. Tente novamente.",
       });
       toast.error(errorResult.description);
     },

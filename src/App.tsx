@@ -30,6 +30,10 @@ import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
 import { WeeklyContextPage } from "./pages/WeeklyContextPage";
+import CarouselListPage from "./pages/CarouselListPage";
+import CarouselCreatePage from "./pages/CarouselCreatePage";
+import CarouselManualFormPage from "./pages/CarouselManualFormPage";
+import CarouselViewPage from "./pages/CarouselViewPage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -148,6 +152,12 @@ const App = () => {
 
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />
+                
+                {/* Carousel routes */}
+                <Route path="/carousel" element={<CarouselListPage />} />
+                <Route path="/carousel/create" element={<CarouselCreatePage />} />
+                <Route path="/carousel/create/manual" element={<CarouselManualFormPage />} />
+                <Route path="/carousel/:id" element={<CarouselViewPage />} />
               </Route>
 
               {/* Campaign creation - Full page (not in DashboardLayout) */}

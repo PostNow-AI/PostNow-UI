@@ -45,8 +45,9 @@ export const WeeklyContextModal = ({
     queryKey: ["weekly-context-opportunities"],
     queryFn: async () => {
       try {
-        const response = await api.get("/api/v1/weekly-context/active/");
-        return response.data?.opportunities || [];
+        const response = await api.get("/api/v1/client-context/weekly-context/opportunities/");
+        // Backend retorna { success: true, data: [...] }
+        return response.data?.data || [];
       } catch (error: any) {
         // Se API falhar (404/500), retornar array vazio
         console.warn("Weekly Context não disponível:", error);

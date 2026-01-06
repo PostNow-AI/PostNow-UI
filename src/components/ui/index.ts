@@ -20,6 +20,7 @@ export * from "./navigation-menu";
 export * from "./popover";
 export * from "./progress";
 export * from "./progress-bar";
+export * from "./radio-group";
 export * from "./rich-text-editor";
 export * from "./select";
 export * from "./separator";

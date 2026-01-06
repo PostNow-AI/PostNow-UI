@@ -82,6 +82,26 @@ export const campaignService = {
     return response.data;
   },
 
+  /**
+   * Obter progresso da geração assíncrona
+   */
+  async getProgress(campaignId: number): Promise<{
+    success: boolean;
+    data: {
+      status: 'pending' | 'processing' | 'completed' | 'failed' | 'not_started';
+      current_step: number;
+      total_steps: number;
+      current_action: string;
+      percentage: number;
+      error_message?: string;
+      started_at?: string;
+      completed_at?: string;
+    };
+  }> {
+    const response = await api.get(`/api/v1/campaigns/${campaignId}/progress/`);
+    return response.data;
+  },
+
   // ============================================================================
   // APPROVAL
   // ============================================================================
@@ -217,15 +237,16 @@ export const campaignService = {
    */
   async getVisualStyles(category?: string): Promise<VisualStyle[]> {
     const params = category ? { category } : {};
-    const response = await api.get("/api/v1/campaigns/visual-styles/", { params });
+    const response = await api.get("/api/v1/global-options/visual-styles/", { params });
     return response.data.data;
   },
 
   /**
    * Obter estilos RANQUEADOS por Thompson Sampling (IA!)
+   * NOTA: Por enquanto usa mesma API, mas futuramente implementar ranking
    */
   async getRankedVisualStyles(): Promise<VisualStyle[]> {
-    const response = await api.get("/api/v1/campaigns/visual-styles/ranked/");
+    const response = await api.get("/api/v1/global-options/visual-styles/");
     return response.data.data;
   },
 
@@ -261,5 +282,49 @@ export const campaignService = {
     );
     return response.data;
   },
+
+  // ============================================================================
+  // JORNADAS ADAPTATIVAS
+  // ============================================================================
+
+  /**
+   * Obter sugestão de jornada ideal
+   */
+  async suggestJourney(params?: {
+    explicit_choice?: 'quick' | 'guided' | 'advanced';
+    urgency?: boolean;
+  }): Promise<{
+    success: boolean;
+    data: {
+      journey: 'quick' | 'guided' | 'advanced';
+      title: string;
+      description: string;
+      benefits: string[];
+      ideal_for: string;
+      reasons: Array<{ type: string; message: string }>;
+    };
+  }> {
+    const response = await api.post("/api/v1/campaigns/suggest-journey/", params || {});
+    return response.data;
+  },
+
+  /**
+   * Registrar evento de jornada
+   */
+  async trackJourneyEvent(params: {
+    campaign_id: string;
+    event_type: 'started' | 'completed' | 'abandoned' | 'switched';
+    journey_type: 'quick' | 'guided' | 'advanced';
+    time_spent_seconds?: number;
+    satisfaction_rating?: number;
+  }): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    const response = await api.post("/api/v1/campaigns/track-journey/", params);
+    return response.data;
+  },
 };
 
+// Export também como campaignsService para compatibilidade
+export const campaignsService = campaignService;

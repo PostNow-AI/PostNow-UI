@@ -19,6 +19,10 @@ export const useCampaignWizard = () => {
   const [briefingData, setBriefingData] = useState<Partial<BriefingData>>({});
   const [weeklyContextOpportunities, setWeeklyContextOpportunities] = useState<number[]>([]);
   const [showWeeklyContextModal, setShowWeeklyContextModal] = useState(false);
+  
+  // NOVO: Configurações de qualidade de geração
+  const [generationQuality, setGenerationQuality] = useState<'fast' | 'premium'>('fast');
+  const [visualHarmonyEnabled, setVisualHarmonyEnabled] = useState(true);
 
   // Cálculo de progresso (para progress bar)
   const steps: WizardStep[] = ["briefing", "structure", "duration", "styles", "review"];
@@ -94,6 +98,8 @@ export const useCampaignWizard = () => {
     setBriefingData({});
     setWeeklyContextOpportunities([]);
     setShowWeeklyContextModal(false);
+    setGenerationQuality('fast');
+    setVisualHarmonyEnabled(true);
   };
 
   return {
@@ -109,6 +115,11 @@ export const useCampaignWizard = () => {
     percentage,
     weeklyContextOpportunities,
     showWeeklyContextModal,
+    setShowWeeklyContextModal,
+    generationQuality,
+    setGenerationQuality,
+    visualHarmonyEnabled,
+    setVisualHarmonyEnabled,
     handleNext,
     handleBack,
     handleBriefingComplete,

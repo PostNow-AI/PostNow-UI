@@ -74,31 +74,52 @@ export const VisualStylePicker = ({ onSelect, onBack }: VisualStylePickerProps) 
         <CardContent>
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Carregando estilos...</p>
-          ) : (
+          ) : visualStylePreferences && visualStylePreferences.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {visualStylePreferences?.slice(0, 3).map((pref: any) => (
-                  <Card
-                    key={pref.id}
-                    className={`cursor-pointer transition-all ${
-                      isSelected(pref.id) ? "border-primary border-2" : ""
+                {visualStylePreferences.slice(0, 3).map((style: any) => (
+                  <div
+                    key={style.id}
+                    className={`group cursor-pointer transition-all hover:scale-[1.02] ${
+                      isSelected(style.id) ? "ring-4 ring-primary ring-offset-2" : "ring-2 ring-border"
                     }`}
-                    onClick={() => toggleStyle(pref.id)}
+                    onClick={() => toggleStyle(style.id)}
                   >
-                    <CardContent className="p-4 space-y-2">
-                      <div className="flex items-start gap-2">
-                        <Checkbox checked={isSelected(pref.id)} />
-                        <div className="flex-1">
-                          <h4 className="font-medium">{pref.name}</h4>
-                          {isFromProfile(pref.id) && (
-                            <Badge variant="secondary" className="mt-1">
-                              Seu estilo
-                            </Badge>
-                          )}
+                    {/* IMAGEM COMPLETA DO ESTILO */}
+                    <div className="aspect-square rounded-xl overflow-hidden shadow-lg relative">
+                      {style.preview_image_url && !style.preview_image_url.includes('placeholder') ? (
+                        <img 
+                          src={style.preview_image_url} 
+                          alt={style.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 flex items-center justify-center">
+                          <p className="text-sm text-center p-4 font-medium">{style.name}</p>
+                        </div>
+                      )}
+                      
+                      {/* Checkbox destacado */}
+                      <div className="absolute top-3 left-3">
+                        <div className="bg-white/95 backdrop-blur-sm rounded-md p-1 shadow-md">
+                          <Checkbox checked={isSelected(style.id)} className="h-5 w-5" />
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                      
+                      {/* Badge "Seu estilo" */}
+                      <div className="absolute top-3 right-3">
+                        <Badge className="bg-primary/90 backdrop-blur-sm shadow-md text-xs">
+                          ⭐ Seu estilo
+                        </Badge>
+                      </div>
+                      
+                      {/* Nome sempre visível embaixo */}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
+                        <p className="font-semibold text-sm text-white drop-shadow-lg">{style.name}</p>
+                        <p className="text-xs text-white/80 mt-1">{style.description}</p>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
               
@@ -106,6 +127,10 @@ export const VisualStylePicker = ({ onSelect, onBack }: VisualStylePickerProps) 
                 ✓ {selected.length} selecionados (Recomendado: 1-3)
               </p>
             </>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhum estilo do perfil. Explore a biblioteca abaixo.
+            </p>
           )}
         </CardContent>
       </Card>
@@ -159,41 +184,53 @@ export const VisualStylePicker = ({ onSelect, onBack }: VisualStylePickerProps) 
               </div>
             </Tabs>
 
-            {/* Grid de Estilos - SIMPLIFICADO */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[500px] overflow-y-auto p-2">
+            {/* Grid de Estilos - IMAGEM COMPLETA ESTILO INSTAGRAM */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-h-[600px] overflow-y-auto p-2">
               {filteredStyles?.map((style) => (
                 <div
                   key={style.id}
-                  className={`group cursor-pointer transition-all hover:scale-105 ${
-                    isSelected(style.id) ? "ring-2 ring-primary ring-offset-2" : ""
+                  className={`group cursor-pointer transition-all hover:scale-[1.02] ${
+                    isSelected(style.id) ? "ring-4 ring-primary ring-offset-2" : ""
                   }`}
                   onClick={() => toggleStyle(style.id)}
                 >
-                  {/* Imagem DIRETA sem Card */}
-                  <div className="aspect-square rounded-lg overflow-hidden shadow-md relative">
-                    {style.preview_image_url ? (
+                  {/* IMAGEM OCUPA 100% - Tamanho Instagram */}
+                  <div className="aspect-square rounded-xl overflow-hidden shadow-lg relative">
+                    {style.preview_image_url && !style.preview_image_url.includes('placeholder') ? (
                       <img 
                         src={style.preview_image_url} 
                         alt={style.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback se imagem falhar
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-                        <p className="text-xs text-center p-2">{style.name}</p>
+                    ) : null}
+                    
+                    {/* Fallback com gradiente */}
+                    {(!style.preview_image_url || style.preview_image_url.includes('placeholder')) && (
+                      <div className="w-full h-full bg-gradient-to-br from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 flex items-center justify-center">
+                        <p className="text-sm text-center p-4 font-medium">{style.name}</p>
                       </div>
                     )}
                     
-                    {/* Checkbox sobreposto */}
-                    <div className="absolute top-2 left-2">
-                      <Checkbox 
-                        checked={isSelected(style.id)} 
-                        className="bg-white/90 backdrop-blur-sm"
-                      />
+                    {/* Checkbox maior e mais visível */}
+                    <div className="absolute top-3 left-3">
+                      <div className="bg-white/95 backdrop-blur-sm rounded-md p-1 shadow-md">
+                        <Checkbox 
+                          checked={isSelected(style.id)} 
+                          className="h-5 w-5"
+                        />
+                      </div>
                     </div>
                     
-                    {/* Nome sobreposto no hover */}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p className="font-medium text-sm text-white">{style.name}</p>
+                    {/* Nome sempre visível embaixo */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
+                      <p className="font-semibold text-sm text-white drop-shadow-lg">{style.name}</p>
+                      {style.category && (
+                        <p className="text-xs text-white/80 mt-0.5 capitalize">{style.category}</p>
+                      )}
                     </div>
                   </div>
                 </div>

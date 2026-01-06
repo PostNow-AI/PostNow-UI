@@ -1,13 +1,29 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Container, Tabs, TabsContent, TabsList, TabsTrigger, Card, CardHeader, CardTitle, CardContent, Badge, Button } from "@/components/ui";
-import { Calendar, FileText, Eye } from "lucide-react";
+import { Calendar, FileText, Eye, ArrowLeft, Edit, Play, Loader2 } from "lucide-react";
 import { campaignService } from "@/features/Campaigns/services";
-import type { CampaignWithPosts } from "@/features/Campaigns/types";
+import { useCampaignGeneration } from "@/features/Campaigns/hooks/useCampaignGeneration";
+import { useCampaignProgress } from "@/features/Campaigns/hooks/useCampaignProgress";
+import { usePostApproval } from "@/features/Campaigns/hooks/usePostApproval";
+import { GenerationProgress } from "@/features/Campaigns/components/GenerationProgress";
+import { PostGridView } from "@/features/Campaigns/components/PostGridView";
+import { BulkActions } from "@/features/Campaigns/components/BulkActions";
+import { InstagramFeedPreview } from "@/features/Campaigns/components/InstagramFeedPreview";
+import { HarmonyAnalyzer } from "@/features/Campaigns/components/HarmonyAnalyzer";
+import { PostViewDialog } from "@/features/IdeaBank/components/PostViewDialog";
+import type { CampaignWithPosts, CampaignPost } from "@/features/Campaigns/types";
 
 export const CampaignDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedPosts, setSelectedPosts] = useState<number[]>([]);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedPostForView, setSelectedPostForView] = useState<CampaignPost | null>(null);
   
   // Buscar dados da campanha
   const { data: campaign, isLoading } = useQuery({
@@ -15,6 +31,41 @@ export const CampaignDetailPage = () => {
     queryFn: () => campaignService.getCampaign(Number(id)),
     enabled: !!id,
   });
+
+  // Progress polling (ativo apenas durante geração)
+  const { data: progress } = useCampaignProgress(
+    Number(id),
+    isGenerating
+  );
+
+  // Auto-parar polling quando completar
+  useEffect(() => {
+    if (progress?.status === 'completed') {
+      setIsGenerating(false);
+      queryClient.invalidateQueries({ queryKey: ["campaign", id] });
+      queryClient.invalidateQueries({ queryKey: ["campaigns"] });
+      queryClient.invalidateQueries({ queryKey: ["monthly-credits"] });
+      toast.success("Campanha gerada com sucesso!");
+    } else if (progress?.status === 'failed') {
+      setIsGenerating(false);
+      toast.error(progress.error_message || "Erro ao gerar campanha");
+    }
+  }, [progress?.status, id, queryClient]);
+
+  // Debug logs (TEMPORÁRIO)
+  if (campaign) {
+    console.log("🔍 Campaign data:", {
+      id: campaign.id,
+      posts_count: campaign.campaign_posts?.length,
+      first_post: campaign.campaign_posts?.[0],
+      has_ideas: campaign.campaign_posts?.[0]?.post?.ideas?.length > 0,
+      first_idea: campaign.campaign_posts?.[0]?.post?.ideas?.[0]
+    });
+  }
+
+  // Hooks de geração e aprovação
+  const generateMutation = useCampaignGeneration(Number(id));
+  const { bulkApprove, isApproving } = usePostApproval(Number(id));
 
   if (isLoading) {
     return (
@@ -42,43 +93,146 @@ export const CampaignDetailPage = () => {
     );
   }
 
+  const isDraft = campaign.status === "draft";
+  const hasPosts = campaign.campaign_posts && campaign.campaign_posts.length > 0;
+
+  const handleEditCampaign = () => {
+    navigate(`/campaigns/new?draftId=${campaign.id}`);
+  };
+
+  const handleGeneratePosts = async () => {
+    setIsGenerating(true);
+    try {
+      await generateMutation.mutateAsync({
+        objective: campaign.objective,
+        main_message: campaign.main_message || "",
+        structure: campaign.structure,
+        visual_styles: campaign.visual_styles || [],
+        duration_days: campaign.duration_days,
+        post_count: campaign.post_count,
+        briefing_data: campaign.briefing_data || {},
+      });
+      // Não desliga isGenerating aqui, vai desligar quando o polling detectar completed/failed
+    } catch (error) {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSelectPost = (postId: number) => {
+    setSelectedPosts((prev) =>
+      prev.includes(postId) ? prev.filter((id) => id !== postId) : [...prev, postId]
+    );
+  };
+
+  const handleBulkApprove = () => {
+    bulkApprove(selectedPosts);
+    setSelectedPosts([]);
+  };
+
+  const handleBulkReject = () => {
+    // TODO: Implementar reject
+    console.log("Reject posts:", selectedPosts);
+    setSelectedPosts([]);
+  };
+
+  const handleBulkRegenerate = () => {
+    // TODO: Implementar regenerate
+    console.log("Regenerate posts:", selectedPosts);
+    setSelectedPosts([]);
+  };
+
+  const handleBulkDelete = () => {
+    // TODO: Implementar delete
+    console.log("Delete posts:", selectedPosts);
+    setSelectedPosts([]);
+  };
+
+  const handlePreviewPost = (campaignPost: CampaignPost) => {
+    setSelectedPostForView(campaignPost);
+    setViewDialogOpen(true);
+  };
+
+  const handleEditPost = (campaignPost: CampaignPost) => {
+    setSelectedPostForView(campaignPost);
+    setViewDialogOpen(true);
+  };
+
+  const handleCloseViewDialog = () => {
+    setViewDialogOpen(false);
+    setSelectedPostForView(null);
+    // Refresh da campanha após fechar (caso tenha havido edições)
+    queryClient.invalidateQueries({ queryKey: ["campaign", id] });
+  };
+
   return (
     <Container
       headerTitle={campaign.name}
       headerDescription={`${campaign.post_count} posts • ${campaign.duration_days} dias`}
+      containerActions={
+        <Button variant="outline" onClick={() => navigate("/campaigns")}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar para Campanhas
+        </Button>
+      }
     >
-      <div className="p-6">
+      <div className="p-6 space-y-6">
         {/* Header com status e ações */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Badge variant={campaign.status === "active" ? "default" : "secondary"}>
-              {campaign.status}
-            </Badge>
-            <div className="text-sm text-muted-foreground">
-              Criada em {new Date(campaign.created_at).toLocaleDateString("pt-BR")}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-4">
+              <CardTitle className="text-lg">{campaign.name}</CardTitle>
+              <Badge variant={campaign.status === "active" ? "default" : "secondary"}>
+                {campaign.status_display}
+              </Badge>
             </div>
-          </div>
-          
-          {/* Botões de ação */}
-          {campaign.status === "draft" && (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => navigate(`/campaigns/new?draft=${campaign.id}`)}
-              >
-                Continuar Editando
-              </Button>
-              {campaign.campaign_posts?.length === 0 && (
-                <Button onClick={() => {
-                  // TODO: Chamar API de geração
-                  console.log("Gerar posts para campanha", campaign.id);
-                }}>
-                  Gerar Posts
+            
+            {/* Botões de ação */}
+            {isDraft && (
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleEditCampaign}>
+                  <Edit className="h-4 w-4 mr-2" /> Continuar Editando
                 </Button>
-              )}
+                {!hasPosts && (
+                  <Button onClick={handleGeneratePosts} disabled={isGenerating || generateMutation.isPending}>
+                    {isGenerating || generateMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
+                    {isGenerating || generateMutation.isPending ? "Gerando..." : "Gerar Posts"}
+                  </Button>
+                )}
+              </div>
+            )}
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <p className="text-muted-foreground">Tipo</p>
+                <p className="font-medium">{campaign.type_display}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Estrutura</p>
+                <p className="font-medium">{campaign.structure}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Duração</p>
+                <p className="font-medium">{campaign.duration_days} dias</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Posts</p>
+                <p className="font-medium">{campaign.campaign_posts?.length || 0}/{campaign.post_count}</p>
+              </div>
             </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
+
+        {/* Progress da geração */}
+        {(isGenerating || generateMutation.isPending) && progress && (
+          <GenerationProgress
+            progress={progress.current_step}
+            total={progress.total_steps}
+            percentage={progress.percentage}
+            currentAction={progress.current_action}
+            status={progress.status}
+          />
+        )}
 
         {/* Tabs */}
         <Tabs defaultValue="posts" className="w-full">
@@ -97,91 +251,78 @@ export const CampaignDetailPage = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="posts" className="mt-6">
-            <PostsList posts={campaign.campaign_posts || []} />
+          <TabsContent value="posts" className="mt-6 space-y-4">
+            <BulkActions
+              selectedCount={selectedPosts.length}
+              onApproveAll={handleBulkApprove}
+              onRejectAll={handleBulkReject}
+              onRegenerateAll={handleBulkRegenerate}
+              onDeleteAll={handleBulkDelete}
+              isLoading={isApproving}
+            />
+            
+            <PostGridView
+              posts={campaign.campaign_posts || []}
+              selectedPosts={selectedPosts}
+              onSelectPost={handleSelectPost}
+              onEditPost={handleEditPost}
+              onPreviewPost={handlePreviewPost}
+            />
           </TabsContent>
 
           <TabsContent value="calendar" className="mt-6">
-            <CalendarView campaign={campaign} />
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  Preview de calendário será implementado aqui.
+                </p>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="preview" className="mt-6">
-            <FeedPreview posts={campaign.campaign_posts || []} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <InstagramFeedPreview
+                posts={campaign.campaign_posts || []}
+                campaignName={campaign.name}
+              />
+              
+              <HarmonyAnalyzer
+                score={75}
+                breakdown={{
+                  color_distribution: 80,
+                  style_balance: 75,
+                  pattern_diversity: 70,
+                  text_legibility: 75,
+                }}
+                suggestions={[
+                  {
+                    type: "color",
+                    severity: "low",
+                    message: "Considere alternar cores mais vibrantes com tons neutros para criar mais contraste.",
+                    action: "Ver sugestões de cores",
+                  },
+                  {
+                    type: "style",
+                    severity: "medium",
+                    message: "Posts 3 e 5 têm estilos muito similares. Considere trocar a ordem.",
+                    action: "Reorganizar posts",
+                  },
+                ]}
+                onApplySuggestion={(suggestion) => console.log("Apply:", suggestion)}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Modal de Visualização/Edição de Post */}
+      <PostViewDialog
+        isOpen={viewDialogOpen}
+        onClose={handleCloseViewDialog}
+        post={selectedPostForView?.post || null}
+      />
     </Container>
   );
 };
-
-// ============================================================================
-// SUB-COMPONENTS
-// ============================================================================
-
-function PostsList({ posts }: { posts: any[] }) {
-  if (!posts || posts.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-12 text-center">
-          <p className="text-muted-foreground">
-            Nenhum post gerado ainda. Clique em "Gerar Posts" para começar.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <div className="grid gap-4">
-      {posts.map((campaignPost, index) => (
-        <Card key={campaignPost.id}>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-base">Post #{index + 1}</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {campaignPost.post?.text?.slice(0, 100)}...
-                </p>
-              </div>
-              <Badge variant={campaignPost.approved ? "default" : "secondary"}>
-                {campaignPost.approved ? "Aprovado" : "Pendente"}
-              </Badge>
-            </div>
-          </CardHeader>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function CalendarView({ campaign }: { campaign: CampaignWithPosts }) {
-  return (
-    <Card>
-      <CardContent className="p-12 text-center">
-        <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-        <p className="text-muted-foreground">
-          Preview de calendário será implementado aqui.
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Mostrará distribuição dos {campaign.post_count} posts ao longo de {campaign.duration_days} dias.
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function FeedPreview({ posts }: { posts: any[] }) {
-  return (
-    <Card>
-      <CardContent className="p-12 text-center">
-        <Eye className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-        <p className="text-muted-foreground">
-          Preview do feed Instagram será implementado aqui.
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Grid 3x3 mostrando como ficará seu feed com estes posts.
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
