@@ -16,3 +16,18 @@ export const postCreationSchema = z.object({
 });
 
 export type PostCreationFormData = z.infer<typeof postCreationSchema>;
+
+export const postTabs = [
+  {
+    id: "feed",
+    label: "Feed",
+  },
+  {
+    id: "story",
+    label: "Stories",
+  },
+  {
+    id: "reels",
+    label: "Reels",
+  },
+];
