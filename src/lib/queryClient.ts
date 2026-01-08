@@ -10,17 +10,7 @@ export const queryClient = new QueryClient({
       gcTime: 10 * 60 * 1000, // 10 minutes (previously cacheTime)
 
       // Number of times to retry failed requests
-      retry: (failureCount, error: unknown) => {
-        // Don't retry on 4xx errors (client errors)
-        if (error && typeof error === "object" && "status" in error) {
-          const status = (error as { status: number }).status;
-          if (status >= 400 && status < 500) {
-            return false;
-          }
-        }
-        // Retry up to 3 times for other errors
-        return failureCount < 3;
-      },
+      retry: 1,
 
       // Retry delay with exponential backoff
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -29,7 +19,7 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
 
       // Refetch on reconnect
-      refetchOnReconnect: "always",
+      refetchOnReconnect: false,
 
       // Refetch on mount
       refetchOnMount: true,
