@@ -57,7 +57,7 @@ export const NoSubscriptionDialog = () => {
               </li>
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                Apenas R$ 10 até dia 25 de Dezembro
+                Apenas R$ 49,99 enquanto durar a promoção
               </li>
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 bg-white rounded-full" />7 dias de
