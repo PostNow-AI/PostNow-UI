@@ -30,7 +30,7 @@ export interface AIErrorHandlingOptions {
   /** Operation context for more specific error messages */
   operationContext?: {
     type: "generate" | "regenerate" | "edit" | "improve" | "create" | "delete";
-    resource: "image" | "text" | "idea" | "campaign" | "post";
+    resource: "image" | "text" | "idea" | "campaign" | "post" | "feed";
     hasExisting?: boolean;
   };
   /** Whether to log the error to console */

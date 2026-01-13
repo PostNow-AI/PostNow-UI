@@ -92,7 +92,7 @@ export const PostCreationDialog = ({
     defaultValues: {
       name: "",
       objective: "branding" as const,
-      type: "post" as const,
+      type: "feed" as const,
       further_details: "",
       include_image: false,
     },
@@ -249,17 +249,17 @@ export const PostCreationDialog = ({
                             >
                               <Switch
                                 checked={field.value}
-                                disabled={postType !== "post"}
+                                disabled={postType !== "feed"}
                                 type="button"
                                 onCheckedChange={field.onChange}
                               />
                             </TooltipTrigger>
                             <TooltipContent>
-                              {postType !== "post"
+                              {postType !== "feed"
                                 ? "A imagem só está disponível para posts do tipo 'Post para Feed'."
                                 : field.value
-                                ? "A imagem será incluída na ideia do post."
-                                : "A imagem não será incluída na ideia do post."}
+                                  ? "A imagem será incluída na ideia do post."
+                                  : "A imagem não será incluída na ideia do post."}
                             </TooltipContent>
                           </Tooltip>
                         </FormControl>

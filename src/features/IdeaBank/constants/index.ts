@@ -10,7 +10,7 @@ export const postCreationSchema = z.object({
     "lead_generation",
     "education",
   ]),
-  type: z.enum(["post", "story", "reel", "carousel"]),
+  type: z.enum(["feed", "story", "reels", "carousel"]),
   further_details: z.string().optional(),
   include_image: z.boolean(),
 });
