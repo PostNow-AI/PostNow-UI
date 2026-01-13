@@ -69,7 +69,7 @@ export const NoSubscriptionDialog = () => {
           <Button className="w-full" onClick={() => handleSubscribe()}>
             {!createCheckout.isPending ? (
               <>
-                <CreditCard /> Comprar agora por {formatToBRL(10)}
+                <CreditCard /> Comprar agora por {formatToBRL(49.99)}
               </>
             ) : (
               <>
