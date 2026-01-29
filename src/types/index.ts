@@ -1,5 +1,6 @@
 export * from "./auth";
 export * from "./credits";
+export * from "./instagram";
 
 export interface AIModel {
   id: number;
