@@ -74,15 +74,14 @@ export const PostList = () => {
     return (
       <div className="mt-30 flex-col items-center justify-center text-center p-4">
         <ClipboardList className="h-12 w-12 mx-auto text-primary-light mb-4" />
-        <p className="text-xl font-bold mb-2">Crie seu primeiro post</p>
         <p className="text-sm text-slate-400 mb-6">
-          Crie seu primeiro post para começar a gerar ideias com IA
+          Seu primeiro post chegará amanhã de manhã!
         </p>
-        <Button disabled={!hasActiveSubscription}>
+        {/* <Button disabled={!hasActiveSubscription}>
           {!hasActiveSubscription && <Lock className="h-4 w-4" />}
           <Plus className="h-4 w-4" />
           Novo Post
-        </Button>
+        </Button> */}
       </div>
     );
   }
