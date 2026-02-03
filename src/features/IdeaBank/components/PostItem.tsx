@@ -1,6 +1,6 @@
 import { Badge, Button, Card, Loader } from "@/components";
 import type { Post } from "@/features/IdeaBank/types";
-import { Calendar, Edit2, Trash2, Type } from "lucide-react";
+import { Calendar, Eye, Trash2, Type } from "lucide-react";
 
 export const PostItem = ({
   post,
@@ -92,8 +92,8 @@ export const PostItem = ({
           className="flex-1"
           onClick={() => handlePostClick(post)}
         >
-          <Edit2 className="h-4 w-4" />
-          Editar
+          <Eye className="h-4 w-4" />
+          Visualizar
         </Button>
 
         <Button
