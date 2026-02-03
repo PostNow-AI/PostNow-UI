@@ -4,6 +4,8 @@ import { OnboardingComplete } from "@/features/Auth/Onboarding/components/Onboar
 import { useOnboardingFlow } from "@/features/Auth/Onboarding/hooks/useOnboardingFlow";
 import { OnboardingForm } from "@/features/Auth/Onboarding/OnboardingForm";
 import { NoSubscriptionDialog } from "@/features/IdeaBank/components/NoSubscriptionDialog";
+import { PaymentPendingDialog } from "@/features/Subscription/components/PaymentPendingDialog";
+import { usePaymentStatus } from "@/features/Subscription/hooks/usePaymentStatus";
 import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -31,6 +33,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { data: userSubscription, isLoading: isSubscriptionLoading } =
     useUserSubscription();
+   const { data: paymentStatus } = usePaymentStatus();
 
   const hasActiveSubscription = userSubscription?.status === "active";
 
@@ -76,7 +79,17 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
         )}
       </BlurryBackground>
 
+      {paymentStatus?.has_pending_payment && (
+        <PaymentPendingDialog
+          planName={paymentStatus.plan_name || "Desconhecido"}
+          timePendingMinutes={paymentStatus.time_pending_minutes}
+          lastError={paymentStatus.last_error}
+        />
+      )}
+
       {!hasActiveSubscription && <NoSubscriptionDialog />}
+
+      {/* PaymentPendingDialog removed due to unavailable usePaymentStatus hook */}
     </OnboardingContext.Provider>
   );
 };

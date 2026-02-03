@@ -1,4 +1,5 @@
 import {
+  type PaymentStatusResponse,
   type StripeCheckoutSessionRequest,
   type StripeCheckoutSessionResponse,
   type SubscriptionCancelResponse,
@@ -37,5 +38,11 @@ export const subscriptionApiService = {
   cancelSubscription: async (): Promise<SubscriptionCancelResponse> => {
     const response = await api.post("/api/v1/credits/subscription/cancel/");
     return response.data;
+  },
+
+  // Check payment status
+  checkPaymentStatus: async (): Promise<PaymentStatusResponse> => {
+    const response = await api.get("/api/v1/credit-system/payment-status/");
+    return response.data.data;
   },
 };
