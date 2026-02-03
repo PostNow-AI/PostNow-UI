@@ -1,7 +1,6 @@
-import { ClipboardList, Lock, Plus } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 
 import {
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -10,12 +9,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { postTabs } from "@/features/IdeaBank/constants";
 import { usePostList } from "@/features/IdeaBank/hooks";
-import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import { PostItem } from "./PostItem";
 import { PostViewDialog } from "./PostViewDialog";
 
 export const PostList = () => {
-  const { data: userSubscription } = useUserSubscription();
+  // const { data: userSubscription } = useUserSubscription();
   const {
     posts,
     isLoading,
@@ -30,7 +28,7 @@ export const PostList = () => {
     setSelectedTab,
   } = usePostList();
 
-  const hasActiveSubscription = userSubscription?.status === "active";
+  // const hasActiveSubscription = userSubscription?.status === "active";
 
   if (isLoading) {
     return (
