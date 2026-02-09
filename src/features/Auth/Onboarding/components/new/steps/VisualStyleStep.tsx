@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, Loader2, Palette } from "lucide-react";
@@ -64,8 +63,14 @@ export const VisualStyleStep = ({
   }
 
   // Usar opções da API se disponíveis, senão usar fallback estático
-  const preferences: VisualStyle[] = (visualStylePreferences && visualStylePreferences.length > 0)
-    ? visualStylePreferences
+  const apiStyles: VisualStyle[] | undefined = visualStylePreferences?.map(pref => ({
+    id: pref.id,
+    name: pref.name,
+    description: pref.description,
+  }));
+
+  const preferences: VisualStyle[] = (apiStyles && apiStyles.length > 0)
+    ? apiStyles
     : fallbackStyles;
 
   return (

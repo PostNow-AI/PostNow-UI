@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { api } from "@/lib/api";
 
 export interface SocialAccount {
@@ -18,7 +17,7 @@ export interface SocialAccountsResponse {
 export const socialAccountsService = {
   // Get social accounts
   getSocialAccounts: async (): Promise<SocialAccountsResponse> => {
-    const response = await api.get("/api/v1/auth/social-accounts/");
+    const response = await api.get<SocialAccountsResponse>("/api/v1/auth/social-accounts/");
     return response.data;
   },
 

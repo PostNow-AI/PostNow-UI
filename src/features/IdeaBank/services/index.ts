@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { api } from "@/lib/api";
 import type {
   Post,
@@ -12,13 +11,13 @@ import type {
 export const ideaBankService = {
   // Get all posts with their ideas
   async getPostsWithIdeas(): Promise<PostsWithIdeasResponse> {
-    const response = await api.get("api/v1/ideabank/posts/all-with-ideas/");
+    const response = await api.get<PostsWithIdeasResponse>("api/v1/ideabank/posts/all-with-ideas/");
     return response.data;
   },
 
   // Get post statistics
   async getPostStats(): Promise<PostStats> {
-    const response = await api.get("api/v1/ideabank/stats/");
+    const response = await api.get<PostStats>("api/v1/ideabank/stats/");
     return response.data;
   },
 
@@ -26,7 +25,7 @@ export const ideaBankService = {
   async createPostWithIdea(
     data: PostCreationData
   ): Promise<PostCreationResponse> {
-    const response = await api.post(
+    const response = await api.post<PostCreationResponse>(
       "api/v1/ideabank/generate/post-idea/",
       data
     );
@@ -45,13 +44,13 @@ export const ideaBankService = {
 
   // Update a post
   async updatePost(postId: number, data: Partial<Post>): Promise<Post> {
-    const response = await api.patch(`api/v1/ideabank/posts/${postId}/`, data);
+    const response = await api.patch<Post>(`api/v1/ideabank/posts/${postId}/`, data);
     return response.data;
   },
 
   // Get ideas for a specific post
   async getPostIdeas(postId: number): Promise<PostIdea[]> {
-    const response = await api.get(`api/v1/ideabank/posts/${postId}/ideas/`);
+    const response = await api.get<PostIdea[]>(`api/v1/ideabank/posts/${postId}/ideas/`);
     return response.data;
   },
 
@@ -60,7 +59,7 @@ export const ideaBankService = {
     ideaId: number,
     data: { content: string; improvement_prompt?: string }
   ): Promise<PostIdea> {
-    const response = await api.post(
+    const response = await api.post<PostIdea>(
       `api/v1/ideabank/ideas/${ideaId}/edit/`,
       data
     );
@@ -72,7 +71,7 @@ export const ideaBankService = {
     ideaId: number,
     data?: { prompt?: string }
   ): Promise<{ image_url: string; message: string }> {
-    const response = await api.post(
+    const response = await api.post<{ image_url: string; message: string }>(
       `api/v1/ideabank/ideas/${ideaId}/generate-image/`,
       data || {}
     );
@@ -84,7 +83,7 @@ export const ideaBankService = {
     ideaId: number,
     data?: { prompt?: string }
   ): Promise<{ image_url: string; message: string }> {
-    const response = await api.post(
+    const response = await api.post<{ image_url: string; message: string }>(
       `api/v1/ideabank/ideas/${ideaId}/regenerate-image/`,
       data || {}
     );

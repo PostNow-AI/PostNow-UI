@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import { Building, Edit, Palette } from "lucide-react";
 import {
@@ -12,6 +11,7 @@ import {
   Separator,
 } from "../../../components/ui";
 import { useVisualStylePreferences } from "../Onboarding/hooks/useVisualStylePreferences";
+import type { VisualStylePreference } from "../Onboarding/services";
 
 export const OnboardingReview = ({
   values,
@@ -28,13 +28,8 @@ export const OnboardingReview = ({
 }) => {
   const { visualStylePreferences } = useVisualStylePreferences();
 
-  interface VisualStyle {
-    id: string;
-    name: string;
-  }
-
-  const selectedVisualStyles: VisualStyle[] =
-    visualStylePreferences?.filter((style: VisualStyle) =>
+  const selectedVisualStyles: VisualStylePreference[] =
+    visualStylePreferences?.filter((style) =>
       values.visual_style_ids
         ?.map((id) => Number(id))
         ?.includes(Number(style.id))

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createVisualStylePreference,
   fetchVisualStylePreferences,
+  type VisualStylePreference,
 } from "../services";
 
 export const useVisualStylePreferences = () => {
@@ -11,12 +12,9 @@ export const useVisualStylePreferences = () => {
     data: visualStylePreferences,
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<VisualStylePreference[]>({
     queryKey: ["visualStylePreferences"],
-    queryFn: async () => {
-      const data = await fetchVisualStylePreferences();
-      return data;
-    },
+    queryFn: fetchVisualStylePreferences,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 

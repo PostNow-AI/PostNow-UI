@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { AxiosError, type AxiosResponse } from "axios";
+import { isAxiosError, AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 import { cookieUtils } from "./api";
 
 // Generic error handling
@@ -12,8 +13,8 @@ export const handleApiError = (
   error: unknown,
   fallbackMessage: string
 ): never => {
-  if (error instanceof AxiosError && error.response) {
-    const apiError: ApiError = error.response.data;
+  if (isAxiosError(error) && error.response) {
+    const apiError: ApiError = error.response.data as ApiError;
     throw new Error(apiError.message || fallbackMessage);
   }
   throw new Error(fallbackMessage);

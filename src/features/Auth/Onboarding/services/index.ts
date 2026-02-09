@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { api } from "@/lib/api";
 import type { OnboardingFormData } from "../constants/onboardingSchema";
 
@@ -31,8 +30,14 @@ export interface OnboardingStep2Data {
   visual_style_ids?: string[];
 }
 
-export const fetchOnboardingStatus = async () => {
-  const response = await api.get("/api/v1/creator-profile/onboarding/status/");
+export interface OnboardingStatus {
+  onboarding_completed: boolean;
+  step1_completed: boolean;
+  step2_completed: boolean;
+}
+
+export const fetchOnboardingStatus = async (): Promise<OnboardingStatus> => {
+  const response = await api.get<OnboardingStatus>("/api/v1/creator-profile/onboarding/status/");
   return response.data;
 };
 
@@ -40,11 +45,22 @@ export const completeOnboarding = async (): Promise<{
   message: string;
   completed: boolean;
 }> => {
-  const response = await api.post("/api/v1/creator-profile/profile/complete/");
+  const response = await api.post<{ message: string; completed: boolean }>("/api/v1/creator-profile/profile/complete/");
   return response.data;
 };
 
-export const submitOnboardingStep1 = async (data: OnboardingFormData | OnboardingStep1Data) => {
+export interface OnboardingStepResponse {
+  message: string;
+  step_completed: boolean;
+}
+
+export interface VisualStylePreference {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export const submitOnboardingStep1 = async (data: OnboardingFormData | OnboardingStep1Data): Promise<OnboardingStepResponse> => {
   const payload = {
     business_name: data.business_name,
     business_phone: data.business_phone,
@@ -61,14 +77,14 @@ export const submitOnboardingStep1 = async (data: OnboardingFormData | Onboardin
     main_competitors: data.main_competitors || "",
     reference_profiles: data.reference_profiles || "",
   };
-  const response = await api.put(
+  const response = await api.put<OnboardingStepResponse>(
     "/api/v1/creator-profile/onboarding/step1/",
     payload,
   );
   return response.data;
 };
 
-export const submitOnboardingStep2 = async (data: OnboardingFormData | OnboardingStep2Data) => {
+export const submitOnboardingStep2 = async (data: OnboardingFormData | OnboardingStep2Data): Promise<OnboardingStepResponse> => {
   const payload = {
     voice_tone: data.voice_tone,
     logo: data.logo || "",
@@ -79,15 +95,15 @@ export const submitOnboardingStep2 = async (data: OnboardingFormData | Onboardin
     color_5: data.color_5 || "",
     visual_style_ids: data.visual_style_ids || [],
   };
-  const response = await api.put(
+  const response = await api.put<OnboardingStepResponse>(
     "/api/v1/creator-profile/onboarding/step2/",
     payload,
   );
   return response.data;
 };
 
-export const fetchVisualStylePreferences = async () => {
-  const response = await api.get(
+export const fetchVisualStylePreferences = async (): Promise<VisualStylePreference[]> => {
+  const response = await api.get<VisualStylePreference[]>(
     "/api/v1/creator-profile/visual-style-preferences/",
   );
   return response.data;
@@ -96,20 +112,20 @@ export const fetchVisualStylePreferences = async () => {
 export const createVisualStylePreference = async (
   name: string,
   description: string,
-) => {
+): Promise<VisualStylePreference> => {
   const payload = {
     name,
     description,
   };
-  const response = await api.post(
+  const response = await api.post<VisualStylePreference>(
     "/api/v1/creator-profile/visual-style-preferences/",
     payload,
   );
   return response.data;
 };
 
-export const generateSingleClientContext = async () => {
-  const response = await api.post(
+export const generateSingleClientContext = async (): Promise<{ message: string }> => {
+  const response = await api.post<{ message: string }>(
     "/api/v1/client-context/generate-single-client-context/",
   );
   return response.data;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { api } from "@/lib/api";
 
 export interface PasswordResetRequest {
@@ -28,7 +27,7 @@ export const passwordResetService = {
   requestPasswordReset: async (
     data: PasswordResetRequest
   ): Promise<PasswordResetResponse> => {
-    const response = await api.post(
+    const response = await api.post<PasswordResetResponse>(
       `/api/v1/auth/accounts/password/reset/`,
       data
     );
@@ -44,7 +43,7 @@ export const passwordResetService = {
   confirmPasswordReset: async (
     data: PasswordResetConfirmRequest
   ): Promise<PasswordResetResponse> => {
-    const response = await api.post(
+    const response = await api.post<PasswordResetResponse>(
       `/api/v1/auth/accounts/password/reset/${data.uid}/${data.token}/`,
       {
         password1: data.new_password1,

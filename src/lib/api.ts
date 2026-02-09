@@ -1,5 +1,6 @@
 // @ts-nocheck
-import axios, { AxiosError, type AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 
 export const API_BASE_URL =
@@ -145,7 +146,7 @@ api.interceptors.response.use(
 
       try {
         // Attempt to refresh the token
-        const response = await axios.post(`${API_BASE_URL}/api/auth/refresh/`, {
+        const response = await axios.post<{ access_token: string }>(`${API_BASE_URL}/api/auth/refresh/`, {
           refresh_token: refreshToken,
         });
 

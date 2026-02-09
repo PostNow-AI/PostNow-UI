@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { AxiosError } from "axios";
+import { isAxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 /**
  * Unified backend error response format
@@ -152,7 +153,7 @@ function extractErrorInfo(error: unknown): {
   isUnifiedFormat: boolean;
 } {
   // Handle Axios errors
-  if (error instanceof AxiosError && error.response) {
+  if (isAxiosError(error) && error.response) {
     const data = error.response.data;
 
     // Check if it's the new unified error format
@@ -276,7 +277,7 @@ export function handleApiError(
   // Log error if requested
   if (logError) {
     console.error("API Error:", error);
-    if (error instanceof AxiosError && error.response) {
+    if (isAxiosError(error) && error.response) {
       console.error("Response data:", error.response.data);
       console.error("Response status:", error.response.status);
     }
@@ -356,10 +357,8 @@ export function handleCreditError(
   });
 }
 
-// Legacy functions for backward compatibility
-export const isAxiosError = (error: unknown): error is AxiosError => {
-  return error instanceof AxiosError;
-};
+// Re-export isAxiosError for backward compatibility
+export { isAxiosError };
 
 export const getErrorMessage = (error: AxiosError<ApiError>): string => {
   if (isAxiosError(error)) {
@@ -381,7 +380,7 @@ export const getErrorMessage = (error: AxiosError<ApiError>): string => {
 };
 
 export const getErrorType = (error: unknown): string => {
-  if (error instanceof AxiosError && error.response) {
+  if (isAxiosError(error) && error.response) {
     const apiError: ApiError = error.response.data;
     return apiError.error_type || "unknown";
   }
@@ -389,7 +388,7 @@ export const getErrorType = (error: unknown): string => {
 };
 
 export const getErrorDetails = (error: unknown): string | undefined => {
-  if (error instanceof AxiosError && error.response) {
+  if (isAxiosError(error) && error.response) {
     const apiError: ApiError = error.response.data;
     return apiError.details;
   }
