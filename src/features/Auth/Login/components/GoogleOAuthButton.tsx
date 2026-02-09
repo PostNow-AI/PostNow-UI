@@ -19,7 +19,7 @@ export function GoogleOAuthButton({
       size={"sm"}
       onClick={onClick}
       disabled={disabled}
-      className={`max-w-95 flex items-center bg-white justify-center gap-2 ${
+      className={`flex items-center bg-white justify-center gap-2 ${
         className || ""
       }`}
     >

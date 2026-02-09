@@ -1,0 +1,167 @@
+import { useCallback, useEffect, useState } from "react";
+
+const STORAGE_KEY = "postnow_onboarding_data";
+const EXPIRY_HOURS = 24;
+
+export interface OnboardingTempData {
+  // Fase 1: Boas-vindas
+  // (sem dados, apenas introdução)
+
+  // Fase 2: Seu Negócio
+  business_name: string;
+  business_phone: string;
+  business_instagram_handle: string;
+  business_website: string;
+  specialization: string;
+  business_description: string;
+  business_purpose: string;
+  brand_personality: string[];
+  products_services: string;
+
+  // Fase 3: Seu Público
+  target_audience: string;
+  target_interests: string[];
+  business_location: string;
+  main_competitors: string;
+  reference_profiles: string;
+
+  // Fase 4: Identidade Visual
+  voice_tone: string;
+  visual_style_ids: string[];
+  colors: string[];
+  logo: string;
+  suggested_colors: string[];
+
+  // Metadados
+  current_step: number;
+  completed_at?: string;
+  expires_at: string;
+}
+
+const getDefaultData = (): OnboardingTempData => ({
+  business_name: "",
+  business_phone: "",
+  business_instagram_handle: "",
+  business_website: "",
+  specialization: "",
+  business_description: "",
+  business_purpose: "",
+  brand_personality: [],
+  products_services: "",
+  target_audience: "",
+  target_interests: [],
+  business_location: "",
+  main_competitors: "",
+  reference_profiles: "",
+  voice_tone: "",
+  visual_style_ids: [],
+  colors: ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"],
+  logo: "",
+  suggested_colors: [],
+  current_step: 1,
+  expires_at: new Date(Date.now() + EXPIRY_HOURS * 60 * 60 * 1000).toISOString(),
+});
+
+export const useOnboardingStorage = () => {
+  const [data, setData] = useState<OnboardingTempData>(getDefaultData);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Carregar dados do localStorage na montagem
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed: OnboardingTempData = JSON.parse(stored);
+        // Verificar se expirou
+        if (new Date(parsed.expires_at) > new Date()) {
+          // Merge com defaults para garantir que novos campos existam
+          setData({ ...getDefaultData(), ...parsed });
+        } else {
+          // Dados expirados, limpar
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Salvar dados no localStorage sempre que mudarem
+  const saveData = useCallback((newData: Partial<OnboardingTempData>) => {
+    setData((prev) => {
+      const updated = {
+        ...prev,
+        ...newData,
+        expires_at: new Date(Date.now() + EXPIRY_HOURS * 60 * 60 * 1000).toISOString(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  // Atualizar step atual
+  const setCurrentStep = useCallback((step: number) => {
+    saveData({ current_step: step });
+  }, [saveData]);
+
+  // Marcar como completo
+  const markAsCompleted = useCallback(() => {
+    saveData({ completed_at: new Date().toISOString() });
+  }, [saveData]);
+
+  // Limpar dados (após criar conta)
+  const clearData = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setData(getDefaultData());
+  }, []);
+
+  // Verificar se onboarding foi completado
+  const isCompleted = Boolean(data.completed_at);
+
+  // Obter dados formatados para API (Step 1)
+  const getStep1Payload = useCallback(() => {
+    return {
+      business_name: data.business_name,
+      business_phone: data.business_phone,
+      business_website: data.business_website,
+      business_instagram_handle: data.business_instagram_handle,
+      specialization: data.specialization,
+      business_description: data.business_description,
+      business_purpose: data.business_purpose,
+      brand_personality: data.brand_personality.join(", "), // Array → String
+      products_services: data.products_services,
+      business_location: data.business_location,
+      target_audience: data.target_audience,
+      target_interests: data.target_interests.join(", "), // Array → String
+      main_competitors: data.main_competitors,
+      reference_profiles: data.reference_profiles,
+    };
+  }, [data]);
+
+  // Obter dados formatados para API (Step 2)
+  const getStep2Payload = useCallback(() => {
+    return {
+      voice_tone: data.voice_tone,
+      logo: data.logo,
+      color_1: data.colors[0] || "#FF6B6B",
+      color_2: data.colors[1] || "#4ECDC4",
+      color_3: data.colors[2] || "#45B7D1",
+      color_4: data.colors[3] || "#96CEB4",
+      color_5: data.colors[4] || "#FFBE0B",
+      visual_style_ids: data.visual_style_ids,
+    };
+  }, [data]);
+
+  return {
+    data,
+    isLoaded,
+    isCompleted,
+    saveData,
+    setCurrentStep,
+    markAsCompleted,
+    clearData,
+    getStep1Payload,
+    getStep2Payload,
+  };
+};
