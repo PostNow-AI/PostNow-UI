@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { Activity, ClipboardList, LogOut, Radio, Wallet, Zap } from "lucide-react";
+import { Activity, ClipboardList, LogOut, Radio, Wallet, Zap, Layers } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   Avatar,
@@ -43,11 +43,16 @@ export function AppSidebar() {
       icon: ClipboardList,
       url: "/ideabank",
     },
-    {
-      title: "Campanhas",
-      icon: Zap,
-      url: "/campaigns",
-    },
+    // {
+    //   title: "Campanhas",
+    //   icon: Zap,
+    //   url: "/campaigns",
+    // },
+    // {
+    //   title: "Carrosséis",
+    //   icon: Layers,
+    //   url: "/carousel",
+    // },
     {
       title: "Assinatura",
       icon: Wallet,
@@ -61,11 +66,11 @@ export function AppSidebar() {
       icon: Activity,
       url: "/admin/daily-posts",
     },
-    {
-      title: "Radar Semanal",
-      icon: Radio,
-      url: "/weekly-context",
-    },
+    // {
+    //   title: "Radar Semanal",
+    //   icon: Radio,
+    //   url: "/weekly-context",
+    // },
   ];
 
   if (user?.is_superuser) {
