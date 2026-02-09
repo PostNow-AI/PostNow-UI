@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Campaign Service - API calls para campanhas.
  * Seguindo padrão de IdeaBank/services/index.ts

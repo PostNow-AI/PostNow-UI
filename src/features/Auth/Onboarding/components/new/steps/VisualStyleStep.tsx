@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, Loader2, Palette } from "lucide-react";

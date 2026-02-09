@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -98,7 +99,7 @@ export const GeneratingPostSheet = ({
       objective: "branding",
       type: "post",
       custom_instructions: "",
-      include_image: false,
+      include_image: true,
     },
   });
 

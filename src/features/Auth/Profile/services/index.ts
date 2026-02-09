@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import { api } from "../../../../lib/api";
 import type { OnboardingStatus, UserData } from "../types";

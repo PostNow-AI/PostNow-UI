@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { Activity, ClipboardList, LogOut, Radio, Wallet, Zap, Layers } from "lucide-react";
+import { Activity, ClipboardList, LogOut, Wallet } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   Avatar,

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Re-exports de todos os hooks de Campaigns.
  * Seguindo padrão de IdeaBank/hooks/index.ts

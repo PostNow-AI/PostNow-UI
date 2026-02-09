@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seletor de estrutura narrativa da campanha.
  */

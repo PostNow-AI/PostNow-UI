@@ -30,13 +30,11 @@ type SignupFormData = z.infer<typeof signupSchema>;
 
 interface SignupStepProps {
   onSuccess: () => void;
-  onLoginClick: () => void;
   onBack: () => void;
 }
 
 export const SignupStep = ({
   onSuccess,
-  onLoginClick,
   onBack,
 }: SignupStepProps) => {
   const [showPassword, setShowPassword] = useState(false);

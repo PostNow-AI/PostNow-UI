@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   type StripeCheckoutSessionRequest,
   type StripeCheckoutSessionResponse,

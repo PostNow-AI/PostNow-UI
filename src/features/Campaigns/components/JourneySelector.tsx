@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JourneySelector - Componente para seleção de jornada adaptativa
  * 

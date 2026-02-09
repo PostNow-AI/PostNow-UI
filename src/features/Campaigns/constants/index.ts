@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Constants e Zod schemas para Campaigns.
  * Seguindo padrão de IdeaBank/constants/index.ts

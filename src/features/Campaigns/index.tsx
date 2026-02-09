@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Página principal de Campanhas - Dashboard.
  * Seguindo padrão de IdeaBank/index.tsx

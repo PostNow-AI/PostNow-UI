@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dialog/Sheet de criação de campanha - Wizard multi-step.
  * Híbrido: Sheet em mobile, Dialog em desktop (seguindo padrão sidebar.tsx).

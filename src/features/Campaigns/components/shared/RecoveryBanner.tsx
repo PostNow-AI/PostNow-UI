@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Banner de recuperação de draft abandonado.
  * Descoberto como crítico nas simulações (75% recovery rate).

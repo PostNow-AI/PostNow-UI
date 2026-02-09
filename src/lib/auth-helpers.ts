@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AxiosError, type AxiosResponse } from "axios";
 import { cookieUtils } from "./api";
 

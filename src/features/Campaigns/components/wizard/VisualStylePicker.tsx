@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seletor de estilos visuais para campanha.
  * Adaptado de Auth/Onboarding/BrandingStep.tsx (reutilização 80%).

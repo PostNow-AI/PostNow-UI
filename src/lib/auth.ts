@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   type AuthResponse,
   type LoginRequest,

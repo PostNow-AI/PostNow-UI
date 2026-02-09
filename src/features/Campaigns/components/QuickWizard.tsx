@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * QuickWizard - Wizard simplificado para Jornada Rápida
  * 

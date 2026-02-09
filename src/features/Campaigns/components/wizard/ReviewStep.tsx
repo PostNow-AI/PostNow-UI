@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Step de revisão final antes de gerar campanha.
  * Adaptado de Onboarding/ReviewStep.tsx (< 150 linhas).

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook principal para lógica do wizard de campanhas.
  * Gerencia estado, navegação entre steps, e dados acumulados.

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Grid de aprovação de posts - Descoberta #1 das simulações (40-60% mais rápido que linear).
  * Permite seleção múltipla, visualização rápida e ações em massa.

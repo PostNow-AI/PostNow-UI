@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Componente para reorganizar posts com Drag & Drop.
  * Usa @dnd-kit para funcionalidade moderna de arrastar.

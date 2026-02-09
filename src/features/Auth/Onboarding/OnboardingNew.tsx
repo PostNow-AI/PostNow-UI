@@ -126,7 +126,6 @@ export const OnboardingNew = () => {
     return (
       <SignupStep
         onSuccess={handleAuthSuccess}
-        onLoginClick={() => setAuthMode("login")}
         onBack={() => setAuthMode(null)}
       />
     );

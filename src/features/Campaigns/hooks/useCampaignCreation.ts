@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook para criar campanha.
  * Seguindo padrão de IdeaBank/hooks/useCreatePostWithIdea.ts

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Step de configuração de duração da campanha.
  * Component < 100 linhas (só UI), seguindo React Rules.

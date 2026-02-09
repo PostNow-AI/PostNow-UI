@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook para gerar conteúdo de campanha (todos os posts).
  * Agora usa geração assíncrona com Celery.

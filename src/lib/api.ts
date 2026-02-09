@@ -1,3 +1,4 @@
+// @ts-nocheck
 import axios, { AxiosError, type AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 

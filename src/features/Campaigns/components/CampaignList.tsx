@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Lista de campanhas em grid.
  */

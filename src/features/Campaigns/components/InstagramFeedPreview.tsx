@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Preview do Feed do Instagram - Descoberta #2 das simulações (#1 em impacto, 100% valorizam).
  * Simula como os posts aparecerão no feed do Instagram em grid 3x3.

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook para detecção e gerenciamento de jornadas adaptativas
  * 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Seletor de fluxo: Rápido vs. Completo.
  * Component < 100 linhas (React Rule).

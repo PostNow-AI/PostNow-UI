@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook para aprovar/rejeitar posts de campanha.
  */

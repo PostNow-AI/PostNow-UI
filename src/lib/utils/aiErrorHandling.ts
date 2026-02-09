@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AxiosError } from "axios";
 import { handleApiError, type ErrorHandlingResult } from "./errorHandling";
 

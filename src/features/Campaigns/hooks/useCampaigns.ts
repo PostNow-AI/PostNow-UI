@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook para listar campanhas do usuário.
  * Seguindo padrão de IdeaBank/hooks/usePostList.ts

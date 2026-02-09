@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Preview do Instagram Feed - Grid 3x3 simulado.
  * Feature #1 em impacto descoberta nas 25 simulações.

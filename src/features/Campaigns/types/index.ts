@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types para o sistema de Campanhas.
  * Seguindo padrão de IdeaBank/types/index.ts

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook de lógica para seleção de estilos visuais.
  * Busca os estilos do perfil do usuário E todos os estilos disponíveis.

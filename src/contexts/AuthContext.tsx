@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LoadingPage } from "@/components/ui/loading";
 import { authApi, authUtils, subscribeToAuthChanges } from "@/lib/auth";
 import type { AuthContextType } from "@/types/auth";

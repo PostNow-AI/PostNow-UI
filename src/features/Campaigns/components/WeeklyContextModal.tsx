@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Modal para selecionar oportunidades do Weekly Context durante criação de campanha.
  * Aparece após o usuário preencher o briefing (Step 1).

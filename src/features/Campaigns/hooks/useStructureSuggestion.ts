@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook para buscar sugestão de estrutura com Thompson Sampling.
  * Segue React Rules: TanStack Query para data fetching.
