@@ -33,7 +33,7 @@ export const CompetitorsStep = ({
       onNext={onNext}
       onBack={onBack}
       isValid={isValid}
-      nextLabel={hasContent ? "Continuar" : "Pular"}
+      nextLabel={hasContent ? "Continuar" : "Ignorar"}
     >
       <div className="space-y-5">
         {/* Concorrentes */}

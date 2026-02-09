@@ -298,6 +298,7 @@ export const OnboardingNew = () => {
           <LogoStep
             value={data.logo}
             onChange={(value) => saveData({ logo: value })}
+            suggestedColors={data.suggested_colors}
             onColorsExtracted={(colors) => saveData({ suggested_colors: colors })}
             onNext={handleNext}
             onBack={handleBack}

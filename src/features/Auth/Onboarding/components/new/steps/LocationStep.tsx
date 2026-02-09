@@ -41,7 +41,7 @@ export const LocationStep = ({
           />
         </div>
         <p className="text-sm text-muted-foreground">
-          Se atende online/todo Brasil, escreva "Brasil" ou "Online".
+          Se atende online/todo Brasil, escreva "Brasil" ou "online".
         </p>
       </div>
     </MicroStepLayout>

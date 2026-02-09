@@ -10,6 +10,7 @@ import { PreviewColorButton } from "../PreviewColorButton";
 interface LogoStepProps {
   value: string;
   onChange: (value: string) => void;
+  suggestedColors?: string[];
   onColorsExtracted?: (colors: string[]) => void;
   onNext: () => void;
   onBack: () => void;
@@ -18,25 +19,31 @@ interface LogoStepProps {
 export const LogoStep = ({
   value,
   onChange,
+  suggestedColors,
   onColorsExtracted,
   onNext,
   onBack,
 }: LogoStepProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const { extractedColors, isExtracting, extractColorsFromImage, updateColor } = useExtractColors();
+  const { extractedColors, isExtracting, extractColorsFromImage, updateColor, setExtractedColors } = useExtractColors();
   // Logo é opcional
   const isValid = true;
 
-  // Quando logo é carregado, extrair cores
+  // Inicializar com cores já salvas ou extrair se tem logo mas não tem cores
   useEffect(() => {
-    if (value && value.startsWith("data:image")) {
+    if (suggestedColors && suggestedColors.length > 0) {
+      // Já tem cores salvas, usar elas
+      setExtractedColors(suggestedColors);
+    } else if (value && value.startsWith("data:image")) {
+      // Tem logo mas não tem cores, extrair (primeira vez no step)
       extractColorsFromImage(value)
         .then((colors) => onColorsExtracted?.(colors))
         .catch(() => onColorsExtracted?.([]));
     }
+    // Só rodar na montagem inicial
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, []);
 
   // Handler para edição de cor individual
   const handleColorChange = useCallback((index: number, newColor: string) => {
@@ -56,12 +63,21 @@ export const LogoStep = ({
 
     // Converter para base64 para armazenar localmente
     const reader = new FileReader();
-    reader.onloadend = () => {
-      onChange(reader.result as string);
+    reader.onloadend = async () => {
+      const base64 = reader.result as string;
+      onChange(base64);
       setIsUploading(false);
+
+      // Extrair cores do novo logo
+      try {
+        const colors = await extractColorsFromImage(base64);
+        onColorsExtracted?.(colors);
+      } catch {
+        onColorsExtracted?.([]);
+      }
     };
     reader.readAsDataURL(file);
-  }, [onChange]);
+  }, [onChange, extractColorsFromImage, onColorsExtracted]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();

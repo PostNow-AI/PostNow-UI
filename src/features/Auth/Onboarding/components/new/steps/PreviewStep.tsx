@@ -110,10 +110,10 @@ export const PreviewStep = ({
 
             <div className="p-4 rounded-lg bg-muted/50">
               <h4 className="font-medium mb-2">
-                "3 dicas de {data.specialization || "seu nicho"} que seu público precisa saber"
+                "Mitos e verdades sobre {data.specialization || "seu nicho"}"
               </h4>
               <p className="text-sm text-muted-foreground">
-                Carrossel educativo focado em {data.target_audience?.slice(0, 50) || "seu público"}...
+                Post educativo para {data.target_audience?.slice(0, 50) || "seu público"}...
               </p>
             </div>
 

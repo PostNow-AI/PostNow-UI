@@ -39,7 +39,7 @@ export const NicheStep = ({
     <MicroStepLayout
       step={4}
       totalSteps={TOTAL_STEPS}
-      title="Qual seu nicho de atuação?"
+      title="Qual é o seu nicho de atuação?"
       subtitle="Escolha a área que melhor representa seu negócio."
       onNext={handleNext}
       onBack={onBack}

@@ -85,7 +85,7 @@ export const SignupStep = ({
       authUtils.loginWithGoogle();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Falha no cadastro com Google"
+        error instanceof Error ? error.message : "Erro ao fazer cadastro com Google"
       );
     }
   };

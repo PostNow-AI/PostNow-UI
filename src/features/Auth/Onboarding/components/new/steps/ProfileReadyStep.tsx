@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { CheckCircle2, Sparkles } from "lucide-react";
 import type { OnboardingTempData } from "@/features/Auth/Onboarding/hooks/useOnboardingStorage";
+import { nicheOptions } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
 
 interface ProfileReadyStepProps {
   data: OnboardingTempData;
@@ -16,7 +17,7 @@ export const ProfileReadyStep = ({
 }: ProfileReadyStepProps) => {
   const summaryItems = [
     { label: "Negócio", value: data.business_name },
-    { label: "Nicho", value: data.specialization },
+    { label: "Nicho", value: nicheOptions.find(n => n.id === data.specialization)?.label || data.specialization },
     { label: "Localização", value: data.business_location },
     { label: "Personalidade", value: data.brand_personality.slice(0, 3).join(", ") },
     { label: "Tom de voz", value: data.voice_tone },

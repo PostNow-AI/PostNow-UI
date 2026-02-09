@@ -75,7 +75,7 @@ export const LoginStep = ({
       authUtils.loginWithGoogle();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Falha no login com Google"
+        error instanceof Error ? error.message : "Erro ao fazer login com Google"
       );
     }
   };
