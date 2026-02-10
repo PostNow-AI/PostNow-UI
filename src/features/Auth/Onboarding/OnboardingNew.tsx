@@ -31,6 +31,7 @@ import {
   submitOnboardingStep2,
 } from "./services";
 import { handleApiError } from "@/lib/utils/errorHandling";
+import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
 import {
   useSubscriptionPlans,
   useCreateCheckoutSession,
@@ -155,38 +156,50 @@ export const OnboardingNew = ({
     setAuthMode(null);
 
     // Sincronizar dados do localStorage com o backend
-    await syncMutation.mutateAsync();
-
-    // Ir para o paywall
-    goToStep(20); // Paywall step
+    try {
+      await syncMutation.mutateAsync();
+      // Ir para o paywall
+      goToStep(20); // Paywall step
+    } catch (error) {
+      console.error("[Onboarding] Erro ao sincronizar:", error);
+      toast.error("Erro ao salvar seus dados. Tente novamente.");
+      // Ainda assim permite ir para o paywall para não bloquear o usuário
+      goToStep(20);
+    }
   }, [syncMutation, goToStep]);
 
   const handlePlanSelect = useCallback(async (planId: string) => {
-    // Mapear o ID do frontend para o interval do backend
-    // planId é "monthly" ou "annual" do PaywallStep
-    // Usar interval (mais estável que nome) para encontrar o plano
-    const intervalMap: Record<string, string> = {
-      monthly: "monthly",
-      annual: "yearly",
-    };
+    // Verificar se planos estão carregados
+    if (!subscriptionPlans?.length) {
+      toast.error("Planos não carregados. Aguarde e tente novamente.");
+      return;
+    }
 
-    const targetInterval = intervalMap[planId];
+    // Usar config centralizada para mapear interval
+    const { PLAN_INTERVAL_MAP, STRIPE_URLS } = SUBSCRIPTION_CONFIG;
+    const targetInterval = PLAN_INTERVAL_MAP[planId as keyof typeof PLAN_INTERVAL_MAP];
+
+    if (!targetInterval) {
+      console.error("[Onboarding] Plano inválido:", planId);
+      toast.error("Plano inválido selecionado.");
+      return;
+    }
 
     // Encontrar o plano correspondente no backend pelo interval
-    const backendPlan = subscriptionPlans?.find(
+    const backendPlan = subscriptionPlans.find(
       (plan) => plan.interval === targetInterval && plan.is_active
     );
 
     if (!backendPlan) {
       console.error("[Onboarding] Plano não encontrado:", { planId, targetInterval, availablePlans: subscriptionPlans });
-      toast.error("Plano não encontrado. Tente novamente.");
+      toast.error("Plano não disponível no momento. Tente novamente.");
       return;
     }
 
-    // URLs de retorno após checkout (usando origin para suportar qualquer ambiente)
+    // URLs de retorno após checkout (usando config centralizada)
     const baseUrl = window.location.origin;
-    const successUrl = `${baseUrl}/?checkout=success`;
-    const cancelUrl = `${baseUrl}/onboarding?checkout=cancelled`;
+    const successUrl = `${baseUrl}${STRIPE_URLS.SUCCESS}`;
+    const cancelUrl = `${baseUrl}${STRIPE_URLS.CANCEL}`;
 
     // Criar sessão de checkout no Stripe
     try {
