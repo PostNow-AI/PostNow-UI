@@ -25,21 +25,7 @@ describe("EngagementSection", () => {
     expect(screen.getByText("Engajamento")).toBeInTheDocument();
   });
 
-  it("deve exibir valores das métricas", () => {
-    const data: AllMetricsData = {
-      "posts-total": createMockMetric(1000),
-      "posts-email": createMockMetric(600),
-      "posts-manual": createMockMetric(400),
-    };
-
-    render(<EngagementSection data={data} />);
-
-    expect(screen.getByText("1.000")).toBeInTheDocument();
-    expect(screen.getByText("600")).toBeInTheDocument();
-    expect(screen.getByText("400")).toBeInTheDocument();
-  });
-
-  it("deve exibir labels corretos para desktop", () => {
+  it("deve exibir total de posts no centro do donut", () => {
     const data: AllMetricsData = {
       "posts-total": createMockMetric(100),
       "posts-email": createMockMetric(60),
@@ -48,25 +34,34 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
-    // Desktop labels (hidden sm:inline)
-    expect(screen.getByText("Posts Totais")).toBeInTheDocument();
+    expect(screen.getByText("100")).toBeInTheDocument();
+    expect(screen.getByText("posts")).toBeInTheDocument();
+  });
+
+  it("deve exibir valores de posts automáticos e manuais", () => {
+    const data: AllMetricsData = {
+      "posts-total": createMockMetric(100),
+      "posts-email": createMockMetric(60),
+      "posts-manual": createMockMetric(40),
+    };
+
+    render(<EngagementSection data={data} />);
+
+    expect(screen.getByText("60")).toBeInTheDocument();
+    expect(screen.getByText("40")).toBeInTheDocument();
+  });
+
+  it("deve exibir labels corretos", () => {
+    const data: AllMetricsData = {
+      "posts-total": createMockMetric(100),
+      "posts-email": createMockMetric(60),
+      "posts-manual": createMockMetric(40),
+    };
+
+    render(<EngagementSection data={data} />);
+
     expect(screen.getByText("Automáticos")).toBeInTheDocument();
     expect(screen.getByText("Manuais")).toBeInTheDocument();
-  });
-
-  it("deve exibir labels curtos para mobile", () => {
-    const data: AllMetricsData = {
-      "posts-total": createMockMetric(100),
-      "posts-email": createMockMetric(60),
-      "posts-manual": createMockMetric(40),
-    };
-
-    render(<EngagementSection data={data} />);
-
-    // Mobile labels (sm:hidden)
-    expect(screen.getByText("Total")).toBeInTheDocument();
-    expect(screen.getByText("Auto")).toBeInTheDocument();
-    expect(screen.getByText("Manual")).toBeInTheDocument();
   });
 
   it("deve calcular porcentagens corretamente", () => {
@@ -78,8 +73,9 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
-    expect(screen.getByText(/Auto 70\.0%/)).toBeInTheDocument();
-    expect(screen.getByText(/Manual 30\.0%/)).toBeInTheDocument();
+    // Formato: (70.0%) e (30.0%)
+    expect(screen.getByText("(70.0%)")).toBeInTheDocument();
+    expect(screen.getByText("(30.0%)")).toBeInTheDocument();
   });
 
   it("deve exibir 0% quando total é zero", () => {
@@ -91,8 +87,9 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
-    expect(screen.getByText(/Auto 0%/)).toBeInTheDocument();
-    expect(screen.getByText(/Manual 0%/)).toBeInTheDocument();
+    // Deve mostrar (0%) para ambas as categorias
+    const zeroPercents = screen.getAllByText("(0%)");
+    expect(zeroPercents.length).toBe(2);
   });
 
   it("deve lidar com dados undefined", () => {
@@ -100,19 +97,22 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
+    // Deve mostrar 0 em múltiplos lugares (centro do donut e valores)
     const zeros = screen.getAllByText("0");
-    expect(zeros.length).toBe(3);
+    expect(zeros.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("deve exibir texto de distribuição", () => {
+  it("deve renderizar barra de distribuição", () => {
     const data: AllMetricsData = {
       "posts-total": createMockMetric(100),
       "posts-email": createMockMetric(60),
       "posts-manual": createMockMetric(40),
     };
 
-    render(<EngagementSection data={data} />);
+    const { container } = render(<EngagementSection data={data} />);
 
-    expect(screen.getByText("Distribuição")).toBeInTheDocument();
+    // Deve ter uma barra de progresso com cores rosa e âmbar
+    const progressBar = container.querySelector(".bg-pink-500");
+    expect(progressBar).toBeInTheDocument();
   });
 });

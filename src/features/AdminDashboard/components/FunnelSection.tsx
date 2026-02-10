@@ -1,22 +1,16 @@
 /**
  * FunnelSection Component
  * Displays conversion funnel metrics (subscriptions -> onboardings -> images)
- * Mobile-first responsive design
+ * Mobile-first responsive design with visual funnel
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { ArrowDown } from "lucide-react";
 import type { AllMetricsData } from "../types";
+import { cn } from "@/lib/utils";
 
 export interface FunnelSectionProps {
   data: AllMetricsData;
-}
-
-interface FunnelStep {
-  label: string;
-  shortLabel: string;
-  value: number;
-  color: string;
 }
 
 export const FunnelSection = ({ data }: FunnelSectionProps) => {
@@ -24,68 +18,68 @@ export const FunnelSection = ({ data }: FunnelSectionProps) => {
   const onboardings = data.onboardings?.count ?? 0;
   const images = data.images?.count ?? 0;
 
-  const steps: FunnelStep[] = [
-    { label: "Assinaturas", shortLabel: "Assinar", value: subscriptions, color: "bg-green-500" },
-    { label: "Onboardings", shortLabel: "Onboard", value: onboardings, color: "bg-blue-500" },
-    { label: "Imagens", shortLabel: "Imagens", value: images, color: "bg-purple-500" },
-  ];
-
-  const maxValue = Math.max(...steps.map((s) => s.value), 1);
-
   // Calculate conversion rates
   const onboardingRate = subscriptions > 0
-    ? ((onboardings / subscriptions) * 100).toFixed(1)
+    ? ((onboardings / subscriptions) * 100).toFixed(0)
     : "0";
   const imageRate = onboardings > 0
-    ? ((images / onboardings) * 100).toFixed(1)
+    ? ((images / onboardings) * 100).toFixed(0)
     : "0";
+
+  const steps = [
+    { label: "Assinaturas", value: subscriptions, color: "bg-green-500", textColor: "text-green-600", width: "w-full" },
+    { label: "Onboardings", value: onboardings, color: "bg-blue-500", textColor: "text-blue-600", width: "w-[85%]" },
+    { label: "Imagens", value: images, color: "bg-purple-500", textColor: "text-purple-600", width: "w-[70%]" },
+  ];
 
   return (
     <Card>
-      <CardHeader className="pb-2 sm:pb-6">
-        <CardTitle className="text-sm sm:text-base">Funil de Conversão</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-medium">Funil de Conversão</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4 sm:space-y-6">
-        {/* Funnel visualization */}
-        <div className="space-y-3 sm:space-y-4">
-          {steps.map((step, index) => (
-            <div key={step.label} className="space-y-1 sm:space-y-2">
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="font-medium">
-                  <span className="sm:hidden">{step.shortLabel}</span>
-                  <span className="hidden sm:inline">{step.label}</span>
-                </span>
-                <span className="text-muted-foreground tabular-nums">
+      <CardContent className="space-y-1">
+        {steps.map((step, index) => (
+          <div key={step.label}>
+            {/* Funnel bar */}
+            <div className={cn("mx-auto transition-all", step.width)}>
+              <div className={cn("rounded-lg p-3 flex items-center justify-between", step.color, "bg-opacity-15")}>
+                <div className="flex items-center gap-2">
+                  <div className={cn("w-2 h-2 rounded-full", step.color)} />
+                  <span className="text-sm font-medium">{step.label}</span>
+                </div>
+                <span className={cn("text-lg font-bold tabular-nums", step.textColor)}>
                   {step.value.toLocaleString("pt-BR")}
                 </span>
               </div>
-              <Progress
-                value={(step.value / maxValue) * 100}
-                className="h-2 sm:h-3"
-              />
-              {index < steps.length - 1 && (
-                <div className="text-[10px] sm:text-xs text-muted-foreground text-right">
-                  {index === 0 && `→ ${onboardingRate}%`}
-                  {index === 1 && `→ ${imageRate}%`}
-                </div>
-              )}
             </div>
-          ))}
-        </div>
 
-        {/* Summary stats */}
-        <div className="grid grid-cols-2 gap-2 sm:gap-4 pt-3 sm:pt-4 border-t">
-          <div className="text-center p-2 sm:p-0">
-            <p className="text-lg sm:text-2xl font-bold text-green-600">{onboardingRate}%</p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
-              Assinar → Onboard
-            </p>
+            {/* Arrow with conversion rate */}
+            {index < steps.length - 1 && (
+              <div className="flex items-center justify-center gap-1.5 py-1 text-muted-foreground">
+                <ArrowDown className="h-3 w-3" />
+                <span className="text-xs font-medium">
+                  {index === 0 ? onboardingRate : imageRate}%
+                </span>
+              </div>
+            )}
           </div>
-          <div className="text-center p-2 sm:p-0">
-            <p className="text-lg sm:text-2xl font-bold text-purple-600">{imageRate}%</p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground">
-              Onboard → Imagem
+        ))}
+
+        {/* Summary */}
+        <div className="pt-3 mt-2 border-t flex justify-between text-center">
+          <div>
+            <p className="text-lg font-bold text-green-600">{onboardingRate}%</p>
+            <p className="text-[10px] text-muted-foreground">Conversão 1</p>
+          </div>
+          <div>
+            <p className="text-lg font-bold text-purple-600">{imageRate}%</p>
+            <p className="text-[10px] text-muted-foreground">Conversão 2</p>
+          </div>
+          <div>
+            <p className="text-lg font-bold text-indigo-600">
+              {subscriptions > 0 ? ((images / subscriptions) * 100).toFixed(0) : 0}%
             </p>
+            <p className="text-[10px] text-muted-foreground">Total</p>
           </div>
         </div>
       </CardContent>

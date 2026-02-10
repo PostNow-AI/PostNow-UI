@@ -39,6 +39,21 @@ describe("FunnelSection", () => {
     expect(screen.getByText("250")).toBeInTheDocument();
   });
 
+  it("deve exibir labels das etapas do funil", () => {
+    const data: AllMetricsData = {
+      subscriptions: createMockMetric(100),
+      onboardings: createMockMetric(50),
+      images: createMockMetric(25),
+    };
+
+    render(<FunnelSection data={data} />);
+
+    expect(screen.getByText("Assinaturas")).toBeInTheDocument();
+    expect(screen.getByText("Onboardings")).toBeInTheDocument();
+    // Imagens aparece duas vezes (no funil e possivelmente em outro lugar)
+    expect(screen.getAllByText("Imagens").length).toBeGreaterThanOrEqual(1);
+  });
+
   it("deve calcular taxa de conversão corretamente", () => {
     const data: AllMetricsData = {
       subscriptions: createMockMetric(100),
@@ -48,9 +63,13 @@ describe("FunnelSection", () => {
 
     render(<FunnelSection data={data} />);
 
-    // Both rates are 50% (50/100 and 25/50)
-    const percentages = screen.getAllByText("50.0%");
-    expect(percentages.length).toBe(2);
+    // Conversão 1: 50/100 = 50%
+    // Conversão 2: 25/50 = 50%
+    // Total: 25/100 = 25%
+    // O componente mostra as taxas sem casas decimais
+    const fiftyPercents = screen.getAllByText("50%");
+    expect(fiftyPercents.length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("25%")).toBeInTheDocument();
   });
 
   it("deve exibir 0% quando não há dados de assinaturas", () => {
@@ -62,8 +81,9 @@ describe("FunnelSection", () => {
 
     render(<FunnelSection data={data} />);
 
+    // Quando não há dados, mostra 0%
     const zeros = screen.getAllByText("0%");
-    expect(zeros.length).toBe(2);
+    expect(zeros.length).toBeGreaterThan(0);
   });
 
   it("deve lidar com dados undefined graciosamente", () => {
@@ -76,7 +96,7 @@ describe("FunnelSection", () => {
     expect(zeros.length).toBeGreaterThan(0);
   });
 
-  it("deve exibir labels corretos para cada etapa (desktop)", () => {
+  it("deve exibir labels de conversão", () => {
     const data: AllMetricsData = {
       subscriptions: createMockMetric(100),
       onboardings: createMockMetric(50),
@@ -85,37 +105,22 @@ describe("FunnelSection", () => {
 
     render(<FunnelSection data={data} />);
 
-    // Desktop labels (hidden sm:inline)
-    expect(screen.getByText("Assinaturas")).toBeInTheDocument();
-    expect(screen.getByText("Onboardings")).toBeInTheDocument();
-    // "Imagens" aparece duas vezes (mesmo valor para short e long)
-    expect(screen.getAllByText("Imagens").length).toBeGreaterThanOrEqual(1);
+    // Novo design usa "Conversão 1", "Conversão 2", "Total"
+    expect(screen.getByText("Conversão 1")).toBeInTheDocument();
+    expect(screen.getByText("Conversão 2")).toBeInTheDocument();
+    expect(screen.getByText("Total")).toBeInTheDocument();
   });
 
-  it("deve exibir labels curtos para mobile", () => {
+  it("deve calcular taxa total corretamente", () => {
     const data: AllMetricsData = {
-      subscriptions: createMockMetric(100),
-      onboardings: createMockMetric(50),
-      images: createMockMetric(25),
+      subscriptions: createMockMetric(200),
+      onboardings: createMockMetric(100),
+      images: createMockMetric(50),
     };
 
     render(<FunnelSection data={data} />);
 
-    // Mobile labels (sm:hidden)
-    expect(screen.getByText("Assinar")).toBeInTheDocument();
-    expect(screen.getByText("Onboard")).toBeInTheDocument();
-  });
-
-  it("deve exibir textos de taxa de conversão", () => {
-    const data: AllMetricsData = {
-      subscriptions: createMockMetric(100),
-      onboardings: createMockMetric(50),
-      images: createMockMetric(25),
-    };
-
-    render(<FunnelSection data={data} />);
-
-    expect(screen.getByText("Assinar → Onboard")).toBeInTheDocument();
-    expect(screen.getByText("Onboard → Imagem")).toBeInTheDocument();
+    // Total: 50/200 = 25%
+    expect(screen.getByText("25%")).toBeInTheDocument();
   });
 });

@@ -23,3 +23,9 @@ export type { EngagementSectionProps } from "./EngagementSection";
 
 export { EmailSection } from "./EmailSection";
 export type { EmailSectionProps } from "./EmailSection";
+
+export { HeroMetricCard } from "./HeroMetricCard";
+export type { HeroMetricCardProps } from "./HeroMetricCard";
+
+export { QuickStatsRow } from "./QuickStatsRow";
+export type { QuickStatsRowProps, QuickStat } from "./QuickStatsRow";
