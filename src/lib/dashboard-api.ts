@@ -10,7 +10,7 @@ import type {
   PeriodDays,
 } from "@/features/AdminDashboard/types";
 
-const BASE_URL = "/auditsystem/dashboard";
+const BASE_URL = "/api/v1/audit/dashboard";
 
 export const dashboardApiService = {
   /**
