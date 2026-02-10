@@ -18,7 +18,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAllDashboardMetrics } from "./hooks/useDashboardMetrics";
 import {
@@ -87,97 +86,76 @@ export const AdminDashboard = () => {
   const chartColor = selectedConfig ? colorToHex[selectedConfig.color] : "#6366f1";
 
   return (
-    <div className="space-y-4 p-3 sm:p-6 max-w-7xl mx-auto">
-      {/* Header - Mobile first */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg sm:text-2xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
-              Visão geral do comportamento dos usuários
-            </p>
-          </div>
+    <div className="p-3 sm:p-6 max-w-7xl mx-auto">
+      {/* Header compacto */}
+      <div className="flex items-center justify-between mb-3">
+        <h1 className="text-lg sm:text-xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <PeriodSelector value={days} onChange={setDays} disabled={isFetching} />
           <Button
             variant="outline"
-            size="sm"
+            size="icon"
             onClick={refetchAll}
             disabled={isFetching}
-            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
+            className="h-9 w-9 shrink-0"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-            <span className="hidden sm:inline ml-2">Atualizar</span>
           </Button>
         </div>
-
-        {/* Period Selector - Full width on mobile */}
-        <PeriodSelector value={days} onChange={setDays} disabled={isFetching} />
       </div>
 
-      {/* KPI Grid - 2 columns mobile, 4 columns desktop */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-        {METRICS_CONFIG.map((config) => {
-          const Icon = ICON_MAP[config.iconName];
-          return (
-            <MetricCard
-              key={config.type}
-              title={config.label}
-              value={data[config.type]?.count ?? 0}
-              icon={Icon}
-              color={config.color}
-              onClick={() => setSelectedMetric(config.type)}
-              isSelected={selectedMetric === config.type}
-              isLoading={isFetching}
+      {/* Layout Principal: Métricas + Gráfico lado a lado em desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.5fr] gap-4 mb-4">
+        {/* Coluna Esquerda: KPIs em grid compacto */}
+        <div className="grid grid-cols-4 lg:grid-cols-2 gap-2">
+          {METRICS_CONFIG.map((config) => {
+            const Icon = ICON_MAP[config.iconName];
+            return (
+              <MetricCard
+                key={config.type}
+                title={config.label}
+                value={data[config.type]?.count ?? 0}
+                icon={Icon}
+                color={config.color}
+                onClick={() => setSelectedMetric(config.type)}
+                isSelected={selectedMetric === config.type}
+                isLoading={isFetching}
+              />
+            );
+          })}
+        </div>
+
+        {/* Coluna Direita: Gráfico */}
+        <Card className="min-h-[280px]">
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <span
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: chartColor }}
+              />
+              {selectedConfig?.label} - últimos {days} dias
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-2 pb-4">
+            <MetricChart
+              data={data[selectedMetric]?.timeline ?? []}
+              color={chartColor}
+              height={220}
             />
-          );
-        })}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Main Chart */}
-      <Card>
-        <CardHeader className="pb-2 sm:pb-6">
-          <CardTitle className="text-sm sm:text-base">
-            {selectedConfig?.label} - {days}d
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pl-0 pr-2 sm:pl-2 sm:pr-6">
-          <MetricChart
-            data={data[selectedMetric]?.timeline ?? []}
-            color={chartColor}
-            height={200}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Detail Sections - Scrollable tabs on mobile */}
-      <Tabs defaultValue="conversao" className="space-y-3">
-        <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="conversao" className="text-xs sm:text-sm">
-            Funil
-          </TabsTrigger>
-          <TabsTrigger value="engajamento" className="text-xs sm:text-sm">
-            Engajamento
-          </TabsTrigger>
-          <TabsTrigger value="emails" className="text-xs sm:text-sm">
-            Emails
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="conversao">
-          <FunnelSection data={data} />
-        </TabsContent>
-
-        <TabsContent value="engajamento">
-          <EngagementSection data={data} />
-        </TabsContent>
-
-        <TabsContent value="emails">
-          <EmailSection data={data} />
-        </TabsContent>
-      </Tabs>
+      {/* Seções de Detalhe em grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <FunnelSection data={data} />
+        <EngagementSection data={data} />
+        <EmailSection data={data} />
+      </div>
 
       {/* Footer note */}
       {data.subscriptions?.note && (
-        <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
+        <p className="text-[10px] sm:text-xs text-muted-foreground text-center mt-4">
           {data.subscriptions.note}
         </p>
       )}

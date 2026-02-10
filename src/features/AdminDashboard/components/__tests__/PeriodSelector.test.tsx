@@ -34,14 +34,16 @@ describe("PeriodSelector", () => {
     expect(screen.getByText("6m")).toBeInTheDocument();
   });
 
-  it("deve renderizar labels longos para desktop", () => {
+  it("deve renderizar apenas labels curtos (design compacto)", () => {
     render(<PeriodSelector {...defaultProps} />);
 
-    // Long labels também estão no DOM (visíveis em desktop)
-    expect(screen.getByText("7 dias")).toBeInTheDocument();
-    expect(screen.getByText("30 dias")).toBeInTheDocument();
-    expect(screen.getByText("90 dias")).toBeInTheDocument();
-    expect(screen.getByText("6 meses")).toBeInTheDocument();
+    // Agora usamos apenas labels curtos em todos os breakpoints
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs[0]).toHaveTextContent("24h");
+    expect(tabs[1]).toHaveTextContent("7d");
+    expect(tabs[2]).toHaveTextContent("30d");
+    expect(tabs[3]).toHaveTextContent("90d");
+    expect(tabs[4]).toHaveTextContent("6m");
   });
 
   it("deve marcar o período selecionado como ativo", () => {

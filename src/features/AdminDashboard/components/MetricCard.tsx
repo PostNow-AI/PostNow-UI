@@ -37,7 +37,13 @@ export const MetricCard = ({
   isSelected = false,
   isLoading = false,
 }: MetricCardProps) => {
-  const formattedValue = value.toLocaleString("pt-BR");
+  // Formatar valor de forma compacta para números grandes
+  const formatValue = (num: number): string => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1).replace(".0", "") + "k";
+    }
+    return num.toLocaleString("pt-BR");
+  };
 
   return (
     <Card
@@ -49,33 +55,31 @@ export const MetricCard = ({
       )}
       onClick={onClick}
     >
-      <CardContent className="p-3 sm:pt-6 sm:p-6">
+      <CardContent className="p-2 lg:p-4">
         {isLoading ? (
-          <div className="animate-pulse">
-            <div className="h-3 sm:h-4 bg-muted rounded w-16 sm:w-20 mb-2" />
-            <div className="h-6 sm:h-8 bg-muted rounded w-12 sm:w-16" />
+          <div className="animate-pulse flex flex-col items-center gap-1">
+            <div className="h-4 w-4 bg-muted rounded-full" />
+            <div className="h-4 bg-muted rounded w-8" />
           </div>
         ) : (
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] sm:text-sm text-muted-foreground truncate">
-                {title}
+          <div className="flex flex-col items-center text-center gap-0.5 lg:gap-1">
+            <Icon className={cn("h-4 w-4 lg:h-6 lg:w-6", color)} />
+            <p className={cn("text-base lg:text-2xl font-bold tabular-nums leading-tight", color)}>
+              {formatValue(value)}
+            </p>
+            <p className="text-[9px] lg:text-xs text-muted-foreground leading-tight truncate w-full">
+              {title}
+            </p>
+            {trend !== undefined && (
+              <p
+                className={cn(
+                  "text-[8px] lg:text-xs font-medium",
+                  trend >= 0 ? "text-green-600" : "text-red-600"
+                )}
+              >
+                {trend >= 0 ? "↑" : "↓"} {Math.abs(trend).toFixed(1)}%
               </p>
-              <p className={cn("text-xl sm:text-3xl font-bold tabular-nums", color)}>
-                {formattedValue}
-              </p>
-              {trend !== undefined && (
-                <p
-                  className={cn(
-                    "text-[10px] sm:text-xs font-medium",
-                    trend >= 0 ? "text-green-600" : "text-red-600"
-                  )}
-                >
-                  {trend >= 0 ? "↑" : "↓"} {Math.abs(trend).toFixed(1)}%
-                </p>
-              )}
-            </div>
-            <Icon className={cn("h-5 w-5 sm:h-8 sm:w-8 opacity-70 flex-shrink-0", color)} />
+            )}
           </div>
         )}
       </CardContent>

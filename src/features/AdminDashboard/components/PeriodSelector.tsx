@@ -40,17 +40,16 @@ export const PeriodSelector = ({
   };
 
   return (
-    <Tabs value={String(value)} onValueChange={handleValueChange} className="w-full">
-      <TabsList className="w-full grid grid-cols-5 h-9">
+    <Tabs value={String(value)} onValueChange={handleValueChange}>
+      <TabsList className="h-9">
         {PERIOD_OPTIONS.map((option) => (
           <TabsTrigger
             key={option.value}
             value={String(option.value)}
             disabled={disabled}
-            className="text-xs sm:text-sm px-1 sm:px-3 data-[state=active]:text-primary"
+            className="text-xs px-2 lg:px-3 data-[state=active]:text-primary"
           >
-            <span className="sm:hidden">{option.shortLabel}</span>
-            <span className="hidden sm:inline">{option.label}</span>
+            {option.shortLabel}
           </TabsTrigger>
         ))}
       </TabsList>

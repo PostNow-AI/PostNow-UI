@@ -19,10 +19,17 @@ describe("MetricCard", () => {
     expect(screen.getByText("42")).toBeInTheDocument();
   });
 
-  it("deve formatar valores grandes com separador de milhar", () => {
+  it("deve formatar valores grandes de forma compacta", () => {
     render(<MetricCard {...defaultProps} value={1234567} />);
 
-    expect(screen.getByText("1.234.567")).toBeInTheDocument();
+    // Valores >= 1000 são formatados como "Xk" (ex: 1234567 -> 1234.6k)
+    expect(screen.getByText("1234.6k")).toBeInTheDocument();
+  });
+
+  it("deve formatar valores menores que 1000 normalmente", () => {
+    render(<MetricCard {...defaultProps} value={999} />);
+
+    expect(screen.getByText("999")).toBeInTheDocument();
   });
 
   it("deve mostrar trend positivo com seta para cima", () => {
@@ -95,8 +102,8 @@ describe("MetricCard", () => {
 
     const svg = container.querySelector("svg");
     expect(svg).toHaveClass("text-green-600");
-    // Mobile-first: h-5 w-5 sm:h-8 sm:w-8
-    expect(svg).toHaveClass("h-5");
-    expect(svg).toHaveClass("w-5");
+    // Layout compacto: h-4 w-4 lg:h-6 lg:w-6
+    expect(svg).toHaveClass("h-4");
+    expect(svg).toHaveClass("w-4");
   });
 });
