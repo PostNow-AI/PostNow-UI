@@ -44,8 +44,8 @@ describe("EmailSection", () => {
 
     render(<EmailSection data={data} />);
 
-    expect(screen.getByText("Emails Enviados")).toBeInTheDocument();
-    expect(screen.getByText("Emails Abertos")).toBeInTheDocument();
+    expect(screen.getByText("Enviados")).toBeInTheDocument();
+    expect(screen.getByText("Abertos")).toBeInTheDocument();
   });
 
   it("deve calcular taxa de abertura corretamente", () => {
@@ -122,7 +122,7 @@ describe("EmailSection", () => {
 
     render(<EmailSection data={data} />);
 
-    expect(screen.getByText("Benchmark do mercado: 20-25%")).toBeInTheDocument();
+    expect(screen.getByText("Benchmark: 20-25%")).toBeInTheDocument();
   });
 
   it("deve exibir label de taxa de abertura", () => {

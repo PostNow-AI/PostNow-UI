@@ -10,21 +10,47 @@ describe("PeriodSelector", () => {
     onChange: vi.fn(),
   };
 
-  it("deve renderizar todas as opções de período", () => {
+  // Helper para encontrar tab pelo valor
+  const getTabByValue = (value: string) => {
+    return screen.getByRole("tab", { name: new RegExp(value) });
+  };
+
+  it("deve renderizar todas as 5 opções de período", () => {
     render(<PeriodSelector {...defaultProps} />);
 
-    expect(screen.getByText("24h")).toBeInTheDocument();
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs).toHaveLength(5);
+  });
+
+  it("deve renderizar labels curtos para mobile", () => {
+    render(<PeriodSelector {...defaultProps} />);
+
+    // Short labels são sempre renderizados (visíveis em mobile)
+    // "24h" aparece duas vezes (mesmo valor para short e long)
+    expect(screen.getAllByText("24h").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("7d")).toBeInTheDocument();
+    expect(screen.getByText("30d")).toBeInTheDocument();
+    expect(screen.getByText("90d")).toBeInTheDocument();
+    expect(screen.getByText("6m")).toBeInTheDocument();
+  });
+
+  it("deve renderizar labels longos para desktop", () => {
+    render(<PeriodSelector {...defaultProps} />);
+
+    // Long labels também estão no DOM (visíveis em desktop)
     expect(screen.getByText("7 dias")).toBeInTheDocument();
     expect(screen.getByText("30 dias")).toBeInTheDocument();
     expect(screen.getByText("90 dias")).toBeInTheDocument();
-    expect(screen.getByText("180 dias")).toBeInTheDocument();
+    expect(screen.getByText("6 meses")).toBeInTheDocument();
   });
 
   it("deve marcar o período selecionado como ativo", () => {
     render(<PeriodSelector {...defaultProps} value={7} />);
 
-    const trigger = screen.getByText("7 dias");
-    expect(trigger.getAttribute("data-state")).toBe("active");
+    const tabs = screen.getAllByRole("tab");
+    const activeTab = tabs.find(tab => tab.getAttribute("data-state") === "active");
+    expect(activeTab).toBeDefined();
+    expect(activeTab).toHaveTextContent("7d");
   });
 
   it("deve chamar onChange com valor correto ao clicar em período", async () => {
@@ -33,7 +59,7 @@ describe("PeriodSelector", () => {
 
     render(<PeriodSelector {...defaultProps} onChange={mockOnChange} />);
 
-    await user.click(screen.getByText("7 dias"));
+    await user.click(screen.getByText("7d"));
 
     expect(mockOnChange).toHaveBeenCalledWith(7);
   });
@@ -44,29 +70,30 @@ describe("PeriodSelector", () => {
 
     render(<PeriodSelector {...defaultProps} onChange={mockOnChange} />);
 
-    await user.click(screen.getByText("24h"));
+    // "24h" aparece duas vezes (mesmo valor para short e long), clicar no primeiro
+    await user.click(screen.getAllByText("24h")[0]);
 
     expect(mockOnChange).toHaveBeenCalledWith(1);
   });
 
-  it("deve chamar onChange com 90 ao clicar em 90 dias", async () => {
+  it("deve chamar onChange com 90 ao clicar em 90d", async () => {
     const user = userEvent.setup();
     const mockOnChange = vi.fn();
 
     render(<PeriodSelector {...defaultProps} onChange={mockOnChange} />);
 
-    await user.click(screen.getByText("90 dias"));
+    await user.click(screen.getByText("90d"));
 
     expect(mockOnChange).toHaveBeenCalledWith(90);
   });
 
-  it("deve chamar onChange com 180 ao clicar em 180 dias", async () => {
+  it("deve chamar onChange com 180 ao clicar em 6m", async () => {
     const user = userEvent.setup();
     const mockOnChange = vi.fn();
 
     render(<PeriodSelector {...defaultProps} onChange={mockOnChange} />);
 
-    await user.click(screen.getByText("180 dias"));
+    await user.click(screen.getByText("6m"));
 
     expect(mockOnChange).toHaveBeenCalledWith(180);
   });

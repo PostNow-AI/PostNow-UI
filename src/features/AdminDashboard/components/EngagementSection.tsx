@@ -1,6 +1,7 @@
 /**
  * EngagementSection Component
  * Displays user engagement metrics (posts breakdown)
+ * Mobile-first responsive design
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,10 +14,10 @@ export interface EngagementSectionProps {
 
 interface EngagementMetric {
   label: string;
+  shortLabel: string;
   value: number;
   icon: React.ElementType;
   color: string;
-  description: string;
 }
 
 export const EngagementSection = ({ data }: EngagementSectionProps) => {
@@ -27,24 +28,24 @@ export const EngagementSection = ({ data }: EngagementSectionProps) => {
   const metrics: EngagementMetric[] = [
     {
       label: "Posts Totais",
+      shortLabel: "Total",
       value: postsTotal,
       icon: FileText,
       color: "text-indigo-600",
-      description: "Total de posts criados no período",
     },
     {
-      label: "Posts Automáticos",
+      label: "Automáticos",
+      shortLabel: "Auto",
       value: postsEmail,
       icon: Mail,
       color: "text-pink-600",
-      description: "Posts criados via email/automação",
     },
     {
-      label: "Posts Manuais",
+      label: "Manuais",
+      shortLabel: "Manual",
       value: postsManual,
       icon: Edit,
       color: "text-amber-600",
-      description: "Posts criados manualmente pelos usuários",
     },
   ];
 
@@ -58,25 +59,26 @@ export const EngagementSection = ({ data }: EngagementSectionProps) => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Engajamento de Conteúdo</CardTitle>
+      <CardHeader className="pb-2 sm:pb-6">
+        <CardTitle className="text-sm sm:text-base">Engajamento</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         {/* Metrics grid */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           {metrics.map((metric) => {
             const Icon = metric.icon;
             return (
               <div
                 key={metric.label}
-                className="text-center p-4 rounded-lg bg-muted/50"
+                className="text-center p-2 sm:p-4 rounded-lg bg-muted/50"
               >
-                <Icon className={`h-6 w-6 mx-auto mb-2 ${metric.color}`} />
-                <p className={`text-2xl font-bold ${metric.color}`}>
+                <Icon className={`h-4 w-4 sm:h-6 sm:w-6 mx-auto mb-1 sm:mb-2 ${metric.color}`} />
+                <p className={`text-base sm:text-2xl font-bold tabular-nums ${metric.color}`}>
                   {metric.value.toLocaleString("pt-BR")}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {metric.label}
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+                  <span className="sm:hidden">{metric.shortLabel}</span>
+                  <span className="hidden sm:inline">{metric.label}</span>
                 </p>
               </div>
             );
@@ -85,27 +87,25 @@ export const EngagementSection = ({ data }: EngagementSectionProps) => {
 
         {/* Distribution bar */}
         <div className="space-y-2">
-          <p className="text-sm font-medium">Distribuição de Posts</p>
-          <div className="flex h-4 rounded-full overflow-hidden bg-muted">
+          <p className="text-xs sm:text-sm font-medium">Distribuição</p>
+          <div className="flex h-3 sm:h-4 rounded-full overflow-hidden bg-muted">
             <div
               className="bg-pink-500 transition-all"
               style={{ width: `${autoPercentage}%` }}
-              title={`Automáticos: ${autoPercentage}%`}
             />
             <div
               className="bg-amber-500 transition-all"
               style={{ width: `${manualPercentage}%` }}
-              title={`Manuais: ${manualPercentage}%`}
             />
           </div>
-          <div className="flex justify-between text-xs text-muted-foreground">
+          <div className="flex justify-between text-[10px] sm:text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full bg-pink-500" />
-              Automáticos ({autoPercentage}%)
+              Auto {autoPercentage}%
             </span>
             <span className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full bg-amber-500" />
-              Manuais ({manualPercentage}%)
+              Manual {manualPercentage}%
             </span>
           </div>
         </div>

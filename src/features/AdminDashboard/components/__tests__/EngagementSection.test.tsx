@@ -22,7 +22,7 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
-    expect(screen.getByText("Engajamento de Conteúdo")).toBeInTheDocument();
+    expect(screen.getByText("Engajamento")).toBeInTheDocument();
   });
 
   it("deve exibir valores das métricas", () => {
@@ -39,7 +39,7 @@ describe("EngagementSection", () => {
     expect(screen.getByText("400")).toBeInTheDocument();
   });
 
-  it("deve exibir labels corretos", () => {
+  it("deve exibir labels corretos para desktop", () => {
     const data: AllMetricsData = {
       "posts-total": createMockMetric(100),
       "posts-email": createMockMetric(60),
@@ -48,9 +48,25 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
+    // Desktop labels (hidden sm:inline)
     expect(screen.getByText("Posts Totais")).toBeInTheDocument();
-    expect(screen.getByText("Posts Automáticos")).toBeInTheDocument();
-    expect(screen.getByText("Posts Manuais")).toBeInTheDocument();
+    expect(screen.getByText("Automáticos")).toBeInTheDocument();
+    expect(screen.getByText("Manuais")).toBeInTheDocument();
+  });
+
+  it("deve exibir labels curtos para mobile", () => {
+    const data: AllMetricsData = {
+      "posts-total": createMockMetric(100),
+      "posts-email": createMockMetric(60),
+      "posts-manual": createMockMetric(40),
+    };
+
+    render(<EngagementSection data={data} />);
+
+    // Mobile labels (sm:hidden)
+    expect(screen.getByText("Total")).toBeInTheDocument();
+    expect(screen.getByText("Auto")).toBeInTheDocument();
+    expect(screen.getByText("Manual")).toBeInTheDocument();
   });
 
   it("deve calcular porcentagens corretamente", () => {
@@ -62,8 +78,8 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
-    expect(screen.getByText("Automáticos (70.0%)")).toBeInTheDocument();
-    expect(screen.getByText("Manuais (30.0%)")).toBeInTheDocument();
+    expect(screen.getByText(/Auto 70\.0%/)).toBeInTheDocument();
+    expect(screen.getByText(/Manual 30\.0%/)).toBeInTheDocument();
   });
 
   it("deve exibir 0% quando total é zero", () => {
@@ -75,8 +91,8 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
-    expect(screen.getByText("Automáticos (0%)")).toBeInTheDocument();
-    expect(screen.getByText("Manuais (0%)")).toBeInTheDocument();
+    expect(screen.getByText(/Auto 0%/)).toBeInTheDocument();
+    expect(screen.getByText(/Manual 0%/)).toBeInTheDocument();
   });
 
   it("deve lidar com dados undefined", () => {
@@ -88,7 +104,7 @@ describe("EngagementSection", () => {
     expect(zeros.length).toBe(3);
   });
 
-  it("deve exibir texto de distribuição de posts", () => {
+  it("deve exibir texto de distribuição", () => {
     const data: AllMetricsData = {
       "posts-total": createMockMetric(100),
       "posts-email": createMockMetric(60),
@@ -97,6 +113,6 @@ describe("EngagementSection", () => {
 
     render(<EngagementSection data={data} />);
 
-    expect(screen.getByText("Distribuição de Posts")).toBeInTheDocument();
+    expect(screen.getByText("Distribuição")).toBeInTheDocument();
   });
 });

@@ -1,6 +1,7 @@
 /**
  * AdminDashboard Feature
  * Main dashboard page for admin analytics visualization
+ * Mobile-first responsive design
  */
 
 import { useState } from "react";
@@ -48,12 +49,12 @@ const ICON_MAP: Record<string, LucideIcon> = {
 const METRICS_CONFIG: MetricConfig[] = [
   { type: "subscriptions", label: "Assinaturas", color: "text-green-600", iconName: "Users" },
   { type: "onboardings", label: "Onboardings", color: "text-blue-600", iconName: "UserPlus" },
-  { type: "images", label: "Imagens Geradas", color: "text-purple-600", iconName: "Image" },
-  { type: "emails-sent", label: "Emails Enviados", color: "text-orange-600", iconName: "Send" },
-  { type: "emails-opened", label: "Emails Abertos", color: "text-teal-600", iconName: "MailOpen" },
-  { type: "posts-total", label: "Posts Totais", color: "text-indigo-600", iconName: "FileText" },
-  { type: "posts-email", label: "Posts Automáticos", color: "text-pink-600", iconName: "Mail" },
-  { type: "posts-manual", label: "Posts Manuais", color: "text-amber-600", iconName: "Edit" },
+  { type: "images", label: "Imagens", color: "text-purple-600", iconName: "Image" },
+  { type: "emails-sent", label: "Enviados", color: "text-orange-600", iconName: "Send" },
+  { type: "emails-opened", label: "Abertos", color: "text-teal-600", iconName: "MailOpen" },
+  { type: "posts-total", label: "Posts", color: "text-indigo-600", iconName: "FileText" },
+  { type: "posts-email", label: "Automáticos", color: "text-pink-600", iconName: "Mail" },
+  { type: "posts-manual", label: "Manuais", color: "text-amber-600", iconName: "Edit" },
 ];
 
 /** Map Tailwind text color to hex for charts */
@@ -86,32 +87,34 @@ export const AdminDashboard = () => {
   const chartColor = selectedConfig ? colorToHex[selectedConfig.color] : "#6366f1";
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard de Métricas</h1>
-          <p className="text-muted-foreground">
-            Visão geral do comportamento dos usuários
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
+    <div className="space-y-4 p-3 sm:p-6 max-w-7xl mx-auto">
+      {/* Header - Mobile first */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg sm:text-2xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+              Visão geral do comportamento dos usuários
+            </p>
+          </div>
           <Button
             variant="outline"
             size="sm"
             onClick={refetchAll}
             disabled={isFetching}
-            className="gap-2"
+            className="h-8 w-8 p-0 sm:h-9 sm:w-auto sm:px-3"
           >
             <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-            Atualizar
+            <span className="hidden sm:inline ml-2">Atualizar</span>
           </Button>
-          <PeriodSelector value={days} onChange={setDays} disabled={isFetching} />
         </div>
+
+        {/* Period Selector - Full width on mobile */}
+        <PeriodSelector value={days} onChange={setDays} disabled={isFetching} />
       </div>
 
-      {/* KPI Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* KPI Grid - 2 columns mobile, 4 columns desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
         {METRICS_CONFIG.map((config) => {
           const Icon = ICON_MAP[config.iconName];
           return (
@@ -131,26 +134,32 @@ export const AdminDashboard = () => {
 
       {/* Main Chart */}
       <Card>
-        <CardHeader>
-          <CardTitle>
-            {selectedConfig?.label ?? "Métrica"} - Últimos {days} dias
+        <CardHeader className="pb-2 sm:pb-6">
+          <CardTitle className="text-sm sm:text-base">
+            {selectedConfig?.label} - {days}d
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pl-0 pr-2 sm:pl-2 sm:pr-6">
           <MetricChart
             data={data[selectedMetric]?.timeline ?? []}
             color={chartColor}
-            height={300}
+            height={200}
           />
         </CardContent>
       </Card>
 
-      {/* Detail Sections */}
-      <Tabs defaultValue="conversao" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="conversao">Funil de Conversão</TabsTrigger>
-          <TabsTrigger value="engajamento">Engajamento</TabsTrigger>
-          <TabsTrigger value="emails">Performance de Email</TabsTrigger>
+      {/* Detail Sections - Scrollable tabs on mobile */}
+      <Tabs defaultValue="conversao" className="space-y-3">
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="conversao" className="text-xs sm:text-sm">
+            Funil
+          </TabsTrigger>
+          <TabsTrigger value="engajamento" className="text-xs sm:text-sm">
+            Engajamento
+          </TabsTrigger>
+          <TabsTrigger value="emails" className="text-xs sm:text-sm">
+            Emails
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="conversao">
@@ -168,7 +177,7 @@ export const AdminDashboard = () => {
 
       {/* Footer note */}
       {data.subscriptions?.note && (
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
           {data.subscriptions.note}
         </p>
       )}

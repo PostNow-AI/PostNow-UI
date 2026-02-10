@@ -95,7 +95,8 @@ describe("MetricCard", () => {
 
     const svg = container.querySelector("svg");
     expect(svg).toHaveClass("text-green-600");
-    expect(svg).toHaveClass("h-8");
-    expect(svg).toHaveClass("w-8");
+    // Mobile-first: h-5 w-5 sm:h-8 sm:w-8
+    expect(svg).toHaveClass("h-5");
+    expect(svg).toHaveClass("w-5");
   });
 });

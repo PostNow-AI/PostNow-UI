@@ -76,7 +76,7 @@ describe("FunnelSection", () => {
     expect(zeros.length).toBeGreaterThan(0);
   });
 
-  it("deve exibir labels corretos para cada etapa", () => {
+  it("deve exibir labels corretos para cada etapa (desktop)", () => {
     const data: AllMetricsData = {
       subscriptions: createMockMetric(100),
       onboardings: createMockMetric(50),
@@ -85,9 +85,25 @@ describe("FunnelSection", () => {
 
     render(<FunnelSection data={data} />);
 
+    // Desktop labels (hidden sm:inline)
     expect(screen.getByText("Assinaturas")).toBeInTheDocument();
-    expect(screen.getByText("Onboardings Completos")).toBeInTheDocument();
-    expect(screen.getByText("Imagens Geradas")).toBeInTheDocument();
+    expect(screen.getByText("Onboardings")).toBeInTheDocument();
+    // "Imagens" aparece duas vezes (mesmo valor para short e long)
+    expect(screen.getAllByText("Imagens").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("deve exibir labels curtos para mobile", () => {
+    const data: AllMetricsData = {
+      subscriptions: createMockMetric(100),
+      onboardings: createMockMetric(50),
+      images: createMockMetric(25),
+    };
+
+    render(<FunnelSection data={data} />);
+
+    // Mobile labels (sm:hidden)
+    expect(screen.getByText("Assinar")).toBeInTheDocument();
+    expect(screen.getByText("Onboard")).toBeInTheDocument();
   });
 
   it("deve exibir textos de taxa de conversão", () => {
@@ -99,7 +115,7 @@ describe("FunnelSection", () => {
 
     render(<FunnelSection data={data} />);
 
-    expect(screen.getByText("Assinatura → Onboarding")).toBeInTheDocument();
-    expect(screen.getByText("Onboarding → Geração")).toBeInTheDocument();
+    expect(screen.getByText("Assinar → Onboard")).toBeInTheDocument();
+    expect(screen.getByText("Onboard → Imagem")).toBeInTheDocument();
   });
 });

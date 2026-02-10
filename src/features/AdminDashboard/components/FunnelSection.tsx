@@ -1,6 +1,7 @@
 /**
  * FunnelSection Component
  * Displays conversion funnel metrics (subscriptions -> onboardings -> images)
+ * Mobile-first responsive design
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,7 @@ export interface FunnelSectionProps {
 
 interface FunnelStep {
   label: string;
+  shortLabel: string;
   value: number;
   color: string;
 }
@@ -23,9 +25,9 @@ export const FunnelSection = ({ data }: FunnelSectionProps) => {
   const images = data.images?.count ?? 0;
 
   const steps: FunnelStep[] = [
-    { label: "Assinaturas", value: subscriptions, color: "bg-green-500" },
-    { label: "Onboardings Completos", value: onboardings, color: "bg-blue-500" },
-    { label: "Imagens Geradas", value: images, color: "bg-purple-500" },
+    { label: "Assinaturas", shortLabel: "Assinar", value: subscriptions, color: "bg-green-500" },
+    { label: "Onboardings", shortLabel: "Onboard", value: onboardings, color: "bg-blue-500" },
+    { label: "Imagens", shortLabel: "Imagens", value: images, color: "bg-purple-500" },
   ];
 
   const maxValue = Math.max(...steps.map((s) => s.value), 1);
@@ -40,28 +42,31 @@ export const FunnelSection = ({ data }: FunnelSectionProps) => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Funil de Conversão</CardTitle>
+      <CardHeader className="pb-2 sm:pb-6">
+        <CardTitle className="text-sm sm:text-base">Funil de Conversão</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         {/* Funnel visualization */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {steps.map((step, index) => (
-            <div key={step.label} className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="font-medium">{step.label}</span>
-                <span className="text-muted-foreground">
+            <div key={step.label} className="space-y-1 sm:space-y-2">
+              <div className="flex justify-between text-xs sm:text-sm">
+                <span className="font-medium">
+                  <span className="sm:hidden">{step.shortLabel}</span>
+                  <span className="hidden sm:inline">{step.label}</span>
+                </span>
+                <span className="text-muted-foreground tabular-nums">
                   {step.value.toLocaleString("pt-BR")}
                 </span>
               </div>
               <Progress
                 value={(step.value / maxValue) * 100}
-                className="h-3"
+                className="h-2 sm:h-3"
               />
               {index < steps.length - 1 && (
-                <div className="text-xs text-muted-foreground text-right">
-                  {index === 0 && `Taxa de conversão: ${onboardingRate}%`}
-                  {index === 1 && `Taxa de geração: ${imageRate}%`}
+                <div className="text-[10px] sm:text-xs text-muted-foreground text-right">
+                  {index === 0 && `→ ${onboardingRate}%`}
+                  {index === 1 && `→ ${imageRate}%`}
                 </div>
               )}
             </div>
@@ -69,17 +74,17 @@ export const FunnelSection = ({ data }: FunnelSectionProps) => {
         </div>
 
         {/* Summary stats */}
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-green-600">{onboardingRate}%</p>
-            <p className="text-xs text-muted-foreground">
-              Assinatura → Onboarding
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 pt-3 sm:pt-4 border-t">
+          <div className="text-center p-2 sm:p-0">
+            <p className="text-lg sm:text-2xl font-bold text-green-600">{onboardingRate}%</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
+              Assinar → Onboard
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-purple-600">{imageRate}%</p>
-            <p className="text-xs text-muted-foreground">
-              Onboarding → Geração
+          <div className="text-center p-2 sm:p-0">
+            <p className="text-lg sm:text-2xl font-bold text-purple-600">{imageRate}%</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
+              Onboard → Imagem
             </p>
           </div>
         </div>
