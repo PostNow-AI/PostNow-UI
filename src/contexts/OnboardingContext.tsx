@@ -3,8 +3,8 @@ import { BlurryBackground } from "@/components/ui/blurry-background";
 import { OnboardingComplete } from "@/features/Auth/Onboarding/components/OnboardingComplete";
 import { useOnboardingFlow } from "@/features/Auth/Onboarding/hooks/useOnboardingFlow";
 import { OnboardingForm } from "@/features/Auth/Onboarding/OnboardingForm";
-import { NoSubscriptionDialog } from "@/features/IdeaBank/components/NoSubscriptionDialog";
-import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
+import { OnboardingNew } from "@/features/Auth/Onboarding/OnboardingNew";
+import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface OnboardingContextType {
@@ -14,6 +14,10 @@ interface OnboardingContextType {
   setOpenOnboarding: React.Dispatch<React.SetStateAction<boolean>>;
   showSuccessDialog: boolean;
   setShowSuccessDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  editMode: boolean;
+  setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
+  editData: OnboardingFormData | null;
+  setEditData: React.Dispatch<React.SetStateAction<OnboardingFormData | null>>;
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -29,10 +33,8 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   const { isLoading, needsOnboarding } = useOnboardingFlow();
   const [openOnboarding, setOpenOnboarding] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const { data: userSubscription, isLoading: isSubscriptionLoading } =
-    useUserSubscription();
-
-  const hasActiveSubscription = userSubscription?.status === "active";
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState<OnboardingFormData | null>(null);
 
   useEffect(() => {
     if (!isLoading && needsOnboarding === true) {
@@ -45,7 +47,19 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
     setOpenOnboarding(false);
   };
 
-  if (isLoading || isSubscriptionLoading) {
+  const handleEditComplete = () => {
+    setOpenOnboarding(false);
+    setEditMode(false);
+    setEditData(null);
+  };
+
+  const handleEditCancel = () => {
+    setOpenOnboarding(false);
+    setEditMode(false);
+    setEditData(null);
+  };
+
+  if (isLoading) {
     return <LoadingPage />;
   }
 
@@ -58,11 +72,24 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
         setOpenOnboarding,
         showSuccessDialog,
         setShowSuccessDialog,
+        editMode,
+        setEditMode,
+        editData,
+        setEditData,
       }}
     >
       <BlurryBackground variant="2">
         {openOnboarding ? (
-          <OnboardingForm />
+          editMode && editData ? (
+            <OnboardingNew
+              mode="edit"
+              initialData={editData}
+              onComplete={handleEditComplete}
+              onCancel={handleEditCancel}
+            />
+          ) : (
+            <OnboardingForm />
+          )
         ) : (
           <>
             {children}
@@ -75,8 +102,6 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
           </>
         )}
       </BlurryBackground>
-
-      {!hasActiveSubscription && <NoSubscriptionDialog />}
     </OnboardingContext.Provider>
   );
 };

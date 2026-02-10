@@ -1,13 +1,23 @@
-import { PaywallScreen } from "../PaywallScreen";
-import { useNavigate } from "react-router-dom";
+import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
+import { PaywallFlow } from "../PaywallFlow";
 
 interface PaywallStepProps {
   onSelectPlan: (planId: string) => void;
+  onBack?: () => void;
+  isLoading?: boolean;
 }
 
-const TRIAL_DAYS = 10;
+/** Usar constante centralizada para evitar duplicação */
+const { TRIAL_DAYS } = SUBSCRIPTION_CONFIG;
 
 const plans = [
+  {
+    id: "monthly",
+    name: "Mensal",
+    price: 49.9,
+    pricePerMonth: 49.9,
+    interval: "month" as const,
+  },
   {
     id: "annual",
     name: "Anual",
@@ -15,34 +25,23 @@ const plans = [
     pricePerMonth: 29.92,
     interval: "year" as const,
     badge: "Melhor valor",
-    savings: "Economize 50%",
+    savings: "Economize 40%",
     recommended: true,
-  },
-  {
-    id: "monthly",
-    name: "Mensal",
-    price: 59.9,
-    pricePerMonth: 59.9,
-    interval: "month" as const,
   },
 ];
 
 export const PaywallStep = ({
   onSelectPlan,
+  onBack,
+  isLoading,
 }: PaywallStepProps) => {
-  const navigate = useNavigate();
-
-  const handleLogin = () => {
-    // Redirecionar para login normal se já tem assinatura
-    navigate("/login");
-  };
-
   return (
-    <PaywallScreen
+    <PaywallFlow
       trialDays={TRIAL_DAYS}
       plans={plans}
       onSelectPlan={onSelectPlan}
-      onLogin={handleLogin}
+      onBack={onBack}
+      isLoading={isLoading}
     />
   );
 };

@@ -1,8 +1,8 @@
-import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useOnboardingStorage } from "./hooks/useOnboardingStorage";
+import type { OnboardingFormData } from "./constants/onboardingSchema";
 import {
   WelcomeStep,
   BusinessNameStep,
@@ -29,15 +29,39 @@ import {
 import {
   submitOnboardingStep1,
   submitOnboardingStep2,
-  generateSingleClientContext,
 } from "./services";
 import { handleApiError } from "@/lib/utils/errorHandling";
+import {
+  useSubscriptionPlans,
+  useCreateCheckoutSession,
+} from "@/features/Subscription/hooks/useSubscription";
 
 type AuthMode = "signup" | "login" | null;
 
-export const OnboardingNew = () => {
-  const navigate = useNavigate();
+interface OnboardingNewProps {
+  mode?: "create" | "edit";
+  initialData?: OnboardingFormData;
+  onComplete?: () => void;
+  onCancel?: () => void;
+}
+
+export const OnboardingNew = ({
+  mode = "create",
+  initialData,
+  onComplete,
+  onCancel,
+}: OnboardingNewProps) => {
   const queryClient = useQueryClient();
+  const isEditMode = mode === "edit";
+
+  const [authMode, setAuthMode] = useState<AuthMode>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Hooks para checkout do Stripe - só busca quando autenticado
+  const { data: subscriptionPlans } = useSubscriptionPlans(isAuthenticated);
+  const createCheckout = useCreateCheckoutSession();
+
   const {
     data,
     saveData,
@@ -47,10 +71,16 @@ export const OnboardingNew = () => {
     getStep1Payload,
     getStep2Payload,
     isLoaded,
+    initializeWithData,
   } = useOnboardingStorage();
 
-  const [authMode, setAuthMode] = useState<AuthMode>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Inicializar com dados no modo edição
+  useEffect(() => {
+    if (isEditMode && initialData && isLoaded && !isInitialized) {
+      initializeWithData(initialData);
+      setIsInitialized(true);
+    }
+  }, [isEditMode, initialData, isLoaded, isInitialized, initializeWithData]);
 
   // Mutation para sincronizar dados com o backend
   const syncMutation = useMutation({
@@ -62,20 +92,43 @@ export const OnboardingNew = () => {
       // Step 2: Branding
       const step2Payload = getStep2Payload();
       await submitOnboardingStep2(step2Payload);
-
-      // Gerar contexto do cliente
-      await generateSingleClientContext();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
       clearData();
-      toast.success("Perfil configurado com sucesso!");
+      // Toast removido - não interromper fluxo do paywall
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
         defaultTitle: "Erro ao salvar dados",
         defaultDescription: "Não foi possível salvar o perfil. Tente novamente.",
+      });
+      toast.error(errorResult.description);
+    },
+  });
+
+  // Mutation para atualizar perfil (modo edição)
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      // Step 1: Business info
+      const step1Payload = getStep1Payload();
+      await submitOnboardingStep1(step1Payload);
+
+      // Step 2: Branding
+      const step2Payload = getStep2Payload();
+      await submitOnboardingStep2(step2Payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
+      clearData();
+      toast.success("Perfil atualizado com sucesso!");
+      onComplete?.();
+    },
+    onError: (error: unknown) => {
+      const errorResult = handleApiError(error, {
+        defaultTitle: "Erro ao atualizar perfil",
+        defaultDescription: "Não foi possível atualizar o perfil. Tente novamente.",
       });
       toast.error(errorResult.description);
     },
@@ -109,20 +162,69 @@ export const OnboardingNew = () => {
   }, [syncMutation, goToStep]);
 
   const handlePlanSelect = useCallback(async (planId: string) => {
-    // Aqui integraria com Stripe para criar subscription com trial
-    console.log("Plano selecionado:", planId);
+    // Mapear o ID do frontend para o interval do backend
+    // planId é "monthly" ou "annual" do PaywallStep
+    // Usar interval (mais estável que nome) para encontrar o plano
+    const intervalMap: Record<string, string> = {
+      monthly: "monthly",
+      annual: "yearly",
+    };
 
-    // Por enquanto, redirecionar para a página de subscription existente
-    navigate(`/subscription?plan=${planId}&trial=10`);
-  }, [navigate]);
+    const targetInterval = intervalMap[planId];
+
+    // Encontrar o plano correspondente no backend pelo interval
+    const backendPlan = subscriptionPlans?.find(
+      (plan) => plan.interval === targetInterval && plan.is_active
+    );
+
+    if (!backendPlan) {
+      console.error("[Onboarding] Plano não encontrado:", { planId, targetInterval, availablePlans: subscriptionPlans });
+      toast.error("Plano não encontrado. Tente novamente.");
+      return;
+    }
+
+    // URLs de retorno após checkout (usando origin para suportar qualquer ambiente)
+    const baseUrl = window.location.origin;
+    const successUrl = `${baseUrl}/?checkout=success`;
+    const cancelUrl = `${baseUrl}/onboarding?checkout=cancelled`;
+
+    // Criar sessão de checkout no Stripe
+    try {
+      await createCheckout.mutateAsync({
+        plan_id: backendPlan.id,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+      // O hook já redireciona para o Stripe automaticamente
+    } catch (error) {
+      console.error("[Onboarding] Erro ao criar checkout:", error);
+      toast.error("Erro ao processar pagamento. Tente novamente.");
+    }
+  }, [subscriptionPlans, createCheckout]);
+
+  // Handler para voltar no modo edição
+  const handleEditBack = useCallback(() => {
+    if (data.current_step <= 2) {
+      // Se estiver no primeiro step útil, cancelar edição
+      clearData();
+      onCancel?.();
+    } else {
+      goToStep(data.current_step - 1);
+    }
+  }, [data.current_step, goToStep, clearData, onCancel]);
 
   // Não renderizar até carregar dados do localStorage
   if (!isLoaded) {
     return null;
   }
 
-  // Se estiver em modo de autenticação
-  if (authMode === "signup") {
+  // No modo edição, aguardar inicialização dos dados
+  if (isEditMode && !isInitialized) {
+    return null;
+  }
+
+  // Se estiver em modo de autenticação (apenas no modo criação)
+  if (!isEditMode && authMode === "signup") {
     return (
       <SignupStep
         onSuccess={handleAuthSuccess}
@@ -131,7 +233,7 @@ export const OnboardingNew = () => {
     );
   }
 
-  if (authMode === "login") {
+  if (!isEditMode && authMode === "login") {
     return (
       <LoginStep
         onSuccess={handleAuthSuccess}
@@ -141,11 +243,12 @@ export const OnboardingNew = () => {
     );
   }
 
-  // Se já autenticado e no paywall
-  if (isAuthenticated && data.current_step >= 19) {
+  // Se já autenticado e no paywall (apenas no modo criação)
+  if (!isEditMode && isAuthenticated && data.current_step >= 19) {
     return (
       <PaywallStep
         onSelectPlan={handlePlanSelect}
+        isLoading={createCheckout.isPending}
       />
     );
   }
@@ -154,6 +257,11 @@ export const OnboardingNew = () => {
   const renderStep = () => {
     switch (data.current_step) {
       case 1:
+        // No modo edição, pular welcome e ir direto para business name
+        if (isEditMode) {
+          goToStep(2);
+          return null;
+        }
         return <WelcomeStep onNext={handleNext} onLogin={() => setAuthMode("login")} />;
 
       case 2:
@@ -162,7 +270,7 @@ export const OnboardingNew = () => {
             value={data.business_name}
             onChange={(value) => saveData({ business_name: value })}
             onNext={handleNext}
-            onBack={handleBack}
+            onBack={isEditMode ? handleEditBack : handleBack}
           />
         );
 
@@ -321,14 +429,26 @@ export const OnboardingNew = () => {
           <ProfileReadyStep
             data={data}
             onNext={() => {
-              markAsCompleted();
-              handleNext();
+              if (isEditMode) {
+                // No modo edição, salvar diretamente
+                updateMutation.mutate();
+              } else {
+                markAsCompleted();
+                handleNext();
+              }
             }}
             onBack={handleBack}
+            isEditMode={isEditMode}
+            isLoading={updateMutation.isPending}
           />
         );
 
       case 18:
+        // No modo edição, não deve chegar aqui (salva no step 17)
+        if (isEditMode) {
+          updateMutation.mutate();
+          return null;
+        }
         return (
           <PreviewStep
             data={data}
