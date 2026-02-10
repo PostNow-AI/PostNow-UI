@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import { PaywallStep } from "../PaywallStep";
 
 // Mock do PaywallFlow para isolar o teste
-vi.mock("../PaywallFlow", () => ({
+// Caminho relativo ao arquivo de teste (dentro de __tests__)
+vi.mock("../../PaywallFlow", () => ({
   PaywallFlow: ({
     trialDays,
     plans,
