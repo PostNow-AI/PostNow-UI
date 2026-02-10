@@ -13,6 +13,7 @@ import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { AdminDailyPosts } from "./pages/AdminDailyPosts";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import CreditsPage from "./pages/CreditsPage";
 import EmailSentPage from "./pages/EmailSentPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
@@ -127,6 +128,10 @@ const App = () => {
                   </AdminRoute>
                 }
               >
+                <Route
+                  path="/admin/dashboard"
+                  element={<AdminDashboardPage />}
+                />
                 <Route
                   path="/admin/daily-posts"
                   element={<AdminDailyPosts />}

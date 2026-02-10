@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { Activity, ClipboardList, LogOut, Wallet } from "lucide-react";
+import { Activity, BarChart3, ClipboardList, LogOut, Wallet } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   Avatar,
@@ -61,6 +61,11 @@ export function AppSidebar() {
   ];
 
   const adminMenuItems = [
+    {
+      title: "Dashboard",
+      icon: BarChart3,
+      url: "/admin/dashboard",
+    },
     {
       title: "Posts Diários",
       icon: Activity,
