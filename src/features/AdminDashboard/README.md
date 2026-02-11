@@ -299,3 +299,4 @@ npm test -- --run src/features/AdminDashboard
 > **Nota:** Componentes sem testes são principalmente UI simples ou wrappers. Testes futuros devem priorizar `MetricDetailView` e `StepDetailsDrawer` por terem lógica mais complexa.
 
 **Total: 128 testes | Cobertura: 14/21 componentes (67%)**
+
