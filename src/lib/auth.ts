@@ -10,11 +10,17 @@ import {
   apiRequest,
   authRequest,
   dispatchAuthStateChange,
+  handleAuthResponse,
 } from "./auth-helpers";
 import { initiateGoogleOAuth } from "./google-oauth";
 
 // Re-export auth helpers
 export { subscribeToAuthChanges } from "./auth-helpers";
+
+// Type for registration response that may require email verification
+export type RegisterResponse =
+  | { type: "authenticated"; data: AuthResponse }
+  | { type: "email_verification_required"; email: string; message: string };
 
 // API Functions for TanStack Query
 export const authApi = {
@@ -25,6 +31,7 @@ export const authApi = {
       "Login falhou"
     ),
 
+  // Standard register (expects tokens - may fail on email verification backends)
   register: (userData: RegisterRequest) =>
     authRequest(
       () =>
@@ -37,6 +44,37 @@ export const authApi = {
         }),
       "Registro falhou"
     ),
+
+  // Register that handles both direct auth and email verification
+  registerWithVerification: async (userData: RegisterRequest): Promise<RegisterResponse> => {
+    try {
+      const response = await api.post("/api/v1/auth/registration/", {
+        email: userData.email,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        password1: userData.password,
+        password2: userData.confirmPassword,
+      });
+
+      const data = response.data;
+
+      // Check if response has tokens (direct authentication)
+      if (data.access && data.refresh) {
+        handleAuthResponse(data as AuthResponse);
+        return { type: "authenticated", data: data as AuthResponse };
+      }
+
+      // Email verification required
+      return {
+        type: "email_verification_required",
+        email: userData.email,
+        message: data.detail || "E-mail de verificação enviado.",
+      };
+    } catch (error: unknown) {
+      // Re-throw for mutation error handling
+      throw error;
+    }
+  },
 
   handleGoogleCallback: (code: string) =>
     authRequest(

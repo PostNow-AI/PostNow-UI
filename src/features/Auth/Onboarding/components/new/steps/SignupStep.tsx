@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { BetaLogo } from "@/components/ui/beta-logo";
 import { Loader } from "@/components/ui/loader";
 import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
-import { authApi, authUtils } from "@/lib/auth";
+import { authApi, authUtils, type RegisterResponse } from "@/lib/auth";
 import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { EmailVerificationStep } from "./EmailVerificationStep";
 
 const signupSchema = z.object({
   first_name: z.string().min(1, "Nome é obrigatório"),
@@ -39,6 +40,10 @@ export const SignupStep = ({
 }: SignupStepProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailVerification, setEmailVerification] = useState<{
+    required: boolean;
+    email: string;
+  } | null>(null);
   const queryClient = useQueryClient();
 
   const form = useForm<SignupFormData>({
@@ -52,12 +57,20 @@ export const SignupStep = ({
   } = form;
 
   const registerMutation = useMutation({
-    mutationFn: authApi.register,
-    onSuccess: async () => {
-      queryClient.clear();
-      // Toast removido - não interromper fluxo do paywall
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      onSuccess();
+    mutationFn: authApi.registerWithVerification,
+    onSuccess: async (result: RegisterResponse) => {
+      if (result.type === "authenticated") {
+        // Direct authentication - proceed to paywall
+        queryClient.clear();
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        onSuccess();
+      } else {
+        // Email verification required - show verification screen
+        setEmailVerification({
+          required: true,
+          email: result.email,
+        });
+      }
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
@@ -77,6 +90,16 @@ export const SignupStep = ({
       confirmPassword: data.confirmPassword,
     });
   };
+
+  // Show email verification screen if required
+  if (emailVerification?.required) {
+    return (
+      <EmailVerificationStep
+        email={emailVerification.email}
+        onBack={() => setEmailVerification(null)}
+      />
+    );
+  }
 
   const handleGoogleSignup = () => {
     try {
