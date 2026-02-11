@@ -184,6 +184,28 @@ STEP_NAMES_PT[1]           // "Boas-vindas"
 STEP_NAMES_PT[4]           // "Nicho"
 ```
 
+## API Backend
+
+O dashboard consome dados do serviço `dashboardApiService` em `@/lib/dashboard-api`.
+
+### Endpoints
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/v1/audit/dashboard/{metric}/` | Busca métrica específica |
+| GET | `/api/v1/audit/dashboard/subscriptions/details/` | Detalhes de assinaturas |
+| GET | `/api/v1/audit/dashboard/logins/details/` | Detalhes de logins |
+| GET | `/api/v1/audit/dashboard/onboarding-funnel/` | Dados do funil |
+| GET | `/api/v1/audit/dashboard/onboarding-step/{step}/` | Detalhes de etapa |
+
+**Query params comuns:** `?days=30` (1, 7, 30, 90, 180)
+
+### Cache
+
+- **Stale time:** 5 minutos (`STALE_TIME = 5 * 60 * 1000`)
+- **Retries:** 2 tentativas (exceto 404)
+- **Parallel fetching:** Todas as métricas são buscadas em paralelo
+
 ## Hooks
 
 ### `useDashboardMetric(metric, days)`
