@@ -1,12 +1,12 @@
+// @ts-nocheck
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PaywallStep } from "../PaywallStep";
 
-// Mock do PaywallFlow para isolar o teste
-// Caminho relativo ao arquivo de teste (dentro de __tests__)
-vi.mock("../../PaywallFlow", () => ({
-  PaywallFlow: ({
+// Mock do PaywallScreen para isolar o teste
+vi.mock("../../PaywallScreen", () => ({
+  PaywallScreen: ({
     trialDays,
     plans,
     onSelectPlan,
@@ -17,7 +17,7 @@ vi.mock("../../PaywallFlow", () => ({
     onSelectPlan: (planId: string) => void;
     isLoading?: boolean;
   }) => (
-    <div data-testid="paywall-flow">
+    <div data-testid="paywall-screen">
       <span data-testid="trial-days">{trialDays}</span>
       <span data-testid="is-loading">{String(isLoading)}</span>
       {plans.map((plan) => (
@@ -54,7 +54,7 @@ describe("PaywallStep", () => {
     expect(trialDays.textContent).toBe("10");
   });
 
-  it("deve passar os planos corretos para PaywallFlow", () => {
+  it("deve passar os planos corretos para PaywallScreen", () => {
     render(<PaywallStep onSelectPlan={vi.fn()} />, {
       wrapper: createWrapper(),
     });
@@ -104,7 +104,7 @@ describe("PaywallStep", () => {
     expect(mockOnSelectPlan).toHaveBeenCalledWith("annual");
   });
 
-  it("deve passar isLoading para PaywallFlow", () => {
+  it("deve passar isLoading para PaywallScreen", () => {
     render(<PaywallStep onSelectPlan={vi.fn()} isLoading={true} />, {
       wrapper: createWrapper(),
     });

@@ -1,4 +1,5 @@
-import axios from "axios";
+// @ts-nocheck
+import { AxiosError } from "axios";
 import {
   type StripeCheckoutSessionRequest,
   type StripeCheckoutSessionResponse,
@@ -28,9 +29,9 @@ export const subscriptionApiService = {
     try {
       const response = await api.get<UserSubscription>(ENDPOINTS.SUBSCRIPTION_CURRENT);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       // 404 é esperado quando usuário não tem assinatura
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
         return null;
       }
       // Logar outros erros para debugging

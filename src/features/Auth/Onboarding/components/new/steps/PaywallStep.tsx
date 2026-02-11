@@ -1,9 +1,8 @@
 import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
-import { PaywallFlow } from "../PaywallFlow";
+import { PaywallScreen } from "../PaywallScreen";
 
 interface PaywallStepProps {
   onSelectPlan: (planId: string) => void;
-  onBack?: () => void;
   isLoading?: boolean;
 }
 
@@ -32,15 +31,13 @@ const plans = [
 
 export const PaywallStep = ({
   onSelectPlan,
-  onBack,
   isLoading,
 }: PaywallStepProps) => {
   return (
-    <PaywallFlow
+    <PaywallScreen
       trialDays={TRIAL_DAYS}
       plans={plans}
       onSelectPlan={onSelectPlan}
-      onBack={onBack}
       isLoading={isLoading}
     />
   );

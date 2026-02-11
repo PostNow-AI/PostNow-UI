@@ -78,7 +78,27 @@ export const OnboardingNew = ({
   // Inicializar com dados no modo edição
   useEffect(() => {
     if (isEditMode && initialData && isLoaded && !isInitialized) {
-      initializeWithData(initialData);
+      // Converter OnboardingFormData para OnboardingTempData
+      const convertedData = {
+        ...initialData,
+        // Converter brand_personality de string para array
+        brand_personality: initialData.brand_personality
+          ? initialData.brand_personality.split(",").map((s) => s.trim())
+          : [],
+        // Converter target_interests de string para array
+        target_interests: initialData.target_interests
+          ? initialData.target_interests.split(",").map((s) => s.trim())
+          : [],
+        // Converter cores individuais para array
+        colors: [
+          initialData.color_1,
+          initialData.color_2,
+          initialData.color_3,
+          initialData.color_4,
+          initialData.color_5,
+        ].filter((c): c is string => !!c),
+      };
+      initializeWithData(convertedData);
       setIsInitialized(true);
     }
   }, [isEditMode, initialData, isLoaded, isInitialized, initializeWithData]);

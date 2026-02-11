@@ -116,6 +116,15 @@ export const useOnboardingStorage = () => {
     setData(getDefaultData());
   }, []);
 
+  // Inicializar com dados existentes (modo edição)
+  const initializeWithData = useCallback((existingData: Partial<OnboardingTempData>) => {
+    setData((prev) => ({
+      ...prev,
+      ...existingData,
+      current_step: 2, // Pular welcome no modo edição
+    }));
+  }, []);
+
   // Verificar se onboarding foi completado
   const isCompleted = Boolean(data.completed_at);
 
@@ -163,5 +172,6 @@ export const useOnboardingStorage = () => {
     clearData,
     getStep1Payload,
     getStep2Payload,
+    initializeWithData,
   };
 };
