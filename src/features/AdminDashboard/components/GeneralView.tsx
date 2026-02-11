@@ -12,7 +12,7 @@
 import { Card } from "@/components/ui/card";
 import { Users, UserPlus, Image, Mail, FileText, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { AllMetricsData, MetricType, TimelinePoint } from "../types";
+import type { AllMetricsData, TimelinePoint } from "../types";
 import { cn } from "@/lib/utils";
 
 /** Simple sparkline SVG component */

@@ -10,7 +10,7 @@
  * - Phase 5 (Auth): 18-20 (Profile Ready, Signup, Paywall)
  */
 
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef } from "react";
 import { api } from "@/lib/api";
 
 const SESSION_STORAGE_KEY = "onboarding_session_id";

@@ -19,10 +19,4 @@ export default defineConfig({
     // Substituir variáveis de ambiente no código
     __CLARITY_ID__: JSON.stringify(process.env.VITE_CLARITY_ID || ""),
   },
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
-    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-  },
 });

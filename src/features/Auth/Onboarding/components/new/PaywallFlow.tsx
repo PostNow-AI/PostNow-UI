@@ -36,7 +36,7 @@ const getFutureDate = (days: number): string => {
 
 // === TELA 1: Introdução ao Trial ===
 const TrialIntroScreen = ({
-  trialDays,
+  trialDays: _trialDays,
   selectedPlan,
   onContinue,
 }: {
@@ -160,7 +160,7 @@ const TrialIntroScreen = ({
 
 // === TELA 2: Lembrete antes de cobrar ===
 const ReminderScreen = ({
-  trialDays,
+  trialDays: _trialDays,
   selectedPlan,
   onContinue,
   onBack,
@@ -432,7 +432,7 @@ export const PaywallFlow = ({
   trialDays,
   plans,
   onSelectPlan,
-  onBack,
+  onBack: _onBack,
   isLoading = false,
 }: PaywallFlowProps) => {
   const [currentScreen, setCurrentScreen] = useState(1);

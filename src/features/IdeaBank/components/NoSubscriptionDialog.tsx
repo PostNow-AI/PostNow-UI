@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogHeader,
 } from "@/components";
+import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
 import { useCreateCheckoutSession } from "@/features/Subscription/hooks/useSubscription";
 import { formatToBRL } from "@/utils";
 import {} from "@radix-ui/react-dialog";
@@ -14,10 +15,17 @@ export const NoSubscriptionDialog = () => {
   const createCheckout = useCreateCheckoutSession();
 
   const handleSubscribe = async () => {
+    const { STRIPE_URLS } = SUBSCRIPTION_CONFIG;
+    const baseUrl = window.location.origin;
+    const successUrl = `${baseUrl}${STRIPE_URLS.SUCCESS}`;
+    const cancelUrl = `${baseUrl}${STRIPE_URLS.CANCEL}`;
+
     try {
       await createCheckout.mutateAsync({
         plan_id: 12,
         upgrade: false,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
       });
     } catch {
       // Handle error

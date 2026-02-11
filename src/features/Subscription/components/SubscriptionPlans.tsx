@@ -1,4 +1,5 @@
 import { Button } from "@/components";
+import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
 import { formatToBRL } from "@/utils";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -49,10 +50,17 @@ export const SubscriptionPlans = () => {
   const handleSubscribe = async (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
 
+    const { STRIPE_URLS } = SUBSCRIPTION_CONFIG;
+    const baseUrl = window.location.origin;
+    const successUrl = `${baseUrl}${STRIPE_URLS.SUCCESS}`;
+    const cancelUrl = `${baseUrl}${STRIPE_URLS.CANCEL}`;
+
     try {
       await createCheckout.mutateAsync({
         plan_id: plan.id,
         upgrade: currentSubscription ? true : false,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
       });
     } catch (error) {
       console.error("Erro ao criar checkout:", error);
@@ -182,7 +190,7 @@ export const SubscriptionPlans = () => {
                   {plan.description}
                 </p>
                 <div className="mt-4 space-y-1 flex flex-col items-start">
-                  {plan.benefits.map((benefit, index) => (
+                  {(plan.benefits ?? []).map((benefit, index) => (
                     <div
                       className="flex flex-row items-center gap-2"
                       key={index}

@@ -15,7 +15,7 @@ import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { ArrowLeft, Users, UserPlus, Image, Mail, FileText, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { AllMetricsData, TimelinePoint } from "../types";
+import type { AllMetricsData } from "../types";
 import { MetricChart } from "./MetricChart";
 import { cn } from "@/lib/utils";
 import type { GeneralMetricType } from "./GeneralView";
@@ -49,7 +49,7 @@ const SWIPE_THRESHOLD = 50;
 export const MetricDetailView = ({
   data,
   initialMetric,
-  periodLabel,
+  periodLabel: _periodLabel,
   onBack,
   onMetricChange,
 }: MetricDetailViewProps) => {

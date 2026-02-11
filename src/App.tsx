@@ -40,7 +40,7 @@ import { SubscriptionPage } from "./pages/SubscriptionPage";
 import OnboardingPage from "./pages/OnboardingPage";
 
 const App = () => {
-  if (process.env.NODE_ENV === "production") {
+  if (import.meta.env.MODE === "production") {
     const clarityId = import.meta.env.VITE_CLARITY_ID;
     if (clarityId && typeof clarityId === "string" && clarityId.trim() !== "") {
       clarity.init(clarityId);

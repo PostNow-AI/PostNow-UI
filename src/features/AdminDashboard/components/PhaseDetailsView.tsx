@@ -74,10 +74,6 @@ export const PhaseDetailsView = ({
   const calcRate = (current: number, previous: number) =>
     previous > 0 ? Math.round((current / previous) * 100) : 0;
 
-  // Get max value for this phase for bar width
-  const phaseStepCounts = phase.steps.map((s) => stepCounts[s] || 0);
-  const maxValue = Math.max(...phaseStepCounts, 1);
-
   return (
     <div className="flex-1 flex flex-col p-3">
       {/* Header with back button */}
@@ -146,7 +142,6 @@ export const PhaseDetailsView = ({
             : stepCounts[phase.steps[stepIdx - 1]] || 0;
           const stepRate = calcRate(stepCount, prevStepCount);
           const dropOff = prevStepCount - stepCount;
-          const barWidth = maxValue > 0 ? (stepCount / maxValue) * 100 : 0;
 
           // For first step, show 100%
           const isFirstStep = stepIdx === 0;
