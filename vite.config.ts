@@ -12,11 +12,17 @@ export default defineConfig({
     },
   },
   server: {
-    host: "127.0.0.1",
+    host: "localhost",
     allowedHosts: ["workable-wealthy-haddock.ngrok-free.app", "localhost", "*"],
   },
   define: {
     // Substituir variáveis de ambiente no código
     __CLARITY_ID__: JSON.stringify(process.env.VITE_CLARITY_ID || ""),
+  },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
+    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
   },
 });

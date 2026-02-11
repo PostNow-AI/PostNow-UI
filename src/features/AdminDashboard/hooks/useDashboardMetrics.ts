@@ -39,6 +39,7 @@ export const useAllDashboardMetrics = (days: PeriodDays = 30) => {
   const metrics: MetricType[] = [
     "subscriptions",
     "onboardings",
+    "logins",
     "images",
     "emails-sent",
     "emails-opened",
@@ -52,11 +53,23 @@ export const useAllDashboardMetrics = (days: PeriodDays = 30) => {
       queryKey: ["dashboard", metric, days],
       queryFn: () => dashboardApiService.getMetric(metric, days),
       staleTime: STALE_TIME,
+      // Don't fail the whole dashboard if one metric is missing
+      retry: (failureCount: number, error: unknown) => {
+        // Don't retry 404 errors (endpoint doesn't exist)
+        if (error && typeof error === 'object' && 'response' in error) {
+          const response = (error as { response?: { status?: number } }).response;
+          if (response?.status === 404) return false;
+        }
+        return failureCount < 2;
+      },
     })),
   });
 
-  const isLoading = queries.some((q) => q.isLoading);
-  const isError = queries.some((q) => q.isError);
+  // Only show loading if ALL queries are loading (first load)
+  const isLoading = queries.every((q) => q.isLoading);
+  // Only show error if a critical metric fails (not logins which may not exist)
+  const criticalMetrics = ["subscriptions", "onboardings", "images"];
+  const isError = queries.some((q, i) => q.isError && criticalMetrics.includes(metrics[i]));
   const isFetching = queries.some((q) => q.isFetching);
 
   const data = metrics.reduce((acc, metric, i) => {

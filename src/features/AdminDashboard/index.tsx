@@ -1,32 +1,22 @@
 /**
  * AdminDashboard Feature
  * Main dashboard page for admin analytics visualization
- * Mobile-first single-column layout with progressive enhancement
+ * Mobile-first layout with screen-based navigation
+ *
+ * Features:
+ * - 4-tab navigation: Geral, Funil, Engaj, Email
+ * - Full-screen views without scroll
+ * - Drill-down from metric cards to detailed charts
+ * - Swipe navigation between metrics in detail view
  *
  * Design based on best practices:
- * - Single column on mobile, scroll vertical
- * - Hero metric at top with sparkline
- * - Quick stats row (scrollable on mobile)
- * - Detail cards below
- *
- * Sources:
- * - Toptal Mobile Dashboard UI Best Practices
- * - PatternFly Dashboard Design Guidelines
- * - Stripe Dashboard Mobile App patterns
+ * - Bottom navigation for tab selection (green zone - easy to reach)
+ * - Content fills available space
+ * - Touch targets minimum 48x48px (using 56px for comfort)
  */
 
 import { useState } from "react";
-import {
-  Users,
-  UserPlus,
-  Image,
-  Send,
-  MailOpen,
-  FileText,
-  RefreshCw,
-  type LucideIcon,
-} from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -37,17 +27,18 @@ import {
 } from "@/components/ui/select";
 import { useAllDashboardMetrics } from "./hooks/useDashboardMetrics";
 import {
-  MetricChart,
   DashboardSkeleton,
   DashboardError,
   FunnelSection,
   EngagementSection,
   EmailSection,
-  HeroMetricCard,
-  QuickStatsRow,
 } from "./components";
-import type { QuickStat } from "./components";
-import type { PeriodDays, MetricType } from "./types";
+import { BottomNav, type DashboardTab } from "./components/BottomNav";
+import { MetricDetailView } from "./components/MetricDetailView";
+import { SubscriptionDetailsSheet } from "./components/SubscriptionDetailsSheet";
+import { LoginDetailsSheet } from "./components/LoginDetailsSheet";
+import type { GeneralMetricType } from "./components/GeneralView";
+import type { PeriodDays } from "./types";
 
 /** Period options for the selector */
 const PERIOD_OPTIONS: { value: PeriodDays; label: string }[] = [
@@ -58,21 +49,12 @@ const PERIOD_OPTIONS: { value: PeriodDays; label: string }[] = [
   { value: 180, label: "6 meses" },
 ];
 
-/** Map Tailwind text color to hex for charts */
-const colorToHex: Record<string, string> = {
-  "text-green-600": "#16a34a",
-  "text-blue-600": "#2563eb",
-  "text-purple-600": "#9333ea",
-  "text-orange-600": "#ea580c",
-  "text-teal-600": "#0d9488",
-  "text-indigo-600": "#4f46e5",
-  "text-pink-600": "#db2777",
-  "text-amber-600": "#d97706",
-};
-
 export const AdminDashboard = () => {
   const [days, setDays] = useState<PeriodDays>(30);
-  const [selectedMetric, setSelectedMetric] = useState<MetricType>("subscriptions");
+  const [activeTab, setActiveTab] = useState<DashboardTab>("geral");
+  const [selectedMetric, setSelectedMetric] = useState<GeneralMetricType>("subscriptions");
+  const [subscriptionSheetOpen, setSubscriptionSheetOpen] = useState(false);
+  const [loginSheetOpen, setLoginSheetOpen] = useState(false);
 
   const { data, isLoading, isError, isFetching, refetchAll } = useAllDashboardMetrics(days);
 
@@ -84,66 +66,49 @@ export const AdminDashboard = () => {
     return <DashboardError onRetry={refetchAll} />;
   }
 
-  // Build quick stats for the row
-  const quickStats: QuickStat[] = [
-    {
-      label: "Onboardings",
-      value: data.onboardings?.count ?? 0,
-      icon: UserPlus,
-      color: "text-blue-600",
-      onClick: () => setSelectedMetric("onboardings"),
-      isSelected: selectedMetric === "onboardings",
-    },
-    {
-      label: "Imagens",
-      value: data.images?.count ?? 0,
-      icon: Image,
-      color: "text-purple-600",
-      onClick: () => setSelectedMetric("images"),
-      isSelected: selectedMetric === "images",
-    },
-    {
-      label: "Emails",
-      value: data["emails-sent"]?.count ?? 0,
-      icon: Send,
-      color: "text-orange-600",
-      onClick: () => setSelectedMetric("emails-sent"),
-      isSelected: selectedMetric === "emails-sent",
-    },
-    {
-      label: "Posts",
-      value: data["posts-total"]?.count ?? 0,
-      icon: FileText,
-      color: "text-indigo-600",
-      onClick: () => setSelectedMetric("posts-total"),
-      isSelected: selectedMetric === "posts-total",
-    },
-  ];
-
-  // Get selected metric info for chart
-  const getMetricInfo = (type: MetricType): { label: string; color: string; icon: LucideIcon } => {
-    const map: Record<MetricType, { label: string; color: string; icon: LucideIcon }> = {
-      subscriptions: { label: "Assinaturas", color: "text-green-600", icon: Users },
-      onboardings: { label: "Onboardings", color: "text-blue-600", icon: UserPlus },
-      images: { label: "Imagens", color: "text-purple-600", icon: Image },
-      "emails-sent": { label: "Emails Enviados", color: "text-orange-600", icon: Send },
-      "emails-opened": { label: "Emails Abertos", color: "text-teal-600", icon: MailOpen },
-      "posts-total": { label: "Posts", color: "text-indigo-600", icon: FileText },
-      "posts-email": { label: "Posts Auto", color: "text-pink-600", icon: Send },
-      "posts-manual": { label: "Posts Manual", color: "text-amber-600", icon: FileText },
-    };
-    return map[type];
-  };
-
-  const selectedInfo = getMetricInfo(selectedMetric);
-  const chartColor = colorToHex[selectedInfo.color] || "#6366f1";
   const periodLabel = PERIOD_OPTIONS.find((p) => p.value === days)?.label ?? `${days}d`;
 
+  // Render active screen content
+  const renderContent = () => {
+    switch (activeTab) {
+      case "geral":
+        // Show chart directly with swipe navigation
+        return (
+          <MetricDetailView
+            data={data}
+            initialMetric={selectedMetric}
+            periodLabel={periodLabel}
+            onMetricChange={setSelectedMetric}
+          />
+        );
+      case "funil":
+        return (
+          <FunnelSection
+            days={days}
+            fullscreen
+          />
+        );
+      case "engaj":
+        return <EngagementSection data={data} fullscreen />;
+      case "email":
+        return <EmailSection data={data} fullscreen />;
+      default:
+        return (
+          <MetricDetailView
+            data={data}
+            initialMetric={selectedMetric}
+            periodLabel={periodLabel}
+            onMetricChange={setSelectedMetric}
+          />
+        );
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-        <div className="flex items-center justify-between p-3 max-w-2xl mx-auto lg:max-w-6xl">
+      <header className="flex-shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+        <div className="flex items-center justify-between p-3">
           <h1 className="text-lg font-semibold">Dashboard</h1>
           <div className="flex items-center gap-2">
             <Select value={String(days)} onValueChange={(v) => setDays(Number(v) as PeriodDays)}>
@@ -169,65 +134,30 @@ export const AdminDashboard = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Main Content - Single column mobile, enhanced desktop */}
-      <div className="p-3 space-y-4 max-w-2xl mx-auto lg:max-w-6xl">
-        {/* Hero Metric - Main KPI */}
-        <div
-          className="cursor-pointer"
-          onClick={() => setSelectedMetric("subscriptions")}
-        >
-          <HeroMetricCard
-            title="Assinaturas"
-            value={data.subscriptions?.count ?? 0}
-            timeline={data.subscriptions?.timeline ?? []}
-            icon={Users}
-            color="text-green-600"
-            periodLabel={periodLabel}
-          />
-        </div>
+      {/* Main Content Area - fills available space */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {renderContent()}
+      </main>
 
-        {/* Quick Stats Row - Scrollable on mobile */}
-        <QuickStatsRow stats={quickStats} />
+      {/* Bottom Navigation */}
+      <BottomNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
-        {/* Chart Card - Full width, prominent */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: chartColor }}
-              />
-              {selectedInfo.label}
-              <span className="text-muted-foreground font-normal">
-                - {periodLabel}
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="px-2 pb-4">
-            <MetricChart
-              data={data[selectedMetric]?.timeline ?? []}
-              color={chartColor}
-              height={180}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Detail Sections - Stack on mobile, grid on desktop */}
-        <div className="space-y-4 lg:grid lg:grid-cols-3 lg:gap-4 lg:space-y-0">
-          <FunnelSection data={data} />
-          <EngagementSection data={data} />
-          <EmailSection data={data} />
-        </div>
-
-        {/* Footer note */}
-        {data.subscriptions?.note && (
-          <p className="text-[10px] text-muted-foreground text-center py-2">
-            {data.subscriptions.note}
-          </p>
-        )}
-      </div>
+      {/* Detail Sheets */}
+      <SubscriptionDetailsSheet
+        open={subscriptionSheetOpen}
+        onOpenChange={setSubscriptionSheetOpen}
+        days={days}
+      />
+      <LoginDetailsSheet
+        open={loginSheetOpen}
+        onOpenChange={setLoginSheetOpen}
+        days={days}
+      />
     </div>
   );
 };

@@ -1,12 +1,12 @@
 import { useOnboardingContext } from "@/contexts/OnboardingContext";
 import { profileApi } from "@/features/Auth/Profile/services";
 import { useAuth } from "@/hooks/useAuth";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 export const useProfilePage = () => {
   const { user } = useAuth();
-  const { setOpenOnboarding } = useOnboardingContext();
+  const { setOpenOnboarding, setEditMode, setEditData } = useOnboardingContext();
   // Fetch creator profile
   const {
     data: profile,
@@ -22,17 +22,13 @@ export const useProfilePage = () => {
     return new Date(dateString).toLocaleDateString("pt-BR");
   };
 
-  const resetOnboardingForEditMutation = useMutation({
-    mutationFn: async () => {
-      await profileApi.resetOnboardingForEdit();
-    },
-    onSuccess: () => {
+  const openEditOnboarding = useCallback(() => {
+    if (profile) {
+      setEditData(profile);
+      setEditMode(true);
       setOpenOnboarding(true);
-    },
-    onError: () => {
-      toast.error("Erro ao preparar onboarding para edição");
-    },
-  });
+    }
+  }, [profile, setEditData, setEditMode, setOpenOnboarding]);
 
   return {
     // Data
@@ -41,6 +37,6 @@ export const useProfilePage = () => {
     isLoading,
     error,
     formatDate,
-    resetOnboardingForEditMutation,
+    openEditOnboarding,
   };
 };

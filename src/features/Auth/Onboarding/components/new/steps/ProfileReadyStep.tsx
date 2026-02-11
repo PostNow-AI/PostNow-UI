@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2, Sparkles, Loader2, Save } from "lucide-react";
 import type { OnboardingTempData } from "@/features/Auth/Onboarding/hooks/useOnboardingStorage";
 import { nicheOptions } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
 
@@ -8,12 +8,16 @@ interface ProfileReadyStepProps {
   data: OnboardingTempData;
   onNext: () => void;
   onBack: () => void;
+  isEditMode?: boolean;
+  isLoading?: boolean;
 }
 
 export const ProfileReadyStep = ({
   data,
   onNext,
   onBack,
+  isEditMode = false,
+  isLoading = false,
 }: ProfileReadyStepProps) => {
   const summaryItems = [
     { label: "Negócio", value: data.business_name },
@@ -125,9 +129,24 @@ export const ProfileReadyStep = ({
             onClick={onNext}
             className="w-full h-12 text-base font-medium gap-2"
             size="lg"
+            disabled={isLoading}
           >
-            <Sparkles className="h-4 w-4" />
-            Ver o que preparamos
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : isEditMode ? (
+              <>
+                <Save className="h-4 w-4" />
+                Salvar Alterações
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Ver o que preparamos
+              </>
+            )}
           </Button>
 
           <button

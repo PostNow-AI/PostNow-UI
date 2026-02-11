@@ -13,7 +13,7 @@ import { useProfilePage } from "@/features/Auth/Profile/hooks/useProfilePage";
 import { BasicUserInfo } from "./components/BasicUserInfo";
 
 export const Profile = () => {
-  const { user, profile, isLoading, error, resetOnboardingForEditMutation } =
+  const { user, profile, isLoading, error, openEditOnboarding } =
     useProfilePage();
 
   if (isLoading) {
@@ -58,8 +58,7 @@ export const Profile = () => {
               title="Informações de negócio"
               description="Os dados de seu negócio ajudam a personalizar sua experiência na plataforma"
               values={profile}
-              onEdit={resetOnboardingForEditMutation.mutate}
-              onLoading={resetOnboardingForEditMutation.isPending}
+              onEdit={openEditOnboarding}
             />
           </Card>
         </div>

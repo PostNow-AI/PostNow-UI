@@ -55,7 +55,7 @@ export const SignupStep = ({
     mutationFn: authApi.register,
     onSuccess: async () => {
       queryClient.clear();
-      toast.success("Conta criada com sucesso!");
+      // Toast removido - não interromper fluxo do paywall
       await new Promise((resolve) => setTimeout(resolve, 100));
       onSuccess();
     },

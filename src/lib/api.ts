@@ -146,19 +146,19 @@ api.interceptors.response.use(
 
       try {
         // Attempt to refresh the token
-        const response = await axios.post<{ access_token: string }>(`${API_BASE_URL}/api/auth/refresh/`, {
-          refresh_token: refreshToken,
+        const response = await axios.post<{ access: string }>(`${API_BASE_URL}/api/v1/auth/refresh/`, {
+          refresh: refreshToken,
         });
 
-        const { access_token } = response.data;
-        cookieUtils.updateAccessToken(access_token);
+        const { access } = response.data;
+        cookieUtils.updateAccessToken(access);
 
         // Process queued requests
-        processQueue(null, access_token);
+        processQueue(null, access);
 
         // Retry the original request
         if (originalRequest?.headers) {
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          originalRequest.headers.Authorization = `Bearer ${access}`;
         }
         return api(originalRequest);
       } catch (refreshError) {

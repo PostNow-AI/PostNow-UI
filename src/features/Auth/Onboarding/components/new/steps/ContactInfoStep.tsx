@@ -1,8 +1,10 @@
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MicroStepLayout } from "../MicroStepLayout";
 import { TOTAL_STEPS } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
 import { phoneMask } from "@/utils";
+import { cn } from "@/lib/utils";
 
 interface ContactInfoStepProps {
   phone: string;
@@ -16,6 +18,33 @@ interface ContactInfoStepProps {
   stepNumber: number;
 }
 
+// Validation functions
+const validateInstagram = (value: string): string | undefined => {
+  if (!value) return undefined;
+  const clean = value.replace(/^@/, "");
+  if (!/^[a-zA-Z0-9._]{1,30}$/.test(clean)) {
+    return "Use apenas letras, números, _ e . (máx 30 caracteres)";
+  }
+  return undefined;
+};
+
+const validateWebsite = (value: string): string | undefined => {
+  if (!value) return undefined;
+
+  // Verificar se tem espaços ou caracteres inválidos
+  if (/\s/.test(value)) {
+    return "URL não pode conter espaços";
+  }
+
+  // Regex básica para URL
+  const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
+  if (!urlPattern.test(value)) {
+    return "URL inválida. Ex: https://seunegocio.com";
+  }
+
+  return undefined;
+};
+
 export const ContactInfoStep = ({
   phone,
   instagram,
@@ -27,19 +56,34 @@ export const ContactInfoStep = ({
   onBack,
   stepNumber,
 }: ContactInfoStepProps) => {
-  // Telefone é obrigatório
-  const isValid = phone.replace(/\D/g, "").length >= 10;
+  const [errors, setErrors] = useState<{ instagram?: string; website?: string }>({});
+
+  // Telefone é obrigatório + validation errors
+  const isValid = phone.replace(/\D/g, "").length >= 10 && !errors.instagram && !errors.website;
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const masked = phoneMask(e.target.value);
     onPhoneChange(masked);
   };
 
-  const handleInstagramChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInstagramChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     // Remover @ se o usuário digitar
     const value = e.target.value.replace(/^@/, "");
     onInstagramChange(value);
-  };
+
+    // Validate on change
+    const error = validateInstagram(value);
+    setErrors(prev => ({ ...prev, instagram: error }));
+  }, [onInstagramChange]);
+
+  const handleWebsiteChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    onWebsiteChange(value);
+
+    // Validate on change
+    const error = validateWebsite(value);
+    setErrors(prev => ({ ...prev, website: error }));
+  }, [onWebsiteChange]);
 
   return (
     <MicroStepLayout
@@ -86,9 +130,12 @@ export const ContactInfoStep = ({
               value={instagram}
               onChange={handleInstagramChange}
               placeholder="seu_usuario"
-              className="h-12 pl-10"
+              className={cn("h-12 pl-10", errors.instagram && "border-red-500")}
             />
           </div>
+          {errors.instagram && (
+            <p className="text-xs text-red-500">{errors.instagram}</p>
+          )}
         </div>
 
         {/* Website - Opcional */}
@@ -97,11 +144,13 @@ export const ContactInfoStep = ({
           <Input
             id="website"
             value={website}
-            onChange={(e) => onWebsiteChange(e.target.value)}
+            onChange={handleWebsiteChange}
             placeholder="https://www.seunegocio.com"
-            className="h-12"
-            type="url"
+            className={cn("h-12", errors.website && "border-red-500")}
           />
+          {errors.website && (
+            <p className="text-xs text-red-500">{errors.website}</p>
+          )}
         </div>
       </div>
     </MicroStepLayout>
