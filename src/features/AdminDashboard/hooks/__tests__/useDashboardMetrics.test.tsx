@@ -157,8 +157,9 @@ describe("useAllDashboardMetrics", () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    // Deve ter chamado para cada uma das 8 métricas
-    expect(dashboardApiService.getMetric).toHaveBeenCalledTimes(8);
+    // Deve ter chamado para cada uma das 9 métricas
+    // subscriptions, onboardings, logins, images, emails-sent, emails-opened, posts-total, posts-email, posts-manual
+    expect(dashboardApiService.getMetric).toHaveBeenCalledTimes(9);
   });
 
   it("deve retornar dados agrupados por tipo", async () => {
@@ -192,10 +193,19 @@ describe("useAllDashboardMetrics", () => {
     });
   });
 
-  it("deve retornar isError true quando alguma query falha", async () => {
-    vi.mocked(dashboardApiService.getMetric).mockRejectedValue(
-      new Error("Error")
-    );
+  it("deve retornar isError true quando métrica crítica falha", async () => {
+    // isError só é true quando métricas críticas falham (subscriptions, onboardings, images)
+    // Usa erro 404 para evitar retries (o hook não faz retry em 404s)
+    const error404 = Object.assign(new Error("Not Found"), {
+      response: { status: 404 },
+    });
+
+    vi.mocked(dashboardApiService.getMetric).mockImplementation((metric) => {
+      if (metric === "subscriptions") {
+        return Promise.reject(error404);
+      }
+      return Promise.resolve(mockMetric);
+    });
 
     const { result } = renderHook(() => useAllDashboardMetrics(30), {
       wrapper: createWrapper(),
@@ -203,7 +213,7 @@ describe("useAllDashboardMetrics", () => {
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
-    });
+    }, { timeout: 2000 });
   });
 
   it("deve chamar todas as métricas esperadas", async () => {
@@ -222,6 +232,7 @@ describe("useAllDashboardMetrics", () => {
         "onboardings",
         30
       );
+      expect(dashboardApiService.getMetric).toHaveBeenCalledWith("logins", 30);
       expect(dashboardApiService.getMetric).toHaveBeenCalledWith("images", 30);
       expect(dashboardApiService.getMetric).toHaveBeenCalledWith(
         "emails-sent",
