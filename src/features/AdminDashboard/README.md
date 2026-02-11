@@ -99,6 +99,55 @@ O funil rastreia **20 etapas** organizadas em **5 fases**:
 
 > **Nota:** Métricas críticas causam `isError=true` se falharem. Métricas não-críticas podem falhar silenciosamente.
 
+## Tipos Principais (types/index.ts)
+
+### Períodos Disponíveis
+
+```typescript
+type PeriodDays = 1 | 7 | 30 | 90 | 180;
+```
+
+| Valor | Descrição |
+|-------|-----------|
+| 1 | Últimas 24 horas |
+| 7 | Última semana |
+| 30 | Último mês |
+| 90 | Último trimestre |
+| 180 | Último semestre |
+
+### Estrutura de Resposta da API
+
+```typescript
+interface DashboardMetric {
+  count: number;           // Total no período
+  timeline: TimelinePoint[]; // Dados para gráfico
+  start_date: string;      // Início do período
+  end_date: string;        // Fim do período
+  metric_name: string;     // Nome da métrica
+  period_days: number;     // Dias do período
+  note?: string;           // Nota opcional (ex: "Excludes admin users")
+}
+
+interface TimelinePoint {
+  date: string;  // "YYYY-MM-DD"
+  count: number;
+}
+```
+
+### Constantes do Funil
+
+```typescript
+// Configuração das 5 fases (importar de types/index.ts)
+import { FUNNEL_PHASES, STEP_NAMES_PT } from './types';
+
+FUNNEL_PHASES[0].name      // "Boas-vindas"
+FUNNEL_PHASES[0].steps     // [1, 2, 3]
+FUNNEL_PHASES[0].color     // "bg-blue-500"
+
+STEP_NAMES_PT[1]           // "Boas-vindas"
+STEP_NAMES_PT[4]           // "Nicho"
+```
+
 ## Hooks
 
 ### `useDashboardMetric(metric, days)`
@@ -158,24 +207,37 @@ npm test -- --run src/features/AdminDashboard
 
 ### Cobertura de Testes
 
-**Componentes principais:**
-- `BottomNav.test.tsx` - Navegação inferior (5 testes)
-- `EmailSection.test.tsx` - Seção de email (12 testes)
-- `EngagementSection.test.tsx` - Seção de engajamento (8 testes)
-- `FunnelSection.test.tsx` - Funil principal (9 testes)
-- `GeneralView.test.tsx` - Visão geral (5 testes)
-- `MetricCard.test.tsx` - Card de métrica (12 testes)
-- `MetricChart.test.tsx` - Gráfico (7 testes)
-- `PeriodSelector.test.tsx` - Seletor de período (10 testes)
-- `PhaseDetailsView.test.tsx` - Detalhes de fase (7 testes)
+**Componentes COM testes (14 arquivos, 128 testes):**
 
-**Componentes do funil:**
-- `PhaseHeader.test.tsx` - Cabeçalho de fase (9 testes)
-- `StepRow.test.tsx` - Linha de etapa (9 testes)
-- `PercentageLabel.test.tsx` - Label de % (7 testes)
+| Componente | Testes | Arquivo |
+|------------|--------|---------|
+| BottomNav | 5 | `BottomNav.test.tsx` |
+| EmailSection | 12 | `EmailSection.test.tsx` |
+| EngagementSection | 8 | `EngagementSection.test.tsx` |
+| FunnelSection | 9 | `FunnelSection.test.tsx` |
+| GeneralView | 5 | `GeneralView.test.tsx` |
+| MetricCard | 12 | `MetricCard.test.tsx` |
+| MetricChart | 7 | `MetricChart.test.tsx` |
+| PeriodSelector | 10 | `PeriodSelector.test.tsx` |
+| PhaseDetailsView | 7 | `PhaseDetailsView.test.tsx` |
+| PhaseHeader | 9 | `funnel/PhaseHeader.test.tsx` |
+| StepRow | 9 | `funnel/StepRow.test.tsx` |
+| PercentageLabel | 7 | `funnel/PercentageLabel.test.tsx` |
+| funnelUtils | 15 | `utils/funnelUtils.test.ts` |
+| useDashboardMetrics | 13 | `hooks/useDashboardMetrics.test.tsx` |
 
-**Utilitários e hooks:**
-- `funnelUtils.test.ts` - Funções utilitárias (15 testes)
-- `useDashboardMetrics.test.tsx` - Hooks de métricas (13 testes)
+**Componentes SEM testes (7 arquivos):**
 
-**Total: 128 testes**
+| Componente | Motivo |
+|------------|--------|
+| DashboardError | Componente simples de UI |
+| DashboardSkeleton | Componente simples de loading |
+| HeroMetricCard | Wrapper de MetricCard |
+| LoginDetailsSheet | Sheet de drill-down |
+| MetricDetailView | View de detalhes |
+| StepDetailsDrawer | Drawer de detalhes |
+| SubscriptionDetailsSheet | Sheet de drill-down |
+
+> **Nota:** Componentes sem testes são principalmente UI simples ou wrappers. Testes futuros devem priorizar `MetricDetailView` e `StepDetailsDrawer` por terem lógica mais complexa.
+
+**Total: 128 testes | Cobertura: 14/21 componentes (67%)**
