@@ -2,6 +2,42 @@
 
 Dashboard administrativo para visualização de métricas e analytics da plataforma.
 
+## Quick Start
+
+```tsx
+// 1. Importar o componente
+import { AdminDashboard } from "@/features/AdminDashboard";
+
+// 2. Usar na página (não requer props)
+export const AdminDashboardPage = () => {
+  return <AdminDashboard />;
+};
+```
+
+**Dependências obrigatórias:**
+- `@tanstack/react-query` - Gerenciamento de estado e cache
+- `lucide-react` - Ícones
+- `recharts` - Gráficos
+
+## Navegação
+
+O dashboard possui **4 abas** de navegação (bottom nav):
+
+| Aba | Componente | Descrição |
+|-----|------------|-----------|
+| **Geral** | `MetricDetailView` | Gráfico da métrica selecionada com swipe |
+| **Funil** | `FunnelSection` | Funil de onboarding com 5 fases |
+| **Engaj** | `EngagementSection` | Métricas de engajamento (posts, imagens) |
+| **Email** | `EmailSection` | Métricas de email (enviados, abertos) |
+
+## Design
+
+- **Mobile-first**: Layout otimizado para telas pequenas
+- **Full-screen**: Cada aba ocupa a tela inteira (sem scroll)
+- **Touch-friendly**: Botões mínimo 48x48px (usamos 56px)
+- **Swipe navigation**: Deslize entre métricas na aba Geral
+- **Bottom nav**: Navegação na "zona verde" (fácil alcance com polegar)
+
 ## Estrutura
 
 ```
