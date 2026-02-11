@@ -188,6 +188,7 @@ export interface FunnelPhase {
   steps: number[];
   color: string;
   textColor: string;
+  lightTextColor: string; // Light color for labels on dark backgrounds
 }
 
 /** Onboarding funnel phases configuration */
@@ -199,6 +200,7 @@ export const FUNNEL_PHASES: FunnelPhase[] = [
     steps: [1, 2, 3],
     color: "bg-blue-500",
     textColor: "text-blue-400",
+    lightTextColor: "text-blue-200",
   },
   {
     id: 2,
@@ -207,6 +209,7 @@ export const FUNNEL_PHASES: FunnelPhase[] = [
     steps: [4, 5, 6, 7, 8],
     color: "bg-purple-500",
     textColor: "text-purple-400",
+    lightTextColor: "text-purple-200",
   },
   {
     id: 3,
@@ -215,6 +218,7 @@ export const FUNNEL_PHASES: FunnelPhase[] = [
     steps: [9, 10, 11, 12],
     color: "bg-indigo-500",
     textColor: "text-indigo-400",
+    lightTextColor: "text-indigo-200",
   },
   {
     id: 4,
@@ -223,6 +227,7 @@ export const FUNNEL_PHASES: FunnelPhase[] = [
     steps: [13, 14, 15, 16, 17],
     color: "bg-pink-500",
     textColor: "text-pink-400",
+    lightTextColor: "text-pink-200",
   },
   {
     id: 5,
@@ -231,6 +236,7 @@ export const FUNNEL_PHASES: FunnelPhase[] = [
     steps: [18, 19, 20],
     color: "bg-green-500",
     textColor: "text-green-400",
+    lightTextColor: "text-green-200",
   },
 ];
 

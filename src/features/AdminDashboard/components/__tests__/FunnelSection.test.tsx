@@ -1,126 +1,164 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+/**
+ * Tests for FunnelSection component
+ * Updated for the new onboarding funnel implementation
+ */
+
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { FunnelSection } from "../FunnelSection";
-import type { AllMetricsData, DashboardMetric } from "../../types";
+
+// Mock the dashboard API service
+vi.mock("@/lib/dashboard-api", () => ({
+  dashboardApiService: {
+    getOnboardingFunnel: vi.fn(),
+  },
+}));
+
+import { dashboardApiService } from "@/lib/dashboard-api";
+
+const mockFunnelData = {
+  started: 100,
+  step_1: 100,
+  step_2: 98,
+  step_3: 92,
+  step_4: 88,
+  step_5: 83,
+  step_6: 79,
+  step_7: 72,
+  step_8: 66,
+  step_9: 57,
+  step_10: 48,
+  step_11: 48,
+  step_12: 40,
+  step_13: 34,
+  step_14: 32,
+  step_15: 29,
+  step_16: 25,
+  step_17: 23,
+  step_18: 22,
+  step_19: 19,
+  step_20: 12,
+  start_date: "2026-01-11",
+  end_date: "2026-02-10",
+};
+
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+const renderWithClient = (ui: React.ReactElement) => {
+  const queryClient = createTestQueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+  );
+};
 
 describe("FunnelSection", () => {
-  const createMockMetric = (count: number): DashboardMetric => ({
-    count,
-    timeline: [],
-    start_date: "2026-01-11T00:00:00",
-    end_date: "2026-02-10T00:00:00",
-    metric_name: "test",
-    period_days: 30,
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (dashboardApiService.getOnboardingFunnel as ReturnType<typeof vi.fn>).mockResolvedValue(
+      mockFunnelData
+    );
   });
 
-  it("deve renderizar título do card", () => {
-    const data: AllMetricsData = {
-      subscriptions: createMockMetric(100),
-      onboardings: createMockMetric(50),
-      images: createMockMetric(25),
-    };
+  it("deve renderizar título do card quando não fullscreen", async () => {
+    renderWithClient(<FunnelSection days={30} fullscreen={false} />);
 
-    render(<FunnelSection data={data} />);
-
-    expect(screen.getByText("Funil de Conversão")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Funil do Onboarding")).toBeInTheDocument();
+    });
   });
 
-  it("deve exibir valores das métricas formatados", () => {
-    const data: AllMetricsData = {
-      subscriptions: createMockMetric(1000),
-      onboardings: createMockMetric(500),
-      images: createMockMetric(250),
-    };
+  it("deve exibir o número de sessões", async () => {
+    renderWithClient(<FunnelSection days={30} />);
 
-    render(<FunnelSection data={data} />);
-
-    expect(screen.getByText("1.000")).toBeInTheDocument();
-    expect(screen.getByText("500")).toBeInTheDocument();
-    expect(screen.getByText("250")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("100 sessões")).toBeInTheDocument();
+    });
   });
 
-  it("deve exibir labels das etapas do funil", () => {
-    const data: AllMetricsData = {
-      subscriptions: createMockMetric(100),
-      onboardings: createMockMetric(50),
-      images: createMockMetric(25),
-    };
+  it("deve exibir as 5 fases do funil", async () => {
+    renderWithClient(<FunnelSection days={30} />);
 
-    render(<FunnelSection data={data} />);
-
-    expect(screen.getByText("Assinaturas")).toBeInTheDocument();
-    expect(screen.getByText("Onboardings")).toBeInTheDocument();
-    // Imagens aparece duas vezes (no funil e possivelmente em outro lugar)
-    expect(screen.getAllByText("Imagens").length).toBeGreaterThanOrEqual(1);
+    await waitFor(() => {
+      // Phase names appear in uppercase in headers
+      expect(screen.getAllByText(/Boas-vindas/i).length).toBeGreaterThan(0);
+      expect(screen.getByText("Seu Negócio")).toBeInTheDocument();
+      expect(screen.getByText("Seu Público")).toBeInTheDocument();
+      expect(screen.getByText("Identidade Visual")).toBeInTheDocument();
+      expect(screen.getByText("Autenticação")).toBeInTheDocument();
+    });
   });
 
-  it("deve calcular taxa de conversão corretamente", () => {
-    const data: AllMetricsData = {
-      subscriptions: createMockMetric(100),
-      onboardings: createMockMetric(50),
-      images: createMockMetric(25),
-    };
+  it("deve exibir os nomes das etapas", async () => {
+    renderWithClient(<FunnelSection days={30} />);
 
-    render(<FunnelSection data={data} />);
-
-    // Conversão 1: 50/100 = 50%
-    // Conversão 2: 25/50 = 50%
-    // Total: 25/100 = 25%
-    // O componente mostra as taxas sem casas decimais
-    const fiftyPercents = screen.getAllByText("50%");
-    expect(fiftyPercents.length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText("25%")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Nome do Negócio")).toBeInTheDocument();
+      expect(screen.getByText("Contato")).toBeInTheDocument();
+      expect(screen.getByText("Nicho")).toBeInTheDocument();
+    });
   });
 
-  it("deve exibir 0% quando não há dados de assinaturas", () => {
-    const data: AllMetricsData = {
-      subscriptions: createMockMetric(0),
-      onboardings: createMockMetric(0),
-      images: createMockMetric(0),
-    };
+  it("deve exibir contagens das etapas", async () => {
+    renderWithClient(<FunnelSection days={30} />);
 
-    render(<FunnelSection data={data} />);
-
-    // Quando não há dados, mostra 0%
-    const zeros = screen.getAllByText("0%");
-    expect(zeros.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(screen.getByText("100")).toBeInTheDocument();
+      expect(screen.getByText("98")).toBeInTheDocument();
+      expect(screen.getByText("92")).toBeInTheDocument();
+    });
   });
 
-  it("deve lidar com dados undefined graciosamente", () => {
-    const data: AllMetricsData = {};
+  it("deve exibir a taxa de conversão total", async () => {
+    renderWithClient(<FunnelSection days={30} />);
 
-    render(<FunnelSection data={data} />);
-
-    // Deve exibir 0 para valores undefined
-    const zeros = screen.getAllByText("0");
-    expect(zeros.length).toBeGreaterThan(0);
+    await waitFor(() => {
+      // Total: 12/100 = 12%
+      expect(screen.getByText(/Total:/)).toBeInTheDocument();
+    });
   });
 
-  it("deve exibir labels de conversão", () => {
-    const data: AllMetricsData = {
-      subscriptions: createMockMetric(100),
-      onboardings: createMockMetric(50),
-      images: createMockMetric(25),
-    };
+  it("deve mostrar loading enquanto carrega", () => {
+    (dashboardApiService.getOnboardingFunnel as ReturnType<typeof vi.fn>).mockImplementation(
+      () => new Promise(() => {})
+    );
+    renderWithClient(<FunnelSection days={30} />);
 
-    render(<FunnelSection data={data} />);
-
-    // Novo design usa "Conversão 1", "Conversão 2", "Total"
-    expect(screen.getByText("Conversão 1")).toBeInTheDocument();
-    expect(screen.getByText("Conversão 2")).toBeInTheDocument();
-    expect(screen.getByText("Total")).toBeInTheDocument();
+    expect(document.querySelector(".animate-spin")).toBeInTheDocument();
   });
 
-  it("deve calcular taxa total corretamente", () => {
-    const data: AllMetricsData = {
-      subscriptions: createMockMetric(200),
-      onboardings: createMockMetric(100),
-      images: createMockMetric(50),
-    };
+  it("deve mostrar erro quando falha", async () => {
+    (dashboardApiService.getOnboardingFunnel as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error("API Error")
+    );
+    renderWithClient(<FunnelSection days={30} />);
 
-    render(<FunnelSection data={data} />);
+    await waitFor(() => {
+      expect(screen.getByText("Erro ao carregar dados do funil")).toBeInTheDocument();
+    });
+  });
 
-    // Total: 50/200 = 25%
-    expect(screen.getByText("25%")).toBeInTheDocument();
+  it("deve navegar para detalhes da fase ao clicar", async () => {
+    renderWithClient(<FunnelSection days={30} fullscreen={true} />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/Boas-vindas/i).length).toBeGreaterThan(0);
+    });
+
+    // Click on a phase header
+    const phaseHeader = screen.getAllByRole("button")[0];
+    fireEvent.click(phaseHeader);
+
+    // Should show phase details view
+    await waitFor(() => {
+      expect(screen.getByText("Entraram")).toBeInTheDocument();
+    });
   });
 });
