@@ -136,8 +136,8 @@ api.interceptors.response.use(
         processQueue(error, null);
         isRefreshing = false;
 
-        // Redirect to login page
-        if (typeof window !== "undefined") {
+        // Redirect to login page (except during onboarding flow)
+        if (typeof window !== "undefined" && !window.location.pathname.includes("/onboarding")) {
           window.location.href = "/login";
         }
 
@@ -166,8 +166,8 @@ api.interceptors.response.use(
         cookieUtils.removeTokens();
         processQueue(refreshError as Error, null);
 
-        // Redirect to login page
-        if (typeof window !== "undefined") {
+        // Redirect to login page (except during onboarding flow)
+        if (typeof window !== "undefined" && !window.location.pathname.includes("/onboarding")) {
           window.location.href = "/login";
         }
 
