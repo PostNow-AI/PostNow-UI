@@ -206,7 +206,8 @@ export const OnboardingNew = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
-      clearData();
+      // NÃO limpar dados aqui - só limpar após checkout completo
+      // O clearData() será chamado na página de sucesso do checkout
       // Mark final step as completed and clear tracking
       trackStepComplete(20);
       clearTracking();
