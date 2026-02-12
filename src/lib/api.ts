@@ -24,6 +24,12 @@ const COOKIE_OPTIONS = {
 const ACCESS_TOKEN_COOKIE = "access";
 const REFRESH_TOKEN_COOKIE = "refresh";
 
+// Auth state change event (must match auth-helpers.ts)
+const AUTH_STATE_CHANGED = "auth-state-changed";
+const dispatchAuthStateChange = () => {
+  window.dispatchEvent(new CustomEvent(AUTH_STATE_CHANGED));
+};
+
 // Cookie utility functions
 export const cookieUtils = {
   setTokens: (accessToken: string, refreshToken: string) => {
@@ -48,6 +54,8 @@ export const cookieUtils = {
   removeTokens: () => {
     Cookies.remove(ACCESS_TOKEN_COOKIE);
     Cookies.remove(REFRESH_TOKEN_COOKIE);
+    // Notify components of authentication state change
+    dispatchAuthStateChange();
   },
 
   updateAccessToken: (accessToken: string) => {
