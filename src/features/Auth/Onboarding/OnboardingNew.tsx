@@ -212,23 +212,23 @@ export const OnboardingNew = ({
   }, [data.current_step, goToStep]);
 
   // Handlers de autenticação
-  const handleAuthSuccess = useCallback(async () => {
+  const handleAuthSuccess = useCallback(() => {
     // IMPORTANTE: Definir step ANTES de mudar authMode para evitar re-render incorreto
+    // NÃO fazer chamadas API aqui - deixar para quando selecionar plano
     setCurrentStep(20); // Ir para paywall primeiro
     setIsAuthenticated(true);
     setAuthMode(null);
+  }, [setCurrentStep]);
 
-    // Sincronizar dados do localStorage com o backend (em background)
+  const handlePlanSelect = useCallback(async (planId: string) => {
+    // Sincronizar dados do onboarding com o backend primeiro
     try {
       await syncMutation.mutateAsync();
     } catch (error) {
       console.error("[Onboarding] Erro ao sincronizar:", error);
-      toast.error("Erro ao salvar seus dados. Tente novamente.");
-      // Continua no paywall mesmo com erro
+      // Continua mesmo com erro - não bloquear o checkout
     }
-  }, [syncMutation, setCurrentStep]);
 
-  const handlePlanSelect = useCallback(async (planId: string) => {
     // Verificar se planos estão carregados
     if (!subscriptionPlans?.length) {
       toast.error("Planos não carregados. Aguarde e tente novamente.");
@@ -273,7 +273,7 @@ export const OnboardingNew = ({
       console.error("[Onboarding] Erro ao criar checkout:", error);
       toast.error("Erro ao processar pagamento. Tente novamente.");
     }
-  }, [subscriptionPlans, createCheckout]);
+  }, [subscriptionPlans, createCheckout, syncMutation]);
 
   // Handler para voltar no modo edição
   const handleEditBack = useCallback(() => {
