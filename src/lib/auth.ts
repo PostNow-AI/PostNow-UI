@@ -41,6 +41,11 @@ export const authApi = {
         password2: userData.confirmPassword,
       }
     );
+    // Save tokens to cookies if registration returns them
+    if (response.data.access && response.data.refresh) {
+      cookieUtils.setTokens(response.data.access, response.data.refresh);
+      dispatchAuthStateChange();
+    }
     return response.data;
   },
 
