@@ -12,11 +12,12 @@ export const useSubscriptionPlans = (enabled = true) => {
   });
 };
 
-export const useUserSubscription = () => {
+export const useUserSubscription = (enabled = true) => {
   return useQuery({
     queryKey: ["user-subscription"],
     queryFn: subscriptionApiService.getUserSubscription,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled,
   });
 };
 

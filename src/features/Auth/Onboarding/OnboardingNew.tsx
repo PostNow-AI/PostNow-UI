@@ -64,7 +64,7 @@ export const OnboardingNew = ({
 
   // Check if user is already logged in from previous session
   const { isAuthenticated: isLoggedIn } = useAuth();
-  const { data: userSubscription } = useUserSubscription();
+  const { data: userSubscription } = useUserSubscription(isLoggedIn);
   const hasActiveSubscription = userSubscription?.status === "active";
 
   // Hooks para checkout do Stripe - só busca quando autenticado
