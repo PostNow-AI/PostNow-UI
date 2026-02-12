@@ -15,7 +15,7 @@ export const SUBSCRIPTION_CONFIG = {
 
   /** URLs de retorno do Stripe */
   STRIPE_URLS: {
-    SUCCESS: "/?checkout=success",
+    SUCCESS: "/subscription/success",
     CANCEL: "/onboarding?checkout=cancelled",
   } as const,
 } as const;
