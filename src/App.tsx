@@ -54,8 +54,8 @@ const App = () => {
         <Router>
           <AuthProvider>
             <Routes>
-              {/* Root redirect */}
-              <Route path="/" element={<Navigate to="/ideabank" replace />} />
+              {/* Root redirect - Onboarding 2.0 first */}
+              <Route path="/" element={<Navigate to="/onboarding" replace />} />
 
               {/* Public routes */}
               <Route
