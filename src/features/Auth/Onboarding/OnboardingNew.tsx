@@ -35,7 +35,9 @@ import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
 import {
   useSubscriptionPlans,
   useCreateCheckoutSession,
+  useUserSubscription,
 } from "@/features/Subscription/hooks/useSubscription";
+import { useAuth } from "@/hooks/useAuth";
 
 type AuthMode = "signup" | "login" | null;
 
@@ -59,8 +61,13 @@ export const OnboardingNew = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Check if user is already logged in from previous session
+  const { isAuthenticated: isLoggedIn } = useAuth();
+  const { data: userSubscription } = useUserSubscription();
+  const hasActiveSubscription = userSubscription?.status === "active";
+
   // Hooks para checkout do Stripe - só busca quando autenticado
-  const { data: subscriptionPlans } = useSubscriptionPlans(isAuthenticated);
+  const { data: subscriptionPlans } = useSubscriptionPlans(isAuthenticated || isLoggedIn);
   const createCheckout = useCreateCheckoutSession();
 
   const {
@@ -102,6 +109,32 @@ export const OnboardingNew = ({
       setIsInitialized(true);
     }
   }, [isEditMode, initialData, isLoaded, isInitialized, initializeWithData]);
+
+  // If user is already logged in but has no subscription, jump to paywall
+  useEffect(() => {
+    if (!isEditMode && isLoaded && isLoggedIn && !hasActiveSubscription) {
+      setIsAuthenticated(true);
+      // Jump directly to paywall step
+      if (data.current_step < 20) {
+        setCurrentStep(20);
+      }
+    }
+  }, [isEditMode, isLoaded, isLoggedIn, hasActiveSubscription, data.current_step, setCurrentStep]);
+
+  // Track step visits for funnel analytics (only in create mode)
+  useEffect(() => {
+    if (!isEditMode && isLoaded && data.current_step !== lastTrackedStepRef.current) {
+      // Track visit to the current step
+      trackStep(data.current_step, false);
+
+      // If we moved forward, mark the previous step as completed
+      if (lastTrackedStepRef.current > 0 && data.current_step > lastTrackedStepRef.current) {
+        trackStepComplete(lastTrackedStepRef.current);
+      }
+
+      lastTrackedStepRef.current = data.current_step;
+    }
+  }, [data.current_step, isLoaded, isEditMode, trackStep, trackStepComplete]);
 
   // Mutation para sincronizar dados com o backend
   const syncMutation = useMutation({

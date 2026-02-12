@@ -37,10 +37,15 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   const [editData, setEditData] = useState<OnboardingFormData | null>(null);
 
   useEffect(() => {
-    if (!isLoading && needsOnboarding === true) {
-      setOpenOnboarding(true);
+    // Open onboarding if:
+    // 1. Profile not completed (needsOnboarding)
+    // 2. OR profile completed but no active subscription (needs to complete checkout)
+    if (!isLoading && !isSubscriptionLoading) {
+      if (needsOnboarding || !hasActiveSubscription) {
+        setOpenOnboarding(true);
+      }
     }
-  }, [isLoading, needsOnboarding]);
+  }, [isLoading, isSubscriptionLoading, needsOnboarding, hasActiveSubscription]);
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
@@ -102,6 +107,18 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
           </>
         )}
       </BlurryBackground>
+
+      {paymentStatus?.has_pending_payment && (
+        <PaymentPendingDialog
+          planName={paymentStatus.plan_name || "Desconhecido"}
+          timePendingMinutes={paymentStatus.time_pending_minutes}
+          lastError={paymentStatus.last_error}
+        />
+      )}
+
+      {!hasActiveSubscription && !openOnboarding && <NoSubscriptionDialog />}
+
+      {/* PaymentPendingDialog removed due to unavailable usePaymentStatus hook */}
     </OnboardingContext.Provider>
   );
 };
