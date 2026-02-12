@@ -42,7 +42,7 @@ export const subscriptionApiService = {
 
   // Check payment status
   checkPaymentStatus: async (): Promise<PaymentStatusResponse> => {
-    const response = await api.get("/api/v1/credit-system/payment-status/");
+    const response = await api.get("/api/v1/credits/payment-status/");
     return response.data.data;
   },
 };
