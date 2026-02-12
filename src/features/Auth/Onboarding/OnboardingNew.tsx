@@ -151,12 +151,56 @@ export const OnboardingNew = ({
   // Mutation para sincronizar dados com o backend
   const syncMutation = useMutation({
     mutationFn: async () => {
+      // Ler dados FRESCOS do localStorage para evitar stale closure
+      const STORAGE_KEY = "postnow_onboarding_data";
+      const stored = localStorage.getItem(STORAGE_KEY);
+
+      if (!stored) {
+        throw new Error("Dados do onboarding não encontrados");
+      }
+
+      const freshData = JSON.parse(stored);
+      console.log("[Onboarding] Dados frescos do localStorage:", freshData);
+
       // Step 1: Business info
-      const step1Payload = getStep1Payload();
+      const step1Payload = {
+        business_name: freshData.business_name,
+        business_phone: freshData.business_phone,
+        business_website: freshData.business_website,
+        business_instagram_handle: freshData.business_instagram_handle,
+        specialization: freshData.specialization,
+        business_description: freshData.business_description,
+        business_purpose: freshData.business_purpose,
+        brand_personality: Array.isArray(freshData.brand_personality)
+          ? freshData.brand_personality.join(", ")
+          : freshData.brand_personality,
+        products_services: freshData.products_services,
+        business_location: freshData.business_location,
+        target_audience: freshData.target_audience,
+        target_interests: Array.isArray(freshData.target_interests)
+          ? freshData.target_interests.join(", ")
+          : freshData.target_interests,
+        main_competitors: freshData.main_competitors,
+        reference_profiles: freshData.reference_profiles,
+      };
+
+      console.log("[Onboarding] Step 1 payload:", step1Payload);
       await submitOnboardingStep1(step1Payload);
 
       // Step 2: Branding
-      const step2Payload = getStep2Payload();
+      const colors = freshData.colors || ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"];
+      const step2Payload = {
+        voice_tone: freshData.voice_tone,
+        logo: freshData.logo,
+        color_1: colors[0] || "#FF6B6B",
+        color_2: colors[1] || "#4ECDC4",
+        color_3: colors[2] || "#45B7D1",
+        color_4: colors[3] || "#96CEB4",
+        color_5: colors[4] || "#FFBE0B",
+        visual_style_ids: freshData.visual_style_ids,
+      };
+
+      console.log("[Onboarding] Step 2 payload:", step2Payload);
       await submitOnboardingStep2(step2Payload);
     },
     onSuccess: () => {
