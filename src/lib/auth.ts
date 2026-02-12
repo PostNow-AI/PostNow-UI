@@ -13,6 +13,11 @@ import {
 } from "./auth-helpers";
 import { initiateGoogleOAuth } from "./google-oauth";
 
+// Response type for registration with email verification support
+export type RegisterResponse =
+  | { type: "authenticated" }
+  | { type: "verification_required"; email: string };
+
 // Re-export auth helpers
 export { subscribeToAuthChanges } from "./auth-helpers";
 
@@ -37,6 +42,40 @@ export const authApi = {
       }
     );
     return response.data;
+  },
+
+  registerWithVerification: async (userData: RegisterRequest): Promise<RegisterResponse> => {
+    try {
+      const response = await api.post<AuthResponse>(
+        "/api/v1/auth/registration/",
+        {
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          password1: userData.password,
+          password2: userData.confirmPassword,
+        }
+      );
+
+      // If we got tokens, user is authenticated directly
+      if (response.data.access && response.data.refresh) {
+        cookieUtils.setTokens(response.data.access, response.data.refresh);
+        dispatchAuthStateChange();
+        return { type: "authenticated" };
+      }
+
+      // Otherwise, email verification is required
+      return { type: "verification_required", email: userData.email };
+    } catch (error: unknown) {
+      // Check if it's a 201 response that requires verification
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number } };
+        if (axiosError.response?.status === 201) {
+          return { type: "verification_required", email: userData.email };
+        }
+      }
+      throw error;
+    }
   },
 
   handleGoogleCallback: (code: string) =>

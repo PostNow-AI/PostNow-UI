@@ -57,4 +57,10 @@ export const subscriptionApiService = {
     const response = await api.post<SubscriptionCancelResponse>(ENDPOINTS.CANCEL);
     return response.data;
   },
+
+  // Check payment status
+  checkPaymentStatus: async (): Promise<PaymentStatusResponse> => {
+    const response = await api.get("/api/v1/credits/payment-status/");
+    return response.data.data;
+  },
 };
