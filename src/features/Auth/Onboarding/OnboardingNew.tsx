@@ -213,21 +213,20 @@ export const OnboardingNew = ({
 
   // Handlers de autenticação
   const handleAuthSuccess = useCallback(async () => {
+    // IMPORTANTE: Definir step ANTES de mudar authMode para evitar re-render incorreto
+    setCurrentStep(20); // Ir para paywall primeiro
     setIsAuthenticated(true);
     setAuthMode(null);
 
-    // Sincronizar dados do localStorage com o backend
+    // Sincronizar dados do localStorage com o backend (em background)
     try {
       await syncMutation.mutateAsync();
-      // Ir para o paywall
-      goToStep(20); // Paywall step
     } catch (error) {
       console.error("[Onboarding] Erro ao sincronizar:", error);
       toast.error("Erro ao salvar seus dados. Tente novamente.");
-      // Ainda assim permite ir para o paywall para não bloquear o usuário
-      goToStep(20);
+      // Continua no paywall mesmo com erro
     }
-  }, [syncMutation, goToStep]);
+  }, [syncMutation, setCurrentStep]);
 
   const handlePlanSelect = useCallback(async (planId: string) => {
     // Verificar se planos estão carregados
