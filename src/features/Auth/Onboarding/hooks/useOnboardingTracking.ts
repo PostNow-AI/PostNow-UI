@@ -11,7 +11,7 @@
  */
 
 import { useCallback, useRef } from "react";
-import { api } from "@/lib/api";
+import { api, cookieUtils } from "@/lib/api";
 
 const SESSION_STORAGE_KEY = "onboarding_session_id";
 
@@ -54,6 +54,12 @@ export const useOnboardingTracking = () => {
       return;
     }
 
+    // Skip API call if not authenticated (to avoid 401 redirect)
+    if (!cookieUtils.getAccessToken()) {
+      trackedStepsRef.current.add(stepNumber);
+      return;
+    }
+
     try {
       await api.post("/api/v1/creator-profile/onboarding/track/", {
         session_id: sessionIdRef.current,
@@ -69,6 +75,11 @@ export const useOnboardingTracking = () => {
 
   // Track when a step is completed (user proceeds to next step)
   const trackStepComplete = useCallback(async (stepNumber: number) => {
+    // Skip API call if not authenticated (to avoid 401 redirect)
+    if (!cookieUtils.getAccessToken()) {
+      return;
+    }
+
     try {
       await api.post("/api/v1/creator-profile/onboarding/track/", {
         session_id: sessionIdRef.current,
