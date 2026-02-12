@@ -2,8 +2,11 @@ import { LoadingPage } from "@/components";
 import { BlurryBackground } from "@/components/ui/blurry-background";
 import { OnboardingComplete } from "@/features/Auth/Onboarding/components/OnboardingComplete";
 import { useOnboardingFlow } from "@/features/Auth/Onboarding/hooks/useOnboardingFlow";
-import { OnboardingForm } from "@/features/Auth/Onboarding/OnboardingForm";
 import { OnboardingNew } from "@/features/Auth/Onboarding/OnboardingNew";
+import { NoSubscriptionDialog } from "@/features/IdeaBank/components/NoSubscriptionDialog";
+import { PaymentPendingDialog } from "@/features/Subscription/components/PaymentPendingDialog";
+import { usePaymentStatus } from "@/features/Subscription/hooks/usePaymentStatus";
+import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -36,6 +39,12 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState<OnboardingFormData | null>(null);
 
+  const { data: userSubscription, isLoading: isSubscriptionLoading } =
+    useUserSubscription();
+  const { data: paymentStatus } = usePaymentStatus();
+
+  const hasActiveSubscription = userSubscription?.status === "active";
+
   useEffect(() => {
     // Open onboarding if:
     // 1. Profile not completed (needsOnboarding)
@@ -64,7 +73,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
     setEditData(null);
   };
 
-  if (isLoading) {
+  if (isLoading || isSubscriptionLoading) {
     return <LoadingPage />;
   }
 
@@ -93,7 +102,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
               onCancel={handleEditCancel}
             />
           ) : (
-            <OnboardingForm />
+            <OnboardingNew />
           )
         ) : (
           <>
@@ -117,8 +126,6 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
       )}
 
       {!hasActiveSubscription && !openOnboarding && <NoSubscriptionDialog />}
-
-      {/* PaymentPendingDialog removed due to unavailable usePaymentStatus hook */}
     </OnboardingContext.Provider>
   );
 };

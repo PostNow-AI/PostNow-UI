@@ -1,7 +1,8 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useOnboardingStorage } from "./hooks/useOnboardingStorage";
+import { useOnboardingTracking } from "./hooks/useOnboardingTracking";
 import type { OnboardingFormData } from "./constants/onboardingSchema";
 import {
   WelcomeStep,
@@ -82,6 +83,10 @@ export const OnboardingNew = ({
     initializeWithData,
   } = useOnboardingStorage();
 
+  // Tracking hook for funnel analytics
+  const { trackStep, trackStepComplete, clearTracking } = useOnboardingTracking();
+  const lastTrackedStepRef = useRef<number>(0);
+
   // Inicializar com dados no modo edição
   useEffect(() => {
     if (isEditMode && initialData && isLoaded && !isInitialized) {
@@ -151,6 +156,9 @@ export const OnboardingNew = ({
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
       clearData();
+      // Mark final step as completed and clear tracking
+      trackStepComplete(20);
+      clearTracking();
       // Toast removido - não interromper fluxo do paywall
     },
     onError: (error: unknown) => {
