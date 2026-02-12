@@ -139,7 +139,8 @@ export const useOnboardingStorage = () => {
       main_competitors: backendData.main_competitors || "",
       reference_profiles: backendData.reference_profiles || "",
       voice_tone: backendData.voice_tone || "",
-      visual_style_ids: backendData.visual_style_ids || [],
+      // Convert to strings for comparison in VisualStyleStep
+      visual_style_ids: (backendData.visual_style_ids || []).map(id => String(id)),
       colors: [
         backendData.color_1 || "#FF6B6B",
         backendData.color_2 || "#4ECDC4",

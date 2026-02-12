@@ -2,7 +2,6 @@ import { LoadingPage } from "@/components";
 import { BlurryBackground } from "@/components/ui/blurry-background";
 import { OnboardingComplete } from "@/features/Auth/Onboarding/components/OnboardingComplete";
 import { useOnboardingFlow } from "@/features/Auth/Onboarding/hooks/useOnboardingFlow";
-import { OnboardingForm } from "@/features/Auth/Onboarding/OnboardingForm";
 import { OnboardingNew } from "@/features/Auth/Onboarding/OnboardingNew";
 import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -88,7 +87,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
               onCancel={handleEditCancel}
             />
           ) : (
-            <OnboardingForm />
+            <OnboardingNew />
           )
         ) : (
           <>
