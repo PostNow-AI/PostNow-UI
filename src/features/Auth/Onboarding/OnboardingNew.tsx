@@ -25,7 +25,6 @@ import {
   SignupStep,
   LoginStep,
   PaywallStep,
-  ContactInfoStep,
 } from "./components/new/steps";
 import {
   submitOnboardingStep1,
@@ -126,8 +125,8 @@ export const OnboardingNew = ({
       if (hasOnboardingData) {
         setIsAuthenticated(true);
         // Jump directly to paywall step
-        if (data.current_step < 20) {
-          setCurrentStep(20);
+        if (data.current_step < 19) {
+          setCurrentStep(19);
         }
       }
       // Se não tem dados do onboarding, deixa o usuário completar o fluxo
@@ -210,7 +209,7 @@ export const OnboardingNew = ({
       // NÃO limpar dados aqui - só limpar após checkout completo
       // O clearData() será chamado na página de sucesso do checkout
       // Mark final step as completed and clear tracking
-      trackStepComplete(20);
+      trackStepComplete(19);
       clearTracking();
       // Toast removido - não interromper fluxo do paywall
     },
@@ -268,7 +267,7 @@ export const OnboardingNew = ({
   const handleAuthSuccess = useCallback(() => {
     // IMPORTANTE: Definir step ANTES de mudar authMode para evitar re-render incorreto
     // NÃO fazer chamadas API aqui - deixar para quando selecionar plano
-    setCurrentStep(20); // Ir para paywall primeiro
+    setCurrentStep(19); // Ir para paywall primeiro
     setIsAuthenticated(true);
     setAuthMode(null);
   }, [setCurrentStep]);
@@ -370,7 +369,7 @@ export const OnboardingNew = ({
   }
 
   // Se já autenticado e no paywall (apenas no modo criação)
-  if (!isEditMode && isAuthenticated && data.current_step >= 19) {
+  if (!isEditMode && isAuthenticated && data.current_step >= 18) {
     return (
       <PaywallStep
         onSelectPlan={handlePlanSelect}
@@ -402,21 +401,6 @@ export const OnboardingNew = ({
 
       case 3:
         return (
-          <ContactInfoStep
-            phone={data.business_phone}
-            instagram={data.business_instagram_handle}
-            website={data.business_website}
-            onPhoneChange={(value) => saveData({ business_phone: value })}
-            onInstagramChange={(value) => saveData({ business_instagram_handle: value })}
-            onWebsiteChange={(value) => saveData({ business_website: value })}
-            onNext={handleNext}
-            onBack={handleBack}
-            stepNumber={3}
-          />
-        );
-
-      case 4:
-        return (
           <NicheStep
             value={data.specialization}
             onChange={(value) => saveData({ specialization: value })}
@@ -425,7 +409,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 5:
+      case 4:
         return (
           <DescriptionStep
             value={data.business_description}
@@ -435,7 +419,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 6:
+      case 5:
         return (
           <PurposeStep
             value={data.business_purpose}
@@ -445,7 +429,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 7:
+      case 6:
         return (
           <PersonalityStep
             value={data.brand_personality}
@@ -455,7 +439,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 8:
+      case 7:
         return (
           <ProductsStep
             value={data.products_services}
@@ -465,7 +449,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 9:
+      case 8:
         return (
           <TargetAudienceStep
             value={data.target_audience}
@@ -475,7 +459,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 10:
+      case 9:
         return (
           <InterestsStep
             value={data.target_interests}
@@ -485,7 +469,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 11:
+      case 10:
         return (
           <LocationStep
             value={data.business_location}
@@ -495,7 +479,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 12:
+      case 11:
         return (
           <CompetitorsStep
             competitors={data.main_competitors}
@@ -507,7 +491,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 13:
+      case 12:
         return (
           <VoiceToneStep
             value={data.voice_tone}
@@ -517,7 +501,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 14:
+      case 13:
         return (
           <VisualStyleStep
             value={data.visual_style_ids}
@@ -527,7 +511,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 15:
+      case 14:
         return (
           <LogoStep
             value={data.logo}
@@ -539,7 +523,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 16:
+      case 15:
         return (
           <ColorsStep
             value={data.colors}
@@ -550,7 +534,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 17:
+      case 16:
         return (
           <ProfileReadyStep
             data={data}
@@ -569,8 +553,8 @@ export const OnboardingNew = ({
           />
         );
 
-      case 18:
-        // No modo edição, não deve chegar aqui (salva no step 17)
+      case 17:
+        // No modo edição, não deve chegar aqui (salva no step 16)
         if (isEditMode) {
           updateMutation.mutate();
           return null;
