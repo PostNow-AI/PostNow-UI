@@ -9,7 +9,7 @@ import { usePaymentStatus } from "@/features/Subscription/hooks/usePaymentStatus
 import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 interface OnboardingContextType {
   isLoading: boolean;
   needsOnboarding: boolean;
