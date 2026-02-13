@@ -6,6 +6,7 @@ import { Sparkles, Target, Zap } from "lucide-react";
 interface WelcomeStepProps {
   onNext: () => void;
   onLogin?: () => void;
+  isAuthenticated: boolean;
 }
 
 const features = [
@@ -26,7 +27,7 @@ const features = [
   },
 ];
 
-export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
+export const WelcomeStep = ({ onNext, onLogin, isAuthenticated }: WelcomeStepProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Content */}
@@ -112,7 +113,7 @@ export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
           <p className="text-center text-xs text-muted-foreground mt-3">
             Leva menos de 3 minutos
           </p>
-          {onLogin && (
+          {!isAuthenticated && onLogin && (
             <p className="text-center text-sm mt-4">
               Já tem uma conta?{" "}
               <button

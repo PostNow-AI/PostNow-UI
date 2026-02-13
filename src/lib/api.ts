@@ -148,7 +148,7 @@ api.interceptors.response.use(
         if (typeof window !== "undefined") {
           const isOnboardingPage = window.location.pathname.startsWith("/onboarding");
           if (!isOnboardingPage) {
-            window.location.href = "/login";
+            window.location.href = "/onboarding";
           }
         }
 
@@ -181,7 +181,7 @@ api.interceptors.response.use(
         if (typeof window !== "undefined") {
           const isOnboardingPage = window.location.pathname.startsWith("/onboarding");
           if (!isOnboardingPage) {
-            window.location.href = "/login";
+            window.location.href = "/onboarding";
           }
         }
 

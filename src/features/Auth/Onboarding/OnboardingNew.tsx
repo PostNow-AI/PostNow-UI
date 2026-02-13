@@ -37,7 +37,7 @@ import {
   useCreateCheckoutSession,
   useUserSubscription,
 } from "@/features/Subscription/hooks/useSubscription";
-import { useAuth } from "@/hooks/useAuth";
+import { authUtils } from "@/lib/auth";
 
 type AuthMode = "signup" | "login" | null;
 
@@ -58,16 +58,15 @@ export const OnboardingNew = ({
   const isEditMode = mode === "edit";
 
   const [authMode, setAuthMode] = useState<AuthMode>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Check if user is already logged in from previous session
-  const { isAuthenticated: isLoggedIn } = useAuth();
-  const { data: userSubscription } = useUserSubscription(isLoggedIn);
+  const isAuthenticated = authUtils.isAuthenticated()
+  const { data: userSubscription } = useUserSubscription(isAuthenticated);
   const hasActiveSubscription = userSubscription?.status === "active";
 
   // Hooks para checkout do Stripe - só busca quando autenticado
-  const { data: subscriptionPlans, isLoading: isLoadingPlans } = useSubscriptionPlans(isAuthenticated || isLoggedIn);
+  const { data: subscriptionPlans, isLoading: isLoadingPlans } = useSubscriptionPlans(isAuthenticated);
   const createCheckout = useCreateCheckoutSession();
 
   const {
@@ -81,6 +80,7 @@ export const OnboardingNew = ({
     isLoaded,
     initializeWithData,
   } = useOnboardingStorage();
+
 
   // Tracking hook for funnel analytics
   const { trackStep, trackStepComplete, clearTracking } = useOnboardingTracking();
@@ -118,12 +118,11 @@ export const OnboardingNew = ({
   // BUT only if onboarding data exists (user completed the flow)
   // AND user is not in login mode (to allow showing error message on login screen)
   useEffect(() => {
-    if (!isEditMode && isLoaded && isLoggedIn && !hasActiveSubscription && authMode !== "login") {
+    if (!isEditMode && isLoaded && isAuthenticated && !hasActiveSubscription && authMode !== "login") {
       // Verificar se os dados do onboarding foram preenchidos
       const hasOnboardingData = data.business_name && data.specialization && data.business_description;
 
       if (hasOnboardingData) {
-        setIsAuthenticated(true);
         // Jump directly to paywall step
         if (data.current_step < 19) {
           setCurrentStep(19);
@@ -131,7 +130,7 @@ export const OnboardingNew = ({
       }
       // Se não tem dados do onboarding, deixa o usuário completar o fluxo
     }
-  }, [isEditMode, isLoaded, isLoggedIn, hasActiveSubscription, authMode, data.current_step, data.business_name, data.specialization, data.business_description, setCurrentStep]);
+  }, [isEditMode, isLoaded, isAuthenticated, hasActiveSubscription, authMode, data.current_step, data.business_name, data.specialization, data.business_description, setCurrentStep]);
 
   // Track step visits for funnel analytics (only in create mode)
   useEffect(() => {
@@ -232,12 +231,15 @@ export const OnboardingNew = ({
       // Step 2: Branding
       const step2Payload = getStep2Payload();
       await submitOnboardingStep2(step2Payload);
+      
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       clearData();
+      trackStepComplete(19);
       toast.success("Perfil atualizado com sucesso!");
       onComplete?.();
+      
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
@@ -268,7 +270,6 @@ export const OnboardingNew = ({
     // IMPORTANTE: Definir step ANTES de mudar authMode para evitar re-render incorreto
     // NÃO fazer chamadas API aqui - deixar para quando selecionar plano
     setCurrentStep(19); // Ir para paywall primeiro
-    setIsAuthenticated(true);
     setAuthMode(null);
   }, [setCurrentStep]);
 
@@ -368,8 +369,9 @@ export const OnboardingNew = ({
     );
   }
 
+
   // Se já autenticado e no paywall (apenas no modo criação)
-  if (!isEditMode && isAuthenticated && data.current_step >= 18) {
+  if (!isAuthenticated && !hasActiveSubscription) {
     return (
       <PaywallStep
         onSelectPlan={handlePlanSelect}
@@ -387,7 +389,7 @@ export const OnboardingNew = ({
           goToStep(2);
           return null;
         }
-        return <WelcomeStep onNext={handleNext} onLogin={() => setAuthMode("login")} />;
+        return <WelcomeStep onNext={handleNext} isAuthenticated={isAuthenticated} onLogin={() => setAuthMode("login")} />;
 
       case 2:
         return (
@@ -539,7 +541,7 @@ export const OnboardingNew = ({
           <ProfileReadyStep
             data={data}
             onNext={() => {
-              if (isEditMode) {
+              if (isAuthenticated) {
                 // No modo edição, salvar diretamente
                 updateMutation.mutate();
               } else {
@@ -548,14 +550,14 @@ export const OnboardingNew = ({
               }
             }}
             onBack={handleBack}
-            isEditMode={isEditMode}
+            isEditMode={isAuthenticated}
             isLoading={updateMutation.isPending}
           />
         );
 
       case 17:
         // No modo edição, não deve chegar aqui (salva no step 16)
-        if (isEditMode) {
+        if (isAuthenticated) {
           updateMutation.mutate();
           return null;
         }
@@ -568,7 +570,7 @@ export const OnboardingNew = ({
         );
 
       default:
-        return <WelcomeStep onNext={() => goToStep(1)} />;
+        return <WelcomeStep isAuthenticated={isAuthenticated} onNext={() => goToStep(1)} />;
     }
   };
 

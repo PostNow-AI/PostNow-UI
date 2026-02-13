@@ -61,18 +61,18 @@ export const LoginStep = ({
       // Check if user already has active subscription
       try {
         const subscription = await subscriptionApiService.getUserSubscription();
-        if (subscription?.status === "active") {
           // User has active subscription, go directly to the system
-          toast.success("Bem-vindo de volta!");
+        if (subscription?.status === "active") {
+            toast.success("Bem-vindo de volta!");}
+          else {  
+            toast.error("Sua assinatura não está ativa. Por favor, faça uma nova assinatura.");
+          }
           navigate("/ideabank");
-          return;
-        }
       } catch (error) {
         console.error("[LoginStep] Error checking subscription:", error);
       }
 
       // No active subscription, show error and stay on login screen
-      toast.error("Sua assinatura não está ativa. Por favor, faça uma nova assinatura.");
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {

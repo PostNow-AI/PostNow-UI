@@ -15,9 +15,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <LoadingPage />;
   }
 
-  // Redirect to login if not authenticated, preserving the intended destination
+  // Redirect to onboarding if not authenticated, preserving the intended destination
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/onboarding" state={{ from: location }} replace />;
   }
 
   // Render the protected component if authenticated

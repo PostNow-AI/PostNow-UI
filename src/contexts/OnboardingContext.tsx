@@ -9,7 +9,7 @@ import { usePaymentStatus } from "@/features/Subscription/hooks/usePaymentStatus
 import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
 import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import React, { createContext, useContext, useEffect, useState } from "react";
-
+import { useNavigate, useSearchParams } from "react-router-dom";
 interface OnboardingContextType {
   isLoading: boolean;
   needsOnboarding: boolean;
@@ -38,6 +38,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState<OnboardingFormData | null>(null);
+  const navigate = useNavigate();
 
   const { data: userSubscription, isLoading: isSubscriptionLoading } =
     useUserSubscription();
@@ -65,6 +66,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
     setOpenOnboarding(false);
     setEditMode(false);
     setEditData(null);
+    navigate('/ideabank'); // Refresh the page to reflect changes immediately
   };
 
   const handleEditCancel = () => {
