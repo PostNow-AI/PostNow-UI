@@ -68,7 +68,7 @@ export const OnboardingNew = ({
   const hasActiveSubscription = userSubscription?.status === "active";
 
   // Hooks para checkout do Stripe - só busca quando autenticado
-  const { data: subscriptionPlans } = useSubscriptionPlans(isAuthenticated || isLoggedIn);
+  const { data: subscriptionPlans, isLoading: isLoadingPlans } = useSubscriptionPlans(isAuthenticated || isLoggedIn);
   const createCheckout = useCreateCheckoutSession();
 
   const {
@@ -373,7 +373,7 @@ export const OnboardingNew = ({
     return (
       <PaywallStep
         onSelectPlan={handlePlanSelect}
-        isLoading={createCheckout.isPending}
+        isLoading={createCheckout.isPending || isLoadingPlans}
       />
     );
   }
