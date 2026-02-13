@@ -26,19 +26,8 @@ export const subscriptionApiService = {
 
   // Get user's current subscription
   getUserSubscription: async (): Promise<UserSubscription | null> => {
-    try {
-      const response = await api.get<UserSubscription>(ENDPOINTS.SUBSCRIPTION_CURRENT);
-      return response.data;
-    } catch (error: unknown) {
-      // 404 é esperado quando usuário não tem assinatura
-      if (error instanceof AxiosError && error.response?.status === 404) {
-        return null;
-      }
-      // Logar outros erros para debugging
-      console.error("[subscription-api] Erro ao buscar assinatura:", error);
-      // Retornar null para não quebrar a UI, mas o erro foi logado
-      return null;
-    }
+    const response = await api.get<UserSubscription | null>(ENDPOINTS.SUBSCRIPTION_CURRENT);
+    return response.data;
   },
 
   // Create Stripe checkout session for subscription
