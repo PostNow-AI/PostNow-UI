@@ -5,6 +5,7 @@ import { BetaLogo } from "@/components/ui/beta-logo";
 import { Loader } from "@/components/ui/loader";
 import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
 import { authApi, authUtils } from "@/lib/auth";
+import { subscriptionApiService } from "@/lib/subscription-api";
 import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,7 +13,7 @@ import { motion } from "framer-motion";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -36,6 +37,7 @@ export const LoginStep = ({
 }: LoginStepProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -53,6 +55,21 @@ export const LoginStep = ({
       queryClient.clear();
       toast.success("Bem-vindo de volta!");
       await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Check if user already has active subscription
+      try {
+        const subscription = await subscriptionApiService.getUserSubscription();
+        if (subscription?.status === "active") {
+          // User has active subscription, go directly to the system
+          navigate("/ideabank");
+          return;
+        }
+      } catch (error) {
+        // If error checking subscription, continue to paywall
+        console.error("[LoginStep] Error checking subscription:", error);
+      }
+
+      // No active subscription, go to paywall
       onSuccess();
     },
     onError: (error: unknown) => {
