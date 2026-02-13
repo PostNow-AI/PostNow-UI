@@ -58,6 +58,16 @@ export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
           </p>
         </motion.div>
 
+        {/* Section title */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35, duration: 0.4 }}
+          className="text-sm font-medium text-muted-foreground mb-4"
+        >
+          O que você vai receber?
+        </motion.p>
+
         {/* Features */}
         <div className="w-full max-w-sm space-y-4">
           {features.map((feature, index) => (
