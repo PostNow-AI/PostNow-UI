@@ -82,7 +82,7 @@ export const LoginStep = ({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 pt-8 pb-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
