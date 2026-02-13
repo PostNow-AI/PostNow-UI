@@ -31,6 +31,10 @@ interface SocialAccount {
   };
 }
 
+interface SocialAccountsResponse {
+  social_accounts: SocialAccount[];
+}
+
 export const BasicUserInfo = ({ user }: BasicUserInfoProps) => {
   const { updateUserProfile, isUpdatingUserProfile } = useProfileEdits();
   const { user: authUser } = useAuth();
@@ -52,7 +56,7 @@ export const BasicUserInfo = ({ user }: BasicUserInfoProps) => {
   useEffect(() => {
     const fetchSocialAccounts = async () => {
       try {
-        const response = await api.get("/api/v1/auth/social-accounts/");
+        const response = await api.get<SocialAccountsResponse>("/api/v1/auth/social-accounts/");
         const socialAccounts = response.data.social_accounts || [];
         const googleAcc = socialAccounts.find(
           (acc: SocialAccount) => acc.provider === "google"

@@ -12,6 +12,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: "127.0.0.1",
     allowedHosts: ["workable-wealthy-haddock.ngrok-free.app", "localhost", "*"],
   },
   define: {

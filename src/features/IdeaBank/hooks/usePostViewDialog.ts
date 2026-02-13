@@ -161,7 +161,7 @@ export const usePostViewDialog = (post: Post | null, isOpen: boolean) => {
     setImagePrompt,
     handleCopyContent,
     handleRegenerateIdea,
-    handleImageGeneration,
     handleDownloadImage,
+    handleImageGeneration,
   };
 };

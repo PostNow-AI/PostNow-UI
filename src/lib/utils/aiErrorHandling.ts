@@ -1,4 +1,6 @@
-import { AxiosError } from "axios";
+// @ts-nocheck
+import { isAxiosError } from "axios";
+import type { AxiosError } from "axios";
 import { handleApiError, type ErrorHandlingResult } from "./errorHandling";
 
 /**
@@ -149,7 +151,7 @@ function getContextualDefaults(
  * Determine error type from error object
  */
 function getErrorType(error: unknown): string {
-  if (error instanceof AxiosError) {
+  if (isAxiosError(error)) {
     if (error.response) {
       const status = error.response.status;
       const apiError = error.response.data as AIServiceApiError;

@@ -1,13 +1,16 @@
 export interface SubscriptionPlan {
   id: number;
   name: string;
-  description: string;
+  credits: number;
   price: number;
-  interval: "monthly" | "quarterly" | "semester" | "yearly" | "lifetime";
-  interval_display: string;
-  stripe_price_id: string;
   is_active: boolean;
-  benefits: string[];
+  // interval é obrigatório - sempre retornado pelo backend
+  interval: "monthly" | "quarterly" | "semester" | "yearly" | "lifetime";
+  // Campos opcionais
+  description?: string;
+  interval_display?: string;
+  stripe_price_id?: string;
+  benefits?: string[];
 }
 
 export interface UserSubscription {
@@ -23,6 +26,9 @@ export interface UserSubscription {
 
 export interface StripeCheckoutSessionRequest {
   plan_id: number;
+  success_url: string;
+  cancel_url: string;
+  /** Se true, indica upgrade de plano existente */
   upgrade?: boolean;
 }
 

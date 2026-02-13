@@ -15,8 +15,11 @@ export const NoSubscriptionDialog = () => {
 
   const handleSubscribe = async () => {
     try {
+      const baseUrl = window.location.origin;
       await createCheckout.mutateAsync({
         plan_id: 12,
+        success_url: `${baseUrl}/subscription/success`,
+        cancel_url: `${baseUrl}/subscription/cancel`,
         upgrade: false,
       });
     } catch {

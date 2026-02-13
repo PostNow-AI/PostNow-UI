@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchOnboardingStatus } from "../services";
-import type { OnboardingStatus } from "../types";
+import { fetchOnboardingStatus, type OnboardingStatus } from "../services";
 
 export const useOnboardingFlow = () => {
   const {

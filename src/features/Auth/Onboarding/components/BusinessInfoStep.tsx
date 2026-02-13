@@ -5,21 +5,13 @@ import {
   CardTitle,
   Input,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Separator,
   Textarea,
 } from "@/components";
+import { phoneMask } from "@/utils";
 import { Building } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
-import {
-  ageRangeOptions,
-  genderOptions,
-  type OnboardingFormData,
-} from "../constants/onboardingSchema";
+import { type OnboardingFormData } from "../constants/onboardingSchema";
 
 export const BusinessInfoStep = ({
   form,
@@ -30,7 +22,6 @@ export const BusinessInfoStep = ({
     register,
     formState: { errors },
     setValue,
-    watch,
   } = form;
 
   return (
@@ -66,7 +57,35 @@ export const BusinessInfoStep = ({
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="specialization">Nicho/especialidade</Label>
+          <Label htmlFor="whatsapp_number">Telefone do negócio *</Label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+              +55
+            </span>
+            <Input
+              id="whatsapp_number"
+              placeholder="(99) 99999-9999"
+              className="pl-12"
+              {...register("business_phone", {
+                onChange: (e) => {
+                  const value = phoneMask(e.target.value);
+                  setValue("business_phone", value);
+                },
+              })}
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Beta: No futuro você poderá receber suas ideias de post por esse
+            número{" "}
+          </p>
+          {errors.business_phone && (
+            <p className="text-sm text-destructive">
+              {errors.business_phone.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="specialization">Nicho/especialidade *</Label>
           <Input
             id="specialization"
             placeholder="Ex: Saúde, Beleza, Tecnologia"
@@ -79,11 +98,45 @@ export const BusinessInfoStep = ({
           )}
         </div>
         <div className="space-y-2">
+          <Label htmlFor="instagram_username">Instagram do negócio</Label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+              @
+            </span>
+            <Input
+              id="instagram_handle"
+              placeholder="seu_usuario"
+              className="pl-8"
+              {...register("business_instagram_handle")}
+            />
+          </div>
+          {errors.business_instagram_handle && (
+            <p className="text-sm text-destructive">
+              {errors.business_instagram_handle.message}
+            </p>
+          )}
+        </div>{" "}
+        <div className="space-y-2">
+          <Label htmlFor="instagram_username">Website do negócio</Label>
+          <div className="relative">
+            <Input
+              id="business_website"
+              placeholder="https://www.seunegocio.com"
+              {...register("business_website")}
+            />
+          </div>
+          {errors.business_website && (
+            <p className="text-sm text-destructive">
+              {errors.business_website.message}
+            </p>
+          )}
+        </div>{" "}
+        <div className="space-y-2">
           <Label htmlFor="business_description">Descrição do Negócio *</Label>
           <Textarea
             rows={3}
             id="business_description"
-            placeholder="Descreva o que seu negócio faz, seus produtos/serviços, mercado alvo e o que o torna único."
+            placeholder="Descreva o que seu negócio faz, o que o torna único."
             {...register("business_description")}
           />
           <p className="text-xs text-muted-foreground">
@@ -96,66 +149,129 @@ export const BusinessInfoStep = ({
             </p>
           )}
         </div>
-        <CardTitle>Público-Alvo</CardTitle>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="target_gender">Gênero *</Label>
-            <Select
-              onValueChange={(value) => setValue("target_gender", value)}
-              value={watch().target_gender || ""}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione um gênero" />
-              </SelectTrigger>
-              <SelectContent>
-                {genderOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.target_gender && (
-              <p className="text-sm text-destructive">
-                {errors.target_gender.message}
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="target_age_range">Idade *</Label>
-            <Select
-              onValueChange={(value) => setValue("target_age_range", value)}
-              value={watch().target_age_range || ""}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione uma faixa etária" />
-              </SelectTrigger>
-              <SelectContent>
-                {ageRangeOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.target_age_range && (
-              <p className="text-sm text-destructive">
-                {errors.target_age_range.message}
-              </p>
-            )}
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="business_purpose">Propósito do Negócio *</Label>
+          <Textarea
+            rows={3}
+            id="business_purpose"
+            placeholder="Descreva o propósito do seu negócio, seus valores e objetivos."
+            {...register("business_purpose")}
+          />
+          <p className="text-xs text-muted-foreground">
+            Quanto mais detalhes fornecer, mais precisos serão as ideais
+            geradas.{" "}
+          </p>
+          {errors.business_purpose && (
+            <p className="text-sm text-destructive">
+              {errors.business_purpose.message}
+            </p>
+          )}
+        </div>{" "}
+        <div className="space-y-2">
+          <Label htmlFor="brand_personality">Personalidade de marca *</Label>
+          <Textarea
+            rows={3}
+            id="brand_personality"
+            placeholder="Descreva a personalidade da sua marca, seu tom de voz e estilo."
+            {...register("brand_personality")}
+          />
+          <p className="text-xs text-muted-foreground">
+            Quanto mais detalhes fornecer, mais precisos serão as ideais
+            geradas.{" "}
+          </p>
+          {errors.brand_personality && (
+            <p className="text-sm text-destructive">
+              {errors.brand_personality.message}
+            </p>
+          )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="target_location">Localização *</Label>
-          <Input
-            id="target_location"
-            placeholder="Ex: São Paulo, Brasil, região Sul..."
-            {...register("target_location")}
+          <Label htmlFor="products_services">Produtos/Serviços *</Label>
+          <Textarea
+            rows={3}
+            id="products_services"
+            placeholder="Descreva os produtos ou serviços que sua empresa oferece."
+            {...register("products_services")}
           />
-
-          {errors.target_location && (
+          <p className="text-xs text-muted-foreground">
+            Quanto mais detalhes fornecer, mais precisos serão as ideais
+            geradas.{" "}
+          </p>
+          {errors.products_services && (
             <p className="text-sm text-destructive">
-              {errors.target_location.message}
+              {errors.products_services.message}
+            </p>
+          )}
+        </div>{" "}
+        <div className="space-y-2">
+          <Label htmlFor="business_location">Localização do Negócio *</Label>
+          <Input
+            id="business_location"
+            placeholder="Descreva a localização do seu negócio."
+            {...register("business_location")}
+          />
+          <p className="text-xs text-muted-foreground">
+            Quanto mais detalhes fornecer, mais precisos serão as ideais
+            geradas.{" "}
+          </p>
+          {errors.business_location && (
+            <p className="text-sm text-destructive">
+              {errors.business_location.message}
+            </p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="main_competitors">Principais Concorrentes</Label>{" "}
+          <Textarea
+            rows={3}
+            id="main_competitors"
+            placeholder="Descreva os principais concorrentes da sua empresa."
+            {...register("main_competitors")}
+          />
+          <p className="text-xs text-muted-foreground">
+            Quanto mais detalhes fornecer, mais precisas serão as ideias
+            geradas.{" "}
+          </p>
+          {errors.main_competitors && (
+            <p className="text-sm text-destructive">
+              {errors.main_competitors.message}
+            </p>
+          )}
+        </div>{" "}
+        <div className="space-y-2">
+          <Label htmlFor="reference_profiles">Perfis de referência</Label>
+          <Textarea
+            rows={3}
+            id="reference_profiles"
+            placeholder="Descreva os perfis de referência da sua empresa."
+            {...register("reference_profiles")}
+          />
+          <p className="text-xs text-muted-foreground">
+            Quanto mais detalhes fornecer, mais precisas serão as ideias
+            geradas.{" "}
+          </p>
+          {errors.reference_profiles && (
+            <p className="text-sm text-destructive">
+              {errors.reference_profiles.message}
+            </p>
+          )}
+        </div>{" "}
+        <CardTitle>Público-Alvo</CardTitle>
+        <div className="space-y-2">
+          <Label htmlFor="target_audience">Descrição *</Label>
+          <Textarea
+            rows={3}
+            id="target_audience"
+            placeholder="Descreva informações demográficas e psicográficas do seu público-alvo (ex: idade, gênero, localização, interesses, comportamentos de compra)"
+            {...register("target_audience")}
+          />
+          <p className="text-xs text-muted-foreground">
+            Quanto mais detalhes fornecer, mais precisos serão as ideais
+            geradas.{" "}
+          </p>
+          {errors.target_audience && (
+            <p className="text-sm text-destructive">
+              {errors.target_audience.message}
             </p>
           )}
         </div>
@@ -171,9 +287,9 @@ export const BusinessInfoStep = ({
             Quanto mais detalhes fornecer, mais precisos serão as ideais
             geradas.{" "}
           </p>
-          {errors.business_description && (
+          {errors.target_interests && (
             <p className="text-sm text-destructive">
-              {errors.business_description.message}
+              {errors.target_interests.message}
             </p>
           )}
         </div>

@@ -5,7 +5,6 @@ import { useOnboarding } from "@/features/Auth/Onboarding/hooks/useOnboarding";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { BrandingStep } from "./components/BrandingStep";
 import { BusinessInfoStep } from "./components/BusinessInfoStep";
-import { PersonalInfoStep } from "./components/PersonalInfoStep";
 import { ReviewStep } from "./components/ReviewStep";
 
 export const OnboardingForm = () => {
@@ -24,12 +23,10 @@ export const OnboardingForm = () => {
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        return <PersonalInfoStep form={form} />;
-      case 2:
         return <BusinessInfoStep form={form} />;
-      case 3:
+      case 2:
         return <BrandingStep form={form} />;
-      case 4:
+      case 3:
         return <ReviewStep form={form} />;
       default:
         return null;
@@ -71,7 +68,7 @@ export const OnboardingForm = () => {
                 Voltar
               </Button>
             )}
-            {currentStep < 4 ? (
+            {currentStep < 3 ? (
               <Button
                 type="button"
                 onClick={handleNextStep}

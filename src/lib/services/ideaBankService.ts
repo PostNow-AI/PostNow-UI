@@ -119,19 +119,19 @@ export interface ImprovementResponse {
 export const ideaBankService = {
   // Get campaigns with ideas
   getCampaignsWithIdeas: async (): Promise<Campaign[]> => {
-    const response = await api.get("/api/v1/ideabank/campaigns-with-ideas/");
+    const response = await api.get<{ campaigns: Campaign[] }>("/api/v1/ideabank/campaigns-with-ideas/");
     return response.data.campaigns;
   },
 
   // Get campaign statistics
   getCampaignStats: async (): Promise<CampaignStats> => {
-    const response = await api.get("/api/v1/ideabank/stats/");
+    const response = await api.get<CampaignStats>("/api/v1/ideabank/stats/");
     return response.data;
   },
 
   // Get idea generation options
   getIdeaOptions: async (): Promise<IdeaOptions> => {
-    const response = await api.get("/api/v1/ideabank/options/");
+    const response = await api.get<IdeaOptions>("/api/v1/ideabank/options/");
     return response.data;
   },
 
@@ -139,7 +139,7 @@ export const ideaBankService = {
   generateIdeas: async (
     data: IdeaGenerationFormData
   ): Promise<GeneratedIdeasResponse> => {
-    const response = await api.post("/api/v1/ideabank/generate-ideas/", data);
+    const response = await api.post<GeneratedIdeasResponse>("/api/v1/ideabank/generate-ideas/", data);
     return response.data;
   },
 
@@ -147,7 +147,7 @@ export const ideaBankService = {
   generatePublicIdeas: async (
     data: IdeaGenerationFormData
   ): Promise<GeneratedIdeasResponse> => {
-    const response = await api.post("/api/v1/ideabank/generate-ideas/", data);
+    const response = await api.post<GeneratedIdeasResponse>("/api/v1/ideabank/generate-ideas/", data);
     return response.data;
   },
 
@@ -156,7 +156,7 @@ export const ideaBankService = {
     id: number,
     data: Partial<CampaignIdea>
   ): Promise<CampaignIdea> => {
-    const response = await api.patch(`/api/v1/ideabank/ideas/${id}/`, data);
+    const response = await api.patch<CampaignIdea>(`/api/v1/ideabank/ideas/${id}/`, data);
     return response.data;
   },
 
@@ -175,7 +175,7 @@ export const ideaBankService = {
     id: number,
     prompt: string
   ): Promise<ImprovementResponse> => {
-    const response = await api.post(`/api/v1/ideabank/ideas/${id}/improve/`, {
+    const response = await api.post<ImprovementResponse>(`/api/v1/ideabank/ideas/${id}/improve/`, {
       improvement_prompt: prompt,
     });
     return response.data;
@@ -195,7 +195,7 @@ export const ideaBankService = {
       preferred_model?: string;
     }
   ): Promise<CampaignIdea> => {
-    const response = await api.post(`/api/v1/ideabank/generate-single-idea/`, {
+    const response = await api.post<{ idea: CampaignIdea }>(`/api/v1/ideabank/generate-single-idea/`, {
       ...ideaData,
       campaign_id: campaignId,
     });
@@ -207,7 +207,7 @@ export const ideaBankService = {
     id: number,
     data: Partial<Campaign>
   ): Promise<Campaign> => {
-    const response = await api.patch(`/api/v1/ideabank/campaigns/${id}/`, data);
+    const response = await api.patch<Campaign>(`/api/v1/ideabank/campaigns/${id}/`, data);
     return response.data;
   },
 };
