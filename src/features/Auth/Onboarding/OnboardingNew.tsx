@@ -117,8 +117,9 @@ export const OnboardingNew = ({
 
   // If user is already logged in but has no subscription, jump to paywall
   // BUT only if onboarding data exists (user completed the flow)
+  // AND user is not in login mode (to allow showing error message on login screen)
   useEffect(() => {
-    if (!isEditMode && isLoaded && isLoggedIn && !hasActiveSubscription) {
+    if (!isEditMode && isLoaded && isLoggedIn && !hasActiveSubscription && authMode !== "login") {
       // Verificar se os dados do onboarding foram preenchidos
       const hasOnboardingData = data.business_name && data.specialization && data.business_description;
 
@@ -131,7 +132,7 @@ export const OnboardingNew = ({
       }
       // Se não tem dados do onboarding, deixa o usuário completar o fluxo
     }
-  }, [isEditMode, isLoaded, isLoggedIn, hasActiveSubscription, data.current_step, data.business_name, data.specialization, data.business_description, setCurrentStep]);
+  }, [isEditMode, isLoaded, isLoggedIn, hasActiveSubscription, authMode, data.current_step, data.business_name, data.specialization, data.business_description, setCurrentStep]);
 
   // Track step visits for funnel analytics (only in create mode)
   useEffect(() => {
