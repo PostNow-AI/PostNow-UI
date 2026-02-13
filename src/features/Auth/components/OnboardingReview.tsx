@@ -75,30 +75,6 @@ export const OnboardingReview = ({
               {values.business_name}
             </span>
           </div>
-          {values.business_phone && (
-            <div className="space-y-2 flex flex-col">
-              <span className="text-sm">Número do WhatsApp</span>
-              <span className="text-sm text-muted-foreground">
-                {values.business_phone}
-              </span>
-            </div>
-          )}
-          {values.business_website && (
-            <div className="space-y-2 flex flex-col">
-              <span className="text-sm">Website do negócio</span>
-              <span className="text-sm text-muted-foreground">
-                {values.business_website}
-              </span>
-            </div>
-          )}
-          {values.business_instagram_handle && (
-            <div className="space-y-2 flex flex-col">
-              <span className="text-sm">Instagram do negócio</span>
-              <span className="text-sm text-muted-foreground">
-                @{values.business_instagram_handle}
-              </span>
-            </div>
-          )}
           {values?.specialization?.length && (
             <div className="space-y-2 flex flex-col">
               <span className="text-sm">Setor/Nicho</span>
