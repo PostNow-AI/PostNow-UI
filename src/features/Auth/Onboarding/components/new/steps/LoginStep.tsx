@@ -31,10 +31,13 @@ interface LoginStepProps {
 }
 
 export const LoginStep = ({
-  onSuccess,
+  onSuccess: _onSuccess,
   onSignupClick,
   onBack,
 }: LoginStepProps) => {
+  // _onSuccess is kept for interface compatibility but not used
+  // Users with active subscription go to /ideabank, others stay on login screen
+  void _onSuccess;
   const [showPassword, setShowPassword] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
