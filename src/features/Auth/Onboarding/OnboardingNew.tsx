@@ -239,7 +239,7 @@ export const OnboardingNew = ({
       trackStepComplete(19);
       toast.success("Perfil atualizado com sucesso!");
       onComplete?.();
-      
+      window.location.reload(); // Forçar reload para atualizar estado de assinatura e redirecionar corretamente
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
