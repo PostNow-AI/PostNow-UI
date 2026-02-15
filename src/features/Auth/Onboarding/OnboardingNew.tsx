@@ -359,11 +359,12 @@ export const OnboardingNew = ({
     );
   }
 
+
   if (!isEditMode && authMode === "login") {
     return (
       <LoginStep
         onSuccess={handleAuthSuccess}
-        onSignupClick={() => setAuthMode("signup")}
+        onSignupClick={() => setAuthMode(null)}
         onBack={() => setAuthMode(null)}
       />
     );
@@ -371,7 +372,7 @@ export const OnboardingNew = ({
 
 
   // Se já autenticado e no paywall (apenas no modo criação)
-  if (!isAuthenticated && !hasActiveSubscription) {
+  if (isAuthenticated && !hasActiveSubscription) {
     return (
       <PaywallStep
         onSelectPlan={handlePlanSelect}
