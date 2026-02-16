@@ -10,9 +10,24 @@ export const postCreationSchema = z.object({
     "lead_generation",
     "education",
   ]),
-  type: z.enum(["post", "story", "reel", "carousel"]),
+  type: z.enum(["feed", "story", "reels", "carousel"]),
   further_details: z.string().optional(),
   include_image: z.boolean(),
 });
 
 export type PostCreationFormData = z.infer<typeof postCreationSchema>;
+
+export const postTabs = [
+  {
+    id: "feed",
+    label: "Feed",
+  },
+  {
+    id: "story",
+    label: "Stories",
+  },
+  {
+    id: "reels",
+    label: "Reels",
+  },
+];

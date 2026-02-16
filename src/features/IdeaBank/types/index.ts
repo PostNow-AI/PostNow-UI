@@ -63,7 +63,7 @@ export interface PostCreationData {
     | "awareness"
     | "lead_generation"
     | "education";
-  type: "post" | "story" | "reel" | "carousel";
+  type: "feed" | "story" | "reels" | "carousel";
   further_details?: string;
   include_image: boolean;
 }

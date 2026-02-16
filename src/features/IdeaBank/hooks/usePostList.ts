@@ -7,12 +7,13 @@ import { usePostsWithIdeas } from "./usePostsWithIdeas";
 export const usePostList = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<string>("feed");
   const {
     data: postsResponse,
     isLoading,
     error,
     refetch,
-  } = usePostsWithIdeas();
+  } = usePostsWithIdeas(selectedTab);
   const deletePostMutation = useDeletePost();
 
   // Extract posts array from response
@@ -58,5 +59,7 @@ export const usePostList = () => {
     handleDeletePost,
     isDeleting: deletePostMutation.isPending,
     refetch,
+    selectedTab,
+    setSelectedTab,
   };
 };

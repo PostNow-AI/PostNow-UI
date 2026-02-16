@@ -1,13 +1,10 @@
 import parse from "html-react-parser";
 import {
-  Check,
   Copy,
   FileText,
   Image,
   Import,
   MessageSquare,
-  RefreshCw,
-  Sparkles,
 } from "lucide-react";
 
 import {
@@ -42,16 +39,8 @@ export const PostViewDialog = ({
   const {
     currentIdea,
     isLoading,
-    regeneratingIdea,
-    generatingImage,
     downloadingImage,
-    regeneratePrompt,
-    imagePrompt,
-    setRegeneratePrompt,
-    setImagePrompt,
     handleCopyContent,
-    handleRegenerateIdea,
-    handleImageGeneration,
     handleDownloadImage,
   } = usePostViewDialog(post, isOpen);
 
@@ -141,7 +130,7 @@ export const PostViewDialog = ({
                           placeholder="Nenhum conteúdo disponível"
                         />
                       )}
-                      <Button
+                      {/* <Button
                         onClick={handleRegenerateIdea}
                         disabled={regeneratingIdea || !currentIdea}
                         className="w-full"
@@ -155,7 +144,7 @@ export const PostViewDialog = ({
                         {regeneratingIdea
                           ? "Gerando novamente..."
                           : "Gerar texto novamente"}
-                      </Button>
+                      </Button> */}
                     </>
                   ) : (
                     <div className="min-h-[400px] bg-muted/30 rounded-md flex items-center justify-center text-muted-foreground">
@@ -168,7 +157,7 @@ export const PostViewDialog = ({
                       </div>
                     </div>
                   )}
-                  <Card className="bg-background">
+                  {/* <Card className="bg-background">
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
                         <Sparkles className="text-primary h-4 w-4" />
@@ -204,7 +193,7 @@ export const PostViewDialog = ({
                           : "Editar texto"}
                       </Button>
                     </CardContent>
-                  </Card>
+                  </Card> */}
                 </CardContent>
               </Card>
 
@@ -258,7 +247,7 @@ export const PostViewDialog = ({
                       </div>
                     </div>
                   )}
-                  <Button
+                  {/* <Button
                     onClick={handleImageGeneration}
                     disabled={regeneratingIdea || !currentIdea}
                     className="w-full"
@@ -312,18 +301,18 @@ export const PostViewDialog = ({
                           : "Editar imagem..."}
                       </Button>
                     </CardContent>
-                  </Card>
+                  </Card> */}
                 </CardContent>
               </Card>
             </div>
           </div>
         )}
-        <Separator className="absolute left-0 right-0 bottom-17 w-full" />
+        {/* <Separator className="absolute left-0 right-0 bottom-17 w-full" />
         <div className="flex justify-end pt-4">
           <Button onClick={onClose}>
             Salvar post <Check className="h-4 w-4" />
           </Button>
-        </div>
+        </div> */}
       </DialogContent>
     </Dialog>
   );

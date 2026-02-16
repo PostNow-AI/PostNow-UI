@@ -12,8 +12,8 @@ export const PostObjectiveEnum = z.enum([
 
 export const PostTypeEnum = z.enum([
   "live",
-  "reel",
-  "post",
+  "reels",
+  "feed",
   "carousel",
   "story",
 ]);
@@ -47,8 +47,8 @@ export const postObjectiveOptions = [
 ] as const;
 
 export const postTypeOptions = [
-  { value: "reel", label: "Reel" },
-  { value: "post", label: "Feed" },
+  { value: "reels", label: "Reel" },
+  { value: "feed", label: "Feed" },
   { value: "story", label: "Story" },
 ] as const;
 

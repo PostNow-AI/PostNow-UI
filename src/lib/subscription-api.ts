@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { AxiosError } from "axios";
 import {
+  type PaymentStatusResponse,
   type StripeCheckoutSessionRequest,
   type StripeCheckoutSessionResponse,
   type SubscriptionCancelResponse,

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -58,6 +58,7 @@
     "react-hook-form": "^7.62.0",
     "react-microsoft-clarity": "^2.0.0",
     "react-router-dom": "^7.7.1",
+    "recharts": "^3.6.0",
     "shadcn-ui": "^0.9.5",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
