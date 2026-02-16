@@ -104,11 +104,7 @@ export const BrandingStep = ({
           <Label>Estilos Visuais Preferidos * </Label>
           <div className="space-y-3">
             {visualStylePreferences?.map(
-              (preference: {
-                id: number;
-                name: string;
-                description?: string;
-              }) => {
+              (preference) => {
                 const currentIds = watchedValues.visual_style_ids || [];
                 const isChecked = currentIds.includes(preference.id.toString());
 

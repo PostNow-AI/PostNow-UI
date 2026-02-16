@@ -18,7 +18,7 @@ export function AdminRoute({ children }: ProtectedRouteProps) {
 
   // Redirect to login if not authenticated, preserving the intended destination
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/onboarding" state={{ from: location }} replace />;
   }
 
   // Redirect to home if not an admin

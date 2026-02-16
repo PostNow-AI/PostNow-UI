@@ -1,6 +1,6 @@
 import { LoadingPage } from "@/components/ui/loading";
 import { authApi, authUtils, subscribeToAuthChanges } from "@/lib/auth";
-import type { AuthContextType } from "@/types/auth";
+import type { AuthContextType, User } from "@/types/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { AuthContext } from "./auth-context";
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isLoading: userLoading,
     error,
     refetch: refetchUser,
-  } = useQuery({
+  } = useQuery<User>({
     queryKey: ["auth", "user"],
     queryFn: authApi.getCurrentUser,
     enabled: isAuthenticated && !initialLoading, // Only fetch if authenticated and initial check is done

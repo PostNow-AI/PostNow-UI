@@ -3,19 +3,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { subscriptionApiService } from "../../../lib/subscription-api";
 import { type StripeCheckoutSessionRequest } from "../../../types/subscription";
 
-export const useSubscriptionPlans = () => {
+export const useSubscriptionPlans = (enabled = true) => {
   return useQuery({
     queryKey: ["subscription-plans"],
     queryFn: subscriptionApiService.getSubscriptionPlans,
     staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled,
   });
 };
 
-export const useUserSubscription = () => {
+export const useUserSubscription = (enabled = true) => {
   return useQuery({
     queryKey: ["user-subscription"],
     queryFn: subscriptionApiService.getUserSubscription,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled,
   });
 };
 

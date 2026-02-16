@@ -49,6 +49,16 @@ export function AppSidebar() {
       icon: ClipboardList,
       url: "/ideabank",
     },
+    // {
+    //   title: "Campanhas",
+    //   icon: Zap,
+    //   url: "/campaigns",
+    // },
+    // {
+    //   title: "Carrosséis",
+    //   icon: Layers,
+    //   url: "/carousel",
+    // },
     {
       title: "Assinatura",
       icon: Wallet,

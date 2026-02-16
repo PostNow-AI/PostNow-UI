@@ -6,7 +6,7 @@ export const fetchDailyPosts = async ({
 }: {
   date: string;
 }): Promise<DailyPostsResponse> => {
-  const response = await api.get(
+  const response = await api.get<DailyPostsResponse>(
     `/api/v1/ideabank/admin/fetch-all-daily/?date=${date}`,
   );
   return response.data;

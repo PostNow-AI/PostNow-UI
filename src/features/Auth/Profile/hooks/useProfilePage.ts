@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 export const useProfilePage = () => {
   const { user } = useAuth();
-  const { setOpenOnboarding } = useOnboardingContext();
+  const { setOpenOnboarding, setEditMode, setEditData } = useOnboardingContext();
   // Fetch creator profile
   const {
     data: profile,
@@ -27,6 +27,11 @@ export const useProfilePage = () => {
       await profileApi.resetOnboardingForEdit();
     },
     onSuccess: () => {
+      // Usar o novo design (OnboardingNew) no modo edição
+      if (profile) {
+        setEditData(profile);
+        setEditMode(true);
+      }
       setOpenOnboarding(true);
     },
     onError: () => {

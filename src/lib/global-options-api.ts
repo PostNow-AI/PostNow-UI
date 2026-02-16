@@ -50,7 +50,7 @@ export interface CreateCustomFontData {
 export const globalOptionsApi = {
   // Buscar todas as profissões
   async getProfessions(): Promise<Profession[]> {
-    const response = await api.get("/api/v1/global-options/professions/");
+    const response = await api.get<{ data: Profession[] }>("/api/v1/global-options/professions/");
     return response.data.data;
   },
 
@@ -59,7 +59,7 @@ export const globalOptionsApi = {
     profession: { id: number; name: string; is_custom: boolean };
     specializations: Specialization[];
   }> {
-    const response = await api.get(
+    const response = await api.get<{ data: { profession: { id: number; name: string; is_custom: boolean }; specializations: Specialization[] } }>(
       `/api/v1/global-options/professions/${professionId}/specializations/`
     );
     return response.data.data;
@@ -67,7 +67,7 @@ export const globalOptionsApi = {
 
   // Buscar todas as fontes
   async getFonts(): Promise<FontList> {
-    const response = await api.get("/api/v1/global-options/fonts/");
+    const response = await api.get<{ data: FontList }>("/api/v1/global-options/fonts/");
     return response.data.data;
   },
 
@@ -75,7 +75,7 @@ export const globalOptionsApi = {
   async createCustomProfession(
     data: CreateCustomProfessionData
   ): Promise<Profession> {
-    const response = await api.post(
+    const response = await api.post<{ data: Profession }>(
       "/api/v1/global-options/professions/create/",
       data
     );
@@ -86,7 +86,7 @@ export const globalOptionsApi = {
   async createCustomSpecialization(
     data: CreateCustomSpecializationData
   ): Promise<Specialization> {
-    const response = await api.post(
+    const response = await api.post<{ data: Specialization }>(
       "/api/v1/global-options/specializations/create/",
       data
     );
@@ -97,7 +97,7 @@ export const globalOptionsApi = {
   async createCustomSpecializationForProfession(
     data: CreateCustomSpecializationData
   ): Promise<Specialization> {
-    const response = await api.post(
+    const response = await api.post<{ data: Specialization }>(
       "/api/v1/global-options/specializations/create-for-profession/",
       data
     );
@@ -106,7 +106,7 @@ export const globalOptionsApi = {
 
   // Criar fonte customizada
   async createCustomFont(data: CreateCustomFontData): Promise<Font> {
-    const response = await api.post(
+    const response = await api.post<{ data: Font }>(
       "/api/v1/global-options/fonts/create/",
       data
     );
