@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import { profileApi } from "../../Profile/services";
+import { useQuery } from "@tanstack/react-query";
 
 const STORAGE_KEY = "postnow_onboarding_data";
 const EXPIRY_HOURS = 24;
@@ -63,6 +65,12 @@ const getDefaultData = (): OnboardingTempData => ({
 });
 
 export const useOnboardingStorage = () => {
+    const { data: profile } = useQuery({
+    queryKey: ["creator-profile"],
+    queryFn: profileApi.getProfile,
+    retry: false,
+  });
+  
   const [data, setData] = useState<OnboardingTempData>(getDefaultData);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -72,6 +80,51 @@ export const useOnboardingStorage = () => {
     if (stored) {
       try {
         const parsed: OnboardingTempData = JSON.parse(stored);
+
+        // verificar se os items estão preenchidos, se não estiverem preencher com os dados do profile
+        if (!parsed.business_name && profile?.business_name) {
+          parsed.business_name = profile.business_name;
+        }
+        if (!parsed.business_phone && profile?.business_phone) {
+          parsed.business_phone = profile.business_phone;
+        }
+        if (!parsed.business_instagram_handle && profile?.business_instagram_handle) {
+          parsed.business_instagram_handle = profile.business_instagram_handle;
+        }
+        if (!parsed.business_website && profile?.business_website) {
+          parsed.business_website = profile.business_website;
+        }
+        if (!parsed.specialization && profile?.specialization) {
+          parsed.specialization = profile.specialization;
+        }
+        if (!parsed.business_description && profile?.business_description) {
+          parsed.business_description = profile.business_description;
+        }
+        if (!parsed.business_purpose && profile?.business_purpose) {
+          parsed.business_purpose = profile.business_purpose;
+        }
+        if ((!parsed.brand_personality || parsed.brand_personality.length === 0) && profile?.brand_personality) {
+          parsed.brand_personality = profile.brand_personality.split(", ").map((s: string) => s.trim());
+        }
+        if (!parsed.products_services && profile?.products_services) {
+          parsed.products_services = profile.products_services;
+        }
+        if (!parsed.target_audience && profile?.target_audience) {
+          parsed.target_audience = profile.target_audience;
+        }
+        if ((!parsed.target_interests || parsed.target_interests.length === 0) && profile?.target_interests) {
+          parsed.target_interests = profile.target_interests.split(", ").map((s: string) => s.trim());
+        }
+        if (!parsed.business_location && profile?.business_location) {
+          parsed.business_location = profile.business_location;
+        }
+        if (!parsed.main_competitors && profile?.main_competitors) {
+          parsed.main_competitors = profile.main_competitors;
+        }
+        if (!parsed.reference_profiles && profile?.reference_profiles) {
+          parsed.reference_profiles = profile.reference_profiles;
+        }
+
         // Verificar se expirou
         if (new Date(parsed.expires_at) > new Date()) {
           // Merge com defaults para garantir que novos campos existam
@@ -84,8 +137,9 @@ export const useOnboardingStorage = () => {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
+ 
     setIsLoaded(true);
-  }, []);
+  }, [profile]);
 
   // Salvar dados no localStorage sempre que mudarem
   const saveData = useCallback((newData: Partial<OnboardingTempData>) => {
