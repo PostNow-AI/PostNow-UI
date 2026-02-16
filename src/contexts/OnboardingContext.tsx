@@ -7,6 +7,7 @@ import { NoSubscriptionDialog } from "@/features/IdeaBank/components/NoSubscript
 import { PaymentPendingDialog } from "@/features/Subscription/components/PaymentPendingDialog";
 import { usePaymentStatus } from "@/features/Subscription/hooks/usePaymentStatus";
 import { useUserSubscription } from "@/features/Subscription/hooks/useSubscription";
+import { useAuth } from "@/hooks/useAuth";
 import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -34,6 +35,7 @@ interface OnboardingProviderProps {
 
 export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   const { isLoading, needsOnboarding } = useOnboardingFlow();
+  const { user } = useAuth();
   const [openOnboarding, setOpenOnboarding] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -43,18 +45,22 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
     useUserSubscription();
   const { data: paymentStatus } = usePaymentStatus();
 
-  const hasActiveSubscription = userSubscription?.status === "active";
+  const hasActiveSubscription = userSubscription?.status === "active" || userSubscription?.status === "trialing";
+  const isAdmin = user?.is_superuser || user?.is_staff;
 
   useEffect(() => {
-    // Open onboarding if:
-    // 1. Profile not completed (needsOnboarding)
-    // 2. OR profile completed but no active subscription (needs to complete checkout)
+    // Control onboarding based on subscription status
+    // Admins bypass subscription check - they don't need a subscription
+    // If user has paid (active/trialing), close onboarding and let them into the app
+    // If user doesn't have subscription, show onboarding
     if (!isLoading && !isSubscriptionLoading) {
-      if (needsOnboarding || !hasActiveSubscription) {
+      if (isAdmin || hasActiveSubscription) {
+        setOpenOnboarding(false);
+      } else {
         setOpenOnboarding(true);
       }
     }
-  }, [isLoading, isSubscriptionLoading, needsOnboarding, hasActiveSubscription]);
+  }, [isLoading, isSubscriptionLoading, hasActiveSubscription, isAdmin]);
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
@@ -125,7 +131,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
         />
       )}
 
-      {!hasActiveSubscription && !openOnboarding && <NoSubscriptionDialog />}
+      {!isAdmin && !hasActiveSubscription && !openOnboarding && <NoSubscriptionDialog />}
     </OnboardingContext.Provider>
   );
 };

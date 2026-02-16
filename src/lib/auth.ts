@@ -24,7 +24,7 @@ export { subscribeToAuthChanges } from "./auth-helpers";
 // API Functions for TanStack Query
 export const authApi = {
   // Authentication requests
-  login: (credentials: LoginRequest) =>
+  login: (credentials: LoginRequest): Promise<AuthResponse> =>
     authRequest(
       () => api.post<AuthResponse>("/api/v1/auth/login/", credentials),
       "Login falhou"

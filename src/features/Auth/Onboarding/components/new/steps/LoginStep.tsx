@@ -54,14 +54,21 @@ export const LoginStep = ({
 
   const loginMutation = useMutation({
     mutationFn: authApi.login,
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       queryClient.clear();
       await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Check if user is admin/superuser - bypass subscription check
+      if (data?.user?.is_superuser || data?.user?.is_staff) {
+        toast.success("Bem-vindo, admin!");
+        navigate("/admin/daily-posts");
+        return;
+      }
 
       // Check if user already has active subscription
       try {
         const subscription = await subscriptionApiService.getUserSubscription();
-        if (subscription?.status === "active") {
+        if (subscription?.status === "active" || subscription?.status === "trialing") {
           // User has active subscription, go directly to the system
           toast.success("Bem-vindo de volta!");
           navigate("/ideabank");

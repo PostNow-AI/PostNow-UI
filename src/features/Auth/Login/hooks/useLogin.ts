@@ -25,7 +25,7 @@ export function useLogin() {
 
   const loginMutation = useMutation({
     mutationFn: authApi.login,
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       // Invalidate and refetch user-related queries
       queryClient.clear();
 
@@ -35,8 +35,17 @@ export function useLogin() {
       // Small delay to ensure authentication state propagates
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Navigate to intended destination or home page
+      // Check if user is admin and came from admin route
       const from = location.state?.from?.pathname || "/ideabank";
+      const isAdmin = data?.user?.is_superuser || data?.user?.is_staff;
+
+      // If admin without specific destination, go to admin dashboard
+      if (isAdmin && from === "/ideabank") {
+        navigate("/admin/daily-posts", { replace: true });
+        return;
+      }
+
+      // Navigate to intended destination or home page
       navigate(from, { replace: true });
     },
     onError: (error: unknown) => {

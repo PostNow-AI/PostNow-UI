@@ -4,12 +4,14 @@ import { cn } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ReactNode } from "react";
+import { ProgressBarWithPhases } from "./ProgressBarWithPhases";
 
 interface MicroStepLayoutProps {
   step: number;
   totalSteps: number;
   title: string;
   subtitle?: string;
+  titleRight?: ReactNode;
   children: ReactNode;
   onNext: () => void;
   onBack?: () => void;
@@ -18,6 +20,10 @@ interface MicroStepLayoutProps {
   nextLabel?: string;
   showBack?: boolean;
   className?: string;
+  /** Usa barra de progresso com fases e checkmarks */
+  showPhases?: boolean;
+  /** Componente de preview para mostrar no header */
+  preview?: ReactNode;
 }
 
 export const MicroStepLayout = ({
@@ -25,6 +31,7 @@ export const MicroStepLayout = ({
   totalSteps,
   title,
   subtitle,
+  titleRight,
   children,
   onNext,
   onBack,
@@ -33,13 +40,15 @@ export const MicroStepLayout = ({
   nextLabel = "Continuar",
   showBack = true,
   className,
+  showPhases = true,
+  preview,
 }: MicroStepLayoutProps) => {
   const percentage = (step / totalSteps) * 100;
 
   return (
-    <div className={cn("min-h-screen flex flex-col bg-background", className)}>
+    <div className={cn("h-[100dvh] flex flex-col bg-background overflow-hidden", className)}>
       {/* Header fixo com progresso */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+      <header className="shrink-0 bg-background border-b">
         <div className="flex items-center gap-4 px-4 py-3">
           {showBack && onBack && step > 1 && (
             <Button
@@ -53,13 +62,27 @@ export const MicroStepLayout = ({
             </Button>
           )}
           <div className="flex-1">
-            <Progress value={percentage} className="h-1.5" />
+            {showPhases ? (
+              <ProgressBarWithPhases
+                currentStep={step}
+                totalSteps={totalSteps}
+                showPhaseNames={false}
+              />
+            ) : (
+              <Progress value={percentage} className="h-1.5" />
+            )}
           </div>
         </div>
+        {/* Preview progressivo (se fornecido) */}
+        {preview && (
+          <div className="px-4 pb-3">
+            {preview}
+          </div>
+        )}
       </header>
 
       {/* Conteúdo principal com animação */}
-      <main className="flex-1 flex flex-col px-4 py-6 max-w-lg mx-auto w-full">
+      <main className="flex-1 flex flex-col px-4 py-4 max-w-lg mx-auto w-full overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -67,18 +90,21 @@ export const MicroStepLayout = ({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="flex-1 flex flex-col"
+            className="flex-1 flex flex-col overflow-hidden"
           >
             {/* Título e subtítulo */}
-            <div className="mb-6 space-y-2">
-              <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+            <div className="mb-4 space-y-1 shrink-0">
+              <div className="flex items-center justify-between gap-2">
+                <h1 className="text-xl font-bold tracking-tight">{title}</h1>
+                {titleRight}
+              </div>
               {subtitle && (
                 <p className="text-muted-foreground text-sm">{subtitle}</p>
               )}
             </div>
 
             {/* Conteúdo do step */}
-            <div className="flex-1">
+            <div className="flex-1 overflow-hidden">
               {children}
             </div>
           </motion.div>
@@ -86,7 +112,7 @@ export const MicroStepLayout = ({
       </main>
 
       {/* Footer fixo com botão de continuar */}
-      <footer className="sticky bottom-0 bg-background border-t p-4 pb-safe">
+      <footer className="shrink-0 bg-background border-t p-4 pb-safe">
         <div className="max-w-lg mx-auto w-full">
           <Button
             onClick={onNext}
