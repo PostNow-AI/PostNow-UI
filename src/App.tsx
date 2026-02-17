@@ -14,6 +14,8 @@ import {
   ThemeProvider,
   Toaster,
 } from "@/components";
+import {BehaviorDashboard} from "./features/BehaviorDashboard";
+
 import { AuthProvider } from "./contexts/AuthContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { AdminDailyPosts } from "./pages/AdminDailyPosts";
@@ -121,7 +123,8 @@ const App = () => {
                 <Route
                   path="/admin/daily-posts"
                   element={<AdminDailyPosts />}
-                />
+                /> 
+                <Route path="/dashboard" element={<BehaviorDashboard/>}/>
               </Route>
 
               {/* Subscription system routes */}
