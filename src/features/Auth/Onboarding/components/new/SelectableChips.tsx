@@ -1,8 +1,18 @@
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Check, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { Plus, X } from "lucide-react";
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
+
+// Sanitiza input de usuário para prevenir XSS
+const sanitizeInput = (value: string): string => {
+  return value
+    .replace(/[<>]/g, "") // Remove < e > para prevenir tags HTML
+    .replace(/javascript:/gi, "") // Remove tentativas de javascript:
+    .replace(/on\w+=/gi, "") // Remove event handlers (onclick=, onerror=, etc)
+    .trim()
+    .slice(0, 100); // Limita tamanho máximo
+};
 
 interface SelectableChipsProps {
   options: string[];
@@ -31,13 +41,14 @@ export const SelectableChips = ({
   // Encontrar itens customizados (que não estão nas opções originais)
   const customItems = selected.filter((item) => !options.includes(item));
 
-  const handleAddCustom = () => {
-    if (customValue.trim() && !hasReachedMax) {
-      onToggle(customValue.trim());
+  const handleAddCustom = useCallback(() => {
+    const sanitized = sanitizeInput(customValue);
+    if (sanitized && !hasReachedMax && !selected.includes(sanitized)) {
+      onToggle(sanitized);
       setCustomValue("");
       setShowCustomInput(false);
     }
-  };
+  }, [customValue, hasReachedMax, selected, onToggle]);
 
   const handleCustomKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
@@ -50,28 +61,18 @@ export const SelectableChips = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="h-full flex flex-col">
       {/* Contador de seleções */}
       {showCount && maxSelections && (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="shrink-0 text-sm text-muted-foreground mb-3">
           <span>
             {selected.length} de {maxSelections} selecionados
           </span>
-          {selected.length > 0 && (
-            <button
-              type="button"
-              onClick={() => selected.forEach((s) => onToggle(s))}
-              className="text-primary hover:underline flex items-center gap-1"
-            >
-              <X className="h-3 w-3" />
-              Limpar
-            </button>
-          )}
         </div>
       )}
 
-      {/* Grid de chips */}
-      <div className="flex flex-wrap gap-2">
+      {/* Grid de chips alinhado à esquerda */}
+      <div className="flex flex-wrap gap-2 content-start" role="group" aria-label="Opções disponíveis">
         {options.map((option, index) => {
           const isSelected = selected.includes(option);
           const isDisabled = !isSelected && hasReachedMax;
@@ -80,29 +81,22 @@ export const SelectableChips = ({
             <motion.button
               key={option}
               type="button"
+              aria-pressed={isSelected}
+              aria-disabled={isDisabled}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.02 }}
+              transition={{ delay: index * 0.01 }}
               onClick={() => !isDisabled && onToggle(option)}
               disabled={isDisabled}
               className={cn(
-                "inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all",
-                "border-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                "px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap",
+                "border-2",
                 isSelected
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card text-foreground border-border hover:border-primary/50 hover:bg-primary/5",
                 isDisabled && "opacity-50 cursor-not-allowed hover:bg-card hover:border-border"
               )}
             >
-              {isSelected && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                >
-                  <Check className="h-3.5 w-3.5" />
-                </motion.span>
-              )}
               {option}
             </motion.button>
           );
@@ -113,12 +107,13 @@ export const SelectableChips = ({
           <motion.button
             key={item}
             type="button"
+            aria-pressed={true}
+            aria-label={`${item} (personalizado, clique para remover)`}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             onClick={() => onToggle(item)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border-2 bg-primary text-primary-foreground border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap border-2 bg-primary text-primary-foreground border-primary"
           >
-            <Check className="h-3.5 w-3.5" />
             {item}
           </motion.button>
         ))}
@@ -127,34 +122,45 @@ export const SelectableChips = ({
         {allowCustom && !showCustomInput && !hasReachedMax && (
           <motion.button
             type="button"
+            aria-label="Adicionar opção personalizada"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             onClick={() => setShowCustomInput(true)}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all",
-              "border-2 border-dashed border-primary/50 text-primary hover:border-primary hover:bg-primary/5",
-              "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            )}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap border-2 border-dashed border-primary/50 text-primary hover:border-primary hover:bg-primary/5"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4" aria-hidden="true" />
             Outro
           </motion.button>
         )}
       </div>
 
-      {/* Input para opção customizada */}
-      {allowCustom && showCustomInput && (
-        <motion.div
+      {/* Spacer to push input to bottom */}
+      <div className="flex-1" />
+
+      {/* Mensagem quando atingir o máximo */}
+      {hasReachedMax && !showCustomInput && (
+        <motion.p
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex gap-2"
+          className="shrink-0 text-sm text-amber-600 dark:text-amber-400 text-center"
+        >
+          Você atingiu o limite de {maxSelections} seleções
+        </motion.p>
+      )}
+
+      {/* Input para opção customizada - at bottom */}
+      {allowCustom && showCustomInput && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="shrink-0 flex gap-2"
         >
           <Input
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
             onKeyDown={handleCustomKeyDown}
             placeholder={customPlaceholder}
-            className="flex-1"
+            className="flex-1 h-10 text-sm"
             autoFocus
           />
           <button
@@ -168,30 +174,20 @@ export const SelectableChips = ({
                 : "bg-muted text-muted-foreground cursor-not-allowed"
             )}
           >
-            Adicionar
+            OK
           </button>
           <button
             type="button"
+            aria-label="Cancelar"
             onClick={() => {
               setShowCustomInput(false);
               setCustomValue("");
             }}
             className="px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </motion.div>
-      )}
-
-      {/* Mensagem quando atingir o máximo */}
-      {hasReachedMax && (
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-sm text-amber-600 dark:text-amber-400"
-        >
-          Você atingiu o limite de {maxSelections} seleções
-        </motion.p>
       )}
     </div>
   );

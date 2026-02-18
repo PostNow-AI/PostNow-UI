@@ -99,7 +99,8 @@ const PHASE_CONFIG: Record<PhaseType, PhaseConfig> = {
     detail: (data) => {
       // Estilos visuais selecionados
       if (data.visual_style_ids && data.visual_style_ids.length > 0) {
-        return `${data.visual_style_ids.length} estilo${data.visual_style_ids.length > 1 ? 's' : ''} visual${data.visual_style_ids.length > 1 ? 'is' : ''}`;
+        const count = data.visual_style_ids.length;
+        return count === 1 ? "1 estilo visual" : `${count} estilos visuais`;
       }
       return null;
     },
@@ -136,6 +137,7 @@ export const PhaseTransition = memo(({
 }: PhaseTransitionProps) => {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef(true);
 
   const config = PHASE_CONFIG[phase];
 
@@ -147,6 +149,9 @@ export const PhaseTransition = memo(({
 
   // Handler para completar transição
   const handleComplete = useCallback(() => {
+    // Prevenir chamadas após unmount
+    if (!isMountedRef.current) return;
+
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
@@ -156,11 +161,14 @@ export const PhaseTransition = memo(({
 
   // Auto-advance timer
   useEffect(() => {
+    isMountedRef.current = true;
     timerRef.current = setTimeout(handleComplete, autoAdvanceMs);
 
     return () => {
+      isMountedRef.current = false;
       if (timerRef.current) {
         clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
     };
   }, [autoAdvanceMs, handleComplete]);

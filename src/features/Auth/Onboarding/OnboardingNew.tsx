@@ -257,7 +257,6 @@ export const OnboardingNew = ({
           throw new Error("Dados incompletos");
         }
       } catch (parseError) {
-        console.error("[Onboarding] Erro ao parsear dados:", parseError);
         throw new Error("Dados do onboarding corrompidos. Por favor, reinicie o processo.");
       }
 
@@ -388,8 +387,10 @@ export const OnboardingNew = ({
     try {
       await syncMutation.mutateAsync();
     } catch (error) {
-      console.error("[Onboarding] Erro ao sincronizar:", error);
-      // Continua mesmo com erro - não bloquear o checkout
+      // CRÍTICO: Não continuar para checkout se sync falhar
+      // Dados do usuário seriam perdidos
+      toast.error("Erro ao salvar seu perfil. Tente novamente.");
+      return;
     }
 
     // Verificar se planos estão carregados
@@ -403,7 +404,6 @@ export const OnboardingNew = ({
     const targetInterval = PLAN_INTERVAL_MAP[planId as keyof typeof PLAN_INTERVAL_MAP];
 
     if (!targetInterval) {
-      console.error("[Onboarding] Plano inválido:", planId);
       toast.error("Plano inválido selecionado.");
       return;
     }
@@ -414,7 +414,6 @@ export const OnboardingNew = ({
     );
 
     if (!backendPlan) {
-      console.error("[Onboarding] Plano não encontrado:", { planId, targetInterval, availablePlans: subscriptionPlans });
       toast.error("Plano não disponível no momento. Tente novamente.");
       return;
     }
@@ -432,8 +431,7 @@ export const OnboardingNew = ({
         cancel_url: cancelUrl,
       });
       // O hook já redireciona para o Stripe automaticamente
-    } catch (error) {
-      console.error("[Onboarding] Erro ao criar checkout:", error);
+    } catch {
       toast.error("Erro ao processar pagamento. Tente novamente.");
     }
   }, [subscriptionPlans, createCheckout, syncMutation]);
