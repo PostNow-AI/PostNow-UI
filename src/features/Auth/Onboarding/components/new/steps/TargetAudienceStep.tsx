@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -142,7 +142,7 @@ const FemalePerson = ({ ageRange, scale = 1 }: { ageRange: string; scale?: numbe
   const hasGrayStrands = ageRange === "35-44" || ageRange === "45-54";
 
   return (
-    <svg width={w} height={h} viewBox="0 0 80 120" fill="none">
+    <svg width={w} height={h} viewBox="0 0 80 120" fill="none" role="img" aria-label={`Mulher, faixa etária ${ageRange}`}>
       {/* Sombra no chão */}
       <ellipse cx="40" cy="116" rx="16" ry="4" fill="#000" opacity="0.1" />
 
@@ -270,7 +270,7 @@ const MalePerson = ({ ageRange, scale = 1 }: { ageRange: string; scale?: number 
   const isBalding = ageRange === "45-54" || ageRange === "55+";
 
   return (
-    <svg width={w} height={h} viewBox="0 0 80 120" fill="none">
+    <svg width={w} height={h} viewBox="0 0 80 120" fill="none" role="img" aria-label={`Homem, faixa etária ${ageRange}`}>
       {/* Sombra no chão */}
       <ellipse cx="40" cy="116" rx="17" ry="4" fill="#000" opacity="0.1" />
 
@@ -1060,7 +1060,8 @@ export const TargetAudienceStep = ({
                   selection.ageRange.length > 0 &&
                   selection.incomeLevel.length > 0;
 
-  const people = generatePeople(selection);
+  // Memoiza pessoas para evitar re-renders desnecessários
+  const people = useMemo(() => generatePeople(selection), [selection]);
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
@@ -1095,7 +1096,11 @@ export const TargetAudienceStep = ({
         </div>
 
         {/* Área de ilustração */}
-        <div className="relative h-48 mb-6 rounded-2xl border border-border overflow-hidden">
+        <div
+          className="relative h-48 mb-6 rounded-2xl border border-border overflow-hidden"
+          role="img"
+          aria-label={`Visualização do público-alvo: ${people.length} pessoas selecionadas`}
+        >
           <SceneBackground incomeLevel={selection.incomeLevel} peopleCount={people.length} />
 
           {/* Pessoas */}
@@ -1139,6 +1144,7 @@ export const TargetAudienceStep = ({
                   <button
                     key={option.id}
                     type="button"
+                    aria-pressed={isSelected}
                     onClick={() => toggleOption("gender", option.id)}
                     className={cn(
                       "px-4 py-2.5 rounded-lg text-sm font-medium transition-all",
@@ -1167,9 +1173,10 @@ export const TargetAudienceStep = ({
                   <button
                     key={option.id}
                     type="button"
+                    aria-pressed={isSelected}
                     onClick={() => toggleOption("ageRange", option.id)}
                     className={cn(
-                      "px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                      "px-3 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
                       "border",
                       isSelected
                         ? "bg-primary text-primary-foreground border-primary"
@@ -1195,9 +1202,10 @@ export const TargetAudienceStep = ({
                   <button
                     key={option.id}
                     type="button"
+                    aria-pressed={isSelected}
                     onClick={() => toggleOption("incomeLevel", option.id)}
                     className={cn(
-                      "px-2.5 py-2.5 rounded-lg text-sm font-medium transition-all",
+                      "px-2.5 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap",
                       "border flex-1",
                       isSelected
                         ? "bg-primary text-primary-foreground border-primary"

@@ -2,7 +2,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Check, ChevronLeft, Crown, Lock } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+
+// Escapa caracteres HTML para prevenir XSS
+const escapeHtml = (text: string): string => {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+};
 
 interface Plan {
   id: string;
@@ -34,18 +41,25 @@ const getFutureDate = (days: number): string => {
   });
 };
 
-// === Obter nome do negócio do localStorage ===
+// === Obter nome do negócio do localStorage (sanitizado) ===
 const getBusinessName = (): string => {
   try {
     const stored = localStorage.getItem("postnow_onboarding_data");
     if (stored) {
       const data = JSON.parse(stored);
-      return data.business_name || "SUA MARCA";
+      const name = data.business_name || "SUA MARCA";
+      // Sanitiza para prevenir XSS e limita tamanho
+      return escapeHtml(name).slice(0, 100);
     }
   } catch {
     // Ignore errors
   }
   return "SUA MARCA";
+};
+
+// Hook para obter nome do negócio memoizado
+const useBusinessName = (): string => {
+  return useMemo(() => getBusinessName(), []);
 };
 
 // === TELA 1: Introdução ao Trial ===
@@ -59,7 +73,7 @@ const TrialIntroScreen = ({
   onContinue: () => void;
 }) => {
   const [animationPhase, setAnimationPhase] = useState<"arriving" | "waiting" | "finger-in" | "tapping" | "opening" | "open">("arriving");
-  const businessName = getBusinessName();
+  const businessName = useBusinessName(); // Memoizado para evitar re-leitura
 
   // Sequência de animação mais lenta e natural
   useEffect(() => {
