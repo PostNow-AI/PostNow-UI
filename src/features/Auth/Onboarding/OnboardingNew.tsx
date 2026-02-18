@@ -1,29 +1,34 @@
-import { useCallback, useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef, Suspense, startTransition } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { AnimatePresence } from "framer-motion";
 import { useOnboardingStorage } from "./hooks/useOnboardingStorage";
 import { useOnboardingTracking } from "./hooks/useOnboardingTracking";
 import { useCelebration } from "./hooks/useCelebration";
+import { audienceJsonToString } from "./utils/audienceUtils";
 import type { OnboardingFormData } from "./constants/onboardingSchema";
 import {
-  WelcomeStep,
-  BusinessNameStep,
-  NicheStep,
-  OfferStep,
-  PersonalityStep,
-  TargetAudienceStep,
-  InterestsStep,
-  LocationStep,
-  VoiceToneStep,
-  VisualStyleStep,
-  ColorsStep,
-  LogoStep,
-  ProfileReadyStep,
-  PreviewStep,
-  SignupStep,
-  LoginStep,
-  PaywallStep,
-} from "./components/new/steps";
+  LazyWelcomeStep as WelcomeStep,
+  LazyBusinessNameStep as BusinessNameStep,
+  LazyNicheStep as NicheStep,
+  LazyOfferStep as OfferStep,
+  LazyPersonalityStep as PersonalityStep,
+  LazyTargetAudienceStep as TargetAudienceStep,
+  LazyInterestsStep as InterestsStep,
+  LazyLocationStep as LocationStep,
+  LazyVoiceToneStep as VoiceToneStep,
+  LazyVisualStyleStep as VisualStyleStep,
+  LazyColorsStep as ColorsStep,
+  LazyLogoStep as LogoStep,
+  LazyProfileReadyStep as ProfileReadyStep,
+  LazyPreviewStep as PreviewStep,
+  LazySignupStep as SignupStep,
+  LazyLoginStep as LoginStep,
+  LazyPaywallStep as PaywallStep,
+} from "./components/new/steps/index.lazy";
+import { StepSkeleton } from "./components/new/StepSkeleton";
+import { PhaseTransition } from "./components/new/PhaseTransition";
 import {
   submitOnboardingStep1,
   submitOnboardingStep2,
@@ -38,6 +43,14 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 
 type AuthMode = "signup" | "login" | null;
+type PhaseType = "negocio" | "publico" | "marca";
+
+// Mapeamento de steps finais de cada fase para tipo de fase
+const PHASE_END_STEPS: Record<number, PhaseType> = {
+  4: "negocio",   // Step 4 é o último do Negócio
+  8: "publico",   // Step 8 é o último do Público
+  12: "marca",    // Step 12 é o último da Marca
+};
 
 interface OnboardingNewProps {
   mode?: "create" | "edit";
@@ -53,11 +66,18 @@ export const OnboardingNew = ({
   onCancel,
 }: OnboardingNewProps) => {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isEditMode = mode === "edit";
 
   const [authMode, setAuthMode] = useState<AuthMode>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const initialAuthCheckDoneRef = useRef(false);
+
+  // Estados para transição de fase
+  const [showPhaseTransition, setShowPhaseTransition] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState<PhaseType | null>(null);
 
   // Check if user is already logged in from previous session
   const { isAuthenticated: isLoggedIn } = useAuth();
@@ -87,12 +107,41 @@ export const OnboardingNew = ({
   // Celebration hook for gamification
   const { celebrateSubtle, celebrateMedium, celebrateFull } = useCelebration();
 
-  // Steps that trigger celebrations (end of each phase)
+  // Handle reset parameter - allows starting fresh with ?reset=true
+  // Uses sessionStorage to prevent accidental multiple resets in the same session
+  useEffect(() => {
+    const resetParam = searchParams.get("reset");
+    const resetKey = "onboarding_reset_done";
+    const alreadyReset = sessionStorage.getItem(resetKey);
+
+    if (resetParam === "true" && isLoaded && !isResetting && !alreadyReset) {
+      setIsResetting(true);
+      clearData();
+      clearTracking();
+      setIsAuthenticated(false);
+      setAuthMode(null);
+      initialAuthCheckDoneRef.current = false;
+
+      // Mark reset as done in this session
+      sessionStorage.setItem(resetKey, "true");
+
+      // Remove reset param from URL
+      searchParams.delete("reset");
+      setSearchParams(searchParams, { replace: true });
+
+      setTimeout(() => {
+        setIsResetting(false);
+      }, 100);
+    } else if (resetParam === "true") {
+      // Just remove the param if already reset in this session
+      searchParams.delete("reset");
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams, isLoaded, isResetting, clearData, clearTracking]);
+
+  // Steps that trigger celebrations (only at the end now - phases use subtle animation instead)
   const CELEBRATION_STEPS = {
-    4: "subtle",   // Fim da fase "Negócio"
-    8: "subtle",   // Fim da fase "Público"
-    12: "medium",  // Fim da fase "Marca"
-    13: "medium",  // Profile Ready
+    13: "full",    // Profile Ready - celebração completa!
   } as const;
 
   // Inicializar com dados no modo edição
@@ -124,11 +173,23 @@ export const OnboardingNew = ({
   }, [isEditMode, initialData, isLoaded, isInitialized, initializeWithData]);
 
   // If user is already logged in but has no subscription, jump to paywall
-  // BUT only if onboarding data exists (user completed the flow)
-  // AND user is not in login mode (to allow showing error message on login screen)
+  // BUT only if onboarding data exists (user completed the flow BEFORE)
+  // This check runs ONCE on initial load only - not when data changes during onboarding
   useEffect(() => {
+    // Skip if reset is in progress or requested via URL
+    if (isResetting || searchParams.get("reset") === "true") {
+      return;
+    }
+
+    // Only run this check once on initial load
+    if (initialAuthCheckDoneRef.current) {
+      return;
+    }
+
     if (!isEditMode && isLoaded && isLoggedIn && !hasActiveSubscription && authMode !== "login") {
-      // Verificar se os dados do onboarding foram preenchidos
+      initialAuthCheckDoneRef.current = true;
+
+      // Verificar se os dados do onboarding foram preenchidos ANTES (from localStorage)
       const hasOnboardingData = data.business_name && data.specialization && data.business_description;
 
       if (hasOnboardingData) {
@@ -139,8 +200,11 @@ export const OnboardingNew = ({
         }
       }
       // Se não tem dados do onboarding, deixa o usuário completar o fluxo
+    } else if (isLoaded) {
+      // Mark as done even if conditions weren't met, to prevent re-checking
+      initialAuthCheckDoneRef.current = true;
     }
-  }, [isEditMode, isLoaded, isLoggedIn, hasActiveSubscription, authMode, data.current_step, data.business_name, data.specialization, data.business_description, setCurrentStep]);
+  }, [isEditMode, isLoaded, isLoggedIn, hasActiveSubscription, authMode, setCurrentStep, isResetting, searchParams, data.business_name, data.specialization, data.business_description, data.current_step]);
 
   // Track step visits for funnel analytics (only in create mode)
   useEffect(() => {
@@ -185,8 +249,17 @@ export const OnboardingNew = ({
         throw new Error("Dados do onboarding não encontrados");
       }
 
-      const freshData = JSON.parse(stored);
-      console.log("[Onboarding] Dados frescos do localStorage:", freshData);
+      let freshData;
+      try {
+        freshData = JSON.parse(stored);
+        // Validação básica dos campos obrigatórios
+        if (!freshData.business_name || !freshData.specialization) {
+          throw new Error("Dados incompletos");
+        }
+      } catch (parseError) {
+        console.error("[Onboarding] Erro ao parsear dados:", parseError);
+        throw new Error("Dados do onboarding corrompidos. Por favor, reinicie o processo.");
+      }
 
       // Step 1: Business info
       const step1Payload = {
@@ -202,7 +275,7 @@ export const OnboardingNew = ({
           : freshData.brand_personality,
         products_services: freshData.products_services || "",
         business_location: freshData.business_location,
-        target_audience: freshData.target_audience,
+        target_audience: audienceJsonToString(freshData.target_audience),
         target_interests: Array.isArray(freshData.target_interests)
           ? freshData.target_interests.join(", ")
           : freshData.target_interests,
@@ -210,7 +283,6 @@ export const OnboardingNew = ({
         reference_profiles: freshData.reference_profiles,
       };
 
-      console.log("[Onboarding] Step 1 payload:", step1Payload);
       await submitOnboardingStep1(step1Payload);
 
       // Step 2: Branding
@@ -226,7 +298,6 @@ export const OnboardingNew = ({
         visual_style_ids: freshData.visual_style_ids,
       };
 
-      console.log("[Onboarding] Step 2 payload:", step2Payload);
       await submitOnboardingStep2(step2Payload);
     },
     onSuccess: () => {
@@ -279,6 +350,20 @@ export const OnboardingNew = ({
   }, [setCurrentStep]);
 
   const handleNext = useCallback(() => {
+    // Verificar se está no final de uma fase (só no modo criação)
+    const phaseType = PHASE_END_STEPS[data.current_step];
+    if (!isEditMode && phaseType) {
+      setCurrentPhase(phaseType);
+      setShowPhaseTransition(true);
+    } else {
+      goToStep(data.current_step + 1);
+    }
+  }, [data.current_step, goToStep, isEditMode]);
+
+  // Handler para quando a transição de fase terminar
+  const handlePhaseTransitionComplete = useCallback(() => {
+    setShowPhaseTransition(false);
+    setCurrentPhase(null);
     goToStep(data.current_step + 1);
   }, [data.current_step, goToStep]);
 
@@ -290,11 +375,12 @@ export const OnboardingNew = ({
 
   // Handlers de autenticação
   const handleAuthSuccess = useCallback(() => {
-    // IMPORTANTE: Definir step ANTES de mudar authMode para evitar re-render incorreto
-    // NÃO fazer chamadas API aqui - deixar para quando selecionar plano
-    setCurrentStep(16); // Ir para paywall primeiro
-    setIsAuthenticated(true);
-    setAuthMode(null);
+    // Batch all state updates to avoid multiple re-renders
+    startTransition(() => {
+      setCurrentStep(16); // Ir para paywall primeiro
+      setIsAuthenticated(true);
+      setAuthMode(null);
+    });
   }, [setCurrentStep]);
 
   const handlePlanSelect = useCallback(async (planId: string) => {
@@ -363,8 +449,8 @@ export const OnboardingNew = ({
     }
   }, [data.current_step, goToStep, clearData, onCancel]);
 
-  // Não renderizar até carregar dados do localStorage
-  if (!isLoaded) {
+  // Não renderizar até carregar dados do localStorage ou enquanto reseta
+  if (!isLoaded || isResetting) {
     return null;
   }
 
@@ -376,30 +462,51 @@ export const OnboardingNew = ({
   // Se estiver em modo de autenticação (apenas no modo criação)
   if (!isEditMode && authMode === "signup") {
     return (
-      <SignupStep
-        onSuccess={handleAuthSuccess}
-        onBack={() => setAuthMode(null)}
-      />
+      <Suspense fallback={<StepSkeleton showProgress={false} />}>
+        <SignupStep
+          onSuccess={handleAuthSuccess}
+          onBack={() => setAuthMode(null)}
+        />
+      </Suspense>
     );
   }
 
   if (!isEditMode && authMode === "login") {
     return (
-      <LoginStep
-        onSuccess={handleAuthSuccess}
-        onSignupClick={() => setAuthMode("signup")}
-        onBack={() => setAuthMode(null)}
-      />
+      <Suspense fallback={<StepSkeleton showProgress={false} />}>
+        <LoginStep
+          onSuccess={handleAuthSuccess}
+          onSignupClick={() => setAuthMode("signup")}
+          onBack={() => setAuthMode(null)}
+        />
+      </Suspense>
     );
   }
 
   // Se já autenticado e no paywall (apenas no modo criação)
   if (!isEditMode && isAuthenticated && data.current_step >= 15) {
     return (
-      <PaywallStep
-        onSelectPlan={handlePlanSelect}
-        isLoading={createCheckout.isPending || isLoadingPlans}
-      />
+      <Suspense fallback={<StepSkeleton showProgress={false} />}>
+        <PaywallStep
+          onSelectPlan={handlePlanSelect}
+          isLoading={createCheckout.isPending || isLoadingPlans}
+        />
+      </Suspense>
+    );
+  }
+
+  // Se estiver mostrando transição de fase
+  if (showPhaseTransition && currentPhase) {
+    return (
+      <AnimatePresence mode="wait">
+        <PhaseTransition
+          key={currentPhase}
+          phase={currentPhase}
+          data={data}
+          onComplete={handlePhaseTransitionComplete}
+          autoAdvanceMs={3000}
+        />
+      </AnimatePresence>
     );
   }
 
@@ -575,5 +682,9 @@ export const OnboardingNew = ({
     }
   };
 
-  return renderStep();
+  return (
+    <Suspense fallback={<StepSkeleton />}>
+      {renderStep()}
+    </Suspense>
+  );
 };

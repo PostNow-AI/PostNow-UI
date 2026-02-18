@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { audienceJsonToString } from "../utils/audienceUtils";
 
 const STORAGE_KEY = "postnow_onboarding_data";
 const EXPIRY_HOURS = 24;
@@ -132,16 +133,16 @@ export const useOnboardingStorage = () => {
   const getStep1Payload = useCallback(() => {
     return {
       business_name: data.business_name,
-      business_phone: data.business_phone,
+      business_phone: data.business_phone || "",
       business_website: data.business_website,
       business_instagram_handle: data.business_instagram_handle,
       specialization: data.specialization,
       business_description: data.business_description,
-      business_purpose: data.business_purpose,
+      business_purpose: data.business_purpose || "",
       brand_personality: data.brand_personality.join(", "), // Array → String
-      products_services: data.products_services,
+      products_services: data.products_services || "",
       business_location: data.business_location,
-      target_audience: data.target_audience,
+      target_audience: audienceJsonToString(data.target_audience), // JSON → String legível
       target_interests: data.target_interests.join(", "), // Array → String
       main_competitors: data.main_competitors,
       reference_profiles: data.reference_profiles,
