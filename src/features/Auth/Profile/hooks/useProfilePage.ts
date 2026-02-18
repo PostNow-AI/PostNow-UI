@@ -24,7 +24,7 @@ export const useProfilePage = () => {
 
   const resetOnboardingForEditMutation = useMutation({
     mutationFn: async () => {
-      await profileApi.resetOnboardingForEdit();
+      setOpenOnboarding(true);
     },
     onSuccess: () => {
       // Usar o novo design (OnboardingNew) no modo edição
@@ -32,7 +32,6 @@ export const useProfilePage = () => {
         setEditData(profile);
         setEditMode(true);
       }
-      setOpenOnboarding(true);
     },
     onError: () => {
       toast.error("Erro ao preparar onboarding para edição");

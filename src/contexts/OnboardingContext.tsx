@@ -48,14 +48,13 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
 
   useEffect(() => {
     // Open onboarding if:
-    // 1. Profile not completed (needsOnboarding)
-    // 2. OR profile completed but no active subscription (needs to complete checkout)
-    if (!isLoading && !isSubscriptionLoading) {
-      if (needsOnboarding || !hasActiveSubscription) {
+    // 2. Profile completed but no active subscription (needs to complete checkout)
+    if (!isSubscriptionLoading) {
+      if (!hasActiveSubscription) {
         setOpenOnboarding(true);
       }
     }
-  }, [isLoading, isSubscriptionLoading, needsOnboarding, hasActiveSubscription]);
+  }, [isSubscriptionLoading, hasActiveSubscription]);
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
