@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2, ChevronLeft, Sparkles } from "lucide-react";
 import type { OnboardingTempData } from "@/features/Auth/Onboarding/hooks/useOnboardingStorage";
 import { nicheOptions, visualStyleOptions, TOTAL_STEPS } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
+import { audienceToCompactString } from "@/features/Auth/Onboarding/utils/audienceUtils";
 import { ProgressBarWithPhases } from "../ProgressBarWithPhases";
 
 interface ProfileReadyStepProps {
@@ -13,47 +14,12 @@ interface ProfileReadyStepProps {
   isLoading?: boolean;
 }
 
-// Limpa "[custom]" dos valores de personalidade
+// Clean "[custom]" values from personality array
 const cleanPersonality = (personalities: string[]): string => {
   return personalities
     .filter(p => !p.startsWith("[custom]"))
     .slice(0, 3)
     .join(", ");
-};
-
-// Parse do JSON de audiência
-const parseAudience = (value: string): string => {
-  try {
-    const parsed = JSON.parse(value);
-    const parts: string[] = [];
-
-    // Gênero
-    if (parsed.gender?.includes("todos")) {
-      parts.push("Todos");
-    } else if (parsed.gender?.length > 0) {
-      const labels: Record<string, string> = { mulheres: "Mulheres", homens: "Homens" };
-      parts.push(parsed.gender.map((g: string) => labels[g] || g).join(" e "));
-    }
-
-    // Idade
-    if (parsed.ageRange?.includes("todas")) {
-      parts.push("todas as idades");
-    } else if (parsed.ageRange?.length > 0) {
-      parts.push(parsed.ageRange.join(", "));
-    }
-
-    // Classe
-    if (parsed.incomeLevel?.includes("todas")) {
-      parts.push("todas as classes");
-    } else if (parsed.incomeLevel?.length > 0) {
-      const labels: Record<string, string> = { "classe-a": "A", "classe-b": "B", "classe-c": "C" };
-      parts.push("Classe " + parsed.incomeLevel.map((c: string) => labels[c] || c).join("/"));
-    }
-
-    return parts.join(", ");
-  } catch {
-    return value;
-  }
 };
 
 // Obtém nomes dos estilos visuais selecionados
@@ -80,7 +46,7 @@ export const ProfileReadyStep = ({
     { label: "Negócio", value: data.business_name },
     { label: "Nicho", value: nicheOptions.find(n => n.id === data.specialization)?.label || data.specialization },
     { label: "Oferta", value: data.business_description ? (data.business_description.length > 40 ? data.business_description.slice(0, 40) + "..." : data.business_description) : null },
-    { label: "Público", value: data.target_audience ? parseAudience(data.target_audience) : null },
+    { label: "Público", value: data.target_audience ? audienceToCompactString(data.target_audience) : null },
     { label: "Interesses", value: data.target_interests?.length > 0 ? (data.target_interests.slice(0, 3).join(", ") + (data.target_interests.length > 3 ? ` +${data.target_interests.length - 3}` : "")) : null },
     { label: "Localização", value: data.business_location },
     { label: "Personalidade", value: data.brand_personality?.length > 0 ? cleanPersonality(data.brand_personality) : null },

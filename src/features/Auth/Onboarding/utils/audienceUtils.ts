@@ -129,3 +129,42 @@ export const audienceIncomeToString = (value: string): string | null => {
 
   return parsed.incomeLevel.map(i => INCOME_MAP[i] || i).join(", ");
 };
+
+/**
+ * Converte JSON de audiência para formato compacto de exibição.
+ * Formato: "Todos, 25-34, Classe A/B"
+ * Usado no ProfileReadyStep para resumo visual.
+ */
+export const audienceToCompactString = (value: string): string => {
+  const parsed = parseAudienceJson(value);
+
+  if (!parsed) {
+    return value || "";
+  }
+
+  const parts: string[] = [];
+
+  // Gender
+  if (parsed.gender.includes("todos")) {
+    parts.push("Todos");
+  } else if (parsed.gender.length > 0) {
+    parts.push(parsed.gender.map((g: string) => GENDER_MAP[g] || g).join(" e "));
+  }
+
+  // Age range
+  if (parsed.ageRange.includes("todas")) {
+    parts.push("todas as idades");
+  } else if (parsed.ageRange.length > 0) {
+    parts.push(parsed.ageRange.join(", "));
+  }
+
+  // Income level (compact format: "Classe A/B")
+  if (parsed.incomeLevel.includes("todas")) {
+    parts.push("todas as classes");
+  } else if (parsed.incomeLevel.length > 0) {
+    const incomeLabels: Record<string, string> = { "classe-a": "A", "classe-b": "B", "classe-c": "C" };
+    parts.push("Classe " + parsed.incomeLevel.map((c: string) => incomeLabels[c] || c).join("/"));
+  }
+
+  return parts.join(", ");
+};

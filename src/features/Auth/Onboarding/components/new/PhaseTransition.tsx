@@ -4,42 +4,9 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { OnboardingTempData } from "../../hooks/useOnboardingStorage";
 import { audienceToDisplayString, audienceIncomeToString } from "../../utils/audienceUtils";
+import { getNicheLabel, getVoiceToneLabel } from "../../utils/labelUtils";
 
 type PhaseType = "negocio" | "publico" | "marca";
-
-// Mapeamento de ID de nicho para label com acentos
-const NICHE_LABELS: Record<string, string> = {
-  saude: "Saúde & Bem-estar",
-  beleza: "Beleza & Estética",
-  educacao: "Educação",
-  moda: "Moda & Lifestyle",
-  alimentacao: "Alimentação",
-  servicos: "Serviços",
-  pet: "Pet",
-  outro: "Outro",
-};
-
-// Obtém o label do nicho ou retorna como está se for personalizado
-const getNicheLabel = (id: string) => {
-  if (!id) return id;
-  return NICHE_LABELS[id.toLowerCase()] || id;
-};
-
-// Mapeamento de ID de tom de voz para label
-const VOICE_TONE_LABELS: Record<string, string> = {
-  formal: "Formal e Profissional",
-  casual: "Casual e Amigável",
-  inspirador: "Inspirador e Motivacional",
-  educativo: "Educativo e Didático",
-  divertido: "Descontraído e Engraçado",
-  autoridade: "Autoridade no Assunto",
-};
-
-// Obtém o label do tom de voz
-const getVoiceToneLabel = (id: string) => {
-  if (!id) return id;
-  return VOICE_TONE_LABELS[id.toLowerCase()] || id;
-};
 
 interface PhaseTransitionProps {
   phase: PhaseType;
