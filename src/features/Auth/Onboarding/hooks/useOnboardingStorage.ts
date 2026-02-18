@@ -74,6 +74,7 @@ export const useOnboardingStorage = () => {
   const [data, setData] = useState<OnboardingTempData>(getDefaultData);
   const [isLoaded, setIsLoaded] = useState(false);
 
+
   // Carregar dados do localStorage na montagem
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -139,7 +140,7 @@ export const useOnboardingStorage = () => {
     }
  
     setIsLoaded(true);
-  }, [profile]);
+  }, [profile, data.current_step]);
 
   // Salvar dados no localStorage sempre que mudarem
   const saveData = useCallback((newData: Partial<OnboardingTempData>) => {
