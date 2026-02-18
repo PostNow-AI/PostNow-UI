@@ -10,7 +10,7 @@ import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Eye, EyeClosed } from "lucide-react";
+import { Eye, EyeClosed, ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -31,13 +31,10 @@ interface LoginStepProps {
 }
 
 export const LoginStep = ({
-  onSuccess: _onSuccess,
+  onSuccess,
   onSignupClick,
   onBack,
 }: LoginStepProps) => {
-  // _onSuccess is kept for interface compatibility but not used
-  // Users with active subscription go to /ideabank, others stay on login screen
-  void _onSuccess;
   const [showPassword, setShowPassword] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -78,8 +75,9 @@ export const LoginStep = ({
         console.error("[LoginStep] Error checking subscription:", error);
       }
 
-      // No active subscription, show error and stay on login screen
-      toast.error("Sua assinatura não está ativa. Por favor, faça uma nova assinatura.");
+      // No active subscription, continue to paywall
+      toast.success("Login realizado! Finalize sua assinatura.");
+      onSuccess();
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
@@ -107,8 +105,23 @@ export const LoginStep = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 flex flex-col items-center justify-center px-4 pt-8 pb-4">
+    <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
+      {/* HEADER - Apenas botão voltar */}
+      <header className="shrink-0 bg-background">
+        <div className="px-4 py-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            className="-ml-2"
+            aria-label="Voltar"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+        </div>
+      </header>
+
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-4 overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -133,6 +146,7 @@ export const LoginStep = ({
                 id="email"
                 placeholder="seu@email.com"
                 className="h-12"
+                autoComplete="email"
                 autoFocus
               />
               {errors.email && (
@@ -158,6 +172,7 @@ export const LoginStep = ({
                   type={showPassword ? "text" : "password"}
                   id="password"
                   placeholder="Sua senha"
+                  autoComplete="current-password"
                   className="h-12 pr-12"
                 />
                 <Button
@@ -166,6 +181,7 @@ export const LoginStep = ({
                   size="icon"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-1 top-1/2 -translate-y-1/2"
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
                   {showPassword ? <EyeClosed className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
@@ -217,15 +233,6 @@ export const LoginStep = ({
               Criar conta
             </button>
           </p>
-
-          {/* Back button */}
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-full text-center text-sm text-muted-foreground mt-4 hover:text-foreground"
-          >
-            Voltar
-          </button>
         </motion.div>
       </main>
     </div>

@@ -9,11 +9,12 @@ import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Eye, EyeClosed } from "lucide-react";
-import { useState } from "react";
+import { Eye, EyeClosed, Check, X, Loader2, ChevronLeft } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { cn } from "@/lib/utils";
 
 const signupSchema = z.object({
   first_name: z.string().min(1, "Nome é obrigatório"),
@@ -33,17 +34,79 @@ interface SignupStepProps {
   onBack: () => void;
 }
 
+// Email validation states
+type EmailValidationStatus = "idle" | "checking" | "available" | "taken" | "invalid";
+
 export const SignupStep = ({
   onSuccess,
   onBack,
 }: SignupStepProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<EmailValidationStatus>("idle");
+  const [emailMessage, setEmailMessage] = useState("");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const queryClient = useQueryClient();
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
+
+  // Debounced email validation
+  const checkEmail = useCallback(async (email: string) => {
+    // Basic validation first
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setEmailStatus("idle");
+      setEmailMessage("");
+      return;
+    }
+
+    setEmailStatus("checking");
+    setEmailMessage("");
+
+    try {
+      const result = await authApi.checkEmailAvailability(email);
+      if (result.available) {
+        setEmailStatus("available");
+        setEmailMessage("Email disponível");
+      } else {
+        setEmailStatus("taken");
+        setEmailMessage(result.message || "Este email já está cadastrado");
+      }
+    } catch {
+      // On error, don't block - let the registration handle it
+      setEmailStatus("idle");
+      setEmailMessage("");
+    }
+  }, []);
+
+  // Watch email field and validate with debounce
+  const emailValue = form.watch("email");
+  useEffect(() => {
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Reset status if email is empty
+    if (!emailValue) {
+      setEmailStatus("idle");
+      setEmailMessage("");
+      return;
+    }
+
+    // Debounce the API call (500ms)
+    debounceTimerRef.current = setTimeout(() => {
+      checkEmail(emailValue);
+    }, 500);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [emailValue, checkEmail]);
 
   const {
     register,
@@ -91,32 +154,53 @@ export const SignupStep = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <BetaLogo />
-            <h1 className="text-2xl font-bold mt-4">Crie sua conta</h1>
-            <p className="text-muted-foreground mt-2">
-              Para salvar seu perfil e receber ideias personalizadas
-            </p>
-          </div>
+    <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
+      {/* HEADER - Apenas botão voltar */}
+      <header className="shrink-0 bg-background">
+        <div className="px-4 py-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            className="-ml-2"
+            aria-label="Voltar"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+        </div>
+      </header>
 
-          {/* Signup form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first_name">Nome</Label>
+      {/* Título */}
+      <div className="shrink-0 px-4 pt-4 pb-2">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md mx-auto"
+        >
+          <BetaLogo />
+          <h1 className="text-xl font-bold mt-2">Crie sua conta</h1>
+        </motion.div>
+      </div>
+
+      {/* CONTEÚDO - Flexível no meio */}
+      <main className="flex-1 px-4 overflow-hidden">
+        <motion.form
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          onSubmit={handleSubmit(onSubmit)}
+          className="h-full flex flex-col max-w-md mx-auto"
+        >
+          <div className="flex-1 flex flex-col justify-center space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label htmlFor="first_name" className="text-sm">Nome</Label>
                 <Input
                   {...register("first_name")}
                   id="first_name"
                   placeholder="Seu nome"
-                  className="h-12"
+                  className="h-11"
+                  autoComplete="given-name"
                 />
                 {errors.first_name && (
                   <p className="text-destructive text-xs">
@@ -125,13 +209,14 @@ export const SignupStep = ({
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="last_name">Sobrenome</Label>
+              <div className="space-y-1">
+                <Label htmlFor="last_name" className="text-sm">Sobrenome</Label>
                 <Input
                   {...register("last_name")}
                   id="last_name"
                   placeholder="Seu sobrenome"
-                  className="h-12"
+                  className="h-11"
+                  autoComplete="family-name"
                 />
                 {errors.last_name && (
                   <p className="text-destructive text-xs">
@@ -141,38 +226,66 @@ export const SignupStep = ({
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                {...register("email")}
-                type="email"
-                id="email"
-                placeholder="seu@email.com"
-                className="h-12"
-              />
-              {errors.email && (
+            <div className="space-y-1">
+              <Label htmlFor="email" className="text-sm">Email</Label>
+              <div className="relative">
+                <Input
+                  {...register("email")}
+                  type="email"
+                  id="email"
+                  placeholder="seu@email.com"
+                  autoComplete="email"
+                  className={cn(
+                    "h-11 pr-10",
+                    emailStatus === "taken" && "border-destructive focus-visible:ring-destructive",
+                    emailStatus === "available" && "border-green-500 focus-visible:ring-green-500"
+                  )}
+                />
+                {/* Email validation indicator */}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {emailStatus === "checking" && (
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  )}
+                  {emailStatus === "available" && (
+                    <Check className="h-4 w-4 text-green-500" />
+                  )}
+                  {emailStatus === "taken" && (
+                    <X className="h-4 w-4 text-destructive" />
+                  )}
+                </div>
+              </div>
+              {/* Show email validation message or form error */}
+              {emailStatus === "taken" && emailMessage && (
+                <p className="text-destructive text-xs">{emailMessage}</p>
+              )}
+              {emailStatus === "available" && emailMessage && (
+                <p className="text-green-600 text-xs">{emailMessage}</p>
+              )}
+              {errors.email && emailStatus !== "taken" && (
                 <p className="text-destructive text-xs">
                   {errors.email.message}
                 </p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+            <div className="space-y-1">
+              <Label htmlFor="password" className="text-sm">Senha</Label>
               <div className="relative">
                 <Input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
                   id="password"
                   placeholder="Crie uma senha"
-                  className="h-12 pr-12"
+                  autoComplete="new-password"
+                  className="h-11 pr-11"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9"
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
                   {showPassword ? <EyeClosed className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
@@ -184,22 +297,24 @@ export const SignupStep = ({
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar senha</Label>
+            <div className="space-y-1">
+              <Label htmlFor="confirmPassword" className="text-sm">Confirmar senha</Label>
               <div className="relative">
                 <Input
                   {...register("confirmPassword")}
                   type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
                   placeholder="Confirme sua senha"
-                  className="h-12 pr-12"
+                  autoComplete="new-password"
+                  className="h-11 pr-11"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9"
+                  aria-label={showConfirmPassword ? "Ocultar confirmação de senha" : "Mostrar confirmação de senha"}
                 >
                   {showConfirmPassword ? <EyeClosed className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
@@ -210,46 +325,42 @@ export const SignupStep = ({
                 </p>
               )}
             </div>
+          </div>
+        </motion.form>
+      </main>
 
-            <Button
-              type="submit"
-              disabled={registerMutation.isPending}
-              className="w-full h-12 text-base"
-            >
-              {registerMutation.isPending ? <Loader /> : "Criar conta"}
-            </Button>
-          </form>
+      {/* FOOTER - Fixo embaixo */}
+      <footer className="shrink-0 px-4 pb-safe pt-2 pb-4 space-y-3">
+        <div className="max-w-md mx-auto space-y-3">
+          <Button
+            type="submit"
+            disabled={registerMutation.isPending || emailStatus === "taken" || emailStatus === "checking"}
+            onClick={handleSubmit(onSubmit)}
+            className="w-full h-11 text-base"
+          >
+            {registerMutation.isPending ? <Loader /> : "Criar conta"}
+          </Button>
 
           {/* Divider */}
-          <div className="relative my-6">
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
             </div>
-            <div className="relative flex justify-center text-sm">
+            <div className="relative flex justify-center text-xs">
               <span className="px-2 bg-background text-muted-foreground">
                 Ou continue com
               </span>
             </div>
           </div>
 
-          {/* Google button */}
           <GoogleOAuthButton
             onClick={handleGoogleSignup}
-            className="w-full h-12"
+            className="w-full h-11"
           >
             Continuar com Google
           </GoogleOAuthButton>
-
-          {/* Back button */}
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-full text-center text-sm text-muted-foreground mt-4 hover:text-foreground"
-          >
-            Voltar
-          </button>
-        </motion.div>
-      </main>
+        </div>
+      </footer>
     </div>
   );
 };
