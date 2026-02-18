@@ -84,32 +84,16 @@ export const OnboardingReview = ({
             </div>
           )}
           <div className="space-y-2 flex flex-col">
-            <span className="text-sm">Descrição do negócio</span>
+            <span className="text-sm">Oferta</span>
             <span className="text-sm text-muted-foreground">
               {values.business_description}
             </span>
           </div>
-          {values.business_purpose && (
-            <div className="space-y-2 flex flex-col">
-              <span className="text-sm">Propósito do negócio</span>
-              <span className="text-sm text-muted-foreground">
-                {values.business_purpose}
-              </span>
-            </div>
-          )}
           {values.brand_personality && (
             <div className="space-y-2 flex flex-col">
               <span className="text-sm">Personalidade da marca</span>
               <span className="text-sm text-muted-foreground">
                 {values.brand_personality}
-              </span>
-            </div>
-          )}
-          {values.products_services && (
-            <div className="space-y-2 flex flex-col">
-              <span className="text-sm">Produtos/Serviços</span>
-              <span className="text-sm text-muted-foreground">
-                {values.products_services}
               </span>
             </div>
           )}
@@ -134,22 +118,6 @@ export const OnboardingReview = ({
               <span className="text-sm">Interesses do público-alvo</span>
               <span className="text-sm text-muted-foreground">
                 {values.target_interests}
-              </span>
-            </div>
-          )}
-          {values?.main_competitors?.length && (
-            <div className="space-y-2 flex flex-col">
-              <span className="text-sm">Principais concorrentes</span>
-              <span className="text-sm text-muted-foreground">
-                {values.main_competitors}
-              </span>
-            </div>
-          )}
-          {values?.reference_profiles?.length && (
-            <div className="space-y-2 flex flex-col">
-              <span className="text-sm">Perfis de referência</span>
-              <span className="text-sm text-muted-foreground">
-                {values.reference_profiles}
               </span>
             </div>
           )}

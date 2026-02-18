@@ -21,8 +21,20 @@ export type RegisterResponse =
 // Re-export auth helpers
 export { subscribeToAuthChanges } from "./auth-helpers";
 
+// Email availability check response type
+export interface EmailCheckResponse {
+  available: boolean;
+  message: string;
+}
+
 // API Functions for TanStack Query
 export const authApi = {
+  // Email availability check (for registration form)
+  checkEmailAvailability: async (email: string): Promise<EmailCheckResponse> => {
+    const response = await api.post<EmailCheckResponse>("/api/v1/auth/check-email/", { email });
+    return response.data;
+  },
+
   // Authentication requests
   login: (credentials: LoginRequest): Promise<AuthResponse> =>
     authRequest(

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
+import { SUBSCRIPTION_CONFIG, isValidRedirectPath } from "@/config/subscription";
 import {
   useSubscriptionPlans,
   useCreateCheckoutSession,
@@ -8,11 +8,35 @@ import {
 import type { UseMutationResult } from "@tanstack/react-query";
 
 interface UseOnboardingCheckoutProps {
+  /** Se o usuário está autenticado (necessário para buscar planos) */
   isAuthenticated: boolean;
+  /** Mutation para sincronizar dados antes do checkout */
   syncMutation: UseMutationResult<void, unknown, void, unknown>;
+  /** Callback chamado após sync bem-sucedido, antes do redirect ao Stripe */
   onSyncComplete?: () => void;
 }
 
+/**
+ * Hook para gerenciar checkout do Stripe no onboarding
+ *
+ * Responsabilidades:
+ * - Buscar planos de assinatura disponíveis
+ * - Validar URLs de redirect (previne open redirect)
+ * - Sincronizar dados do onboarding antes do checkout
+ * - Criar sessão de checkout no Stripe
+ *
+ * @example
+ * ```tsx
+ * const { handlePlanSelect, isLoadingPlans, isCheckoutPending } = useOnboardingCheckout({
+ *   isAuthenticated: true,
+ *   syncMutation,
+ *   onSyncComplete: () => console.log('Ready for checkout'),
+ * });
+ *
+ * // Selecionar plano mensal
+ * await handlePlanSelect('monthly');
+ * ```
+ */
 export const useOnboardingCheckout = ({
   isAuthenticated,
   syncMutation,
@@ -56,6 +80,12 @@ export const useOnboardingCheckout = ({
 
     if (!backendPlan) {
       toast.error("Plano não disponível no momento. Tente novamente.");
+      return;
+    }
+
+    // Validar URLs de redirect (previne open redirect)
+    if (!isValidRedirectPath(STRIPE_URLS.SUCCESS) || !isValidRedirectPath(STRIPE_URLS.CANCEL)) {
+      toast.error("Erro de configuração. Contate o suporte.");
       return;
     }
 

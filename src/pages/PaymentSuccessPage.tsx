@@ -1,6 +1,7 @@
 import { ArrowRight, Verified } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -11,21 +12,31 @@ import {
 
 const PaymentSuccessPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [countdown, setCountdown] = useState(5);
 
+  // Invalidate subscription cache when page loads to get fresh data
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          navigate("/ideabank");
-          return 0;
-        }
-        return prev - 1;
-      });
+    queryClient.invalidateQueries({ queryKey: ["user-subscription"] });
+  }, [queryClient]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (countdown <= 0) return;
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [navigate]);
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  // Navigate when countdown reaches 0
+  useEffect(() => {
+    if (countdown === 0) {
+      navigate("/ideabank");
+    }
+  }, [countdown, navigate]);
 
   const handleGoToIdeaBank = () => {
     navigate("/ideabank");

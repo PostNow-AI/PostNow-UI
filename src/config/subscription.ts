@@ -3,6 +3,28 @@
  * Evita constantes duplicadas entre frontend e backend
  */
 
+/** URLs permitidas para redirect do Stripe (whitelist) */
+const ALLOWED_REDIRECT_PATHS = [
+  "/subscription/success",
+  "/onboarding",
+  "/dashboard",
+] as const;
+
+/**
+ * Valida se um path é seguro para redirect
+ * Previne open redirect attacks
+ */
+export const isValidRedirectPath = (path: string): boolean => {
+  // Deve começar com / (path relativo)
+  if (!path.startsWith("/")) return false;
+
+  // Não pode ter protocolo ou host
+  if (path.includes("://") || path.includes("//")) return false;
+
+  // Deve estar na whitelist (verifica o início do path)
+  return ALLOWED_REDIRECT_PATHS.some(allowed => path.startsWith(allowed));
+};
+
 export const SUBSCRIPTION_CONFIG = {
   /** Dias de teste grátis */
   TRIAL_DAYS: 10,
@@ -13,7 +35,7 @@ export const SUBSCRIPTION_CONFIG = {
     annual: "yearly",
   } as const,
 
-  /** URLs de retorno do Stripe */
+  /** URLs de retorno do Stripe (validadas) */
   STRIPE_URLS: {
     SUCCESS: "/subscription/success",
     CANCEL: "/onboarding?checkout=cancelled",

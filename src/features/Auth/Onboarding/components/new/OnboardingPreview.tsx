@@ -1,6 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Palette, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState, useRef, useMemo, memo } from "react";
+
+// Cores padrão do onboarding (constante para comparação)
+const DEFAULT_COLORS = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"];
+const DEFAULT_COLORS_SORTED = JSON.stringify([...DEFAULT_COLORS].sort());
 
 interface OnboardingPreviewProps {
   data: {
@@ -17,17 +22,40 @@ interface OnboardingPreviewProps {
 
 /**
  * Preview progressivo do perfil sendo construído
- * - Aparece após step 4 (descrição preenchida)
+ * - Aparece a partir do step 5 (após oferta preenchida)
  * - Expande após step 12 (cores definidas)
  * - Preview completo no step 13
  */
-export const OnboardingPreview = ({
+export const OnboardingPreview = memo(({
   data,
   currentStep,
   className,
 }: OnboardingPreviewProps) => {
-  // Só mostra após step 4
-  if (currentStep < 4) return null;
+  // Detecta mudanças nos dados para animação de pulse
+  const [isPulsing, setIsPulsing] = useState(false);
+  const prevDataRef = useRef<string>("");
+
+  // Hash de todos os campos relevantes para detectar mudanças
+  const dataHash = useMemo(() => JSON.stringify({
+    business_name: data.business_name,
+    specialization: data.specialization,
+    business_description: data.business_description,
+    voice_tone: data.voice_tone,
+    colors: data.colors,
+    logo: data.logo ? "has_logo" : "", // Não inclui base64 inteiro
+  }), [data.business_name, data.specialization, data.business_description, data.voice_tone, data.colors, data.logo]);
+
+  useEffect(() => {
+    if (prevDataRef.current && prevDataRef.current !== dataHash) {
+      setIsPulsing(true);
+      const timer = setTimeout(() => setIsPulsing(false), 300);
+      return () => clearTimeout(timer);
+    }
+    prevDataRef.current = dataHash;
+  }, [dataHash]);
+
+  // Só mostra a partir do step 5 (consistente com MicroStepLayout)
+  if (currentStep < 5) return null;
 
   const hasBasicInfo = data.business_name && data.specialization;
   const hasDescription = !!data.business_description;
@@ -35,52 +63,65 @@ export const OnboardingPreview = ({
   const hasVoiceTone = !!data.voice_tone;
   const hasLogo = !!data.logo;
 
+  // Verifica se cores foram realmente customizadas (não são as padrões)
+  const hasColorsCustomized = Boolean(
+    hasColors &&
+    JSON.stringify([...(data.colors || [])].slice(0, 5).sort()) !== DEFAULT_COLORS_SORTED
+  );
+
   // Determina o nível de expansão
   const isExpanded = currentStep >= 12;
   const isComplete = currentStep >= 13;
 
+  // AnimatePresence é controlado pelo MicroStepLayout, não precisa aqui
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        transition={{ duration: 0.3 }}
-        className={cn(
-          "bg-card/80 backdrop-blur-sm border rounded-xl p-3 shadow-lg",
-          isComplete && "ring-2 ring-primary/20",
-          className
-        )}
-      >
-        {/* Header mini */}
-        <div className="flex items-center gap-2 mb-2">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{
+        opacity: 1,
+        scale: isPulsing ? 1.02 : 1,
+      }}
+      transition={{
+        duration: isPulsing ? 0.15 : 0.2,
+        ease: "easeOut",
+      }}
+      className={cn(
+        "bg-card/80 backdrop-blur-sm border rounded-xl shadow-lg transition-shadow",
+        "p-2 sm:p-3", // Padding responsivo
+        isComplete && "ring-2 ring-primary/20",
+        isPulsing && "shadow-primary/20 shadow-md",
+        className
+      )}
+    >
+        {/* Header mini - responsivo */}
+        <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
           {hasLogo ? (
             <img
               src={data.logo}
               alt="Logo"
-              className="w-8 h-8 rounded-full object-cover"
+              className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="w-4 h-4 text-primary" />
+            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <User className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">
+            <p className="text-xs sm:text-sm font-medium truncate">
               {data.business_name || "Seu negócio"}
             </p>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
               {data.specialization || "Seu nicho"}
             </p>
           </div>
         </div>
 
-        {/* Descrição (aparece após step 4) */}
+        {/* Descrição - escondida em telas muito pequenas */}
         {hasDescription && (
           <motion.p
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
-            className="text-xs text-muted-foreground line-clamp-2 mb-2"
+            className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1 sm:line-clamp-2 mb-1.5 sm:mb-2 hidden min-[320px]:block"
           >
             {data.business_description}
           </motion.p>
@@ -95,8 +136,8 @@ export const OnboardingPreview = ({
               exit={{ opacity: 0, height: 0 }}
               className="space-y-2 pt-2 border-t"
             >
-              {/* Cores */}
-              {hasColors && (
+              {/* Cores (só mostra se customizadas) */}
+              {hasColorsCustomized && (
                 <div className="flex items-center gap-2">
                   <Palette className="w-3 h-3 text-muted-foreground" />
                   <div className="flex gap-1">
@@ -127,29 +168,31 @@ export const OnboardingPreview = ({
           )}
         </AnimatePresence>
 
-        {/* Indicador de progresso do preview */}
-        <div className="flex gap-1 mt-2 pt-2 border-t">
-          <PreviewDot filled={!!hasBasicInfo} label="Info" />
-          <PreviewDot filled={hasDescription} label="Descrição" />
-          <PreviewDot filled={hasVoiceTone} label="Tom" />
-          <PreviewDot filled={!!hasColors} label="Cores" />
-          <PreviewDot filled={hasLogo} label="Logo" />
+        {/* Indicador de progresso simplificado - dots com tooltips */}
+        <div className="flex justify-center gap-1.5 mt-2 pt-2 border-t">
+          <ProgressDot filled={!!hasBasicInfo} label="Informações básicas" />
+          <ProgressDot filled={hasDescription} label="Descrição" />
+          <ProgressDot filled={hasVoiceTone} label="Tom de voz" />
+          <ProgressDot filled={hasColorsCustomized} label="Cores personalizadas" />
+          <ProgressDot filled={hasLogo} label="Logo" />
         </div>
-      </motion.div>
-    </AnimatePresence>
+    </motion.div>
   );
-};
+});
 
-const PreviewDot = ({ filled, label }: { filled: boolean; label: string }) => (
-  <div className="flex-1 flex flex-col items-center gap-0.5">
-    <motion.div
-      initial={false}
-      animate={{
-        backgroundColor: filled ? "hsl(var(--primary))" : "hsl(var(--muted))",
-        scale: filled ? 1 : 0.8,
-      }}
-      className="w-2 h-2 rounded-full"
-    />
-    <span className="text-[9px] text-muted-foreground">{label}</span>
-  </div>
-);
+OnboardingPreview.displayName = "OnboardingPreview";
+
+const ProgressDot = memo(({ filled, label }: { filled: boolean; label: string }) => (
+  <motion.div
+    title={`${label}: ${filled ? "✓" : "pendente"}`}
+    initial={false}
+    animate={{
+      backgroundColor: filled ? "hsl(var(--primary))" : "hsl(var(--muted))",
+      scale: filled ? 1 : 0.7,
+    }}
+    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+    className="w-1.5 h-1.5 rounded-full cursor-help"
+  />
+));
+
+ProgressDot.displayName = "ProgressDot";

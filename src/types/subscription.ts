@@ -19,7 +19,7 @@ export interface UserSubscription {
   plan: SubscriptionPlan;
   start_date: string;
   end_date: string | null;
-  status: "active" | "cancelled" | "expired";
+  status: "active" | "trialing" | "cancelled" | "expired";
   status_display: string;
   stripe_subscription_id: string | null;
 }

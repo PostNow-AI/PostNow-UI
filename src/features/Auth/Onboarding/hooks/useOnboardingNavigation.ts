@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 
 type PhaseType = "negocio" | "publico" | "marca";
 
-// Mapeamento de steps finais de cada fase para tipo de fase
+/** Mapeamento de steps finais de cada fase para tipo de fase */
 const PHASE_END_STEPS: Record<number, PhaseType> = {
   4: "negocio",   // Step 4 é o último do Negócio
   8: "publico",   // Step 8 é o último do Público
@@ -10,11 +10,31 @@ const PHASE_END_STEPS: Record<number, PhaseType> = {
 };
 
 interface UseOnboardingNavigationProps {
+  /** Step atual do onboarding */
   currentStep: number;
+  /** Função para alterar o step atual */
   setCurrentStep: (step: number) => void;
+  /** Se está em modo de edição (não mostra transições de fase) */
   isEditMode: boolean;
 }
 
+/**
+ * Hook para gerenciar navegação entre steps do onboarding
+ *
+ * Gerencia:
+ * - Navegação direta para qualquer step
+ * - Avanço/retorno entre steps
+ * - Transições animadas entre fases
+ *
+ * @example
+ * ```tsx
+ * const { handleNext, handleBack, showPhaseTransition } = useOnboardingNavigation({
+ *   currentStep: data.current_step,
+ *   setCurrentStep,
+ *   isEditMode: false,
+ * });
+ * ```
+ */
 export const useOnboardingNavigation = ({
   currentStep,
   setCurrentStep,

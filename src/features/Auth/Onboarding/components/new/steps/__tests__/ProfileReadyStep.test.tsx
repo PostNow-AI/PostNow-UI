@@ -1,23 +1,39 @@
-// @ts-nocheck
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { ProfileReadyStep } from "../ProfileReadyStep";
 import type { OnboardingTempData } from "@/features/Auth/Onboarding/hooks/useOnboardingStorage";
 
-// Mock framer-motion para evitar problemas com animações
+// Mock framer-motion
 vi.mock("framer-motion", () => ({
   motion: {
-    div: ({ children, ...props }: { children: React.ReactNode }) => (
-      <div {...props}>{children}</div>
-    ),
-    h1: ({ children, ...props }: { children: React.ReactNode }) => (
-      <h1 {...props}>{children}</h1>
-    ),
-    p: ({ children, ...props }: { children: React.ReactNode }) => (
-      <p {...props}>{children}</p>
-    ),
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    h1: ({ children, ...props }: any) => <h1 {...props}>{children}</h1>,
+    p: ({ children, ...props }: any) => <p {...props}>{children}</p>,
   },
+}));
+
+// Mock ProgressBarWithPhases
+vi.mock("../../ProgressBarWithPhases", () => ({
+  ProgressBarWithPhases: () => <div data-testid="progress-bar" />,
+}));
+
+// Mock constants
+vi.mock("@/features/Auth/Onboarding/constants/onboardingNewSchema", () => ({
+  nicheOptions: [
+    { id: "marketing", label: "Marketing Digital" },
+    { id: "saude", label: "Saúde & Bem-estar" },
+  ],
+  visualStyleOptions: [
+    { id: "style1", label: "Minimalista" },
+    { id: "style2", label: "Moderno" },
+  ],
+  TOTAL_STEPS: 14,
+}));
+
+// Mock audienceUtils
+vi.mock("@/features/Auth/Onboarding/utils/audienceUtils", () => ({
+  audienceToCompactString: (value: string) => value || "Seu público",
 }));
 
 describe("ProfileReadyStep", () => {
@@ -27,21 +43,21 @@ describe("ProfileReadyStep", () => {
     business_instagram_handle: "meunegocio",
     business_website: "https://meunegocio.com",
     specialization: "marketing",
-    business_description: "Uma empresa incrível",
+    business_description: "Uma empresa incrível que oferece os melhores serviços",
     business_purpose: "Ajudar pessoas",
     brand_personality: ["Inovador", "Criativo", "Profissional"],
     products_services: "Consultoria",
     target_audience: "Empreendedores",
-    target_interests: ["Marketing", "Vendas"],
+    target_interests: ["Marketing", "Vendas", "Tecnologia", "Negócios"],
     business_location: "São Paulo, SP",
     main_competitors: "Concorrente A",
     reference_profiles: "@perfil1",
     voice_tone: "Profissional",
-    visual_style_ids: ["style1"],
+    visual_style_ids: ["style1", "style2"],
     colors: ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF"],
     logo: "",
     suggested_colors: [],
-    current_step: 17,
+    current_step: 13,
     expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   };
 
@@ -51,73 +67,50 @@ describe("ProfileReadyStep", () => {
     onBack: vi.fn(),
   };
 
-  describe("Modo Criação (padrão)", () => {
-    it('deve mostrar botão "Ver o que preparamos" no modo criação', () => {
-      render(<ProfileReadyStep {...defaultProps} />);
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
-      expect(screen.getByText("Ver o que preparamos")).toBeInTheDocument();
+  describe("Create Mode (default)", () => {
+    it("should show 'Ver o que preparamos' button in create mode", () => {
+      render(<ProfileReadyStep {...defaultProps} />);
+      expect(screen.getByRole("button", { name: /ver o que preparamos/i })).toBeInTheDocument();
     });
 
-    it("deve mostrar ícone Sparkles no modo criação", () => {
-      render(<ProfileReadyStep {...defaultProps} />);
-
-      // O botão deve conter o texto correto
-      const button = screen.getByRole("button", {
-        name: /ver o que preparamos/i,
-      });
-      expect(button).toBeInTheDocument();
-    });
-
-    it("deve chamar onNext quando botão é clicado", async () => {
+    it("should call onNext when button is clicked", async () => {
       const user = userEvent.setup();
       const onNext = vi.fn();
 
       render(<ProfileReadyStep {...defaultProps} onNext={onNext} />);
 
-      const button = screen.getByRole("button", {
-        name: /ver o que preparamos/i,
-      });
+      const button = screen.getByRole("button", { name: /ver o que preparamos/i });
       await user.click(button);
 
       expect(onNext).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe("Modo Edição", () => {
-    it('deve mostrar botão "Salvar alterações" no modo edição', () => {
+  describe("Edit Mode", () => {
+    it("should show 'Salvar alterações' button in edit mode", () => {
       render(<ProfileReadyStep {...defaultProps} isEditMode={true} />);
-
-      expect(screen.getByText("Salvar alterações")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /salvar alterações/i })).toBeInTheDocument();
     });
 
-    it("deve mostrar ícone Save no modo edição", () => {
-      render(<ProfileReadyStep {...defaultProps} isEditMode={true} />);
-
-      const button = screen.getByRole("button", {
-        name: /salvar alterações/i,
-      });
-      expect(button).toBeInTheDocument();
-    });
-
-    it("deve chamar onNext quando botão é clicado no modo edição", async () => {
+    it("should call onNext when button is clicked in edit mode", async () => {
       const user = userEvent.setup();
       const onNext = vi.fn();
 
-      render(
-        <ProfileReadyStep {...defaultProps} onNext={onNext} isEditMode={true} />
-      );
+      render(<ProfileReadyStep {...defaultProps} onNext={onNext} isEditMode={true} />);
 
-      const button = screen.getByRole("button", {
-        name: /salvar alterações/i,
-      });
+      const button = screen.getByRole("button", { name: /salvar alterações/i });
       await user.click(button);
 
       expect(onNext).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe("Estado de Loading", () => {
-    it('deve mostrar "Salvando..." quando isLoading é true', () => {
+  describe("Loading State", () => {
+    it("should show 'Salvando...' when isLoading is true", () => {
       render(
         <ProfileReadyStep
           {...defaultProps}
@@ -129,7 +122,7 @@ describe("ProfileReadyStep", () => {
       expect(screen.getByText("Salvando...")).toBeInTheDocument();
     });
 
-    it("deve desabilitar botão quando isLoading é true", () => {
+    it("should disable button when isLoading is true", () => {
       render(
         <ProfileReadyStep
           {...defaultProps}
@@ -138,12 +131,14 @@ describe("ProfileReadyStep", () => {
         />
       );
 
-      const button = screen.getByRole("button", { name: /salvando/i });
-      expect(button).toBeDisabled();
+      // Find button containing "Salvando"
+      const buttons = screen.getAllByRole("button");
+      const loadingButton = buttons.find(btn => btn.textContent?.includes("Salvando"));
+      expect(loadingButton).toBeDisabled();
     });
 
-    it("deve mostrar spinner de loading", () => {
-      render(
+    it("should show loading spinner", () => {
+      const { container } = render(
         <ProfileReadyStep
           {...defaultProps}
           isEditMode={true}
@@ -151,63 +146,118 @@ describe("ProfileReadyStep", () => {
         />
       );
 
-      // O ícone Loader2 tem classe animate-spin
-      const button = screen.getByRole("button", { name: /salvando/i });
-      expect(button.querySelector(".animate-spin")).toBeInTheDocument();
+      // The loading spinner has animate-spin class
+      expect(container.querySelector(".animate-spin")).toBeInTheDocument();
     });
   });
 
-  describe("Resumo do Perfil", () => {
-    it("deve mostrar nome do negócio", () => {
+  describe("Profile Summary", () => {
+    it("should show business name", () => {
       render(<ProfileReadyStep {...defaultProps} />);
-
       expect(screen.getByText("Meu Negócio")).toBeInTheDocument();
     });
 
-    it("deve mostrar localização", () => {
+    it("should show the Negócio label", () => {
       render(<ProfileReadyStep {...defaultProps} />);
-
-      expect(screen.getByText("São Paulo, SP")).toBeInTheDocument();
+      expect(screen.getByText("Negócio")).toBeInTheDocument();
     });
 
-    it("deve mostrar tom de voz", () => {
+    it("should show niche label", () => {
       render(<ProfileReadyStep {...defaultProps} />);
+      expect(screen.getByText("Nicho")).toBeInTheDocument();
+    });
 
+    it("should show voice tone", () => {
+      render(<ProfileReadyStep {...defaultProps} />);
       expect(screen.getByText("Profissional")).toBeInTheDocument();
     });
 
-    it("deve mostrar personalidades da marca (máx 3)", () => {
+    it("should show personality traits (max 3)", () => {
       render(<ProfileReadyStep {...defaultProps} />);
-
-      expect(
-        screen.getByText("Inovador, Criativo, Profissional")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Inovador, Criativo, Profissional")).toBeInTheDocument();
     });
 
-    it("deve mostrar cores do perfil", () => {
+    it("should show colors section", () => {
       render(<ProfileReadyStep {...defaultProps} />);
-
       expect(screen.getByText("Suas cores")).toBeInTheDocument();
+    });
+
+    it("should render color swatches", () => {
+      const { container } = render(<ProfileReadyStep {...defaultProps} />);
+      // Each color should be rendered as a div with backgroundColor
+      const colorDivs = container.querySelectorAll('[style*="background-color"]');
+      expect(colorDivs.length).toBe(5);
     });
   });
 
-  describe("Botão Voltar", () => {
-    it('deve mostrar botão "Voltar e editar"', () => {
+  describe("Back Button", () => {
+    it("should show back button with aria-label", () => {
       render(<ProfileReadyStep {...defaultProps} />);
-
-      expect(screen.getByText("Voltar e editar")).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /voltar/i })).toBeInTheDocument();
     });
 
-    it("deve chamar onBack quando clicado", async () => {
+    it("should call onBack when back button is clicked", async () => {
       const user = userEvent.setup();
       const onBack = vi.fn();
 
       render(<ProfileReadyStep {...defaultProps} onBack={onBack} />);
 
-      const backButton = screen.getByText("Voltar e editar");
+      const backButton = screen.getByRole("button", { name: /voltar/i });
       await user.click(backButton);
 
       expect(onBack).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("Logo Display", () => {
+    it("should show logo when provided", () => {
+      const dataWithLogo = {
+        ...mockData,
+        logo: "https://example.com/logo.png",
+      };
+
+      render(<ProfileReadyStep {...defaultProps} data={dataWithLogo} />);
+
+      const logo = screen.getByRole("img", { name: /logo/i });
+      expect(logo).toBeInTheDocument();
+      expect(logo).toHaveAttribute("src", "https://example.com/logo.png");
+    });
+
+    it("should not show logo section when logo is empty", () => {
+      render(<ProfileReadyStep {...defaultProps} />);
+      expect(screen.queryByRole("img", { name: /logo/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Content Truncation", () => {
+    it("should truncate long offer description", () => {
+      const dataWithLongDesc = {
+        ...mockData,
+        business_description: "Esta é uma descrição muito longa que deveria ser truncada para caber no espaço disponível",
+      };
+
+      render(<ProfileReadyStep {...defaultProps} data={dataWithLongDesc} />);
+
+      // Should show truncated text with "..."
+      expect(screen.getByText(/Esta é uma descrição muito longa que/)).toBeInTheDocument();
+    });
+
+    it("should show interests count when more than 3", () => {
+      render(<ProfileReadyStep {...defaultProps} />);
+      // With 4 interests, should show "Marketing, Vendas, Tecnologia +1"
+      expect(screen.getByText(/Marketing, Vendas, Tecnologia \+1/)).toBeInTheDocument();
+    });
+  });
+
+  describe("Success Message", () => {
+    it("should show success title", () => {
+      render(<ProfileReadyStep {...defaultProps} />);
+      expect(screen.getByText("Seu perfil está pronto!")).toBeInTheDocument();
+    });
+
+    it("should show success description", () => {
+      render(<ProfileReadyStep {...defaultProps} />);
+      expect(screen.getByText(/Confira um resumo do que você configurou/)).toBeInTheDocument();
     });
   });
 });

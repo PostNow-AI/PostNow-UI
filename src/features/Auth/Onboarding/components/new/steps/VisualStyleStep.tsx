@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { Check, Loader2, Palette } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, Palette } from "lucide-react";
 import { MicroStepLayout } from "../MicroStepLayout";
 import { TOTAL_STEPS, visualStyleOptions } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
-import { useVisualStylePreferences } from "@/features/Auth/Onboarding/hooks/useVisualStylePreferences";
+import { useState } from "react";
 
 interface VisualStyleStepProps {
   value: string[];
@@ -19,9 +19,9 @@ interface VisualStyle {
   preview_image_url?: string | null;
 }
 
-// Opções estáticas como fallback quando a API não está disponível
-const fallbackStyles: VisualStyle[] = visualStyleOptions.map((style, index) => ({
-  id: index + 1,
+// 18 estilos visuais com imagens do S3
+const visualStyles: VisualStyle[] = visualStyleOptions.map((style) => ({
+  id: style.id,
   name: style.label,
   description: style.description,
   preview_image_url: style.preview_image_url,
@@ -33,8 +33,12 @@ export const VisualStyleStep = ({
   onNext,
   onBack,
 }: VisualStyleStepProps) => {
-  const { visualStylePreferences, isLoading, isError } = useVisualStylePreferences();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
   const isValid = value.length > 0;
+
+  // 18 estilos visuais com imagens do S3
+  const preferences = visualStyles;
 
   const handleToggle = (id: string) => {
     if (value.includes(id)) {
@@ -44,130 +48,168 @@ export const VisualStyleStep = ({
     }
   };
 
-  if (isLoading && !isError) {
-    return (
-      <MicroStepLayout
-        step={14}
-        totalSteps={TOTAL_STEPS}
-        title="Escolha seu estilo visual"
-        subtitle="Carregando opções..."
-        onNext={onNext}
-        onBack={onBack}
-        isValid={false}
-      >
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </MicroStepLayout>
-    );
-  }
+  const currentStyle = preferences[currentIndex];
+  const styleId = currentStyle?.id.toString();
+  const isSelected = value.includes(styleId);
 
-  // Usar opções da API se disponíveis, senão usar fallback estático
-  const apiStyles: VisualStyle[] | undefined = visualStylePreferences?.map(pref => ({
-    id: pref.id,
-    name: pref.name,
-    description: pref.description,
-  }));
+  const paginate = (newDirection: number) => {
+    setDirection(newDirection);
+    if (newDirection > 0) {
+      // Próximo
+      setCurrentIndex((prev) => (prev === preferences.length - 1 ? 0 : prev + 1));
+    } else {
+      // Anterior
+      setCurrentIndex((prev) => (prev === 0 ? preferences.length - 1 : prev - 1));
+    }
+  };
 
-  const preferences: VisualStyle[] = (apiStyles && apiStyles.length > 0)
-    ? apiStyles
-    : fallbackStyles;
+  const goToIndex = (index: number) => {
+    setDirection(index > currentIndex ? 1 : -1);
+    setCurrentIndex(index);
+  };
+
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? "100%" : "-100%",
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? "100%" : "-100%",
+    }),
+  };
 
   return (
     <MicroStepLayout
-      step={14}
+      step={10}
       totalSteps={TOTAL_STEPS}
       title="Escolha seu estilo visual"
-      subtitle="Selecione os estilos que combinam com sua marca."
+      titleRight={
+        value.length > 0 ? (
+          <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+            {value.length}
+          </span>
+        ) : null
+      }
       onNext={onNext}
       onBack={onBack}
       isValid={isValid}
     >
-      {/* Container com cards grandes */}
-      <div className="space-y-4">
-        {preferences.map((style, index) => {
-          const styleId = style.id.toString();
-          const isSelected = value.includes(styleId);
-
-          return (
-            <motion.div
-              key={style.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={cn(
-                "cursor-pointer transition-all rounded-2xl overflow-hidden",
-                isSelected
-                  ? "ring-4 ring-primary ring-offset-2"
-                  : "ring-2 ring-border hover:ring-primary/50"
-              )}
-              onClick={() => handleToggle(styleId)}
-            >
-              {/* Imagem no formato Instagram post (4:5 - 1080x1350px) */}
-              <div className="aspect-[4/5] relative">
-                {style.preview_image_url ? (
-                  <img
-                    src={style.preview_image_url}
-                    alt={style.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-                    <Palette className="h-16 w-16 text-muted-foreground/50" />
-                  </div>
-                )}
-
-                {/* Checkbox grande no canto */}
-                <div className="absolute top-4 left-4">
-                  <div
-                    className={cn(
-                      "w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-lg",
-                      isSelected
-                        ? "bg-primary"
-                        : "bg-white/90 backdrop-blur-sm border-2 border-border"
+      <div className="h-full flex flex-col">
+        {/* Carrossel */}
+        <div className="flex-1 flex items-center justify-center overflow-hidden">
+          <div
+            className="relative w-full h-full overflow-hidden"
+            style={{ maxWidth: "calc((100vh - 280px) * 0.75)" }}
+          >
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div
+                key={currentIndex}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "spring", stiffness: 500, damping: 40 },
+                }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={1}
+                onDragEnd={(_, { offset, velocity }) => {
+                  const swipe = swipePower(offset.x, velocity.x);
+                  if (swipe < -swipeConfidenceThreshold) {
+                    paginate(1);
+                  } else if (swipe > swipeConfidenceThreshold) {
+                    paginate(-1);
+                  }
+                }}
+                className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
+                onClick={() => handleToggle(styleId)}
+              >
+                <div
+                  className="w-full overflow-hidden"
+                >
+                  {/* Imagem */}
+                  <div className="aspect-[3/4] relative">
+                    {currentStyle?.preview_image_url ? (
+                      <img
+                        src={currentStyle.preview_image_url}
+                        alt={currentStyle.name}
+                        className="w-full h-full object-cover pointer-events-none"
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+                        <Palette className="h-12 w-12 text-muted-foreground/50" />
+                      </div>
                     )}
-                  >
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
+
+                    {/* Checkbox de seleção */}
+                    <div className="absolute top-3 right-3">
+                      <div
+                        className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-lg",
+                          isSelected
+                            ? "bg-primary"
+                            : "bg-white/90 backdrop-blur-sm border-2 border-border"
+                        )}
                       >
-                        <Check className="h-5 w-5 text-white" />
-                      </motion.div>
-                    )}
+                        {isSelected && (
+                          <Check className="h-5 w-5 text-white" />
+                        )}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
 
-                {/* Nome e descrição embaixo com gradiente */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
-                  <p className="font-bold text-lg text-white drop-shadow-lg">
-                    {style.name}
-                  </p>
-                  {style.description && (
-                    <p className="text-sm text-white/80 mt-1 line-clamp-2">
-                      {style.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-
-        {preferences.length === 0 && (
-          <p className="text-center text-muted-foreground py-8">
-            Nenhum estilo visual disponível no momento.
+        {/* Nome e descrição - fora da imagem */}
+        <div className="shrink-0 text-center pt-3 pb-1">
+          <p className="font-semibold text-lg text-foreground">
+            {currentStyle?.name}
           </p>
-        )}
-      </div>
+          {currentStyle?.description && (
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {currentStyle.description}
+            </p>
+          )}
+        </div>
 
-      {/* Contador fixo */}
-      <div className="text-center text-sm text-muted-foreground mt-4 pt-4 border-t">
-        {value.length > 0
-          ? `✓ ${value.length} estilo${value.length > 1 ? "s" : ""} selecionado${value.length > 1 ? "s" : ""}`
-          : "Selecione pelo menos 1 estilo"
-        }
+        {/* Indicadores de posição */}
+        <div className="shrink-0 flex justify-center items-center gap-1 pt-3">
+          {preferences.map((style, index) => {
+            const id = style.id.toString();
+            const selected = value.includes(id);
+            return (
+              <button
+                key={style.id}
+                type="button"
+                onClick={() => goToIndex(index)}
+                className={cn(
+                  "h-1 rounded-sm transition-all",
+                  index === currentIndex
+                    ? "bg-primary w-6"
+                    : selected
+                      ? "bg-primary/50 w-3"
+                      : "bg-muted-foreground/30 w-3"
+                )}
+              />
+            );
+          })}
+        </div>
       </div>
     </MicroStepLayout>
   );

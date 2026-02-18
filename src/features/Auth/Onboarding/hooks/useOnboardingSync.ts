@@ -7,13 +7,42 @@ import { handleApiError } from "@/lib/utils/errorHandling";
 const STORAGE_KEY = "postnow_onboarding_data";
 
 interface UseOnboardingSyncProps {
+  /** Callback chamado após sync bem-sucedido (novo usuário) */
   onSyncSuccess?: () => void;
+  /** Callback chamado após update bem-sucedido (edição) */
   onUpdateSuccess?: () => void;
+  /** Função que retorna payload do step 1 (dados do negócio) */
   getStep1Payload: () => Record<string, unknown>;
+  /** Função que retorna payload do step 2 (dados de branding) */
   getStep2Payload: () => Record<string, unknown>;
+  /** Função para limpar dados do localStorage */
   clearData: () => void;
 }
 
+/**
+ * Hook para sincronizar dados do onboarding com o backend
+ *
+ * Fornece duas mutations:
+ * - `syncMutation`: Para novos usuários (lê dados frescos do localStorage)
+ * - `updateMutation`: Para edição de perfil existente (usa payloads fornecidos)
+ *
+ * @example
+ * ```tsx
+ * const { syncMutation, updateMutation } = useOnboardingSync({
+ *   onSyncSuccess: () => console.log('Sync OK'),
+ *   onUpdateSuccess: () => console.log('Update OK'),
+ *   getStep1Payload,
+ *   getStep2Payload,
+ *   clearData,
+ * });
+ *
+ * // Sincronizar novo usuário
+ * await syncMutation.mutateAsync();
+ *
+ * // Atualizar perfil existente
+ * await updateMutation.mutateAsync();
+ * ```
+ */
 export const useOnboardingSync = ({
   onSyncSuccess,
   onUpdateSuccess,

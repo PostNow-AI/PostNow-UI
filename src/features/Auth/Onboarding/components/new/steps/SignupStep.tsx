@@ -46,13 +46,15 @@ export const SignupStep = ({
   const [emailStatus, setEmailStatus] = useState<EmailValidationStatus>("idle");
   const [emailMessage, setEmailMessage] = useState("");
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Cache de validação de email para evitar requisições duplicadas
+  const emailValidationCache = useRef<Map<string, { available: boolean; message: string }>>(new Map());
   const queryClient = useQueryClient();
 
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
-  // Debounced email validation
+  // Debounced email validation with cache
   const checkEmail = useCallback(async (email: string) => {
     // Basic validation first
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,17 +64,41 @@ export const SignupStep = ({
       return;
     }
 
+    // Normalizar email para cache (lowercase)
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Verificar cache primeiro
+    const cachedResult = emailValidationCache.current.get(normalizedEmail);
+    if (cachedResult) {
+      if (cachedResult.available) {
+        setEmailStatus("available");
+        setEmailMessage("Email disponível");
+      } else {
+        setEmailStatus("taken");
+        setEmailMessage(cachedResult.message);
+      }
+      return;
+    }
+
     setEmailStatus("checking");
     setEmailMessage("");
 
     try {
       const result = await authApi.checkEmailAvailability(email);
+
+      // Armazenar no cache
+      const message = result.available ? "Email disponível" : (result.message || "Este email já está cadastrado");
+      emailValidationCache.current.set(normalizedEmail, {
+        available: result.available,
+        message,
+      });
+
       if (result.available) {
         setEmailStatus("available");
         setEmailMessage("Email disponível");
       } else {
         setEmailStatus("taken");
-        setEmailMessage(result.message || "Este email já está cadastrado");
+        setEmailMessage(message);
       }
     } catch {
       // On error, don't block - let the registration handle it

@@ -1,12 +1,12 @@
-// @ts-nocheck
+// Tests for Onboarding components
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PaywallStep } from "../PaywallStep";
 
-// Mock do PaywallScreen para isolar o teste
-vi.mock("../../PaywallScreen", () => ({
-  PaywallScreen: ({
+// Mock do PaywallFlow para isolar o teste
+vi.mock("../../PaywallFlow", () => ({
+  PaywallFlow: ({
     trialDays,
     plans,
     onSelectPlan,
@@ -17,7 +17,7 @@ vi.mock("../../PaywallScreen", () => ({
     onSelectPlan: (planId: string) => void;
     isLoading?: boolean;
   }) => (
-    <div data-testid="paywall-screen">
+    <div data-testid="paywall-flow">
       <span data-testid="trial-days">{trialDays}</span>
       <span data-testid="is-loading">{String(isLoading)}</span>
       {plans.map((plan) => (

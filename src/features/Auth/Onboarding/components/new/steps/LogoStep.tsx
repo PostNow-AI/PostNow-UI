@@ -7,6 +7,10 @@ import { TOTAL_STEPS } from "@/features/Auth/Onboarding/constants/onboardingNewS
 import { useExtractColors } from "@/hooks/useExtractColors";
 import { PreviewColorButton } from "../PreviewColorButton";
 
+// Limite de tamanho do logo (500KB)
+const MAX_LOGO_SIZE_KB = 500;
+const MAX_LOGO_SIZE_BYTES = MAX_LOGO_SIZE_KB * 1024;
+
 interface LogoStepProps {
   value: string;
   onChange: (value: string) => void;
@@ -54,8 +58,19 @@ export const LogoStep = ({
     onColorsExtracted?.(updatedColors);
   }, [extractedColors, updateColor, onColorsExtracted]);
 
+  const [sizeError, setSizeError] = useState<string | null>(null);
+
   const handleFileChange = useCallback(async (file: File) => {
+    setSizeError(null);
+
     if (!file.type.startsWith("image/")) {
+      setSizeError("Por favor, selecione uma imagem.");
+      return;
+    }
+
+    // Validar tamanho do arquivo antes de processar
+    if (file.size > MAX_LOGO_SIZE_BYTES) {
+      setSizeError(`O logo deve ter no máximo ${MAX_LOGO_SIZE_KB}KB. Seu arquivo tem ${Math.round(file.size / 1024)}KB.`);
       return;
     }
 
@@ -106,11 +121,13 @@ export const LogoStep = ({
 
   const handleRemove = useCallback(() => {
     onChange("");
-  }, [onChange]);
+    setExtractedColors([]);
+    onColorsExtracted?.([]);
+  }, [onChange, setExtractedColors, onColorsExtracted]);
 
   return (
     <MicroStepLayout
-      step={15}
+      step={11}
       totalSteps={TOTAL_STEPS}
       title="Adicione seu logo"
       subtitle="Opcional - vamos extrair as cores automaticamente!"
@@ -224,11 +241,22 @@ export const LogoStep = ({
                   ou arraste e solte seu logo aqui
                 </span>
                 <span className="text-xs text-muted-foreground mt-2">
-                  PNG, JPG ou SVG (máx. 5MB)
+                  PNG, JPG ou SVG (máx. {MAX_LOGO_SIZE_KB}KB)
                 </span>
               </>
             )}
           </label>
+        )}
+
+        {/* Mensagem de erro de tamanho */}
+        {sizeError && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-sm text-destructive text-center"
+          >
+            {sizeError}
+          </motion.p>
         )}
       </div>
     </MicroStepLayout>

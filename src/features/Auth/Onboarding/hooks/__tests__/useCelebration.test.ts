@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Tests for Onboarding components
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useCelebration } from "../useCelebration";
@@ -30,8 +30,8 @@ describe("useCelebration", () => {
       expect(mockConfetti).toHaveBeenCalledTimes(1);
       expect(mockConfetti).toHaveBeenCalledWith(
         expect.objectContaining({
-          particleCount: 15,
-          spread: 50,
+          particleCount: 25,
+          spread: 55,
           disableForReducedMotion: true,
         })
       );
@@ -133,7 +133,7 @@ describe("useCelebration", () => {
 
       expect(mockConfetti).toHaveBeenCalledWith(
         expect.objectContaining({
-          particleCount: 15,
+          particleCount: 25,
         })
       );
     });

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { render, screen } from "@testing-library/react";
 import { renderHook } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
@@ -7,124 +6,134 @@ import { ProgressBarWithPhases, usePhaseInfo } from "../ProgressBarWithPhases";
 // Mock framer-motion
 vi.mock("framer-motion", () => ({
   motion: {
-    div: ({ children, ...props }: { children: React.ReactNode }) => (
-      <div {...props}>{children}</div>
+    div: ({ children, style, className, ...props }: any) => (
+      <div style={style} className={className} {...props}>{children}</div>
     ),
   },
+  AnimatePresence: ({ children }: any) => children,
 }));
 
 describe("ProgressBarWithPhases", () => {
   const defaultProps = {
     currentStep: 1,
-    totalSteps: 14,
+    totalSteps: 12,
   };
 
-  describe("Renderização Básica", () => {
-    it("deve renderizar sem erros", () => {
-      render(<ProgressBarWithPhases {...defaultProps} />);
-
-      // Deve ter 4 indicadores de fase
-      expect(screen.getByText("1")).toBeInTheDocument();
-      expect(screen.getByText("2")).toBeInTheDocument();
-      expect(screen.getByText("3")).toBeInTheDocument();
-      expect(screen.getByText("4")).toBeInTheDocument();
+  describe("Rendering", () => {
+    it("should render without errors", () => {
+      const { container } = render(<ProgressBarWithPhases {...defaultProps} />);
+      expect(container.firstChild).toBeInTheDocument();
     });
 
-    it("deve mostrar nomes das fases quando showPhaseNames é true", () => {
-      render(<ProgressBarWithPhases {...defaultProps} showPhaseNames={true} />);
+    it("should render the progress bar background", () => {
+      const { container } = render(<ProgressBarWithPhases {...defaultProps} />);
+      expect(container.querySelector(".bg-muted")).toBeInTheDocument();
+    });
 
+    it("should render 3 phase markers", () => {
+      const { container } = render(<ProgressBarWithPhases {...defaultProps} />);
+      // 3 phase markers positioned absolutely
+      const markers = container.querySelectorAll(".absolute.top-1\\/2");
+      expect(markers.length).toBe(3);
+    });
+
+    it("should position markers at specific points", () => {
+      const { container } = render(<ProgressBarWithPhases {...defaultProps} />);
+      // Check for elements with left style positioning
+      const markers = container.querySelectorAll('[style*="left"]');
+      expect(markers.length).toBe(3);
+    });
+  });
+
+  describe("Phase Progress", () => {
+    it("should not show checkmarks on step 1 (no phase complete)", () => {
+      const { container } = render(<ProgressBarWithPhases currentStep={1} totalSteps={12} />);
+      const checkmarks = container.querySelectorAll(".lucide-check");
+      expect(checkmarks.length).toBe(0);
+    });
+
+    it("should show 1 checkmark on step 5 (phase 1 complete)", () => {
+      const { container } = render(<ProgressBarWithPhases currentStep={5} totalSteps={12} />);
+      const checkmarks = container.querySelectorAll(".lucide-check");
+      expect(checkmarks.length).toBe(1);
+    });
+
+    it("should show 2 checkmarks on step 9 (phases 1 and 2 complete)", () => {
+      const { container } = render(<ProgressBarWithPhases currentStep={9} totalSteps={12} />);
+      const checkmarks = container.querySelectorAll(".lucide-check");
+      expect(checkmarks.length).toBe(2);
+    });
+
+    it("should show 3 checkmarks on step 13 (all phases complete)", () => {
+      const { container } = render(<ProgressBarWithPhases currentStep={13} totalSteps={12} />);
+      const checkmarks = container.querySelectorAll(".lucide-check");
+      expect(checkmarks.length).toBe(3);
+    });
+  });
+
+  describe("Visual States", () => {
+    it("active phase should have primary border", () => {
+      const { container } = render(
+        <ProgressBarWithPhases currentStep={1} totalSteps={12} />
+      );
+      const activeMarker = container.querySelector(".border-primary");
+      expect(activeMarker).toBeInTheDocument();
+    });
+
+    it("complete phase should have primary background", () => {
+      const { container } = render(
+        <ProgressBarWithPhases currentStep={5} totalSteps={12} />
+      );
+      const completeMarker = container.querySelector(".bg-primary.border-primary");
+      expect(completeMarker).toBeInTheDocument();
+    });
+  });
+
+  describe("CSS Classes", () => {
+    it("should apply custom className", () => {
+      const { container } = render(
+        <ProgressBarWithPhases {...defaultProps} className="custom-class" />
+      );
+      expect(container.firstChild).toHaveClass("custom-class");
+    });
+  });
+
+  describe("Phase Labels", () => {
+    it("should show phase labels by default", () => {
+      render(<ProgressBarWithPhases {...defaultProps} />);
       expect(screen.getByText("Negócio")).toBeInTheDocument();
       expect(screen.getByText("Público")).toBeInTheDocument();
       expect(screen.getByText("Marca")).toBeInTheDocument();
-      expect(screen.getByText("Finalizar")).toBeInTheDocument();
     });
 
-    it("não deve mostrar nomes das fases por padrão", () => {
-      render(<ProgressBarWithPhases {...defaultProps} />);
-
+    it("should not show labels when showPhaseNames is false", () => {
+      render(<ProgressBarWithPhases {...defaultProps} showPhaseNames={false} />);
       expect(screen.queryByText("Negócio")).not.toBeInTheDocument();
+      expect(screen.queryByText("Público")).not.toBeInTheDocument();
+      expect(screen.queryByText("Marca")).not.toBeInTheDocument();
     });
-  });
 
-  describe("Progresso das Fases", () => {
-    it("deve marcar fase 1 como ativa no step 1", () => {
+    it("active phase label should have foreground color", () => {
       const { container } = render(
-        <ProgressBarWithPhases currentStep={1} totalSteps={14} />
+        <ProgressBarWithPhases currentStep={1} totalSteps={12} />
       );
-
-      // Fase 1 deve ter ring indicando ativa
-      const phase1 = container.querySelector(".ring-2");
-      expect(phase1).toBeInTheDocument();
+      const activeLabels = container.querySelectorAll(".text-foreground");
+      expect(activeLabels.length).toBeGreaterThan(0);
     });
 
-    it("deve marcar fase 1 como completa no step 5", () => {
-      render(<ProgressBarWithPhases currentStep={5} totalSteps={14} />);
-
-      // Fase 1 completa deve mostrar checkmark (não número)
-      expect(screen.queryByText("1")).not.toBeInTheDocument();
-    });
-
-    it("deve marcar fase 2 como ativa no step 5", () => {
+    it("complete phase label should have primary color", () => {
       const { container } = render(
-        <ProgressBarWithPhases currentStep={5} totalSteps={14} />
+        <ProgressBarWithPhases currentStep={5} totalSteps={12} />
       );
-
-      // Deve ter elemento com ring indicando fase ativa
-      const activePhase = container.querySelector(".ring-2");
-      expect(activePhase).toBeInTheDocument();
-    });
-
-    it("deve marcar fases 1 e 2 como completas no step 9", () => {
-      render(<ProgressBarWithPhases currentStep={9} totalSteps={14} />);
-
-      // Fases 1 e 2 completas não mostram números
-      expect(screen.queryByText("1")).not.toBeInTheDocument();
-      expect(screen.queryByText("2")).not.toBeInTheDocument();
-      // Fases 3 e 4 ainda mostram números
-      expect(screen.getByText("3")).toBeInTheDocument();
-      expect(screen.getByText("4")).toBeInTheDocument();
-    });
-
-    it("deve marcar todas as fases exceto última como completas no step 13", () => {
-      render(<ProgressBarWithPhases currentStep={13} totalSteps={14} />);
-
-      // Apenas fase 4 mostra número
-      expect(screen.queryByText("1")).not.toBeInTheDocument();
-      expect(screen.queryByText("2")).not.toBeInTheDocument();
-      expect(screen.queryByText("3")).not.toBeInTheDocument();
-      expect(screen.getByText("4")).toBeInTheDocument();
-    });
-  });
-
-  describe("Barra de Progresso", () => {
-    it("deve ter largura proporcional ao progresso", () => {
-      const { container } = render(
-        <ProgressBarWithPhases currentStep={7} totalSteps={14} />
-      );
-
-      // 7/14 = 50%
-      const progressBar = container.querySelector(".bg-primary");
-      expect(progressBar).toBeInTheDocument();
-    });
-  });
-
-  describe("Classes CSS", () => {
-    it("deve aplicar className customizada", () => {
-      const { container } = render(
-        <ProgressBarWithPhases
-          {...defaultProps}
-          className="custom-class"
-        />
-      );
-
-      expect(container.firstChild).toHaveClass("custom-class");
+      const completeLabels = container.querySelectorAll(".text-primary");
+      expect(completeLabels.length).toBeGreaterThan(0);
     });
   });
 });
 
 describe("usePhaseInfo", () => {
-  describe("Informações da Fase", () => {
-    it("deve retornar fase Negócio para steps 1-4", () => {
+  describe("Phase Information", () => {
+    it("should return Negócio phase for steps 1-4", () => {
       const { result: result1 } = renderHook(() => usePhaseInfo(1));
       expect(result1.current.phaseName).toBe("Negócio");
       expect(result1.current.phaseIndex).toBe(0);
@@ -133,49 +142,49 @@ describe("usePhaseInfo", () => {
       expect(result4.current.phaseName).toBe("Negócio");
     });
 
-    it("deve retornar fase Público para steps 5-8", () => {
+    it("should return Público phase for steps 5-8", () => {
       const { result } = renderHook(() => usePhaseInfo(5));
       expect(result.current.phaseName).toBe("Público");
       expect(result.current.phaseIndex).toBe(1);
     });
 
-    it("deve retornar fase Marca para steps 9-12", () => {
+    it("should return Marca phase for steps 9-12", () => {
       const { result } = renderHook(() => usePhaseInfo(9));
       expect(result.current.phaseName).toBe("Marca");
       expect(result.current.phaseIndex).toBe(2);
     });
 
-    it("deve retornar fase Finalizar para steps 13-14", () => {
+    it("should return Marca phase for steps beyond 12", () => {
       const { result } = renderHook(() => usePhaseInfo(13));
-      expect(result.current.phaseName).toBe("Finalizar");
-      expect(result.current.phaseIndex).toBe(3);
+      expect(result.current.phaseName).toBe("Marca");
+      expect(result.current.phaseIndex).toBe(2);
     });
   });
 
-  describe("Posição na Fase", () => {
-    it("deve identificar primeiro step da fase", () => {
+  describe("Position in Phase", () => {
+    it("should identify first step of phase", () => {
       const { result } = renderHook(() => usePhaseInfo(1));
       expect(result.current.isFirstStepOfPhase).toBe(true);
       expect(result.current.isLastStepOfPhase).toBe(false);
     });
 
-    it("deve identificar último step da fase", () => {
+    it("should identify last step of phase", () => {
       const { result } = renderHook(() => usePhaseInfo(4));
       expect(result.current.isFirstStepOfPhase).toBe(false);
       expect(result.current.isLastStepOfPhase).toBe(true);
     });
 
-    it("deve identificar step do meio da fase", () => {
+    it("should identify middle step of phase", () => {
       const { result } = renderHook(() => usePhaseInfo(2));
       expect(result.current.isFirstStepOfPhase).toBe(false);
       expect(result.current.isLastStepOfPhase).toBe(false);
     });
   });
 
-  describe("Total de Fases", () => {
-    it("deve retornar total de 4 fases", () => {
+  describe("Total Phases", () => {
+    it("should return total of 3 phases", () => {
       const { result } = renderHook(() => usePhaseInfo(1));
-      expect(result.current.totalPhases).toBe(4);
+      expect(result.current.totalPhases).toBe(3);
     });
   });
 });

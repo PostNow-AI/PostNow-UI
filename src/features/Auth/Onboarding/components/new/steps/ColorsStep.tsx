@@ -33,10 +33,9 @@ export const ColorsStep = ({
 
   return (
     <MicroStepLayout
-      step={16}
+      step={12}
       totalSteps={TOTAL_STEPS}
-      title="Suas cores"
-      subtitle="Escolha uma paleta ou personalize suas cores da marca."
+      title="Paletas sugeridas"
       onNext={onNext}
       onBack={onBack}
       isValid={isValid}

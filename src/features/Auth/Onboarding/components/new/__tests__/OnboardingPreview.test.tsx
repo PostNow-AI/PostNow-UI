@@ -1,4 +1,4 @@
-// @ts-nocheck
+// Tests for Onboarding components
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import { OnboardingPreview } from "../OnboardingPreview";
@@ -29,16 +29,16 @@ describe("OnboardingPreview", () => {
   };
 
   describe("Visibilidade", () => {
-    it("não deve renderizar antes do step 4", () => {
+    it("não deve renderizar antes do step 5", () => {
       const { container } = render(
-        <OnboardingPreview data={baseData} currentStep={3} />
+        <OnboardingPreview data={baseData} currentStep={4} />
       );
 
       expect(container.firstChild).toBeNull();
     });
 
-    it("deve renderizar a partir do step 4", () => {
-      render(<OnboardingPreview data={baseData} currentStep={4} />);
+    it("deve renderizar a partir do step 5", () => {
+      render(<OnboardingPreview data={baseData} currentStep={5} />);
 
       expect(screen.getByText("Meu Negócio")).toBeInTheDocument();
     });
@@ -137,14 +137,14 @@ describe("OnboardingPreview", () => {
   });
 
   describe("Indicadores de Progresso", () => {
-    it("deve mostrar 5 indicadores de progresso", () => {
-      render(<OnboardingPreview data={baseData} currentStep={5} />);
+    it("deve mostrar 5 dots de progresso", () => {
+      const { container } = render(
+        <OnboardingPreview data={baseData} currentStep={5} />
+      );
 
-      expect(screen.getByText("Info")).toBeInTheDocument();
-      expect(screen.getByText("Descrição")).toBeInTheDocument();
-      expect(screen.getByText("Tom")).toBeInTheDocument();
-      expect(screen.getByText("Cores")).toBeInTheDocument();
-      expect(screen.getByText("Logo")).toBeInTheDocument();
+      // 5 dots simplificados (sem labels)
+      const dots = container.querySelectorAll(".w-1\\.5.h-1\\.5.rounded-full");
+      expect(dots.length).toBe(5);
     });
   });
 
@@ -152,8 +152,8 @@ describe("OnboardingPreview", () => {
     it("deve mostrar ícone padrão quando não tem logo", () => {
       render(<OnboardingPreview data={baseData} currentStep={5} />);
 
-      // Deve ter o ícone User como fallback
-      const userIcon = document.querySelector(".w-8.h-8.rounded-full");
+      // Deve ter o ícone User como fallback (tamanho responsivo)
+      const userIcon = document.querySelector(".rounded-full.bg-primary\\/10");
       expect(userIcon).toBeInTheDocument();
     });
 

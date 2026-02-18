@@ -37,7 +37,7 @@ export const NicheStep = ({
 
   return (
     <MicroStepLayout
-      step={4}
+      step={3}
       totalSteps={TOTAL_STEPS}
       title="Qual é o seu nicho de atuação?"
       subtitle="Escolha a área que melhor representa seu negócio."
@@ -45,23 +45,27 @@ export const NicheStep = ({
       onBack={onBack}
       isValid={isValid}
     >
-      <div className="space-y-4">
-        <SelectableCards
-          options={nicheOptions}
-          selected={value}
-          onSelect={handleSelect}
-          columns={2}
-          size="sm"
-        />
+      <div className="h-full flex flex-col">
+        <div className="flex-1 overflow-hidden">
+          <SelectableCards
+            options={nicheOptions}
+            selected={value}
+            onSelect={handleSelect}
+            columns={2}
+            size="sm"
+          />
+        </div>
 
         {isOther && (
-          <Input
-            value={customNiche}
-            onChange={(e) => setCustomNiche(e.target.value)}
-            placeholder="Digite seu nicho..."
-            className="h-12 text-base"
-            autoFocus
-          />
+          <div className="shrink-0 pt-3">
+            <Input
+              value={customNiche}
+              onChange={(e) => setCustomNiche(e.target.value)}
+              placeholder="Digite seu nicho..."
+              className="h-10 text-sm"
+              autoFocus
+            />
+          </div>
         )}
       </div>
     </MicroStepLayout>

@@ -14,15 +14,15 @@ export const useCelebration = () => {
    */
   const celebrateSubtle = useCallback(() => {
     confetti({
-      particleCount: 15,
-      spread: 50,
+      particleCount: 25,
+      spread: 55,
       origin: { y: 0.7 },
       colors: BRAND_COLORS,
       disableForReducedMotion: true,
-      scalar: 0.8,
-      gravity: 1.2,
+      scalar: 0.85,
+      gravity: 1.0,
       drift: 0,
-      ticks: 150,
+      ticks: 180,
     });
   }, []);
 
