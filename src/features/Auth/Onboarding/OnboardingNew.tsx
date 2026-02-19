@@ -79,6 +79,8 @@ export const OnboardingNew = ({
     getStep2Payload,
     isLoaded,
     initializeWithData,
+    linkDataToUser,
+    sessionId,
   } = useOnboardingStorage();
 
   // Tracking hook for funnel analytics
@@ -265,12 +267,31 @@ export const OnboardingNew = ({
   }, [data.current_step, goToStep]);
 
   // Handlers de autenticação
-  const handleAuthSuccess = useCallback(() => {
+  const handleAuthSuccess = useCallback(async () => {
     // IMPORTANTE: Definir step ANTES de mudar authMode para evitar re-render incorreto
-    // NÃO fazer chamadas API aqui - deixar para quando selecionar plano
-    setCurrentStep(19); // Ir para paywall primeiro
     setAuthMode(null);
-  }, [setCurrentStep]);
+
+    // Primeiro, tentar vincular dados temporários do backend ao usuário
+    try {
+      const linked = await linkDataToUser();
+      if (linked) {
+        console.log("[Onboarding] Dados temporários vinculados ao perfil");
+      }
+    } catch (error) {
+      console.warn("[Onboarding] Erro ao vincular dados temporários:", error);
+    }
+
+    // Sincronizar dados do localStorage com o backend (fallback/atualização)
+    try {
+      await syncMutation.mutateAsync();
+    } catch (error) {
+      console.error("[Onboarding] Erro ao sincronizar:", error);
+      toast.error("Erro ao salvar seus dados. Tente novamente.");
+    }
+
+    // Ir para paywall
+    setCurrentStep(19);
+  }, [syncMutation, setCurrentStep, linkDataToUser]);
 
   const handlePlanSelect = useCallback(async (planId: string) => {
     // Sincronizar dados do onboarding com o backend primeiro

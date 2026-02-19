@@ -1,10 +1,12 @@
 import { cookieUtils } from "@/lib/api";
+import { linkTempDataToUser } from "@/features/Auth/Onboarding/services";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 const ONBOARDING_FLAG_KEY = "postnow_from_onboarding";
+const ONBOARDING_SESSION_KEY = "postnow_onboarding_session_id";
 
 export function useGoogleCallback() {
   const [searchParams] = useSearchParams();
@@ -48,6 +50,20 @@ export function useGoogleCallback() {
       // Authentication was successful - invalidate auth queries and redirect
       queryClient.invalidateQueries({ queryKey: ["auth", "user"] });
       toast.success("Login com Google realizado com sucesso!");
+
+      // Se veio do onboarding, vincular dados temporários ao perfil
+      if (fromOnboarding) {
+        const sessionId = localStorage.getItem(ONBOARDING_SESSION_KEY);
+        if (sessionId) {
+          try {
+            await linkTempDataToUser(sessionId);
+            console.log("[GoogleCallback] Dados de onboarding vinculados ao perfil");
+          } catch (error) {
+            console.warn("[GoogleCallback] Erro ao vincular dados de onboarding:", error);
+          }
+          localStorage.removeItem(ONBOARDING_SESSION_KEY);
+        }
+      }
 
       // Determinar para onde redirecionar
       // Se veio do onboarding, continuar o fluxo de onboarding (que vai para subscription)
