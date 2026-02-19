@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ReactNode } from "react";
-import { useEffect, useRef, useCallback, memo, useMemo } from "react";
+import { useEffect, useRef, useCallback, memo } from "react";
 import { ProgressBarWithPhases } from "./ProgressBarWithPhases";
 import { useOnboardingA11y } from "../../hooks/useOnboardingA11y";
 

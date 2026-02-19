@@ -57,7 +57,8 @@ export const PersonalityQuizStep = ({
   const [phase, setPhase] = useState<QuizPhase>(initialState.phase);
   const [direction, setDirection] = useState<1 | -1>(1);
   const [skippedQuestions, setSkippedQuestions] = useState<number[]>([]);
-  const [customAnswers, setCustomAnswers] = useState<Record<number, string>>({});
+  // Reserved for future use: custom text answers
+  const [, setCustomAnswers] = useState<Record<number, string>>({});
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [currentCustomText, setCurrentCustomText] = useState("");
   const [extraQuestionIndex, setExtraQuestionIndex] = useState(0);
@@ -123,11 +124,11 @@ export const PersonalityQuizStep = ({
     }
   }, [answers, currentQuestion, phase, extraQuestionIndex, onChange]);
 
-  // Mostra campo de texto customizado
-  const handleShowCustomInput = useCallback(() => {
-    setCurrentCustomText(customAnswers[currentQuestion] || "");
-    setShowCustomInput(true);
-  }, [currentQuestion, customAnswers]);
+  // Reserved for future use: show custom input field
+  // const handleShowCustomInput = useCallback(() => {
+  //   setCurrentCustomText(customAnswers[currentQuestion] || "");
+  //   setShowCustomInput(true);
+  // }, [currentQuestion, customAnswers]);
 
   // Confirma resposta customizada e avança
   const handleConfirmCustom = useCallback(() => {
@@ -174,11 +175,11 @@ export const PersonalityQuizStep = ({
     }
   }, [currentQuestion, currentCustomText, answers, onChange, skippedQuestions, phase, extraQuestionIndex]);
 
-  // Cancela input customizado
-  const handleCancelCustom = useCallback(() => {
-    setShowCustomInput(false);
-    setCurrentCustomText("");
-  }, []);
+  // Reserved for future use: cancel custom input
+  // const handleCancelCustom = useCallback(() => {
+  //   setShowCustomInput(false);
+  //   setCurrentCustomText("");
+  // }, []);
 
   // Inicia o quiz extra
   const handleStartExtraQuiz = useCallback(() => {

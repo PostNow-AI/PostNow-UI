@@ -223,11 +223,13 @@ export const OnboardingNew = ({
         if (celebrationType) {
           // Small delay to let the transition happen first
           setTimeout(() => {
-            if (celebrationType === "subtle") {
+            // Currently only "full" is used, but keeping flexibility for future
+            const type = celebrationType as string;
+            if (type === "subtle") {
               celebrateSubtle();
-            } else if (celebrationType === "medium") {
+            } else if (type === "medium") {
               celebrateMedium();
-            } else if (celebrationType === "full") {
+            } else if (type === "full") {
               celebrateFull();
             }
           }, 300);

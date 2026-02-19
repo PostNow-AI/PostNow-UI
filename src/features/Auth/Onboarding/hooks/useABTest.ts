@@ -160,20 +160,22 @@ export const useABTest = () => {
    * Integrar com seu sistema de analytics (Mixpanel, Amplitude, etc)
    */
   const trackConversion = useCallback(
-    (experimentId: string, eventName: string, properties?: Record<string, unknown>) => {
+    (experimentId: string, eventName: string, _properties?: Record<string, unknown>) => {
       const assignment = assignments[experimentId];
       if (!assignment) return;
 
-      const eventData = {
-        experiment_id: experimentId,
-        variant: assignment.variant,
-        event: eventName,
-        assigned_at: assignment.assignedAt,
-        ...properties,
-      };
-
       // TODO: Integrar com analytics
+      // const eventData = {
+      //   experiment_id: experimentId,
+      //   variant: assignment.variant,
+      //   event: eventName,
+      //   assigned_at: assignment.assignedAt,
+      //   ..._properties,
+      // };
       // analytics.track("ab_test_conversion", eventData);
+
+      // Log for debugging (remove in production)
+      console.debug("AB Test conversion:", experimentId, eventName, assignment.variant);
     },
     [assignments]
   );

@@ -211,7 +211,8 @@ export const MalePerson = ({ ageRange, scale = 1 }: { ageRange: string; scale?: 
   const hairColor = ageRange === "55+" ? "#BDBDBD" : ageRange === "45-54" ? "#5D4037" : ageRange === "35-44" ? "#6D4C41" : "#3E2723";
   const hasGlasses = ageRange === "35-44" || ageRange === "55+";
   const hasBeard = ageRange === "25-34" || ageRange === "45-54" || ageRange === "55+";
-  const isBalding = ageRange === "45-54" || ageRange === "55+";
+  // Reserved for future use: balding hairstyle for older age ranges
+  // const isBalding = ageRange === "45-54" || ageRange === "55+";
 
   return (
     <svg width={w} height={h} viewBox="0 0 80 120" fill="none" role="img" aria-label={`Homem, faixa etária ${ageRange}`}>

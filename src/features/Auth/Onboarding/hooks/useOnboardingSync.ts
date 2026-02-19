@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { submitOnboardingStep1, submitOnboardingStep2 } from "../services";
+import { submitOnboardingStep1, submitOnboardingStep2, type OnboardingStep1Data, type OnboardingStep2Data } from "../services";
 import { audienceJsonToString } from "../utils/audienceUtils";
 import { handleApiError } from "@/lib/utils/errorHandling";
 
@@ -128,11 +128,11 @@ export const useOnboardingSync = ({
   const updateMutation = useMutation({
     mutationFn: async () => {
       // Step 1: Business info
-      const step1Payload = getStep1Payload();
+      const step1Payload = getStep1Payload() as unknown as OnboardingStep1Data;
       await submitOnboardingStep1(step1Payload);
 
       // Step 2: Branding
-      const step2Payload = getStep2Payload();
+      const step2Payload = getStep2Payload() as unknown as OnboardingStep2Data;
       await submitOnboardingStep2(step2Payload);
     },
     onSuccess: () => {

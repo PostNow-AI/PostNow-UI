@@ -1,7 +1,8 @@
 import { useEffect, useRef, useCallback, memo, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-import { cn } from "@/lib/utils";
+// cn imported but not currently used - keeping for future styling
+// import { cn } from "@/lib/utils";
 import type { OnboardingTempData } from "../../hooks/useOnboardingStorage";
 import { audienceToDisplayString, audienceIncomeToString } from "../../utils/audienceUtils";
 import { getNicheLabel, getVoiceToneLabel } from "../../utils/labelUtils";
