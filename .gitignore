@@ -25,3 +25,11 @@ dist-ssr
 
 .env
 .vercel
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Temporary files
+QA_DIAGNOSTIC.md
