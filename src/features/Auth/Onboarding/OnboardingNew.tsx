@@ -27,6 +27,7 @@ import {
   PaywallStep,
 } from "./components/new/steps";
 import {
+  generateSingleClientContext,
   submitOnboardingStep1,
   submitOnboardingStep2,
 } from "./services";
@@ -232,12 +233,14 @@ export const OnboardingNew = ({
       await submitOnboardingStep2(step2Payload);
       
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       clearData();
       trackStepComplete(19);
       toast.success("Perfil atualizado com sucesso!");
       onComplete?.();
+      await generateSingleClientContext();
+      
       window.location.reload(); // Forçar reload para atualizar estado de assinatura e redirecionar corretamente
     },
     onError: (error: unknown) => {
