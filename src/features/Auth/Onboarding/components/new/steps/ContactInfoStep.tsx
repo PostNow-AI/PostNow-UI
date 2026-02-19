@@ -1,4 +1,3 @@
-import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MicroStepLayout } from "../MicroStepLayout";
@@ -18,31 +17,25 @@ interface ContactInfoStepProps {
   stepNumber: number;
 }
 
-// Validation functions
-const validateInstagram = (value: string): string | undefined => {
-  if (!value) return undefined;
-  const clean = value.replace(/^@/, "");
-  if (!/^[a-zA-Z0-9._]{1,30}$/.test(clean)) {
+// Validação do Instagram: apenas letras, números, _ e . (máx 30 caracteres)
+const validateInstagram = (value: string): string | null => {
+  if (!value) return null; // Campo opcional
+  if (value.length > 30) {
     return "Use apenas letras, números, _ e . (máx 30 caracteres)";
   }
-  return undefined;
+  if (!/^[a-zA-Z0-9_.]*$/.test(value)) {
+    return "Use apenas letras, números, _ e . (máx 30 caracteres)";
+  }
+  return null;
 };
 
-const validateWebsite = (value: string): string | undefined => {
-  if (!value) return undefined;
-
-  // Verificar se tem espaços ou caracteres inválidos
-  if (/\s/.test(value)) {
+// Validação do Website: não pode ter espaços
+const validateWebsite = (value: string): string | null => {
+  if (!value) return null; // Campo opcional
+  if (value.includes(" ")) {
     return "URL não pode conter espaços";
   }
-
-  // Regex básica para URL
-  const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/i;
-  if (!urlPattern.test(value)) {
-    return "URL inválida. Ex: https://seunegocio.com";
-  }
-
-  return undefined;
+  return null;
 };
 
 export const ContactInfoStep = ({
@@ -56,34 +49,25 @@ export const ContactInfoStep = ({
   onBack,
   stepNumber,
 }: ContactInfoStepProps) => {
-  const [errors, setErrors] = useState<{ instagram?: string; website?: string }>({});
+  // Validações
+  const phoneDigits = phone.replace(/\D/g, "").length;
+  const isPhoneValid = phoneDigits >= 10;
+  const instagramError = validateInstagram(instagram);
+  const websiteError = validateWebsite(website);
 
-  // Telefone é obrigatório + validation errors
-  const isValid = phone.replace(/\D/g, "").length >= 10 && !errors.instagram && !errors.website;
+  // Formulário válido: telefone OK e sem erros nos campos opcionais
+  const isValid = isPhoneValid && !instagramError && !websiteError;
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const masked = phoneMask(e.target.value);
     onPhoneChange(masked);
   };
 
-  const handleInstagramChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInstagramChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Remover @ se o usuário digitar
     const value = e.target.value.replace(/^@/, "");
     onInstagramChange(value);
-
-    // Validate on change
-    const error = validateInstagram(value);
-    setErrors(prev => ({ ...prev, instagram: error }));
-  }, [onInstagramChange]);
-
-  const handleWebsiteChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    onWebsiteChange(value);
-
-    // Validate on change
-    const error = validateWebsite(value);
-    setErrors(prev => ({ ...prev, website: error }));
-  }, [onWebsiteChange]);
+  };
 
   return (
     <MicroStepLayout
@@ -130,11 +114,14 @@ export const ContactInfoStep = ({
               value={instagram}
               onChange={handleInstagramChange}
               placeholder="seu_usuario"
-              className={cn("h-12 pl-10", errors.instagram && "border-red-500")}
+              className={cn(
+                "h-12 pl-10",
+                instagramError && "border-red-500"
+              )}
             />
           </div>
-          {errors.instagram && (
-            <p className="text-xs text-red-500">{errors.instagram}</p>
+          {instagramError && (
+            <p className="text-xs text-red-500">{instagramError}</p>
           )}
         </div>
 
@@ -144,12 +131,16 @@ export const ContactInfoStep = ({
           <Input
             id="website"
             value={website}
-            onChange={handleWebsiteChange}
+            onChange={(e) => onWebsiteChange(e.target.value)}
             placeholder="https://www.seunegocio.com"
-            className={cn("h-12", errors.website && "border-red-500")}
+            className={cn(
+              "h-12",
+              websiteError && "border-red-500"
+            )}
+            type="url"
           />
-          {errors.website && (
-            <p className="text-xs text-red-500">{errors.website}</p>
+          {websiteError && (
+            <p className="text-xs text-red-500">{websiteError}</p>
           )}
         </div>
       </div>

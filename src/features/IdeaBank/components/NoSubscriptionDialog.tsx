@@ -21,8 +21,11 @@ export const NoSubscriptionDialog = () => {
     const cancelUrl = `${baseUrl}${STRIPE_URLS.CANCEL}`;
 
     try {
+      const baseUrl = window.location.origin;
       await createCheckout.mutateAsync({
         plan_id: 12,
+        success_url: `${baseUrl}/subscription/success`,
+        cancel_url: `${baseUrl}/subscription/cancel`,
         upgrade: false,
         success_url: successUrl,
         cancel_url: cancelUrl,
@@ -65,7 +68,7 @@ export const NoSubscriptionDialog = () => {
               </li>
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                Apenas R$ 10 até dia 25 de Dezembro
+                Apenas R$ 49,99 enquanto durar a promoção
               </li>
               <li className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 bg-white rounded-full" />7 dias de
@@ -77,7 +80,7 @@ export const NoSubscriptionDialog = () => {
           <Button className="w-full" onClick={() => handleSubscribe()}>
             {!createCheckout.isPending ? (
               <>
-                <CreditCard /> Comprar agora por {formatToBRL(10)}
+                <CreditCard /> Comprar agora por {formatToBRL(49.99)}
               </>
             ) : (
               <>

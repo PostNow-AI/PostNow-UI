@@ -10,8 +10,10 @@ import type {
 
 export const ideaBankService = {
   // Get all posts with their ideas
-  async getPostsWithIdeas(): Promise<PostsWithIdeasResponse> {
-    const response = await api.get<PostsWithIdeasResponse>("api/v1/ideabank/posts/all-with-ideas/");
+  async getPostsWithIdeas(postType: string): Promise<PostsWithIdeasResponse> {
+    const response = await api.get("api/v1/ideabank/posts/all-with-ideas/", {
+      params: { post_type: postType },
+    });
     return response.data;
   },
 

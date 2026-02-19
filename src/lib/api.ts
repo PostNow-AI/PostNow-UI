@@ -24,6 +24,12 @@ const COOKIE_OPTIONS = {
 const ACCESS_TOKEN_COOKIE = "access";
 const REFRESH_TOKEN_COOKIE = "refresh";
 
+// Auth state change event (must match auth-helpers.ts)
+const AUTH_STATE_CHANGED = "auth-state-changed";
+const dispatchAuthStateChange = () => {
+  window.dispatchEvent(new CustomEvent(AUTH_STATE_CHANGED));
+};
+
 // Cookie utility functions
 export const cookieUtils = {
   setTokens: (accessToken: string, refreshToken: string) => {
@@ -48,6 +54,8 @@ export const cookieUtils = {
   removeTokens: () => {
     Cookies.remove(ACCESS_TOKEN_COOKIE);
     Cookies.remove(REFRESH_TOKEN_COOKIE);
+    // Notify components of authentication state change
+    dispatchAuthStateChange();
   },
 
   updateAccessToken: (accessToken: string) => {
@@ -136,9 +144,12 @@ api.interceptors.response.use(
         processQueue(error, null);
         isRefreshing = false;
 
-        // Redirect to login page (except during onboarding flow)
-        if (typeof window !== "undefined" && !window.location.pathname.includes("/onboarding")) {
-          window.location.href = "/login";
+        // Redirect to login page (but NOT if on onboarding page)
+        if (typeof window !== "undefined") {
+          const isOnboardingPage = window.location.pathname.startsWith("/onboarding");
+          if (!isOnboardingPage) {
+            window.location.href = "/onboarding";
+          }
         }
 
         return Promise.reject(error);
@@ -146,8 +157,8 @@ api.interceptors.response.use(
 
       try {
         // Attempt to refresh the token
-        const response = await axios.post<{ access: string }>(`${API_BASE_URL}/api/v1/auth/refresh/`, {
-          refresh: refreshToken,
+        const response = await axios.post<{ access_token: string }>(`${API_BASE_URL}/api/auth/refresh/`, {
+          refresh_token: refreshToken,
         });
 
         const { access } = response.data;
@@ -166,9 +177,12 @@ api.interceptors.response.use(
         cookieUtils.removeTokens();
         processQueue(refreshError as Error, null);
 
-        // Redirect to login page (except during onboarding flow)
-        if (typeof window !== "undefined" && !window.location.pathname.includes("/onboarding")) {
-          window.location.href = "/login";
+        // Redirect to login page (but NOT if on onboarding page)
+        if (typeof window !== "undefined") {
+          const isOnboardingPage = window.location.pathname.startsWith("/onboarding");
+          if (!isOnboardingPage) {
+            window.location.href = "/onboarding";
+          }
         }
 
         return Promise.reject(refreshError);

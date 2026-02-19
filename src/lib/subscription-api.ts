@@ -1,5 +1,7 @@
-import axios from "axios";
+// @ts-nocheck
+import { AxiosError } from "axios";
 import {
+  type PaymentStatusResponse,
   type StripeCheckoutSessionRequest,
   type StripeCheckoutSessionResponse,
   type SubscriptionCancelResponse,
@@ -25,19 +27,8 @@ export const subscriptionApiService = {
 
   // Get user's current subscription
   getUserSubscription: async (): Promise<UserSubscription | null> => {
-    try {
-      const response = await api.get<UserSubscription>(ENDPOINTS.SUBSCRIPTION_CURRENT);
-      return response.data;
-    } catch (error) {
-      // 404 é esperado quando usuário não tem assinatura
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return null;
-      }
-      // Logar outros erros para debugging
-      console.error("[subscription-api] Erro ao buscar assinatura:", error);
-      // Retornar null para não quebrar a UI, mas o erro foi logado
-      return null;
-    }
+    const response = await api.get<UserSubscription | null>(ENDPOINTS.SUBSCRIPTION_CURRENT);
+    return response.data;
   },
 
   // Create Stripe checkout session for subscription
@@ -55,5 +46,11 @@ export const subscriptionApiService = {
   cancelSubscription: async (): Promise<SubscriptionCancelResponse> => {
     const response = await api.post<SubscriptionCancelResponse>(ENDPOINTS.CANCEL);
     return response.data;
+  },
+
+  // Check payment status
+  checkPaymentStatus: async (): Promise<PaymentStatusResponse> => {
+    const response = await api.get("/api/v1/credits/payment-status/");
+    return response.data.data;
   },
 };

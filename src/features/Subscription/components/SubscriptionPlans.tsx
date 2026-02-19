@@ -56,8 +56,11 @@ export const SubscriptionPlans = () => {
     const cancelUrl = `${baseUrl}${STRIPE_URLS.CANCEL}`;
 
     try {
+      const baseUrl = window.location.origin;
       await createCheckout.mutateAsync({
         plan_id: plan.id,
+        success_url: `${baseUrl}/subscription/success`,
+        cancel_url: `${baseUrl}/subscription/cancel`,
         upgrade: currentSubscription ? true : false,
         success_url: successUrl,
         cancel_url: cancelUrl,
@@ -190,7 +193,7 @@ export const SubscriptionPlans = () => {
                   {plan.description}
                 </p>
                 <div className="mt-4 space-y-1 flex flex-col items-start">
-                  {(plan.benefits ?? []).map((benefit, index) => (
+                  {plan.benefits?.map((benefit, index) => (
                     <div
                       className="flex flex-row items-center gap-2"
                       key={index}

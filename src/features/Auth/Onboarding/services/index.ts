@@ -3,25 +3,25 @@ import type { OnboardingFormData } from "../constants/onboardingSchema";
 
 // Tipos para os steps do novo onboarding
 export interface OnboardingStep1Data {
-  business_name: string | null;
-  business_phone: string | null;
-  business_website?: string | null;
-  business_instagram_handle?: string | null;
-  specialization: string | null;
-  business_description: string | null;
-  business_purpose: string | null;
-  brand_personality: string | null;
-  products_services: string | null;
-  business_location: string | null;
-  target_audience: string | null;
-  target_interests?: string | null;
-  main_competitors?: string | null;
-  reference_profiles?: string | null;
+  business_name: string;
+  business_phone: string;
+  business_website?: string;
+  business_instagram_handle?: string;
+  specialization: string;
+  business_description: string;
+  business_purpose: string;
+  brand_personality: string;
+  products_services: string;
+  business_location: string;
+  target_audience: string;
+  target_interests?: string;
+  main_competitors?: string;
+  reference_profiles?: string;
 }
 
 export interface OnboardingStep2Data {
-  voice_tone: string | null;
-  logo?: string | null;
+  voice_tone: string;
+  logo?: string;
   color_1?: string;
   color_2?: string;
   color_3?: string;

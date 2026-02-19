@@ -22,13 +22,21 @@ export const useProfilePage = () => {
     return new Date(dateString).toLocaleDateString("pt-BR");
   };
 
-  const openEditOnboarding = useCallback(() => {
-    if (profile) {
-      setEditData(profile);
-      setEditMode(true);
+  const resetOnboardingForEditMutation = useMutation({
+    mutationFn: async () => {
       setOpenOnboarding(true);
-    }
-  }, [profile, setEditData, setEditMode, setOpenOnboarding]);
+    },
+    onSuccess: () => {
+      // Usar o novo design (OnboardingNew) no modo edição
+      if (profile) {
+        setEditData(profile);
+        setEditMode(true);
+      }
+    },
+    onError: () => {
+      toast.error("Erro ao preparar onboarding para edição");
+    },
+  });
 
   return {
     // Data

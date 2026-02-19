@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
@@ -83,10 +84,10 @@ describe("ProfileReadyStep", () => {
   });
 
   describe("Modo Edição", () => {
-    it('deve mostrar botão "Salvar Alterações" no modo edição', () => {
+    it('deve mostrar botão "Salvar alterações" no modo edição', () => {
       render(<ProfileReadyStep {...defaultProps} isEditMode={true} />);
 
-      expect(screen.getByText("Salvar Alterações")).toBeInTheDocument();
+      expect(screen.getByText("Salvar alterações")).toBeInTheDocument();
     });
 
     it("deve mostrar ícone Save no modo edição", () => {

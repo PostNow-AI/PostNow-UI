@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import type { OnboardingFormData } from "@/features/Auth/Onboarding/constants/onboardingSchema";
+import { profileApi } from "../../Profile/services";
+import { useQuery } from "@tanstack/react-query";
 
 const STORAGE_KEY = "postnow_onboarding_data";
-const EXPIRY_HOURS = 24; // 24 hours
+const EXPIRY_HOURS = 24;
 
 export interface OnboardingTempData {
   // Fase 1: Boas-vindas
@@ -64,8 +65,15 @@ const getDefaultData = (): OnboardingTempData => ({
 });
 
 export const useOnboardingStorage = () => {
+    const { data: profile } = useQuery({
+    queryKey: ["creator-profile"],
+    queryFn: profileApi.getProfile,
+    retry: false,
+  });
+  
   const [data, setData] = useState<OnboardingTempData>(getDefaultData);
   const [isLoaded, setIsLoaded] = useState(false);
+
 
   // Carregar dados do localStorage na montagem
   useEffect(() => {
@@ -73,6 +81,51 @@ export const useOnboardingStorage = () => {
     if (stored) {
       try {
         const parsed: OnboardingTempData = JSON.parse(stored);
+
+        // verificar se os items estão preenchidos, se não estiverem preencher com os dados do profile
+        if (!parsed.business_name && profile?.business_name) {
+          parsed.business_name = profile.business_name;
+        }
+        if (!parsed.business_phone && profile?.business_phone) {
+          parsed.business_phone = profile.business_phone;
+        }
+        if (!parsed.business_instagram_handle && profile?.business_instagram_handle) {
+          parsed.business_instagram_handle = profile.business_instagram_handle;
+        }
+        if (!parsed.business_website && profile?.business_website) {
+          parsed.business_website = profile.business_website;
+        }
+        if (!parsed.specialization && profile?.specialization) {
+          parsed.specialization = profile.specialization;
+        }
+        if (!parsed.business_description && profile?.business_description) {
+          parsed.business_description = profile.business_description;
+        }
+        if (!parsed.business_purpose && profile?.business_purpose) {
+          parsed.business_purpose = profile.business_purpose;
+        }
+        if ((!parsed.brand_personality || parsed.brand_personality.length === 0) && profile?.brand_personality) {
+          parsed.brand_personality = profile.brand_personality.split(", ").map((s: string) => s.trim());
+        }
+        if (!parsed.products_services && profile?.products_services) {
+          parsed.products_services = profile.products_services;
+        }
+        if (!parsed.target_audience && profile?.target_audience) {
+          parsed.target_audience = profile.target_audience;
+        }
+        if ((!parsed.target_interests || parsed.target_interests.length === 0) && profile?.target_interests) {
+          parsed.target_interests = profile.target_interests.split(", ").map((s: string) => s.trim());
+        }
+        if (!parsed.business_location && profile?.business_location) {
+          parsed.business_location = profile.business_location;
+        }
+        if (!parsed.main_competitors && profile?.main_competitors) {
+          parsed.main_competitors = profile.main_competitors;
+        }
+        if (!parsed.reference_profiles && profile?.reference_profiles) {
+          parsed.reference_profiles = profile.reference_profiles;
+        }
+
         // Verificar se expirou
         if (new Date(parsed.expires_at) > new Date()) {
           // Merge com defaults para garantir que novos campos existam
@@ -85,8 +138,9 @@ export const useOnboardingStorage = () => {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
+ 
     setIsLoaded(true);
-  }, []);
+  }, [profile, data.current_step]);
 
   // Salvar dados no localStorage sempre que mudarem
   const saveData = useCallback((newData: Partial<OnboardingTempData>) => {
@@ -117,87 +171,49 @@ export const useOnboardingStorage = () => {
     setData(getDefaultData());
   }, []);
 
+  // Inicializar com dados existentes (modo edição)
+  const initializeWithData = useCallback((existingData: Partial<OnboardingTempData>) => {
+    setData((prev) => ({
+      ...prev,
+      ...existingData,
+      current_step: 2, // Pular welcome no modo edição
+    }));
+  }, []);
+
   // Verificar se onboarding foi completado
   const isCompleted = Boolean(data.completed_at);
-
-  // Inicializar com dados do backend (para modo edição)
-  const initializeWithData = useCallback((backendData: OnboardingFormData) => {
-    const mappedData: OnboardingTempData = {
-      ...getDefaultData(),
-      business_name: backendData.business_name || "",
-      business_phone: backendData.business_phone || "",
-      business_instagram_handle: backendData.business_instagram_handle || "",
-      business_website: backendData.business_website || "",
-      specialization: backendData.specialization || "",
-      business_description: backendData.business_description || "",
-      business_purpose: backendData.business_purpose || "",
-      brand_personality: backendData.brand_personality?.split(", ") || [],
-      products_services: backendData.products_services || "",
-      target_audience: backendData.target_audience || "",
-      target_interests: backendData.target_interests?.split(", ") || [],
-      business_location: backendData.business_location || "",
-      main_competitors: backendData.main_competitors || "",
-      reference_profiles: backendData.reference_profiles || "",
-      voice_tone: backendData.voice_tone || "",
-      // Convert to strings for comparison in VisualStyleStep
-      visual_style_ids: (backendData.visual_style_ids || []).map(id => String(id)),
-      colors: [
-        backendData.color_1 || "#FF6B6B",
-        backendData.color_2 || "#4ECDC4",
-        backendData.color_3 || "#45B7D1",
-        backendData.color_4 || "#96CEB4",
-        backendData.color_5 || "#FFBE0B",
-      ],
-      logo: backendData.logo || "",
-      suggested_colors: [],
-      current_step: 2, // Pular welcome
-      expires_at: new Date(Date.now() + EXPIRY_HOURS * 60 * 60 * 1000).toISOString(),
-    };
-    setData(mappedData);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(mappedData));
-  }, []);
-
-  // Formatar website para URL válida
-  const formatWebsiteUrl = useCallback((url: string): string | null => {
-    if (!url || !url.trim()) return null;
-    const trimmed = url.trim();
-    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-      return trimmed;
-    }
-    return `https://${trimmed}`;
-  }, []);
 
   // Obter dados formatados para API (Step 1)
   const getStep1Payload = useCallback(() => {
     return {
-      business_name: data.business_name || null,
-      business_phone: data.business_phone || null,
-      business_website: formatWebsiteUrl(data.business_website),
-      business_instagram_handle: data.business_instagram_handle || null,
-      specialization: data.specialization || null,
-      business_description: data.business_description || null,
-      business_purpose: data.business_purpose || null,
-      brand_personality: data.brand_personality.length > 0 ? data.brand_personality.join(", ") : null,
-      products_services: data.products_services || null,
-      business_location: data.business_location || null,
-      target_audience: data.target_audience || null,
-      target_interests: data.target_interests.length > 0 ? data.target_interests.join(", ") : null,
-      main_competitors: data.main_competitors || null,
-      reference_profiles: data.reference_profiles || null,
+      business_name: data.business_name,
+      business_phone: data.business_phone,
+      business_website: data.business_website,
+      business_instagram_handle: data.business_instagram_handle,
+      specialization: data.specialization,
+      business_description: data.business_description,
+      business_purpose: data.business_purpose,
+      brand_personality: data.brand_personality.join(", "), // Array → String
+      products_services: data.products_services,
+      business_location: data.business_location,
+      target_audience: data.target_audience,
+      target_interests: data.target_interests.join(", "), // Array → String
+      main_competitors: data.main_competitors,
+      reference_profiles: data.reference_profiles,
     };
-  }, [data, formatWebsiteUrl]);
+  }, [data]);
 
   // Obter dados formatados para API (Step 2)
   const getStep2Payload = useCallback(() => {
     return {
-      voice_tone: data.voice_tone || null,
-      logo: data.logo || null,
+      voice_tone: data.voice_tone,
+      logo: data.logo,
       color_1: data.colors[0] || "#FF6B6B",
       color_2: data.colors[1] || "#4ECDC4",
       color_3: data.colors[2] || "#45B7D1",
       color_4: data.colors[3] || "#96CEB4",
       color_5: data.colors[4] || "#FFBE0B",
-      visual_style_ids: data.visual_style_ids.length > 0 ? data.visual_style_ids : [],
+      visual_style_ids: data.visual_style_ids,
     };
   }, [data]);
 

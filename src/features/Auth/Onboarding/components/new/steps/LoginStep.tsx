@@ -5,6 +5,7 @@ import { BetaLogo } from "@/components/ui/beta-logo";
 import { Loader } from "@/components/ui/loader";
 import { GoogleOAuthButton } from "@/features/Auth/Login/components/GoogleOAuthButton";
 import { authApi, authUtils } from "@/lib/auth";
+import { subscriptionApiService } from "@/lib/subscription-api";
 import { handleApiError } from "@/lib/utils/errorHandling";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,7 +13,7 @@ import { motion } from "framer-motion";
 import { Eye, EyeClosed } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -30,12 +31,16 @@ interface LoginStepProps {
 }
 
 export const LoginStep = ({
-  onSuccess,
+  onSuccess: _onSuccess,
   onSignupClick,
   onBack,
 }: LoginStepProps) => {
+  // _onSuccess is kept for interface compatibility but not used
+  // Users with active subscription go to /ideabank, others stay on login screen
+  void _onSuccess;
   const [showPassword, setShowPassword] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -51,9 +56,23 @@ export const LoginStep = ({
     mutationFn: authApi.login,
     onSuccess: async () => {
       queryClient.clear();
-      toast.success("Bem-vindo de volta!");
       await new Promise((resolve) => setTimeout(resolve, 100));
-      onSuccess();
+
+      // Check if user already has active subscription
+      try {
+        const subscription = await subscriptionApiService.getUserSubscription();
+          // User has active subscription, go directly to the system
+        if (subscription?.status === "active") {
+            toast.success("Bem-vindo de volta!");}
+          else {  
+            toast.error("Sua assinatura não está ativa. Por favor, faça uma nova assinatura.");
+          }
+          navigate("/ideabank");
+      } catch (error) {
+        console.error("[LoginStep] Error checking subscription:", error);
+      }
+
+      // No active subscription, show error and stay on login screen
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
@@ -82,7 +101,7 @@ export const LoginStep = ({
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 pt-8 pb-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

@@ -40,3 +40,15 @@ export interface SubscriptionCancelResponse {
   success: boolean;
   message: string;
 }
+
+export interface PaymentStatusResponse {
+  has_pending_payment: boolean;
+  subscription_id?: number;
+  plan_name?: string;
+  status?: string;
+  pending_since?: string;
+  time_pending_minutes?: number;
+  last_error?: string;
+  can_use_system: boolean;
+  required_action?: string;
+}

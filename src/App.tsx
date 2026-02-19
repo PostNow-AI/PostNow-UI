@@ -1,15 +1,20 @@
 import { clarity } from "react-microsoft-clarity";
 import {
+  BrowserRouter as Router,
   Navigate,
   Route,
-  BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
 import { AdminRoute } from "./components/AdminRoute";
-import { DashboardLayout } from "./components/DashboardLayout";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import { PublicRoute } from "./components/PublicRoute";
-import { ErrorBoundary, ThemeProvider, Toaster } from "./components/ui";
+import {
+  DashboardLayout,
+  ErrorBoundary,
+  ProtectedRoute,
+  PublicRoute,
+  ThemeProvider,
+  Toaster,
+} from "@/components";
+import { BehaviorDashboard } from "./features/BehaviorDashboard";
 import { AuthProvider } from "./contexts/AuthContext";
 import { OnboardingProvider } from "./contexts/OnboardingContext";
 import { AdminDailyPosts } from "./pages/AdminDailyPosts";
@@ -30,13 +35,6 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
-// import { WeeklyContextPage } from "./pages/WeeklyContextPage";
-// import CarouselListPage from "./pages/CarouselListPage";
-// import CarouselCreatePage from "./pages/CarouselCreatePage";
-// import CarouselManualFormPage from "./pages/CarouselManualFormPage";
-// import CarouselViewPage from "./pages/CarouselViewPage";
-// import CarouselWizardPage from "./pages/CarouselWizardPage";
-// import CarouselGeneratingPage from "./pages/CarouselGeneratingPage";
 import OnboardingPage from "./pages/OnboardingPage";
 
 const App = () => {
@@ -55,8 +53,8 @@ const App = () => {
         <Router>
           <AuthProvider>
             <Routes>
-              {/* Root redirect */}
-              <Route path="/" element={<Navigate to="/ideabank" replace />} />
+              {/* Root redirect - Onboarding 2.0 first */}
+              <Route path="/" element={<Navigate to="/onboarding" replace />} />
 
               {/* Public routes */}
               <Route
@@ -113,10 +111,7 @@ const App = () => {
               />
 
               {/* Public Onboarding - Mobile-First Flow */}
-              <Route
-                path="/onboarding"
-                element={<OnboardingPage />}
-              />
+              <Route path="/onboarding" element={<OnboardingPage />} />
 
               {/* ADMIN ROUTES */}
               <Route
@@ -135,7 +130,8 @@ const App = () => {
                 <Route
                   path="/admin/daily-posts"
                   element={<AdminDailyPosts />}
-                />
+                /> 
+                <Route path="/dashboard" element={<BehaviorDashboard/>}/>
               </Route>
 
               {/* Subscription system routes */}

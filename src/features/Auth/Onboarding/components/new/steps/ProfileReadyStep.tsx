@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { CheckCircle2, Sparkles, Loader2, Save } from "lucide-react";
+import { CheckCircle2, Sparkles } from "lucide-react";
 import type { OnboardingTempData } from "@/features/Auth/Onboarding/hooks/useOnboardingStorage";
 import { nicheOptions } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
 
@@ -127,20 +127,20 @@ export const ProfileReadyStep = ({
         >
           <Button
             onClick={onNext}
+            disabled={isLoading}
             className="w-full h-12 text-base font-medium gap-2"
             size="lg"
-            disabled={isLoading}
           >
             {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
                 Salvando...
-              </>
+              </span>
             ) : isEditMode ? (
-              <>
-                <Save className="h-4 w-4" />
-                Salvar Alterações
-              </>
+              "Salvar alterações"
             ) : (
               <>
                 <Sparkles className="h-4 w-4" />

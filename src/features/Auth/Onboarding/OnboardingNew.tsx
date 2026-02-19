@@ -1,5 +1,5 @@
 import { useCallback, useState, useEffect, useRef } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation,  useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useOnboardingStorage } from "./hooks/useOnboardingStorage";
 import { useOnboardingTracking } from "./hooks/useOnboardingTracking";
@@ -25,7 +25,6 @@ import {
   SignupStep,
   LoginStep,
   PaywallStep,
-  ContactInfoStep,
 } from "./components/new/steps";
 import {
   submitOnboardingStep1,
@@ -36,7 +35,9 @@ import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
 import {
   useSubscriptionPlans,
   useCreateCheckoutSession,
+  useUserSubscription,
 } from "@/features/Subscription/hooks/useSubscription";
+import { authUtils } from "@/lib/auth";
 
 type AuthMode = "signup" | "login" | null;
 
@@ -57,11 +58,15 @@ export const OnboardingNew = ({
   const isEditMode = mode === "edit";
 
   const [authMode, setAuthMode] = useState<AuthMode>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Check if user is already logged in from previous session
+  const isAuthenticated = authUtils.isAuthenticated()
+  const { data: userSubscription } = useUserSubscription(isAuthenticated);
+  const hasActiveSubscription = userSubscription?.status === "active";
+
   // Hooks para checkout do Stripe - só busca quando autenticado
-  const { data: subscriptionPlans } = useSubscriptionPlans(isAuthenticated);
+  const { data: subscriptionPlans, isLoading: isLoadingPlans } = useSubscriptionPlans(isAuthenticated);
   const createCheckout = useCreateCheckoutSession();
 
   const {
@@ -83,10 +88,48 @@ export const OnboardingNew = ({
   // Inicializar com dados no modo edição
   useEffect(() => {
     if (isEditMode && initialData && isLoaded && !isInitialized) {
-      initializeWithData(initialData);
+      // Converter OnboardingFormData para OnboardingTempData
+      const convertedData = {
+        ...initialData,
+        // Converter brand_personality de string para array
+        brand_personality: initialData.brand_personality
+          ? initialData.brand_personality.split(",").map((s) => s.trim())
+          : [],
+        // Converter target_interests de string para array
+        target_interests: initialData.target_interests
+          ? initialData.target_interests.split(",").map((s) => s.trim())
+          : [],
+        // Converter cores individuais para array
+        colors: [
+          initialData.color_1,
+          initialData.color_2,
+          initialData.color_3,
+          initialData.color_4,
+          initialData.color_5,
+        ].filter((c): c is string => !!c),
+      };
+      initializeWithData(convertedData);
       setIsInitialized(true);
     }
   }, [isEditMode, initialData, isLoaded, isInitialized, initializeWithData]);
+
+  // If user is already logged in but has no subscription, jump to paywall
+  // BUT only if onboarding data exists (user completed the flow)
+  // AND user is not in login mode (to allow showing error message on login screen)
+  useEffect(() => {
+    if (!isEditMode && isLoaded && isAuthenticated && !hasActiveSubscription && authMode !== "login") {
+      // Verificar se os dados do onboarding foram preenchidos
+      const hasOnboardingData = data.business_name && data.specialization && data.business_description;
+
+      if (hasOnboardingData) {
+        // Jump directly to paywall step
+        if (data.current_step < 19) {
+          setCurrentStep(19);
+        }
+      }
+      // Se não tem dados do onboarding, deixa o usuário completar o fluxo
+    }
+  }, [isEditMode, isLoaded, isAuthenticated, hasActiveSubscription, authMode, data.current_step, data.business_name, data.specialization, data.business_description, setCurrentStep]);
 
   // Track step visits for funnel analytics (only in create mode)
   useEffect(() => {
@@ -106,20 +149,65 @@ export const OnboardingNew = ({
   // Mutation para sincronizar dados com o backend
   const syncMutation = useMutation({
     mutationFn: async () => {
+      // Ler dados FRESCOS do localStorage para evitar stale closure
+      const STORAGE_KEY = "postnow_onboarding_data";
+      const stored = localStorage.getItem(STORAGE_KEY);
+
+      if (!stored) {
+        throw new Error("Dados do onboarding não encontrados");
+      }
+
+      const freshData = JSON.parse(stored);
+      console.log("[Onboarding] Dados frescos do localStorage:", freshData);
+
       // Step 1: Business info
-      const step1Payload = getStep1Payload();
+      const step1Payload = {
+        business_name: freshData.business_name,
+        business_phone: freshData.business_phone,
+        business_website: freshData.business_website,
+        business_instagram_handle: freshData.business_instagram_handle,
+        specialization: freshData.specialization,
+        business_description: freshData.business_description,
+        business_purpose: freshData.business_purpose,
+        brand_personality: Array.isArray(freshData.brand_personality)
+          ? freshData.brand_personality.join(", ")
+          : freshData.brand_personality,
+        products_services: freshData.products_services,
+        business_location: freshData.business_location,
+        target_audience: freshData.target_audience,
+        target_interests: Array.isArray(freshData.target_interests)
+          ? freshData.target_interests.join(", ")
+          : freshData.target_interests,
+        main_competitors: freshData.main_competitors,
+        reference_profiles: freshData.reference_profiles,
+      };
+
+      console.log("[Onboarding] Step 1 payload:", step1Payload);
       await submitOnboardingStep1(step1Payload);
 
       // Step 2: Branding
-      const step2Payload = getStep2Payload();
+      const colors = freshData.colors || ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"];
+      const step2Payload = {
+        voice_tone: freshData.voice_tone,
+        logo: freshData.logo,
+        color_1: colors[0] || "#FF6B6B",
+        color_2: colors[1] || "#4ECDC4",
+        color_3: colors[2] || "#45B7D1",
+        color_4: colors[3] || "#96CEB4",
+        color_5: colors[4] || "#FFBE0B",
+        visual_style_ids: freshData.visual_style_ids,
+      };
+
+      console.log("[Onboarding] Step 2 payload:", step2Payload);
       await submitOnboardingStep2(step2Payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
-      clearData();
+      // NÃO limpar dados aqui - só limpar após checkout completo
+      // O clearData() será chamado na página de sucesso do checkout
       // Mark final step as completed and clear tracking
-      trackStepComplete(20);
+      trackStepComplete(19);
       clearTracking();
       // Toast removido - não interromper fluxo do paywall
     },
@@ -142,12 +230,15 @@ export const OnboardingNew = ({
       // Step 2: Branding
       const step2Payload = getStep2Payload();
       await submitOnboardingStep2(step2Payload);
+      
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["creator-profile"] });
       clearData();
+      trackStepComplete(19);
       toast.success("Perfil atualizado com sucesso!");
       onComplete?.();
+      window.location.reload(); // Forçar reload para atualizar estado de assinatura e redirecionar corretamente
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
@@ -174,24 +265,22 @@ export const OnboardingNew = ({
   }, [data.current_step, goToStep]);
 
   // Handlers de autenticação
-  const handleAuthSuccess = useCallback(async () => {
-    setIsAuthenticated(true);
+  const handleAuthSuccess = useCallback(() => {
+    // IMPORTANTE: Definir step ANTES de mudar authMode para evitar re-render incorreto
+    // NÃO fazer chamadas API aqui - deixar para quando selecionar plano
+    setCurrentStep(19); // Ir para paywall primeiro
     setAuthMode(null);
-
-    // Sincronizar dados do localStorage com o backend
-    try {
-      await syncMutation.mutateAsync();
-      // Ir para o paywall
-      goToStep(20); // Paywall step
-    } catch (error) {
-      console.error("[Onboarding] Erro ao sincronizar:", error);
-      toast.error("Erro ao salvar seus dados. Tente novamente.");
-      // Ainda assim permite ir para o paywall para não bloquear o usuário
-      goToStep(20);
-    }
-  }, [syncMutation, goToStep]);
+  }, [setCurrentStep]);
 
   const handlePlanSelect = useCallback(async (planId: string) => {
+    // Sincronizar dados do onboarding com o backend primeiro
+    try {
+      await syncMutation.mutateAsync();
+    } catch (error) {
+      console.error("[Onboarding] Erro ao sincronizar:", error);
+      // Continua mesmo com erro - não bloquear o checkout
+    }
+
     // Verificar se planos estão carregados
     if (!subscriptionPlans?.length) {
       toast.error("Planos não carregados. Aguarde e tente novamente.");
@@ -236,7 +325,7 @@ export const OnboardingNew = ({
       console.error("[Onboarding] Erro ao criar checkout:", error);
       toast.error("Erro ao processar pagamento. Tente novamente.");
     }
-  }, [subscriptionPlans, createCheckout]);
+  }, [subscriptionPlans, createCheckout, syncMutation]);
 
   // Handler para voltar no modo edição
   const handleEditBack = useCallback(() => {
@@ -273,18 +362,19 @@ export const OnboardingNew = ({
     return (
       <LoginStep
         onSuccess={handleAuthSuccess}
-        onSignupClick={() => setAuthMode("signup")}
+        onSignupClick={() => setAuthMode(null)}
         onBack={() => setAuthMode(null)}
       />
     );
   }
 
+
   // Se já autenticado e no paywall (apenas no modo criação)
-  if (!isEditMode && isAuthenticated && data.current_step >= 19) {
+  if (isAuthenticated && !hasActiveSubscription) {
     return (
       <PaywallStep
         onSelectPlan={handlePlanSelect}
-        isLoading={createCheckout.isPending}
+        isLoading={createCheckout.isPending || isLoadingPlans}
       />
     );
   }
@@ -298,7 +388,7 @@ export const OnboardingNew = ({
           goToStep(2);
           return null;
         }
-        return <WelcomeStep onNext={handleNext} onLogin={() => setAuthMode("login")} />;
+        return <WelcomeStep onNext={handleNext} isAuthenticated={isAuthenticated} onLogin={() => setAuthMode("login")} />;
 
       case 2:
         return (
@@ -312,21 +402,6 @@ export const OnboardingNew = ({
 
       case 3:
         return (
-          <ContactInfoStep
-            phone={data.business_phone}
-            instagram={data.business_instagram_handle}
-            website={data.business_website}
-            onPhoneChange={(value) => saveData({ business_phone: value })}
-            onInstagramChange={(value) => saveData({ business_instagram_handle: value })}
-            onWebsiteChange={(value) => saveData({ business_website: value })}
-            onNext={handleNext}
-            onBack={handleBack}
-            stepNumber={3}
-          />
-        );
-
-      case 4:
-        return (
           <NicheStep
             value={data.specialization}
             onChange={(value) => saveData({ specialization: value })}
@@ -335,7 +410,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 5:
+      case 4:
         return (
           <DescriptionStep
             value={data.business_description}
@@ -345,7 +420,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 6:
+      case 5:
         return (
           <PurposeStep
             value={data.business_purpose}
@@ -355,7 +430,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 7:
+      case 6:
         return (
           <PersonalityStep
             value={data.brand_personality}
@@ -365,7 +440,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 8:
+      case 7:
         return (
           <ProductsStep
             value={data.products_services}
@@ -375,7 +450,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 9:
+      case 8:
         return (
           <TargetAudienceStep
             value={data.target_audience}
@@ -385,7 +460,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 10:
+      case 9:
         return (
           <InterestsStep
             value={data.target_interests}
@@ -395,7 +470,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 11:
+      case 10:
         return (
           <LocationStep
             value={data.business_location}
@@ -405,7 +480,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 12:
+      case 11:
         return (
           <CompetitorsStep
             competitors={data.main_competitors}
@@ -417,7 +492,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 13:
+      case 12:
         return (
           <VoiceToneStep
             value={data.voice_tone}
@@ -427,7 +502,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 14:
+      case 13:
         return (
           <VisualStyleStep
             value={data.visual_style_ids}
@@ -437,7 +512,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 15:
+      case 14:
         return (
           <LogoStep
             value={data.logo}
@@ -449,7 +524,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 16:
+      case 15:
         return (
           <ColorsStep
             value={data.colors}
@@ -460,12 +535,12 @@ export const OnboardingNew = ({
           />
         );
 
-      case 17:
+      case 16:
         return (
           <ProfileReadyStep
             data={data}
             onNext={() => {
-              if (isEditMode) {
+              if (isAuthenticated) {
                 // No modo edição, salvar diretamente
                 updateMutation.mutate();
               } else {
@@ -474,14 +549,14 @@ export const OnboardingNew = ({
               }
             }}
             onBack={handleBack}
-            isEditMode={isEditMode}
+            isEditMode={isAuthenticated}
             isLoading={updateMutation.isPending}
           />
         );
 
-      case 18:
-        // No modo edição, não deve chegar aqui (salva no step 17)
-        if (isEditMode) {
+      case 17:
+        // No modo edição, não deve chegar aqui (salva no step 16)
+        if (isAuthenticated) {
           updateMutation.mutate();
           return null;
         }
@@ -494,7 +569,7 @@ export const OnboardingNew = ({
         );
 
       default:
-        return <WelcomeStep onNext={() => goToStep(1)} />;
+        return <WelcomeStep isAuthenticated={isAuthenticated} onNext={() => goToStep(1)} />;
     }
   };
 
