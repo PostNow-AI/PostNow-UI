@@ -15,6 +15,7 @@ import {
 import { useAuth, useDashboardLayout } from "@/hooks";
 import {
   Activity,
+  BarChart3,
   ChartArea,
   ClipboardList,
   LogOut,
@@ -68,15 +69,16 @@ export function AppSidebar() {
 
   const adminMenuItems = [
     {
+      title: "Dashboard",
+      icon: BarChart3,
+      url: "/admin/dashboard",
+    },
+    {
       title: "Posts Diários",
       icon: Activity,
       url: "/admin/daily-posts",
     },
-    {
-      title: "Dashboard",
-      icon: ChartArea,
-      url: "/dashboard",
-    },
+    
   ];
 
   if (user?.is_superuser) {

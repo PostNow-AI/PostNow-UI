@@ -161,15 +161,15 @@ api.interceptors.response.use(
           refresh_token: refreshToken,
         });
 
-        const { access_token } = response.data;
-        cookieUtils.updateAccessToken(access_token);
+        const { access } = response.data;
+        cookieUtils.updateAccessToken(access);
 
         // Process queued requests
-        processQueue(null, access_token);
+        processQueue(null, access);
 
         // Retry the original request
         if (originalRequest?.headers) {
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          originalRequest.headers.Authorization = `Bearer ${access}`;
         }
         return api(originalRequest);
       } catch (refreshError) {

@@ -5,7 +5,7 @@ import {
   type VisualStylePreference,
 } from "../services";
 
-export const useVisualStylePreferences = () => {
+export const useVisualStylePreferences = (enabled = false) => {
   const queryClient = useQueryClient();
 
   const {
@@ -16,6 +16,7 @@ export const useVisualStylePreferences = () => {
     queryKey: ["visualStylePreferences"],
     queryFn: fetchVisualStylePreferences,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled, // Só busca quando explicitamente habilitado
   });
 
   const createPreferenceMutation = useMutation({

@@ -1,4 +1,5 @@
 import { Button } from "@/components";
+import { SUBSCRIPTION_CONFIG } from "@/config/subscription";
 import { formatToBRL } from "@/utils";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -49,6 +50,11 @@ export const SubscriptionPlans = () => {
   const handleSubscribe = async (plan: SubscriptionPlan) => {
     setSelectedPlan(plan);
 
+    const { STRIPE_URLS } = SUBSCRIPTION_CONFIG;
+    const baseUrl = window.location.origin;
+    const successUrl = `${baseUrl}${STRIPE_URLS.SUCCESS}`;
+    const cancelUrl = `${baseUrl}${STRIPE_URLS.CANCEL}`;
+
     try {
       const baseUrl = window.location.origin;
       await createCheckout.mutateAsync({
@@ -56,6 +62,8 @@ export const SubscriptionPlans = () => {
         success_url: `${baseUrl}/subscription/success`,
         cancel_url: `${baseUrl}/subscription/cancel`,
         upgrade: currentSubscription ? true : false,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
       });
     } catch (error) {
       console.error("Erro ao criar checkout:", error);

@@ -8,7 +8,7 @@ const TOKEN_LIFETIME = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 export function useTokenRefresh() {
   const queryClient = useQueryClient();
-  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const scheduleTokenRefresh = useCallback(() => {
     // Clear any existing timeout

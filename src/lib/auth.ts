@@ -10,6 +10,7 @@ import {
   apiRequest,
   authRequest,
   dispatchAuthStateChange,
+  handleAuthResponse,
 } from "./auth-helpers";
 import { initiateGoogleOAuth } from "./google-oauth";
 
@@ -21,6 +22,11 @@ export type RegisterResponse =
 // Re-export auth helpers
 export { subscribeToAuthChanges } from "./auth-helpers";
 
+// Type for registration response that may require email verification
+export type RegisterResponse =
+  | { type: "authenticated"; data: AuthResponse }
+  | { type: "email_verification_required"; email: string; message: string };
+
 // API Functions for TanStack Query
 export const authApi = {
   // Authentication requests
@@ -30,23 +36,58 @@ export const authApi = {
       "Login falhou"
     ),
 
-  register: async (userData: RegisterRequest) => {
-    const response = await api.post<AuthResponse>(
-      "/api/v1/auth/registration/",
-      {
+  // Standard register (expects tokens - may fail on email verification backends)
+  register: (userData: RegisterRequest) =>
+    authRequest(
+      () =>
+        api.post<AuthResponse>("/api/v1/auth/registration/", {
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          password1: userData.password,
+          password2: userData.confirmPassword,
+        }),
+      "Registro falhou"
+    ),
+
+  // Register that handles both direct auth and email verification
+  registerWithVerification: async (userData: RegisterRequest): Promise<RegisterResponse> => {
+    try {
+      const response = await api.post("/api/v1/auth/registration/", {
         email: userData.email,
         first_name: userData.first_name,
         last_name: userData.last_name,
         password1: userData.password,
         password2: userData.confirmPassword,
+      });
+
+      const data = response.data;
+
+      // Check if response has tokens (direct authentication)
+      if (data.access && data.refresh) {
+        handleAuthResponse(data as AuthResponse);
+        return { type: "authenticated", data: data as AuthResponse };
       }
-    );
-    // Save tokens to cookies if registration returns them
-    if (response.data.access && response.data.refresh) {
-      cookieUtils.setTokens(response.data.access, response.data.refresh);
-      dispatchAuthStateChange();
+      // Save tokens to cookies if registration returns them
+      if (response.data.access && response.data.refresh) {
+        cookieUtils.setTokens(response.data.access, response.data.refresh);
+        dispatchAuthStateChange();
+      }
+      return response.data;
+    } catch (error: unknown) {
+      // Check if it's a 201 response that requires verification
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number; data?: any } };
+        if (axiosError.response?.status === 201) {
+          return {
+            type: "email_verification_required",
+            email: userData.email,
+            message: axiosError.response.data?.message || "Verificação de email necessária",
+          };
+        }
+      }
+      throw error;
     }
-    return response.data;
   },
 
   registerWithVerification: async (userData: RegisterRequest): Promise<RegisterResponse> => {

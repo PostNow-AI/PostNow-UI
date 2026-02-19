@@ -1,8 +1,8 @@
 import { useOnboardingContext } from "@/contexts/OnboardingContext";
 import { profileApi } from "@/features/Auth/Profile/services";
 import { useAuth } from "@/hooks/useAuth";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 export const useProfilePage = () => {
   const { user } = useAuth();
@@ -45,6 +45,6 @@ export const useProfilePage = () => {
     isLoading,
     error,
     formatDate,
-    resetOnboardingForEditMutation,
+    openEditOnboarding,
   };
 };

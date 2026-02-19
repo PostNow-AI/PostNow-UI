@@ -81,7 +81,6 @@ export const OnboardingNew = ({
     initializeWithData,
   } = useOnboardingStorage();
 
-
   // Tracking hook for funnel analytics
   const { trackStep, trackStepComplete, clearTracking } = useOnboardingTracking();
   const lastTrackedStepRef = useRef<number>(0);
@@ -358,7 +357,6 @@ export const OnboardingNew = ({
       />
     );
   }
-
 
   if (!isEditMode && authMode === "login") {
     return (
