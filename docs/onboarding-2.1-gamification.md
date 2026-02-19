@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-O Onboarding 2.1 é um fluxo de cadastro gamificado com **14 steps** organizados em **3 fases**. O objetivo é coletar informações do negócio do usuário de forma progressiva e engajante, culminando na criação de conta e assinatura.
+O Onboarding 2.1 é um fluxo de cadastro gamificado com **15 steps** organizados em **5 fases**. O objetivo é coletar informações do negócio do usuário de forma progressiva e engajante, culminando na criação de conta e assinatura.
 
 ### Características Principais
 - **Micro-steps**: Cada tela coleta uma informação específica
@@ -43,16 +43,20 @@ src/features/Auth/Onboarding/
 │       ├── StepSkeleton.tsx           # Skeleton loading
 │       ├── SelectableCards.tsx        # Cards de seleção única/múltipla
 │       ├── SelectableChips.tsx        # Chips de seleção
-│       ├── ColorPicker.tsx            # Seletor de cores
+│       ├── ColorPicker.tsx            # Seletor de cores principal
+│       ├── ColorPickerPopover.tsx     # Popover com color picker
+│       ├── EditableColorSwatch.tsx    # Swatch de cor editável
+│       ├── PreviewColorButton.tsx     # Botão de cor no preview
 │       ├── AuthProgressIndicator.tsx  # Indicador de progresso auth
 │       ├── BackButton.tsx             # Botão voltar reutilizável
 │       ├── ThisOrThatCard.tsx         # Card de comparação A/B
-│       ├── PaywallFlow.tsx            # Fluxo de paywall
+│       ├── PaywallFlow.tsx            # Fluxo de paywall (orquestrador)
+│       ├── PaywallScreen.tsx          # Tela de seleção de planos
 │       ├── illustrations/             # SVGs extraídos
 │       │   ├── PersonIllustrations.tsx   # Silhuetas de pessoas
 │       │   ├── SceneIllustrations.tsx    # Cenas de background
 │       │   └── index.ts
-│       ├── steps/                     # 17 step components
+│       ├── steps/                     # 26 step components
 │       │   ├── index.ts               # Exports síncronos
 │       │   ├── index.lazy.ts          # Exports lazy
 │       │   └── __tests__/             # Testes dos steps
@@ -63,11 +67,14 @@ src/features/Auth/Onboarding/
 │   ├── useOnboardingNavigation.ts     # Navegação entre steps
 │   ├── useOnboardingSync.ts           # Sincronização com API
 │   ├── useOnboardingCheckout.ts       # Checkout Stripe
+│   ├── useOnboardingFlow.ts           # Status do onboarding (API)
 │   ├── useCelebration.ts              # Confetti animations
-│   ├── useOnboardingA11y.tsx          # Acessibilidade
+│   ├── useOnboardingA11y.tsx          # Acessibilidade completa
 │   ├── useOnboardingPreviewData.ts    # Dados reativos do preview
 │   ├── usePreviewIdeas.ts             # Ideias de conteúdo para preview
 │   ├── useABTest.ts                   # Experimentos A/B
+│   ├── useProfessions.ts              # Lista de profissões (API)
+│   ├── useSpecializations.ts          # Especializações por profissão (API)
 │   ├── useVisualStylePreferences.ts   # Estilos visuais da API
 │   └── __tests__/                     # Testes dos hooks
 ├── utils/
@@ -77,7 +84,9 @@ src/features/Auth/Onboarding/
 ├── services/
 │   └── index.ts                       # API calls
 └── constants/
-    ├── onboardingSchema.ts            # Zod schemas
+    ├── colors.ts                      # Cores predefinidas
+    ├── onboardingSchema.ts            # Zod schemas (legado)
+    ├── onboardingNewSchema.ts         # Zod schemas + options (novo)
     └── personalityQuizData.ts         # Dados do quiz de personalidade
 ```
 
@@ -85,38 +94,54 @@ src/features/Auth/Onboarding/
 
 ## Fluxo de Steps
 
-### Fase 1: Negócio (Steps 1-4)
+### Fase 1: Boas-vindas (Steps 1-2)
 | Step | Componente | Descrição | Campo |
 |------|------------|-----------|-------|
 | 1 | `WelcomeStep` | Boas-vindas + opção de login | - |
 | 2 | `BusinessNameStep` | Nome do negócio | `business_name` |
-| 3 | `NicheStep` | Nicho de atuação | `specialization` |
-| 4 | `OfferStep` | O que oferece/vende | `business_description` |
 
-### Fase 2: Público (Steps 5-8)
+### Fase 2: Seu Negócio (Steps 3-5)
 | Step | Componente | Descrição | Campo |
 |------|------------|-----------|-------|
+| 3 | `NicheStep` | Nicho de atuação | `specialization` |
+| 4 | `OfferStep` | O que oferece/vende | `business_description` |
 | 5 | `PersonalityStep` | Personalidade da marca | `brand_personality[]` |
+
+### Fase 3: Seu Público (Steps 6-8)
+| Step | Componente | Descrição | Campo |
+|------|------------|-----------|-------|
 | 6 | `TargetAudienceStep` | Público-alvo (gênero, idade, classe) | `target_audience` (JSON) |
 | 7 | `InterestsStep` | Interesses do público | `target_interests[]` |
 | 8 | `LocationStep` | Localização do negócio | `business_location` |
 
-### Fase 3: Marca (Steps 9-12)
+### Fase 4: Identidade Visual (Steps 9-12)
 | Step | Componente | Descrição | Campo |
 |------|------------|-----------|-------|
 | 9 | `VoiceToneStep` | Tom de voz | `voice_tone` |
 | 10 | `VisualStyleStep` | Estilos visuais preferidos | `visual_style_ids[]` |
 | 11 | `LogoStep` | Upload de logo (máx 500KB) | `logo`, `suggested_colors[]` |
-| 12 | `ColorsStep` | Paleta de cores | `colors[]` |
+| 12 | `ColorsStep` | Paleta de cores (5 cores) | `colors[]` |
 
-### Finalização (Steps 13-14 + Auth)
+### Fase 5: Validação (Steps 13-15)
 | Step | Componente | Descrição |
 |------|------------|-----------|
 | 13 | `ProfileReadyStep` | Resumo do perfil criado |
 | 14 | `PreviewStep` | Preview de ideias de conteúdo |
-| - | `SignupStep` | Criação de conta |
-| - | `LoginStep` | Login (alternativo) |
+| 15 | `SignupStep` / `LoginStep` | Criação de conta ou login |
 | - | `PaywallStep` | Seleção de plano e checkout |
+
+### Steps Auxiliares (não no fluxo principal)
+| Componente | Descrição | Campo |
+|------------|-----------|-------|
+| `ContactInfoStep` | Telefone, Instagram, Website | `business_phone`, `business_instagram_handle`, `business_website` |
+| `CompetitorsStep` | Concorrentes e referências | `main_competitors`, `reference_profiles` |
+| `DescriptionStep` | Descrição detalhada | `business_description` |
+| `PhoneStep` | Apenas telefone | `business_phone` |
+| `ProductsStep` | Produtos/serviços | `products_services` |
+| `PurposeStep` | Propósito do negócio | `business_purpose` |
+| `ChipsSelectionStep` | Seleção genérica de chips | (configurável) |
+| `PersonalityQuizStep` | Quiz de personalidade | `brand_personality[]` |
+| `StyleComparisonDemo` | Demo de comparação visual | - |
 
 ---
 
@@ -126,30 +151,34 @@ src/features/Auth/Onboarding/
 
 ```typescript
 interface OnboardingTempData {
-  // Fase 1: Negócio
+  // Fase 1: Boas-vindas
   business_name: string;
-  business_phone: string;
-  business_instagram_handle: string;
-  business_website: string;
+
+  // Fase 2: Seu Negócio
   specialization: string;
   business_description: string;
-  business_purpose: string;
   brand_personality: string[];
+  business_purpose: string;
   products_services: string;
 
-  // Fase 2: Público
+  // Fase 3: Seu Público
   target_audience: string;           // JSON stringificado
   target_interests: string[];
   business_location: string;
   main_competitors: string;
   reference_profiles: string;
 
-  // Fase 3: Marca
+  // Fase 4: Identidade Visual
   voice_tone: string;
   visual_style_ids: string[];
   colors: string[];                  // 5 cores hex
   logo: string;                      // URL ou base64 (máx 500KB)
   suggested_colors: string[];        // Cores extraídas do logo
+
+  // Contato (opcional)
+  business_phone: string;
+  business_instagram_handle: string;
+  business_website: string;
 
   // Metadados
   current_step: number;
@@ -223,8 +252,8 @@ Sincroniza dados do onboarding com a API.
  * incluindo retry automático e tratamento de erros
  */
 const {
-  syncStep1,        // Envia dados da fase 1-2
-  syncStep2,        // Envia dados da fase 3
+  syncStep1,        // Envia dados da fase 1-3
+  syncStep2,        // Envia dados da fase 4
   isSyncing,        // Se está sincronizando
   syncError,        // Erro da última sincronização
 } = useOnboardingSync();
@@ -248,6 +277,22 @@ const {
 
 **Segurança:** Valida URLs de redirect com `isValidRedirectPath()` antes de redirecionar.
 
+### useOnboardingFlow
+Verifica o status do onboarding do usuário na API.
+
+```typescript
+/**
+ * Hook para verificar status do onboarding
+ * @description Consulta a API para saber se o usuário completou o onboarding
+ */
+const {
+  onboardingStatus,   // Status retornado da API
+  isLoading,          // Se está carregando
+  error,              // Erro da requisição
+  needsOnboarding,    // true se onboarding não foi completado
+} = useOnboardingFlow();
+```
+
 ### useOnboardingTracking
 Rastreia progresso do usuário para analytics de funil.
 
@@ -261,8 +306,6 @@ const {
   sessionId,           // ID da sessão
 } = useOnboardingTracking();
 ```
-
-**Endpoint:** `POST /api/v1/creator-profile/onboarding/track/`
 
 ### useCelebration
 Dispara animações de confetti em momentos de celebração.
@@ -281,19 +324,26 @@ const {
 } = useCelebration();
 ```
 
-**Momentos de celebração:**
-| Momento | Intensidade |
-|---------|-------------|
-| Step 13 (Profile Ready) | Full |
-
 ### useOnboardingA11y
-Gerencia acessibilidade (screen readers, foco).
+Gerencia acessibilidade completa (screen readers, foco, teclado).
 
 ```typescript
+/**
+ * Hook para gerenciar acessibilidade no onboarding
+ * @description Focus management, keyboard navigation, screen reader announcements
+ */
 const {
-  announce,              // Anuncia texto para screen readers
-  getProgressBarProps,   // Props de acessibilidade para barra
+  announce,                    // Anuncia texto para screen readers
+  focusMainContent,            // Move foco para conteúdo principal
+  handleKeyboardNavigation,    // Handler para navegação por teclado
+  getStepContainerProps,       // Props ARIA para container do step
+  getProgressBarProps,         // Props ARIA para barra de progresso
+  getNavigationButtonProps,    // Props ARIA para botões de navegação
+  mainContentRef,              // Ref para conteúdo principal
 } = useOnboardingA11y(currentStep);
+
+// Componente auxiliar exportado
+export const SkipToContent: FC;  // Link para pular ao conteúdo
 ```
 
 ### useOnboardingPreviewData
@@ -303,6 +353,156 @@ Fornece dados reativos para o preview (polling 300ms).
 const data = useOnboardingPreviewData();
 // Retorna subset de OnboardingTempData para preview
 ```
+
+### useProfessions
+Busca lista de profissões da API.
+
+```typescript
+/**
+ * Hook para buscar profissões disponíveis
+ * @returns Array de profissões { id, name }
+ */
+const professions = useProfessions();
+// Retorna Profession[] ou []
+```
+
+### useSpecializations
+Busca especializações para uma profissão selecionada.
+
+```typescript
+/**
+ * Hook para buscar especializações de uma profissão
+ * @param professions - Lista de profissões
+ * @param selectedProfession - Profissão selecionada
+ */
+const {
+  specializations,           // { profession, specializations[] }
+  isLoadingSpecializations   // Se está carregando
+} = useSpecializations(professions, selectedProfession);
+```
+
+### useABTest
+Gerencia experimentos A/B no onboarding.
+
+```typescript
+const {
+  variant,        // Variante atual ('A' | 'B')
+  isLoading,      // Se está carregando
+  trackEvent,     // Rastreia evento do experimento
+} = useABTest(experimentName);
+```
+
+### useVisualStylePreferences
+Busca estilos visuais disponíveis da API.
+
+```typescript
+const {
+  styles,      // VisualStyle[]
+  isLoading    // Se está carregando
+} = useVisualStylePreferences();
+```
+
+### usePreviewIdeas
+Gera ideias de conteúdo para preview baseado nos dados coletados.
+
+```typescript
+const {
+  ideas,        // Ideias de posts geradas
+  isLoading,    // Se está gerando
+  refresh,      // Gera novas ideias
+} = usePreviewIdeas(onboardingData);
+```
+
+---
+
+## Constants
+
+### colors.ts
+Cores predefinidas para seleção rápida no color picker.
+
+```typescript
+export const PREDEFINED_COLORS = [
+  "#3B82F6", "#EF4444", "#10B981", "#F59E0B",
+  "#8B5CF6", "#F97316", "#06B6D4", "#EC4899",
+  "#84CC16", "#6366F1", "#F43F5E", "#14B8A6",
+] as const;
+
+export type PredefinedColor = typeof PREDEFINED_COLORS[number];
+```
+
+### onboardingNewSchema.ts
+Schemas Zod e opções para cada step.
+
+```typescript
+// Schemas de validação
+export const stepSchemas = {
+  businessName: z.object({ business_name: z.string().min(1).max(200) }),
+  niche: z.object({ specialization: z.string().min(1) }),
+  offer: z.object({ business_description: z.string().min(10) }),
+  personality: z.object({ brand_personality: z.array(z.string()).min(1) }),
+  targetAudience: z.object({ target_audience: z.string().min(5) }),
+  interests: z.object({ target_interests: z.array(z.string()).min(1) }),
+  location: z.object({ business_location: z.string().min(1) }),
+  voiceTone: z.object({ voice_tone: z.string().min(1) }),
+  visualStyle: z.object({ visual_style_ids: z.array(z.string()).min(1) }),
+  logo: z.object({ logo: z.string().optional() }),
+  colors: z.object({ colors: z.array(z.string().regex(/^#[0-9A-Fa-f]{6}$/)).length(5) }),
+};
+
+// Opções para cada step
+export const nicheOptions: NicheOption[];           // 8 opções de nicho
+export const personalityOptions: string[];          // 16 personalidades
+export const interestOptions: string[];             // 16 interesses
+export const voiceToneOptions: VoiceToneOption[];   // 6 tons de voz
+export const visualStyleOptions: VisualStyle[];     // 18 estilos visuais
+export const colorPalettes: ColorPalette[];         // 6 paletas sugeridas
+
+// Configuração
+export const TOTAL_STEPS = 15;
+export const stepConfig: StepConfig[];              // Mapeamento step → fase
+```
+
+**Nichos disponíveis (8):**
+| ID | Label | Descrição |
+|----|-------|-----------|
+| saude | Saúde & Bem-estar | Médicos, nutricionistas, personal |
+| beleza | Beleza & Estética | Salões, clínicas, maquiadores |
+| educacao | Educação | Cursos, mentorias, professores |
+| moda | Moda & Lifestyle | Lojas, influencers, estilistas |
+| alimentacao | Alimentação | Restaurantes, delivery, confeitarias |
+| servicos | Serviços | Tecnologia, finanças, consultoria |
+| pet | Pet | Petshops, veterinários |
+| outro | Outro | Meu nicho não está na lista |
+
+**Tons de voz (6):**
+| ID | Label | Exemplo |
+|----|-------|---------|
+| formal | Formal e Profissional | "Prezado cliente, informamos que..." |
+| casual | Casual e Amigável | "E aí, tudo bem? Olha só..." |
+| inspirador | Inspirador e Motivacional | "Você pode conquistar tudo..." |
+| educativo | Educativo e Didático | "Vamos entender como funciona..." |
+| divertido | Descontraído e Engraçado | "Bora rir um pouco? 😄" |
+| autoridade | Autoridade no Assunto | "Com base em 10 anos..." |
+
+**Estilos visuais (18):**
+1. Minimalista Moderno
+2. Bold Vibrante
+3. Elegante Editorial
+4. Divertido Ilustrado
+5. Profissional Corporativo
+6. Criativo Experimental
+7. Tech Futurista
+8. Natural Orgânico
+9. Escandinavo Clean
+10. Zen Japonês
+11. Jurídico Profissional
+12. Financeiro Clean
+13. Neon Pop
+14. Gradiente Explosivo
+15. Retro Anos 80
+16. Gradiente Moderno
+17. Flat Design
+18. Material Design
 
 ---
 
@@ -345,28 +545,6 @@ getNicheLabel(id: string): string    // "saude" → "Saúde & Bem-estar"
 getVoiceToneLabel(id: string): string // "casual" → "Casual e Amigável"
 ```
 
-**Nichos disponíveis:**
-| ID | Label |
-|----|-------|
-| saude | Saúde & Bem-estar |
-| beleza | Beleza & Estética |
-| educacao | Educação |
-| moda | Moda & Lifestyle |
-| alimentacao | Alimentação |
-| servicos | Serviços |
-| pet | Pet |
-| outro | Outro |
-
-**Tons de voz:**
-| ID | Label |
-|----|-------|
-| formal | Formal e Profissional |
-| casual | Casual e Amigável |
-| inspirador | Inspirador e Motivacional |
-| educativo | Educativo e Didático |
-| divertido | Descontraído e Engraçado |
-| autoridade | Autoridade no Assunto |
-
 ---
 
 ## Componentes Principais
@@ -404,11 +582,6 @@ interface MicroStepLayoutProps {
 - `Escape`: Voltar
 - `Tab`: Cicla entre elementos focáveis (focus trap)
 
-**Acessibilidade:**
-- Focus trap mantém foco dentro do step
-- Auto-foco no primeiro elemento interativo
-- Anúncios para screen readers
-
 ### PhaseTransition
 Tela de transição exibida ao completar cada fase.
 
@@ -420,12 +593,6 @@ interface PhaseTransitionProps {
   autoAdvanceMs?: number;    // Default: 3000
 }
 ```
-
-**Comportamento:**
-- Auto-avança após 3 segundos
-- Clique/toque para avançar imediatamente
-- Mostra resumo dos dados coletados na fase
-- Exibe cores na fase "marca"
 
 ### ProgressBarWithPhases
 Barra de progresso com marcadores de fase e checkmarks.
@@ -439,12 +606,50 @@ interface ProgressBarWithPhasesProps {
 }
 ```
 
-**Fases e posições:**
-| Fase | Steps | Posição |
-|------|-------|---------|
-| Negócio | 1-4 | 28% |
-| Público | 5-8 | 57% |
-| Marca | 9-12 | 85% |
+### ColorPicker & ColorPickerPopover
+Seletores de cor com cores predefinidas e picker personalizado.
+
+```tsx
+// ColorPicker - Componente principal
+interface ColorPickerProps {
+  colors: string[];           // 5 cores selecionadas
+  onChange: (colors: string[]) => void;
+  suggestedColors?: string[]; // Cores do logo
+}
+
+// ColorPickerPopover - Popover com HexColorPicker
+interface ColorPickerPopoverProps {
+  color: string;
+  onChange: (color: string) => void;
+  children: ReactNode;
+  align?: "start" | "center" | "end";
+}
+```
+
+### PaywallFlow & PaywallScreen
+Fluxo de paywall com seleção de planos.
+
+```tsx
+// PaywallScreen - Tela de seleção
+interface PaywallScreenProps {
+  trialDays: number;
+  plans: Plan[];
+  onSelectPlan: (planId: string) => void;
+  onLogin?: () => void;
+  isLoading?: boolean;
+}
+
+interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  pricePerMonth: number;
+  interval: "month" | "year";
+  badge?: string;
+  savings?: string;
+  recommended?: boolean;
+}
+```
 
 ### Illustrations (SVGs Extraídos)
 SVGs extraídos para arquivos separados para melhor manutenibilidade.
@@ -531,12 +736,22 @@ Body: OnboardingStep1Data
 POST /api/v1/creator-profile/onboarding/step-2/
 Body: OnboardingStep2Data
 
+// Status do onboarding
+GET /api/v1/creator-profile/onboarding/status/
+Response: { onboarding_completed: boolean }
+
 // Tracking de funil
 POST /api/v1/creator-profile/onboarding/track/
 Body: { session_id, step_number, completed }
 
 // Estilos visuais
 GET /api/v1/creator-profile/visual-style-preferences/
+
+// Profissões
+GET /api/v1/global-options/professions/
+
+// Especializações
+GET /api/v1/global-options/professions/:id/specializations/
 
 // Validação de email
 POST /api/v1/auth/check-email/
@@ -688,6 +903,7 @@ const FOCUSABLE_SELECTOR = [
 - Anúncios de mudança de step via `aria-live`
 - Labels descritivos em todos os inputs
 - Roles apropriados em componentes interativos
+- Componente `SkipToContent` para pular navegação
 
 ### Reduced Motion
 - Confetti respeita `prefers-reduced-motion`
@@ -709,7 +925,7 @@ export const LazyWelcomeStep = lazy(() =>
 export const LazyBusinessNameStep = lazy(() =>
   import("./BusinessNameStep").then(m => ({ default: m.BusinessNameStep }))
 );
-// ... 15 mais steps
+// ... 24 mais steps
 ```
 
 ### Otimizações Implementadas
@@ -760,7 +976,8 @@ O componente suporta modo de edição para usuários existentes:
 {
   "canvas-confetti": "^1.9.4",
   "@types/canvas-confetti": "^1.9.0",
-  "@playwright/test": "^1.58.2"
+  "@playwright/test": "^1.58.2",
+  "react-colorful": "^5.6.1"
 }
 ```
 
@@ -818,7 +1035,10 @@ export default defineConfig({
 - [x] Validação de URLs de redirect Stripe
 - [x] Limite de 500KB para logo
 - [x] JSDoc nos hooks principais
-- [x] Simplificado para 3 fases
+- [x] Simplificado para 5 fases (15 steps)
+- [x] 18 estilos visuais disponíveis
+- [x] 8 nichos de atuação
+- [x] 6 tons de voz
 
 ### Próximos Passos
 - [ ] Aumentar cobertura de testes para 80%+
