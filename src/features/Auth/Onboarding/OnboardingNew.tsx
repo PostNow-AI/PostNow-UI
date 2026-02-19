@@ -80,7 +80,6 @@ export const OnboardingNew = ({
     isLoaded,
     initializeWithData,
     linkDataToUser,
-    sessionId,
   } = useOnboardingStorage();
 
   // Tracking hook for funnel analytics

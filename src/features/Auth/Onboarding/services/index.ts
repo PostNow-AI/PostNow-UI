@@ -198,7 +198,7 @@ export const getTempOnboardingData = async (sessionId: string): Promise<GetTempD
       `/api/v1/creator-profile/onboarding/temp-data/?session_id=${encodeURIComponent(sessionId)}`,
     );
     return response.data;
-  } catch (error) {
+  } catch {
     // Return null if data not found (404)
     return null;
   }
