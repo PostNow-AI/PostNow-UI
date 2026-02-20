@@ -19,13 +19,6 @@ interface VisualStyle {
   preview_image_url?: string | null;
 }
 
-// Opções estáticas como fallback quando a API não está disponível
-const fallbackStyles: VisualStyle[] = visualStyleOptions.map((style, index) => ({
-  id: index + 1,
-  name: style.label,
-  description: style.description,
-  preview_image_url: style.preview_image_url,
-}));
 
 export const VisualStyleStep = ({
   value,
@@ -70,7 +63,6 @@ export const VisualStyleStep = ({
     preview_image_url: pref.preview_image_url ,
   }));
 
-  const preferences: VisualStyle[] = apiStyles ?? fallbackStyles;
 
   return (
     <MicroStepLayout
@@ -84,7 +76,7 @@ export const VisualStyleStep = ({
     >
       {/* Container com cards grandes */}
       <div className="space-y-4">
-        {preferences.map((style, index) => {
+        {apiStyles?.map((style, index) => {
           const styleId = style.id.toString();
           const isSelected = value.includes(styleId);
 
@@ -154,7 +146,7 @@ export const VisualStyleStep = ({
           );
         })}
 
-        {preferences.length === 0 && (
+        {apiStyles?.length === 0 && (
           <p className="text-center text-muted-foreground py-8">
             Nenhum estilo visual disponível no momento.
           </p>
