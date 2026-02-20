@@ -219,7 +219,7 @@ export const trackOnboardingStep = async (
   stepNumber: number,
   completed: boolean = true,
 ): Promise<void> => {
-  await api.post("/api/v1/creator-profile/onboarding/track-step/", {
+  await api.post("/api/v1/creator-profile/onboarding/track/", {
     session_id: sessionId,
     step_number: stepNumber,
     completed,
