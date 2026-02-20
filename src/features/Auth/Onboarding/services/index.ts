@@ -130,3 +130,97 @@ export const generateSingleClientContext = async (): Promise<{ message: string }
   );
   return response.data;
 };
+
+// ========================================
+// Temporary Onboarding Data (for anonymous users)
+// ========================================
+
+export interface TempOnboardingData {
+  session_id: string;
+  // Business data
+  business_name?: string;
+  business_phone?: string;
+  business_website?: string;
+  business_instagram_handle?: string;
+  specialization?: string;
+  business_description?: string;
+  business_purpose?: string;
+  brand_personality?: string;
+  products_services?: string;
+  target_audience?: string;
+  target_interests?: string;
+  business_location?: string;
+  main_competitors?: string;
+  reference_profiles?: string;
+  // Branding data
+  voice_tone?: string;
+  logo?: string;
+  color_1?: string;
+  color_2?: string;
+  color_3?: string;
+  color_4?: string;
+  color_5?: string;
+  visual_style_ids?: string[];
+}
+
+export interface GetTempDataResponse {
+  session_id: string;
+  business_data: Record<string, unknown>;
+  branding_data: Record<string, unknown>;
+  expires_at: string;
+}
+
+/**
+ * Save temporary onboarding data (no auth required).
+ * Use this to persist data for anonymous users during onboarding.
+ */
+export const saveTempOnboardingData = async (data: TempOnboardingData): Promise<GetTempDataResponse> => {
+  const response = await api.post<GetTempDataResponse>(
+    "/api/v1/creator-profile/onboarding/temp-data/",
+    data,
+  );
+  return response.data;
+};
+
+/**
+ * Get temporary onboarding data by session_id (no auth required).
+ * Returns null if data not found or expired.
+ */
+export const getTempOnboardingData = async (sessionId: string): Promise<GetTempDataResponse | null> => {
+  try {
+    const response = await api.get<GetTempDataResponse>(
+      `/api/v1/creator-profile/onboarding/temp-data/?session_id=${encodeURIComponent(sessionId)}`,
+    );
+    return response.data;
+  } catch {
+    // Return null if data not found (404)
+    return null;
+  }
+};
+
+/**
+ * Link temporary data to authenticated user (auth required).
+ * Call this AFTER user signs up to transfer temp data to their profile.
+ */
+export const linkTempDataToUser = async (sessionId: string): Promise<{ status: string; profile_updated: boolean }> => {
+  const response = await api.post<{ status: string; profile_updated: boolean }>(
+    "/api/v1/creator-profile/onboarding/link-data/",
+    { session_id: sessionId },
+  );
+  return response.data;
+};
+
+/**
+ * Track onboarding step completion (no auth required).
+ */
+export const trackOnboardingStep = async (
+  sessionId: string,
+  stepNumber: number,
+  completed: boolean = true,
+): Promise<void> => {
+  await api.post("/api/v1/creator-profile/onboarding/track-step/", {
+    session_id: sessionId,
+    step_number: stepNumber,
+    completed,
+  });
+};
