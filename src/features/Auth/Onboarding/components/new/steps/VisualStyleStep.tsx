@@ -62,14 +62,15 @@ export const VisualStyleStep = ({
     );
   }
 
-  // // Usar opções da API se disponíveis, senão usar fallback estático
-  // const apiStyles: VisualStyle[] | undefined = visualStylePreferences?.map(pref => ({
-  //   id: pref.id,
-  //   name: pref.name,
-  //   description: pref.description,
-  // }));
+  // Usar opções da API se disponíveis, senão usar fallback estático
+  const apiStyles: VisualStyle[] | undefined = visualStylePreferences?.map(pref => ({
+    id: pref.id,
+    name: pref.name,
+    description: pref.description,
+    preview_image_url: pref.preview_image_url,
+  }));
 
-  const preferences: VisualStyle[] = fallbackStyles;
+  const preferences: VisualStyle[] = apiStyles ?? fallbackStyles;
 
   return (
     <MicroStepLayout

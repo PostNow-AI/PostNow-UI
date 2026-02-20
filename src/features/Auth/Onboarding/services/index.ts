@@ -58,6 +58,7 @@ export interface VisualStylePreference {
   id: string;
   name: string;
   description: string;
+  preview_image_url?: string | null;
 }
 
 export const submitOnboardingStep1 = async (data: OnboardingFormData | OnboardingStep1Data): Promise<OnboardingStepResponse> => {
