@@ -2,8 +2,9 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, Loader2, Palette } from "lucide-react";
 import { MicroStepLayout } from "../MicroStepLayout";
-import { TOTAL_STEPS, visualStyleOptions } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
-import { useVisualStylePreferences } from "@/features/Auth/Onboarding/hooks/useVisualStylePreferences";
+import { TOTAL_STEPS } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
+import { useQuery } from "@tanstack/react-query";
+import { fetchVisualStylePreferences, type VisualStylePreference } from "../../../services";
 
 interface VisualStyleStepProps {
   value: string[];
@@ -26,8 +27,16 @@ export const VisualStyleStep = ({
   onNext,
   onBack,
 }: VisualStyleStepProps) => {
-  const { visualStylePreferences, isLoading, isError } = useVisualStylePreferences();
   const isValid = value.length > 0;
+
+  const {
+    data: visualStylePreferences,
+    isLoading,
+    isError,
+  } = useQuery<VisualStylePreference[]>({
+    queryKey: ["visualStylePreferences"],
+    queryFn: fetchVisualStylePreferences,
+  });
 
   const handleToggle = (id: string) => {
     if (value.includes(id)) {
@@ -54,6 +63,8 @@ export const VisualStyleStep = ({
       </MicroStepLayout>
     );
   }
+
+  console.log(visualStylePreferences)
 
   // Usar opções da API se disponíveis, senão usar fallback estático
   const apiStyles: VisualStyle[] | undefined = visualStylePreferences?.map(pref => ({

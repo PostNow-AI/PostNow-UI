@@ -15,7 +15,6 @@ export const useVisualStylePreferences = (enabled = false) => {
   } = useQuery<VisualStylePreference[]>({
     queryKey: ["visualStylePreferences"],
     queryFn: fetchVisualStylePreferences,
-    staleTime: 5 * 60 * 1000, // 5 minutes
     enabled, // Só busca quando explicitamente habilitado
   });
 
