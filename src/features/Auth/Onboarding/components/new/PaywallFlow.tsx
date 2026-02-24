@@ -44,6 +44,7 @@ const TrialIntroScreen = ({
   selectedPlan: Plan;
   onContinue: () => void;
 }) => {
+  console.log("Selected Plan in TrialIntroScreen:", selectedPlan); // Log para verificar o plano selecionado
   return (
     <motion.div
       initial={{ opacity: 0, x: 50 }}

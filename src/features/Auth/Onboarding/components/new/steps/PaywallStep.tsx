@@ -22,7 +22,7 @@ const plans = [
     id: "annual",
     name: "Anual",
     price: 359.0,
-    pricePerMonth: 29.92,
+    pricePerMonth: 29.90,
     interval: "year" as const,
     badge: "Melhor valor",
     savings: "Economize 40%",

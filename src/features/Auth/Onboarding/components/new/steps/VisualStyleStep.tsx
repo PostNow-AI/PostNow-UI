@@ -64,8 +64,6 @@ export const VisualStyleStep = ({
     );
   }
 
-  console.log(visualStylePreferences)
-
   // Usar opções da API se disponíveis, senão usar fallback estático
   const apiStyles: VisualStyle[] | undefined = visualStylePreferences?.map(pref => ({
     id: pref.id,

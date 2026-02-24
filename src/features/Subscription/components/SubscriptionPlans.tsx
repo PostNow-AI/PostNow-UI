@@ -80,16 +80,7 @@ export const SubscriptionPlans = () => {
 
   const calculateMonthlyPrice = (plan: SubscriptionPlan) => {
     const basePrice = Number(plan.price);
-    if (plan.interval === "monthly") {
-      return basePrice;
-    } else if (plan.interval === "semester") {
-      const monthlyBase = basePrice / 6;
-      return monthlyBase * 0.75; // 25% discount
-    } else if (plan.interval === "yearly") {
-      const monthlyBase = basePrice / 12;
-      return monthlyBase * 0.5; // 50% discount
-    }
-    return basePrice; // fallback for other intervals
+    return basePrice; 
   };
 
   if (isLoading) {
@@ -165,6 +156,7 @@ export const SubscriptionPlans = () => {
           const bestChoice = plan.interval === "yearly"; // You can adjust this logic
           const monthlyPrice = calculateMonthlyPrice(plan);
 
+          
           return (
             <Card
               key={plan.id}
