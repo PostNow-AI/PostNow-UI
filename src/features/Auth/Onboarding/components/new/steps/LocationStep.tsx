@@ -67,10 +67,12 @@ export const LocationStep = ({
           const data = await fallbackResponse.json();
 
           if (data.cityName && data.regionName) {
-            const stateAbbr = getStateAbbreviation(data.regionName) || data.regionName;
+            // Translate state name from English to Portuguese if needed
+            const statePt = STATES_EN_TO_PT[data.regionName] || data.regionName;
+            const stateAbbr = getStateAbbreviation(statePt) || statePt;
             setDetected({
               city: data.cityName,
-              state: data.regionName,
+              state: statePt,
               stateAbbr,
             });
           }
@@ -201,6 +203,20 @@ export const LocationStep = ({
       </div>
     </MicroStepLayout>
   );
+};
+
+// Brazilian states: English name -> Portuguese name (for FreeIPAPI translation)
+const STATES_EN_TO_PT: Record<string, string> = {
+  "Acre": "Acre", "Alagoas": "Alagoas", "Amapá": "Amapá", "Amazonas": "Amazonas",
+  "Bahia": "Bahia", "Ceará": "Ceará", "Federal District": "Distrito Federal",
+  "Espírito Santo": "Espírito Santo", "Goiás": "Goiás", "Maranhão": "Maranhão",
+  "Mato Grosso": "Mato Grosso", "Mato Grosso do Sul": "Mato Grosso do Sul",
+  "Minas Gerais": "Minas Gerais", "Pará": "Pará", "Paraíba": "Paraíba",
+  "Paraná": "Paraná", "Pernambuco": "Pernambuco", "Piauí": "Piauí",
+  "Rio de Janeiro": "Rio de Janeiro", "Rio Grande do Norte": "Rio Grande do Norte",
+  "Rio Grande do Sul": "Rio Grande do Sul", "Rondônia": "Rondônia",
+  "Roraima": "Roraima", "Santa Catarina": "Santa Catarina",
+  "São Paulo": "São Paulo", "Sergipe": "Sergipe", "Tocantins": "Tocantins"
 };
 
 // Brazilian states mapping
