@@ -30,24 +30,44 @@ export const LocationStep = ({
 
   const isValid = value.trim().length >= 2;
 
-  // Detect location by IP on mount (using HTTPS API)
+  // Detect location on mount
+  // Uses Vercel headers in production, FreeIPAPI as fallback for localhost
   useEffect(() => {
     const detectLocation = async () => {
       try {
-        // ipapi.co supports HTTPS and has good Brazil coverage
-        const response = await fetch("https://ipapi.co/json/", {
-          signal: AbortSignal.timeout(5000), // 5s timeout
+        // First, try Vercel's geolocation endpoint (works in production)
+        const vercelResponse = await fetch("/api/geolocation", {
+          signal: AbortSignal.timeout(3000),
         });
-        if (!response.ok) throw new Error("Failed to fetch");
 
-        const data = await response.json();
+        if (vercelResponse.ok) {
+          const vercelData = await vercelResponse.json();
+          if (vercelData.success && vercelData.city && vercelData.region) {
+            const stateName = getStateName(vercelData.region) || vercelData.region;
+            setDetected({
+              city: vercelData.city,
+              state: stateName,
+              stateAbbr: vercelData.region,
+            });
+            setIsDetecting(false);
+            return;
+          }
+        }
 
-        // ipapi.co returns: city, region (state name), region_code (state abbr)
-        if (data.city && data.region) {
-          const stateAbbr = data.region_code || getStateAbbreviation(data.region) || data.region;
+        // Fallback: FreeIPAPI (for localhost or if Vercel headers unavailable)
+        const fallbackResponse = await fetch("https://freeipapi.com/api/json/", {
+          signal: AbortSignal.timeout(5000),
+        });
+
+        if (!fallbackResponse.ok) throw new Error("Failed to fetch");
+
+        const data = await fallbackResponse.json();
+
+        if (data.cityName && data.regionName) {
+          const stateAbbr = getStateAbbreviation(data.regionName) || data.regionName;
           setDetected({
-            city: data.city,
-            state: data.region,
+            city: data.cityName,
+            state: data.regionName,
             stateAbbr,
           });
         }
@@ -179,16 +199,24 @@ export const LocationStep = ({
   );
 };
 
+// Brazilian states mapping
+const BRAZILIAN_STATES: Record<string, string> = {
+  "Acre": "AC", "Alagoas": "AL", "Amapá": "AP", "Amazonas": "AM",
+  "Bahia": "BA", "Ceará": "CE", "Distrito Federal": "DF", "Espírito Santo": "ES",
+  "Goiás": "GO", "Maranhão": "MA", "Mato Grosso": "MT", "Mato Grosso do Sul": "MS",
+  "Minas Gerais": "MG", "Pará": "PA", "Paraíba": "PB", "Paraná": "PR",
+  "Pernambuco": "PE", "Piauí": "PI", "Rio de Janeiro": "RJ", "Rio Grande do Norte": "RN",
+  "Rio Grande do Sul": "RS", "Rondônia": "RO", "Roraima": "RR", "Santa Catarina": "SC",
+  "São Paulo": "SP", "Sergipe": "SE", "Tocantins": "TO"
+};
+
 // Helper to convert Brazilian state names to abbreviations
 function getStateAbbreviation(state: string): string | null {
-  const states: Record<string, string> = {
-    "Acre": "AC", "Alagoas": "AL", "Amapá": "AP", "Amazonas": "AM",
-    "Bahia": "BA", "Ceará": "CE", "Distrito Federal": "DF", "Espírito Santo": "ES",
-    "Goiás": "GO", "Maranhão": "MA", "Mato Grosso": "MT", "Mato Grosso do Sul": "MS",
-    "Minas Gerais": "MG", "Pará": "PA", "Paraíba": "PB", "Paraná": "PR",
-    "Pernambuco": "PE", "Piauí": "PI", "Rio de Janeiro": "RJ", "Rio Grande do Norte": "RN",
-    "Rio Grande do Sul": "RS", "Rondônia": "RO", "Roraima": "RR", "Santa Catarina": "SC",
-    "São Paulo": "SP", "Sergipe": "SE", "Tocantins": "TO"
-  };
-  return states[state] || null;
+  return BRAZILIAN_STATES[state] || null;
+}
+
+// Helper to convert Brazilian state abbreviations to names
+function getStateName(abbr: string): string | null {
+  const entry = Object.entries(BRAZILIAN_STATES).find(([, value]) => value === abbr);
+  return entry ? entry[0] : null;
 }
