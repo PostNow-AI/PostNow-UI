@@ -19,7 +19,6 @@ const OnboardingStorageSchema = z.object({
   brand_personality: z.array(z.string().max(50)).max(10).default([]),
   products_services: z.string().max(500).default(""),
   target_audience: z.string().max(1000).default(""),
-  target_interests: z.array(z.string().max(50)).max(20).default([]),
   business_location: z.string().max(200).default(""),
   main_competitors: z.string().max(500).default(""),
   reference_profiles: z.string().max(500).default(""),
@@ -67,7 +66,6 @@ const sanitizeData = (data: Partial<OnboardingTempData>): Partial<OnboardingTemp
 
   // Limitar arrays
   if (sanitized.brand_personality) sanitized.brand_personality = sanitized.brand_personality.slice(0, 10);
-  if (sanitized.target_interests) sanitized.target_interests = sanitized.target_interests.slice(0, 20);
   if (sanitized.visual_style_ids) sanitized.visual_style_ids = sanitized.visual_style_ids.slice(0, 10);
   if (sanitized.colors) sanitized.colors = sanitized.colors.slice(0, 10);
 
@@ -91,7 +89,6 @@ export interface OnboardingTempData {
 
   // Fase 3: Seu Público
   target_audience: string;
-  target_interests: string[];
   business_location: string;
   main_competitors: string;
   reference_profiles: string;
@@ -120,7 +117,6 @@ const getDefaultData = (): OnboardingTempData => ({
   brand_personality: [],
   products_services: "",
   target_audience: "",
-  target_interests: [],
   business_location: "",
   main_competitors: "",
   reference_profiles: "",
@@ -243,7 +239,6 @@ export const useOnboardingStorage = () => {
       products_services: data.products_services || "",
       business_location: data.business_location,
       target_audience: audienceJsonToString(data.target_audience), // JSON → String legível
-      target_interests: data.target_interests.join(", "), // Array → String
       main_competitors: data.main_competitors,
       reference_profiles: data.reference_profiles,
     };

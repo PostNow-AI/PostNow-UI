@@ -98,7 +98,6 @@ export const ChipsSelectionStep = ({
 
 import {
   personalityOptions,
-  interestOptions,
 } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
 
 /** Configuração para PersonalityStep */
@@ -112,13 +111,3 @@ export const PERSONALITY_STEP_CONFIG = {
   customPlaceholder: "Digite outra característica...",
 } as const;
 
-/** Configuração para InterestsStep */
-export const INTERESTS_STEP_CONFIG = {
-  step: 7,
-  title: "Quais são os interesses do seu público?",
-  subtitle: "Pense no que seu cliente ideal gosta e consome.",
-  options: interestOptions,
-  maxSelections: 8,
-  allowCustom: true,
-  customPlaceholder: "Digite outro interesse...",
-} as const;

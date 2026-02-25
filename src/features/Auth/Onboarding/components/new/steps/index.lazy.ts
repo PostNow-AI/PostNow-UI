@@ -41,10 +41,6 @@ export const LazyTargetAudienceStep = lazy(() =>
   import("./TargetAudienceStep").then((m) => ({ default: m.TargetAudienceStep }))
 );
 
-export const LazyInterestsStep = lazy(() =>
-  import("./InterestsStep").then((m) => ({ default: m.InterestsStep }))
-);
-
 export const LazyLocationStep = lazy(() =>
   import("./LocationStep").then((m) => ({ default: m.LocationStep }))
 );

@@ -75,17 +75,8 @@ const PHASE_CONFIG: Record<PhaseType, PhaseConfig> = {
       }
       return null;
     },
-    detail2: (data) => {
-      // Interesses
-      if (data.target_interests && data.target_interests.length > 0) {
-        const interests = data.target_interests.slice(0, 4).join(", ");
-        return data.target_interests.length > 4
-          ? `${interests} +${data.target_interests.length - 4}`
-          : interests;
-      }
-      return null;
-    },
-    detail3: (data) => data.business_location || null,
+    detail2: (data) => data.business_location || null,
+    detail3: () => null,
     message: "Agora sabemos para quem você quer falar.",
     progress: "2 de 3",
   },

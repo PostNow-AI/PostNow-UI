@@ -88,9 +88,6 @@ export const useOnboardingSync = ({
         products_services: freshData.products_services || "",
         business_location: freshData.business_location,
         target_audience: audienceJsonToString(freshData.target_audience),
-        target_interests: Array.isArray(freshData.target_interests)
-          ? freshData.target_interests.join(", ")
-          : freshData.target_interests,
         main_competitors: freshData.main_competitors,
         reference_profiles: freshData.reference_profiles,
       };

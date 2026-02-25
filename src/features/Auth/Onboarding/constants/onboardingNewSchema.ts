@@ -27,12 +27,7 @@ export const stepSchemas = {
     target_audience: z.string().min(5, "Selecione as características do seu público"),
   }),
 
-  // Etapa 7: Interesses do público
-  interests: z.object({
-    target_interests: z.array(z.string()).min(1, "Selecione pelo menos um interesse"),
-  }),
-
-  // Etapa 8: Localização
+  // Etapa 7: Localização
   location: z.object({
     business_location: z.string().min(1, "Informe a localização"),
   }),
@@ -88,26 +83,6 @@ export const personalityOptions = [
   "Ousado",
   "Confiável",
   "Jovem",
-];
-
-// Opções de interesses do público (chips)
-export const interestOptions = [
-  "Saúde",
-  "Beleza",
-  "Moda",
-  "Tecnologia",
-  "Finanças",
-  "Viagens",
-  "Gastronomia",
-  "Esportes",
-  "Música",
-  "Arte",
-  "Natureza",
-  "Família",
-  "Carreira",
-  "Empreendedorismo",
-  "Lifestyle",
-  "Bem-estar",
 ];
 
 // Opções de tom de voz (cards visuais)
@@ -278,8 +253,8 @@ export const colorPalettes = [
   { name: "Quente", colors: ["#F56565", "#ED8936", "#ECC94B", "#48BB78", "#38B2AC"] },
 ];
 
-// Total de etapas (15 antes do auth/paywall)
-export const TOTAL_STEPS = 15;
+// Total de etapas (14 antes do auth/paywall - removido InterestsStep)
+export const TOTAL_STEPS = 14;
 
 // Mapeamento de etapas
 export const stepConfig = [
@@ -292,9 +267,8 @@ export const stepConfig = [
   { phase: 2, name: "offer", title: "Qual é a sua oferta?" },
   { phase: 2, name: "personality", title: "Como você quer que as pessoas vejam sua marca?" },
 
-  // FASE 3: SEU PÚBLICO (3 telas)
+  // FASE 3: SEU PÚBLICO (2 telas)
   { phase: 3, name: "targetAudience", title: "Quem é seu cliente ideal?" },
-  { phase: 3, name: "interests", title: "Quais são os interesses dele?" },
   { phase: 3, name: "location", title: "Onde seu público está?" },
 
   // FASE 4: IDENTIDADE VISUAL (4 telas)

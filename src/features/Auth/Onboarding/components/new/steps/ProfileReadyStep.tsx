@@ -47,7 +47,6 @@ export const ProfileReadyStep = ({
     { label: "Nicho", value: nicheOptions.find(n => n.id === data.specialization)?.label || data.specialization },
     { label: "Oferta", value: data.business_description ? (data.business_description.length > 40 ? data.business_description.slice(0, 40) + "..." : data.business_description) : null },
     { label: "Público", value: data.target_audience ? audienceToCompactString(data.target_audience) : null },
-    { label: "Interesses", value: data.target_interests?.length > 0 ? (data.target_interests.slice(0, 3).join(", ") + (data.target_interests.length > 3 ? ` +${data.target_interests.length - 3}` : "")) : null },
     { label: "Localização", value: data.business_location },
     { label: "Personalidade", value: data.brand_personality?.length > 0 ? cleanPersonality(data.brand_personality) : null },
     { label: "Tom de voz", value: data.voice_tone },

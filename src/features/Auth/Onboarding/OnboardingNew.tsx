@@ -15,7 +15,6 @@ import {
   LazyOfferStep as OfferStep,
   LazyPersonalityStep as PersonalityStep,
   LazyTargetAudienceStep as TargetAudienceStep,
-  LazyInterestsStep as InterestsStep,
   LazyLocationStep as LocationStep,
   LazyVoiceToneStep as VoiceToneStep,
   LazyVisualStyleStep as VisualStyleStep,
@@ -48,8 +47,8 @@ type PhaseType = "negocio" | "publico" | "marca";
 // Mapeamento de steps finais de cada fase para tipo de fase
 const PHASE_END_STEPS: Record<number, PhaseType> = {
   4: "negocio",   // Step 4 é o último do Negócio
-  8: "publico",   // Step 8 é o último do Público
-  12: "marca",    // Step 12 é o último da Marca
+  7: "publico",   // Step 7 é o último do Público (removido InterestsStep)
+  11: "marca",    // Step 11 é o último da Marca
 };
 
 interface OnboardingNewProps {
@@ -141,7 +140,7 @@ export const OnboardingNew = ({
 
   // Steps that trigger celebrations (only at the end now - phases use subtle animation instead)
   const CELEBRATION_STEPS = {
-    13: "full",    // Profile Ready - celebração completa!
+    12: "full",    // Profile Ready - celebração completa!
   } as const;
 
   // Inicializar com dados no modo edição
@@ -153,10 +152,6 @@ export const OnboardingNew = ({
         // Converter brand_personality de string para array
         brand_personality: initialData.brand_personality
           ? initialData.brand_personality.split(",").map((s) => s.trim())
-          : [],
-        // Converter target_interests de string para array
-        target_interests: initialData.target_interests
-          ? initialData.target_interests.split(",").map((s) => s.trim())
           : [],
         // Converter cores individuais para array
         colors: [
@@ -195,8 +190,8 @@ export const OnboardingNew = ({
       if (hasOnboardingData) {
         setIsAuthenticated(true);
         // Jump directly to paywall step
-        if (data.current_step < 16) {
-          setCurrentStep(16);
+        if (data.current_step < 15) {
+          setCurrentStep(15);
         }
       }
       // Se não tem dados do onboarding, deixa o usuário completar o fluxo
@@ -277,9 +272,6 @@ export const OnboardingNew = ({
         products_services: freshData.products_services || "",
         business_location: freshData.business_location,
         target_audience: audienceJsonToString(freshData.target_audience),
-        target_interests: Array.isArray(freshData.target_interests)
-          ? freshData.target_interests.join(", ")
-          : freshData.target_interests,
         main_competitors: freshData.main_competitors,
         reference_profiles: freshData.reference_profiles,
       };
@@ -307,7 +299,7 @@ export const OnboardingNew = ({
       // As queries serão invalidadas quando o usuário voltar do Stripe
 
       // Mark final step as completed and clear tracking
-      trackStepComplete(16);
+      trackStepComplete(15);
       clearTracking();
     },
     onError: (error: unknown) => {
@@ -378,7 +370,7 @@ export const OnboardingNew = ({
   const handleAuthSuccess = useCallback(() => {
     // Batch all state updates to avoid multiple re-renders
     startTransition(() => {
-      setCurrentStep(16); // Ir para paywall primeiro
+      setCurrentStep(15); // Ir para paywall primeiro
       setIsAuthenticated(true);
       setAuthMode(null);
     });
@@ -484,7 +476,7 @@ export const OnboardingNew = ({
   }
 
   // Se já autenticado e no paywall (apenas no modo criação)
-  if (!isEditMode && isAuthenticated && data.current_step >= 15) {
+  if (!isEditMode && isAuthenticated && data.current_step >= 14) {
     return (
       <Suspense fallback={<StepSkeleton showProgress={false} />}>
         <PaywallStep
@@ -573,16 +565,6 @@ export const OnboardingNew = ({
 
       case 7:
         return (
-          <InterestsStep
-            value={data.target_interests}
-            onChange={(value) => saveData({ target_interests: value })}
-            onNext={handleNext}
-            onBack={handleBack}
-          />
-        );
-
-      case 8:
-        return (
           <LocationStep
             value={data.business_location}
             onChange={(value) => saveData({ business_location: value })}
@@ -591,7 +573,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 9:
+      case 8:
         return (
           <VoiceToneStep
             value={data.voice_tone}
@@ -601,7 +583,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 10:
+      case 9:
         return (
           <VisualStyleStep
             value={data.visual_style_ids}
@@ -611,7 +593,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 11:
+      case 10:
         return (
           <LogoStep
             value={data.logo}
@@ -633,7 +615,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 12:
+      case 11:
         return (
           <ColorsStep
             value={data.colors}
@@ -644,7 +626,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 13:
+      case 12:
         return (
           <ProfileReadyStep
             data={data}
@@ -663,8 +645,8 @@ export const OnboardingNew = ({
           />
         );
 
-      case 14:
-        // No modo edição, não deve chegar aqui (salva no step 13)
+      case 13:
+        // No modo edição, não deve chegar aqui (salva no step 12)
         if (isEditMode) {
           updateMutation.mutate();
           return null;
