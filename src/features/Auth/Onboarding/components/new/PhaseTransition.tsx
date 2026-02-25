@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 // import { cn } from "@/lib/utils";
 import type { OnboardingTempData } from "../../hooks/useOnboardingStorage";
 import { audienceToDisplayString, audienceIncomeToString } from "../../utils/audienceUtils";
-import { getNicheLabel, getVoiceToneLabel } from "../../utils/labelUtils";
+import { getNicheLabel } from "../../utils/labelUtils";
 
 type PhaseType = "negocio" | "publico" | "marca";
 
@@ -82,12 +82,7 @@ const PHASE_CONFIG: Record<PhaseType, PhaseConfig> = {
   },
   marca: {
     title: "Marca",
-    summary: (data) => {
-      if (data.voice_tone) {
-        return `Tom: ${getVoiceToneLabel(data.voice_tone)}`;
-      }
-      return "Sua identidade";
-    },
+    summary: () => "Sua identidade visual",
     detail: (data) => {
       // Estilos visuais selecionados
       if (data.visual_style_ids && data.visual_style_ids.length > 0) {

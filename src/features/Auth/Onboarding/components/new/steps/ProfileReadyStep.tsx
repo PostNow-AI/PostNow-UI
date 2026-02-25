@@ -49,7 +49,6 @@ export const ProfileReadyStep = ({
     { label: "Público", value: data.target_audience ? audienceToCompactString(data.target_audience) : null },
     { label: "Localização", value: data.business_location },
     { label: "Personalidade", value: data.brand_personality?.length > 0 ? cleanPersonality(data.brand_personality) : null },
-    { label: "Tom de voz", value: data.voice_tone },
     { label: "Estilos", value: data.visual_style_ids?.length > 0 ? getStyleNames(data.visual_style_ids) : null },
   ].filter(item => item.value);
 

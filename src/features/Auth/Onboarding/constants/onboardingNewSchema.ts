@@ -32,12 +32,7 @@ export const stepSchemas = {
     business_location: z.string().min(1, "Informe a localização"),
   }),
 
-  // Etapa 9: Tom de voz
-  voiceTone: z.object({
-    voice_tone: z.string().min(1, "Selecione um tom de voz"),
-  }),
-
-  // Etapa 10: Estilo visual
+  // Etapa 8: Estilo visual
   visualStyle: z.object({
     visual_style_ids: z.array(z.string()).min(1, "Selecione pelo menos um estilo visual"),
   }),
@@ -253,8 +248,8 @@ export const colorPalettes = [
   { name: "Quente", colors: ["#F56565", "#ED8936", "#ECC94B", "#48BB78", "#38B2AC"] },
 ];
 
-// Total de etapas (14 antes do auth/paywall - removido InterestsStep)
-export const TOTAL_STEPS = 14;
+// Total de etapas (13 antes do auth/paywall - removido InterestsStep e VoiceToneStep)
+export const TOTAL_STEPS = 13;
 
 // Mapeamento de etapas
 export const stepConfig = [
@@ -271,8 +266,7 @@ export const stepConfig = [
   { phase: 3, name: "targetAudience", title: "Quem é seu cliente ideal?" },
   { phase: 3, name: "location", title: "Onde seu público está?" },
 
-  // FASE 4: IDENTIDADE VISUAL (4 telas)
-  { phase: 4, name: "voiceTone", title: "Qual o tom de voz da sua marca?" },
+  // FASE 4: IDENTIDADE VISUAL (3 telas - tom de voz inferido da personalidade)
   { phase: 4, name: "visualStyle", title: "Escolha seu estilo visual" },
   { phase: 4, name: "logo", title: "Adicione seu logo" },
   { phase: 4, name: "colors", title: "Suas cores" },

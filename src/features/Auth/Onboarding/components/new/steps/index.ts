@@ -6,7 +6,6 @@ export { PersonalityStep } from "./PersonalityStep";
 export { PersonalityQuizStep } from "./PersonalityQuizStep";
 export { TargetAudienceStep } from "./TargetAudienceStep";
 export { LocationStep } from "./LocationStep";
-export { VoiceToneStep } from "./VoiceToneStep";
 export { VisualStyleStep } from "./VisualStyleStep";
 export { ColorsStep } from "./ColorsStep";
 export { LogoStep } from "./LogoStep";

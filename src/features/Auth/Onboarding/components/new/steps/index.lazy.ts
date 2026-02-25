@@ -45,10 +45,6 @@ export const LazyLocationStep = lazy(() =>
   import("./LocationStep").then((m) => ({ default: m.LocationStep }))
 );
 
-export const LazyVoiceToneStep = lazy(() =>
-  import("./VoiceToneStep").then((m) => ({ default: m.VoiceToneStep }))
-);
-
 export const LazyVisualStyleStep = lazy(() =>
   import("./VisualStyleStep").then((m) => ({ default: m.VisualStyleStep }))
 );

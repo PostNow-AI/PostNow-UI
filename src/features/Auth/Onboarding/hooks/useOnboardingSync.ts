@@ -97,7 +97,7 @@ export const useOnboardingSync = ({
       // Step 2: Branding
       const colors = freshData.colors || ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"];
       const step2Payload = {
-        voice_tone: freshData.voice_tone,
+        voice_tone: "", // Inferido da personalidade da marca
         logo: freshData.logo,
         color_1: colors[0] || "#FF6B6B",
         color_2: colors[1] || "#4ECDC4",

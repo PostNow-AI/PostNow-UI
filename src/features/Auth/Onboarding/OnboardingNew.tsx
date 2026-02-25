@@ -16,7 +16,6 @@ import {
   LazyPersonalityStep as PersonalityStep,
   LazyTargetAudienceStep as TargetAudienceStep,
   LazyLocationStep as LocationStep,
-  LazyVoiceToneStep as VoiceToneStep,
   LazyVisualStyleStep as VisualStyleStep,
   LazyColorsStep as ColorsStep,
   LazyLogoStep as LogoStep,
@@ -47,8 +46,8 @@ type PhaseType = "negocio" | "publico" | "marca";
 // Mapeamento de steps finais de cada fase para tipo de fase
 const PHASE_END_STEPS: Record<number, PhaseType> = {
   4: "negocio",   // Step 4 é o último do Negócio
-  7: "publico",   // Step 7 é o último do Público (removido InterestsStep)
-  11: "marca",    // Step 11 é o último da Marca
+  7: "publico",   // Step 7 é o último do Público
+  10: "marca",    // Step 10 é o último da Marca (removido VoiceToneStep)
 };
 
 interface OnboardingNewProps {
@@ -140,7 +139,7 @@ export const OnboardingNew = ({
 
   // Steps that trigger celebrations (only at the end now - phases use subtle animation instead)
   const CELEBRATION_STEPS = {
-    12: "full",    // Profile Ready - celebração completa!
+    11: "full",    // Profile Ready - celebração completa!
   } as const;
 
   // Inicializar com dados no modo edição
@@ -190,8 +189,8 @@ export const OnboardingNew = ({
       if (hasOnboardingData) {
         setIsAuthenticated(true);
         // Jump directly to paywall step
-        if (data.current_step < 15) {
-          setCurrentStep(15);
+        if (data.current_step < 14) {
+          setCurrentStep(14);
         }
       }
       // Se não tem dados do onboarding, deixa o usuário completar o fluxo
@@ -281,7 +280,7 @@ export const OnboardingNew = ({
       // Step 2: Branding
       const colors = freshData.colors || ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"];
       const step2Payload = {
-        voice_tone: freshData.voice_tone,
+        voice_tone: "", // Inferido da personalidade da marca
         logo: freshData.logo,
         color_1: colors[0] || "#FF6B6B",
         color_2: colors[1] || "#4ECDC4",
@@ -299,7 +298,7 @@ export const OnboardingNew = ({
       // As queries serão invalidadas quando o usuário voltar do Stripe
 
       // Mark final step as completed and clear tracking
-      trackStepComplete(15);
+      trackStepComplete(14);
       clearTracking();
     },
     onError: (error: unknown) => {
@@ -370,7 +369,7 @@ export const OnboardingNew = ({
   const handleAuthSuccess = useCallback(() => {
     // Batch all state updates to avoid multiple re-renders
     startTransition(() => {
-      setCurrentStep(15); // Ir para paywall primeiro
+      setCurrentStep(14); // Ir para paywall primeiro
       setIsAuthenticated(true);
       setAuthMode(null);
     });
@@ -476,7 +475,7 @@ export const OnboardingNew = ({
   }
 
   // Se já autenticado e no paywall (apenas no modo criação)
-  if (!isEditMode && isAuthenticated && data.current_step >= 14) {
+  if (!isEditMode && isAuthenticated && data.current_step >= 13) {
     return (
       <Suspense fallback={<StepSkeleton showProgress={false} />}>
         <PaywallStep
@@ -575,16 +574,6 @@ export const OnboardingNew = ({
 
       case 8:
         return (
-          <VoiceToneStep
-            value={data.voice_tone}
-            onChange={(value) => saveData({ voice_tone: value })}
-            onNext={handleNext}
-            onBack={handleBack}
-          />
-        );
-
-      case 9:
-        return (
           <VisualStyleStep
             value={data.visual_style_ids}
             onChange={(value) => saveData({ visual_style_ids: value })}
@@ -593,7 +582,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 10:
+      case 9:
         return (
           <LogoStep
             value={data.logo}
@@ -615,7 +604,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 11:
+      case 10:
         return (
           <ColorsStep
             value={data.colors}
@@ -626,7 +615,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 12:
+      case 11:
         return (
           <ProfileReadyStep
             data={data}
@@ -645,8 +634,8 @@ export const OnboardingNew = ({
           />
         );
 
-      case 13:
-        // No modo edição, não deve chegar aqui (salva no step 12)
+      case 12:
+        // No modo edição, não deve chegar aqui (salva no step 11)
         if (isEditMode) {
           updateMutation.mutate();
           return null;

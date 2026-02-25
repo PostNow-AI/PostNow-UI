@@ -22,7 +22,6 @@ const OnboardingStorageSchema = z.object({
   business_location: z.string().max(200).default(""),
   main_competitors: z.string().max(500).default(""),
   reference_profiles: z.string().max(500).default(""),
-  voice_tone: z.string().max(50).default(""),
   visual_style_ids: z.array(z.string()).max(10).default([]),
   colors: z.array(z.string().regex(/^#[0-9A-Fa-f]{6}$/)).max(10).default(["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"]),
   logo: z.string().max(MAX_STRING_FIELD_LENGTH).default(""),
@@ -93,8 +92,7 @@ export interface OnboardingTempData {
   main_competitors: string;
   reference_profiles: string;
 
-  // Fase 4: Identidade Visual
-  voice_tone: string;
+  // Fase 4: Identidade Visual (tom de voz inferido da personalidade)
   visual_style_ids: string[];
   colors: string[];
   logo: string;
@@ -120,7 +118,6 @@ const getDefaultData = (): OnboardingTempData => ({
   business_location: "",
   main_competitors: "",
   reference_profiles: "",
-  voice_tone: "",
   visual_style_ids: [],
   colors: ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"],
   logo: "",
@@ -247,7 +244,7 @@ export const useOnboardingStorage = () => {
   // Obter dados formatados para API (Step 2)
   const getStep2Payload = useCallback(() => {
     return {
-      voice_tone: data.voice_tone,
+      voice_tone: "", // Inferido da personalidade da marca
       logo: data.logo,
       color_1: data.colors[0] || "#FF6B6B",
       color_2: data.colors[1] || "#4ECDC4",
