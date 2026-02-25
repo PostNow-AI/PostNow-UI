@@ -115,7 +115,7 @@ export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
               <button
                 type="button"
                 onClick={onLogin}
-                className="text-primary font-medium hover:underline"
+                className="text-primary font-medium hover:underline cursor-pointer"
               >
                 Fazer login
               </button>
