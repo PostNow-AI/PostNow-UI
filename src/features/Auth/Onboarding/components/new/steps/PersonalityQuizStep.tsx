@@ -129,25 +129,30 @@ export const PersonalityQuizStep = ({
 
       // Auto-avança após delay
       setTimeout(() => {
-        // Verifica se há alguma pergunta não respondida no quiz principal
-        const firstUnanswered = newAnswers
-          .slice(0, QUIZ_TOTAL_QUESTIONS)
-          .findIndex((a, i) => !a && i !== currentQuestion);
+        // Verifica quantas das 6 perguntas principais foram respondidas
+        const answeredCount = Array.from({ length: QUIZ_TOTAL_QUESTIONS }, (_, i) => newAnswers[i])
+          .filter(a => a).length;
+        const allMainAnswered = answeredCount === QUIZ_TOTAL_QUESTIONS;
 
-        if (firstUnanswered !== -1) {
-          // Vai para a primeira pergunta não respondida
-          setDirection(firstUnanswered > currentQuestion ? 1 : -1);
-          setCurrentQuestion(firstUnanswered);
-        } else if (newAnswers.slice(0, QUIZ_TOTAL_QUESTIONS).every(a => a)) {
-          // Todas respondidas - volta para resumo
+        if (allMainAnswered) {
+          // Todas as 6 perguntas respondidas - vai para resumo
           setPhase("summary");
         } else if (currentQuestion < QUIZ_TOTAL_QUESTIONS - 1) {
-          // Ainda há perguntas à frente
+          // Ainda há perguntas à frente - avança normalmente
           setDirection(1);
           setCurrentQuestion((prev) => prev + 1);
         } else {
-          // Quiz completo - vai para resumo
-          setPhase("summary");
+          // Estamos na última pergunta mas ainda faltam anteriores
+          // Encontra a primeira não respondida
+          let firstUnanswered = 0;
+          for (let i = 0; i < QUIZ_TOTAL_QUESTIONS; i++) {
+            if (!newAnswers[i]) {
+              firstUnanswered = i;
+              break;
+            }
+          }
+          setDirection(-1);
+          setCurrentQuestion(firstUnanswered);
         }
       }, 400);
     }
@@ -195,23 +200,29 @@ export const PersonalityQuizStep = ({
       setShowCustomInput(false);
       setCurrentCustomText("");
 
-      // Verifica se há alguma pergunta não respondida no quiz principal
-      const firstUnanswered = newAnswers
-        .slice(0, QUIZ_TOTAL_QUESTIONS)
-        .findIndex((a, i) => !a && i !== currentQuestion);
+      // Verifica quantas das 6 perguntas principais foram respondidas
+      const answeredCount = Array.from({ length: QUIZ_TOTAL_QUESTIONS }, (_, i) => newAnswers[i])
+        .filter(a => a).length;
+      const allMainAnswered = answeredCount === QUIZ_TOTAL_QUESTIONS;
 
-      if (firstUnanswered !== -1) {
-        // Vai para a primeira pergunta não respondida
-        setDirection(firstUnanswered > currentQuestion ? 1 : -1);
-        setCurrentQuestion(firstUnanswered);
-      } else if (newAnswers.slice(0, QUIZ_TOTAL_QUESTIONS).every(a => a)) {
-        // Todas respondidas - volta para resumo
+      if (allMainAnswered) {
+        // Todas as 6 perguntas respondidas - vai para resumo
         setPhase("summary");
       } else if (currentQuestion < QUIZ_TOTAL_QUESTIONS - 1) {
+        // Ainda há perguntas à frente - avança normalmente
         setDirection(1);
         setCurrentQuestion((prev) => prev + 1);
       } else {
-        setPhase("summary");
+        // Estamos na última pergunta mas ainda faltam anteriores
+        let firstUnanswered = 0;
+        for (let i = 0; i < QUIZ_TOTAL_QUESTIONS; i++) {
+          if (!newAnswers[i]) {
+            firstUnanswered = i;
+            break;
+          }
+        }
+        setDirection(-1);
+        setCurrentQuestion(firstUnanswered);
       }
     }
   }, [currentQuestion, currentCustomText, answers, onChange, skippedQuestions, phase, extraQuestionIndex]);
