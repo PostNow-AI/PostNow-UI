@@ -113,7 +113,20 @@ export const PersonalityQuizStep = ({
 
       // Auto-avança após delay
       setTimeout(() => {
-        if (currentQuestion < QUIZ_TOTAL_QUESTIONS - 1) {
+        // Verifica se há alguma pergunta não respondida no quiz principal
+        const firstUnanswered = newAnswers
+          .slice(0, QUIZ_TOTAL_QUESTIONS)
+          .findIndex((a, i) => !a && i !== currentQuestion);
+
+        if (firstUnanswered !== -1) {
+          // Vai para a primeira pergunta não respondida
+          setDirection(firstUnanswered > currentQuestion ? 1 : -1);
+          setCurrentQuestion(firstUnanswered);
+        } else if (newAnswers.slice(0, QUIZ_TOTAL_QUESTIONS).every(a => a)) {
+          // Todas respondidas - volta para resumo
+          setPhase("summary");
+        } else if (currentQuestion < QUIZ_TOTAL_QUESTIONS - 1) {
+          // Ainda há perguntas à frente
           setDirection(1);
           setCurrentQuestion((prev) => prev + 1);
         } else {
@@ -151,9 +164,9 @@ export const PersonalityQuizStep = ({
       }
     } else {
       // Quiz principal
+      const newAnswers = [...answers];
       if (currentCustomText.trim()) {
         setCustomAnswers((prev) => ({ ...prev, [currentQuestion]: currentCustomText.trim() }));
-        const newAnswers = [...answers];
         newAnswers[currentQuestion] = `[custom] ${currentCustomText.trim()}`;
         setAnswers(newAnswers);
         onChange(newAnswers);
@@ -166,7 +179,19 @@ export const PersonalityQuizStep = ({
       setShowCustomInput(false);
       setCurrentCustomText("");
 
-      if (currentQuestion < QUIZ_TOTAL_QUESTIONS - 1) {
+      // Verifica se há alguma pergunta não respondida no quiz principal
+      const firstUnanswered = newAnswers
+        .slice(0, QUIZ_TOTAL_QUESTIONS)
+        .findIndex((a, i) => !a && i !== currentQuestion);
+
+      if (firstUnanswered !== -1) {
+        // Vai para a primeira pergunta não respondida
+        setDirection(firstUnanswered > currentQuestion ? 1 : -1);
+        setCurrentQuestion(firstUnanswered);
+      } else if (newAnswers.slice(0, QUIZ_TOTAL_QUESTIONS).every(a => a)) {
+        // Todas respondidas - volta para resumo
+        setPhase("summary");
+      } else if (currentQuestion < QUIZ_TOTAL_QUESTIONS - 1) {
         setDirection(1);
         setCurrentQuestion((prev) => prev + 1);
       } else {
@@ -426,19 +451,32 @@ export const PersonalityQuizStep = ({
               <div className="flex-1">
                 <div className="grid grid-cols-2 gap-2 mb-6">
                   {answers
-                    .filter((a) => a && !a.startsWith("[custom]"))
-                    .map((trait, index) => (
-                      <motion.div
-                        key={trait}
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-primary text-primary-foreground"
-                      >
-                        <Check className="h-4 w-4 shrink-0" />
-                        <span className="text-sm font-medium truncate">{trait}</span>
-                      </motion.div>
-                    ))}
+                    .map((trait, questionIndex) => ({ trait, questionIndex }))
+                    .filter(({ trait }) => trait && !trait.startsWith("[custom]"))
+                    .map(({ trait, questionIndex }, displayIndex) => {
+                      const isMainQuiz = questionIndex < QUIZ_TOTAL_QUESTIONS;
+
+                      return (
+                        <motion.button
+                          key={`${trait}-${questionIndex}`}
+                          type="button"
+                          onClick={() => {
+                            if (isMainQuiz) {
+                              setDirection(-1);
+                              setCurrentQuestion(questionIndex);
+                              setPhase("quiz");
+                            }
+                          }}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: displayIndex * 0.05 }}
+                          className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-primary text-primary-foreground cursor-pointer hover:bg-primary/90 transition-colors"
+                        >
+                          <Check className="h-4 w-4 shrink-0" />
+                          <span className="text-sm font-medium truncate">{trait}</span>
+                        </motion.button>
+                      );
+                    })}
                 </div>
 
                 {/* Respostas customizadas */}
