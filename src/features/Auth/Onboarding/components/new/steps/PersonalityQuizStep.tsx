@@ -86,14 +86,30 @@ export const PersonalityQuizStep = ({
   // Seleciona uma opção e auto-avança
   const handleSelect = useCallback((optionId: string) => {
     if (phase === "extra-quiz") {
-      // Quiz extra - adiciona ao final das respostas
-      const newAnswers = [...answers, optionId];
+      // Quiz extra - substitui ou adiciona resposta
+      const extraAnswerIndex = QUIZ_TOTAL_QUESTIONS + extraQuestionIndex;
+      const newAnswers = [...answers];
+
+      // Se o índice já existe, substitui; senão, adiciona
+      if (extraAnswerIndex < newAnswers.length) {
+        newAnswers[extraAnswerIndex] = optionId;
+      } else {
+        newAnswers.push(optionId);
+      }
+
       setAnswers(newAnswers);
       onChange(newAnswers);
 
       // Auto-avança após delay
       setTimeout(() => {
-        if (extraQuestionIndex < EXTRA_QUIZ_TOTAL - 1) {
+        // Verifica se todas as perguntas extras já foram respondidas
+        const totalAnswered = newAnswers.length;
+        const allExtrasAnswered = totalAnswered >= QUIZ_TOTAL_QUESTIONS + EXTRA_QUIZ_TOTAL;
+
+        if (allExtrasAnswered) {
+          // Todas respondidas - volta para resumo
+          setPhase("summary");
+        } else if (extraQuestionIndex < EXTRA_QUIZ_TOTAL - 1) {
           setDirection(1);
           setExtraQuestionIndex((prev) => prev + 1);
         } else {
@@ -461,10 +477,14 @@ export const PersonalityQuizStep = ({
                           key={`${trait}-${questionIndex}`}
                           type="button"
                           onClick={() => {
+                            setDirection(-1);
                             if (isMainQuiz) {
-                              setDirection(-1);
                               setCurrentQuestion(questionIndex);
                               setPhase("quiz");
+                            } else {
+                              // Pergunta extra
+                              setExtraQuestionIndex(questionIndex - QUIZ_TOTAL_QUESTIONS);
+                              setPhase("extra-quiz");
                             }
                           }}
                           initial={{ scale: 0, opacity: 0 }}
@@ -504,19 +524,21 @@ export const PersonalityQuizStep = ({
                   </div>
                 )}
 
-                {/* Botão para responder mais */}
-                <div className="p-4 rounded-lg border border-dashed border-muted-foreground/20 bg-muted/30">
-                  <p className="text-sm text-muted-foreground mb-3 text-center">
-                    Quer refinar ainda mais?
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleStartExtraQuiz}
-                    className="w-full px-4 py-2.5 rounded-lg border border-primary/50 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
-                  >
-                    + Responder mais 4 perguntas
-                  </button>
-                </div>
+                {/* Botão para responder mais - só aparece se ainda não respondeu as extras */}
+                {answers.length < QUIZ_TOTAL_QUESTIONS + EXTRA_QUIZ_TOTAL && (
+                  <div className="p-4 rounded-lg border border-dashed border-muted-foreground/20 bg-muted/30">
+                    <p className="text-sm text-muted-foreground mb-3 text-center">
+                      Quer refinar ainda mais?
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleStartExtraQuiz}
+                      className="w-full px-4 py-2.5 rounded-lg border border-primary/50 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+                    >
+                      + Responder mais 4 perguntas
+                    </button>
+                  </div>
+                )}
               </div>
 
             </motion.div>
