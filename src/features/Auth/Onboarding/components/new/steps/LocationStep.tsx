@@ -34,8 +34,8 @@ export const LocationStep = ({
   // Uses Vercel headers in production, FreeIPAPI as fallback for localhost
   useEffect(() => {
     const detectLocation = async () => {
+      // First, try Vercel's geolocation endpoint (works in production)
       try {
-        // First, try Vercel's geolocation endpoint (works in production)
         const vercelResponse = await fetch("/api/geolocation", {
           signal: AbortSignal.timeout(3000),
         });
@@ -53,23 +53,27 @@ export const LocationStep = ({
             return;
           }
         }
+      } catch {
+        // Vercel endpoint failed (expected on localhost) - continue to fallback
+      }
 
-        // Fallback: FreeIPAPI (for localhost or if Vercel headers unavailable)
-        const fallbackResponse = await fetch("https://freeipapi.com/api/json/", {
+      // Fallback: FreeIPAPI (for localhost or if Vercel headers unavailable)
+      try {
+        const fallbackResponse = await fetch("https://free.freeipapi.com/api/json", {
           signal: AbortSignal.timeout(5000),
         });
 
-        if (!fallbackResponse.ok) throw new Error("Failed to fetch");
+        if (fallbackResponse.ok) {
+          const data = await fallbackResponse.json();
 
-        const data = await fallbackResponse.json();
-
-        if (data.cityName && data.regionName) {
-          const stateAbbr = getStateAbbreviation(data.regionName) || data.regionName;
-          setDetected({
-            city: data.cityName,
-            state: data.regionName,
-            stateAbbr,
-          });
+          if (data.cityName && data.regionName) {
+            const stateAbbr = getStateAbbreviation(data.regionName) || data.regionName;
+            setDetected({
+              city: data.cityName,
+              state: data.regionName,
+              stateAbbr,
+            });
+          }
         }
       } catch {
         // Silently fail - show generic options instead
