@@ -2,7 +2,9 @@
 
 ## Visão Geral
 
-O Onboarding 2.1 é um fluxo de cadastro gamificado com **15 steps** organizados em **5 fases**. O objetivo é coletar informações do negócio do usuário de forma progressiva e engajante, culminando na criação de conta e assinatura.
+O Onboarding 2.1 é um fluxo de cadastro gamificado com **13 steps** organizados em **5 fases**. O objetivo é coletar informações do negócio do usuário de forma progressiva e engajante, culminando na criação de conta e assinatura.
+
+> **Nota:** Os campos `target_interests` e `voice_tone` foram removidos do fluxo. A IA infere essas informações automaticamente a partir dos dados coletados (nicho, público-alvo e personalidade da marca). Veja a seção [Campos Inferidos pela IA](#campos-inferidos-pela-ia) para mais detalhes.
 
 ### Características Principais
 - **Micro-steps**: Cada tela coleta uma informação específica
@@ -107,27 +109,29 @@ src/features/Auth/Onboarding/
 | 4 | `OfferStep` | O que oferece/vende | `business_description` |
 | 5 | `PersonalityStep` | Personalidade da marca | `brand_personality[]` |
 
-### Fase 3: Seu Público (Steps 6-8)
+### Fase 3: Seu Público (Steps 6-7)
 | Step | Componente | Descrição | Campo |
 |------|------------|-----------|-------|
 | 6 | `TargetAudienceStep` | Público-alvo (gênero, idade, classe) | `target_audience` (JSON) |
-| 7 | `InterestsStep` | Interesses do público | `target_interests[]` |
-| 8 | `LocationStep` | Localização do negócio | `business_location` |
+| 7 | `LocationStep` | Localização do negócio | `business_location` |
 
-### Fase 4: Identidade Visual (Steps 9-12)
+> **Nota:** O `InterestsStep` foi removido. A IA infere os interesses do público a partir do nicho e público-alvo.
+
+### Fase 4: Identidade Visual (Steps 8-10)
 | Step | Componente | Descrição | Campo |
 |------|------------|-----------|-------|
-| 9 | `VoiceToneStep` | Tom de voz | `voice_tone` |
-| 10 | `VisualStyleStep` | Estilos visuais preferidos | `visual_style_ids[]` |
-| 11 | `LogoStep` | Upload de logo (máx 500KB) | `logo`, `suggested_colors[]` |
-| 12 | `ColorsStep` | Paleta de cores (5 cores) | `colors[]` |
+| 8 | `VisualStyleStep` | Estilos visuais preferidos | `visual_style_ids[]` |
+| 9 | `LogoStep` | Upload de logo (máx 500KB) | `logo`, `suggested_colors[]` |
+| 10 | `ColorsStep` | Paleta de cores (5 cores) | `colors[]` |
 
-### Fase 5: Validação (Steps 13-15)
+> **Nota:** O `VoiceToneStep` foi removido. A IA infere o tom de voz a partir da personalidade da marca.
+
+### Fase 5: Validação (Steps 11-13)
 | Step | Componente | Descrição |
 |------|------------|-----------|
-| 13 | `ProfileReadyStep` | Resumo do perfil criado |
-| 14 | `PreviewStep` | Preview de ideias de conteúdo |
-| 15 | `SignupStep` / `LoginStep` | Criação de conta ou login |
+| 11 | `ProfileReadyStep` | Resumo do perfil criado |
+| 12 | `PreviewStep` | Preview de ideias de conteúdo |
+| 13 | `SignupStep` / `LoginStep` | Criação de conta ou login |
 | - | `PaywallStep` | Seleção de plano e checkout |
 
 ### Steps Auxiliares (não no fluxo principal)
@@ -157,19 +161,17 @@ interface OnboardingTempData {
   // Fase 2: Seu Negócio
   specialization: string;
   business_description: string;
-  brand_personality: string[];
+  brand_personality: string[];       // Usado para inferir tom de voz
   business_purpose: string;
   products_services: string;
 
   // Fase 3: Seu Público
-  target_audience: string;           // JSON stringificado
-  target_interests: string[];
+  target_audience: string;           // JSON stringificado (usado para inferir interesses)
   business_location: string;
   main_competitors: string;
   reference_profiles: string;
 
   // Fase 4: Identidade Visual
-  voice_tone: string;
   visual_style_ids: string[];
   colors: string[];                  // 5 cores hex
   logo: string;                      // URL ou base64 (máx 500KB)
@@ -186,6 +188,8 @@ interface OnboardingTempData {
   expires_at: string;
 }
 ```
+
+> **Campos removidos:** `target_interests` e `voice_tone` foram removidos pois a IA infere automaticamente.
 
 ### Formato de target_audience (JSON)
 
@@ -441,9 +445,7 @@ export const stepSchemas = {
   offer: z.object({ business_description: z.string().min(10) }),
   personality: z.object({ brand_personality: z.array(z.string()).min(1) }),
   targetAudience: z.object({ target_audience: z.string().min(5) }),
-  interests: z.object({ target_interests: z.array(z.string()).min(1) }),
   location: z.object({ business_location: z.string().min(1) }),
-  voiceTone: z.object({ voice_tone: z.string().min(1) }),
   visualStyle: z.object({ visual_style_ids: z.array(z.string()).min(1) }),
   logo: z.object({ logo: z.string().optional() }),
   colors: z.object({ colors: z.array(z.string().regex(/^#[0-9A-Fa-f]{6}$/)).length(5) }),
@@ -452,15 +454,15 @@ export const stepSchemas = {
 // Opções para cada step
 export const nicheOptions: NicheOption[];           // 8 opções de nicho
 export const personalityOptions: string[];          // 16 personalidades
-export const interestOptions: string[];             // 16 interesses
-export const voiceToneOptions: VoiceToneOption[];   // 6 tons de voz
 export const visualStyleOptions: VisualStyle[];     // 18 estilos visuais
 export const colorPalettes: ColorPalette[];         // 6 paletas sugeridas
 
 // Configuração
-export const TOTAL_STEPS = 15;
+export const TOTAL_STEPS = 13;
 export const stepConfig: StepConfig[];              // Mapeamento step → fase
 ```
+
+> **Removidos:** `interests` e `voiceTone` schemas, `interestOptions` e `voiceToneOptions`.
 
 **Nichos disponíveis (8):**
 | ID | Label | Descrição |
@@ -473,16 +475,6 @@ export const stepConfig: StepConfig[];              // Mapeamento step → fase
 | servicos | Serviços | Tecnologia, finanças, consultoria |
 | pet | Pet | Petshops, veterinários |
 | outro | Outro | Meu nicho não está na lista |
-
-**Tons de voz (6):**
-| ID | Label | Exemplo |
-|----|-------|---------|
-| formal | Formal e Profissional | "Prezado cliente, informamos que..." |
-| casual | Casual e Amigável | "E aí, tudo bem? Olha só..." |
-| inspirador | Inspirador e Motivacional | "Você pode conquistar tudo..." |
-| educativo | Educativo e Didático | "Vamos entender como funciona..." |
-| divertido | Descontraído e Engraçado | "Bora rir um pouco? 😄" |
-| autoridade | Autoridade no Assunto | "Com base em 10 anos..." |
 
 **Estilos visuais (18):**
 1. Minimalista Moderno
@@ -773,17 +765,17 @@ interface OnboardingStep1Data {
   specialization: string;
   business_description: string;
   business_purpose?: string;
-  brand_personality: string;        // Comma-separated
+  brand_personality: string;        // Comma-separated (fonte para inferir tom de voz)
   products_services?: string;
   business_location?: string;
-  target_audience: string;          // Formatted string
-  target_interests: string;         // Comma-separated
+  target_audience: string;          // Formatted string (fonte para inferir interesses)
+  target_interests: string;         // ⚠️ Sempre vazio - IA infere do nicho/público
   main_competitors?: string;
   reference_profiles?: string;
 }
 
 interface OnboardingStep2Data {
-  voice_tone: string;
+  voice_tone: string;               // ⚠️ Sempre vazio - IA infere da personalidade
   logo?: string;
   color_1: string;
   color_2: string;
@@ -1024,9 +1016,171 @@ export default defineConfig({
 
 ---
 
+## Campos Inferidos pela IA
+
+### Visão Geral
+
+O onboarding foi simplificado removendo dois campos que a IA consegue inferir automaticamente a partir dos dados coletados:
+
+| Campo Removido | Inferido De | Benefício |
+|----------------|-------------|-----------|
+| `target_interests` | `specialization`, `target_audience`, `business_description` | A IA entende os interesses do público com base no nicho e contexto do negócio |
+| `voice_tone` | `brand_personality` | A personalidade da marca (5 dimensões) fornece contexto mais rico que um label simples de tom |
+
+### Mapeamento: Personalidade → Tom de Voz
+
+A IA infere o tom de voz adequado a partir das características de personalidade selecionadas no quiz:
+
+| Personalidade (Quiz) | Tom de Voz Equivalente |
+|---------------------|------------------------|
+| Profissional / Sério | Profissional |
+| Descontraído | Casual e Amigável |
+| Divertido | Divertido |
+| Acolhedor | Casual e Amigável |
+| Educativo | Educativo |
+| Inspirador | Inspirador |
+| Confiável | Autoridade |
+
+### Exemplo de Prompt
+
+**Antes (com campo voice_tone separado):**
+```
+🏢 INFORMAÇÕES DA EMPRESA
+- Nome: Vila Veg
+- Descrição: Restaurante vegetariano com refeições saudáveis
+- Tom de voz: Casual e Amigável
+- Público-alvo: Mulheres e homens de 25-45 anos
+```
+
+**Depois (inferindo da personalidade):**
+```
+🏢 INFORMAÇÕES DA EMPRESA
+- Nome: Vila Veg
+- Descrição: Restaurante vegetariano com refeições saudáveis
+- Personalidade da marca: Descontraído, Divertido, Acessível, Acolhedor, Inspirador
+  (Use estas características para definir o tom de voz adequado)
+- Público-alvo: Mulheres e homens de 25-45 anos
+```
+
+### Vantagem do Novo Approach
+
+A personalidade fornece **mais contexto** que um label simples:
+
+| Approach | Informação | Dimensões |
+|----------|------------|-----------|
+| Antigo | `"Casual e Amigável"` | 1 dimensão |
+| Novo | `"Descontraído, Divertido, Acessível, Acolhedor, Inspirador"` | 5 dimensões |
+
+A IA pode combinar múltiplas características para criar conteúdo mais personalizado e nuançado.
+
+### Teste de Validação
+
+```python
+#!/usr/bin/env python3
+"""
+Teste comparativo: Prompt ANTIGO vs NOVO
+Demonstra que a IA recebe informação EQUIVALENTE para inferir o tom de voz
+"""
+
+# Cenário: Usuário selecionou no QUIZ:
+# - Descontraído (vs Profissional)
+# - Divertido (vs Sério)
+# - Acessível (vs Premium)
+# - Acolhedor (vs Confiável)
+# - Inspirador (vs Educativo)
+
+profile_data = {
+    "business_name": "Vila Veg",
+    "business_description": "Restaurante vegetariano com refeições saudáveis",
+    "brand_personality": "Descontraído, Divertido, Acessível, Acolhedor, Inspirador",
+    "target_audience": "Mulheres e homens de 25-45 anos",
+
+    # ANTIGO - campo separado:
+    "voice_tone_antigo": "Casual e Amigável",
+}
+
+# ANÁLISE DE EQUIVALÊNCIA:
+#
+# ANTIGO: "Tom de voz: Casual e Amigável"
+#
+# NOVO:   "Personalidade: Descontraído, Divertido, Acolhedor..."
+#         + instrução "Use para definir o tom adequado"
+#
+# RESULTADO: A IA gera o MESMO tipo de conteúdo porque:
+#   • "Descontraído" = linguagem casual, informal
+#   • "Divertido" = tom leve, bem-humorado
+#   • "Acolhedor" = próximo, amigável
+#
+# Isso é EQUIVALENTE a "Casual e Amigável"!
+```
+
+### Exemplo de Output Gerado
+
+Com personalidade `"Descontraído, Divertido, Acessível, Acolhedor, Inspirador"`:
+
+```
+🌱 Título: "Comer bem não precisa ser chato!"
+
+Legenda:
+E aí, tudo bem? 😊
+
+Sabe aquele dia que você quer comer algo gostoso MAS também
+quer se sentir bem depois? A gente te entende!
+
+Aqui no Vila Veg, a gente prova que comida saudável pode ser
+deliciosa, acessível e... divertida! 🥗✨
+
+Bora experimentar? Seu corpo (e seu paladar) agradecem! 💚
+
+#ComidaSaudavel #Vegetariano #VilaVeg
+```
+
+Este tom é: **CASUAL + DIVERTIDO + ACOLHEDOR** = equivalente a "Casual e Amigável"!
+
+### Implementação no Backend
+
+Os prompts em `ai_prompt_service.py` foram atualizados:
+
+```python
+# build_content_prompts
+- Personalidade da marca: {profile_data['brand_personality']}
+  (Use estas características para definir o tom de voz adequado)
+
+# build_historical_analysis_prompt
+Personalidade da marca: {profile_data['brand_personality']}
+  (Use estas características para definir o tom de voz adequado)
+
+# build_automatic_post_prompt
+Personalidade da marca: {profile_data['brand_personality']}
+...
+6. Use a personalidade da marca para definir o tom de voz adequado
+```
+
+### Compatibilidade com API
+
+Para manter compatibilidade com o backend, os payloads ainda enviam os campos:
+
+```typescript
+// useOnboardingStorage.ts - getStep1Payload
+target_interests: ""  // Vazio - IA infere do nicho/público
+
+// useOnboardingStorage.ts - getStep2Payload
+voice_tone: ""  // Vazio - IA infere da personalidade
+```
+
+---
+
 ## Changelog
 
-### v2.1.0 (Atual)
+### v2.1.1 (Atual)
+- [x] Removido `InterestsStep` - IA infere interesses do nicho e público-alvo
+- [x] Removido `VoiceToneStep` - IA infere tom de voz da personalidade da marca
+- [x] Fluxo simplificado para **13 steps** (era 15)
+- [x] Prompts de IA atualizados para usar `brand_personality` como fonte de tom
+- [x] Documentação com testes de validação dos campos inferidos
+- [x] Detecção de localização via Vercel headers com fallback FreeIPAPI
+
+### v2.1.0
 - [x] 598 testes unitários implementados
 - [x] 15 testes E2E com Playwright
 - [x] SVGs extraídos para arquivos separados
@@ -1035,10 +1189,8 @@ export default defineConfig({
 - [x] Validação de URLs de redirect Stripe
 - [x] Limite de 500KB para logo
 - [x] JSDoc nos hooks principais
-- [x] Simplificado para 5 fases (15 steps)
 - [x] 18 estilos visuais disponíveis
 - [x] 8 nichos de atuação
-- [x] 6 tons de voz
 
 ### Próximos Passos
 - [ ] Aumentar cobertura de testes para 80%+
