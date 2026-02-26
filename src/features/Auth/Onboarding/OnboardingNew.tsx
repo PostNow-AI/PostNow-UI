@@ -252,7 +252,7 @@ export const OnboardingNew = ({
         if (!freshData.business_name || !freshData.specialization) {
           throw new Error("Dados incompletos");
         }
-      } catch (parseError) {
+      } catch {
         throw new Error("Dados do onboarding corrompidos. Por favor, reinicie o processo.");
       }
 
@@ -379,7 +379,7 @@ export const OnboardingNew = ({
     // Sincronizar dados do onboarding com o backend primeiro
     try {
       await syncMutation.mutateAsync();
-    } catch (error) {
+    } catch {
       // CRÍTICO: Não continuar para checkout se sync falhar
       // Dados do usuário seriam perdidos
       toast.error("Erro ao salvar seu perfil. Tente novamente.");
