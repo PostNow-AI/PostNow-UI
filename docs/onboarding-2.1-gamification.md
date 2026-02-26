@@ -1217,6 +1217,7 @@ voice_tone: ""  // Vazio - IA infere da personalidade
 - [x] Detecção de localização via Vercel headers com fallback FreeIPAPI
 - [x] **570 testes unitários** passando (corrigidos 12 testes após remoção de campos)
 - [x] Novos testes para campos inferidos pela IA e geolocalização
+- [x] Corrigidos erros de lint em `OnboardingNew.tsx` (variáveis não utilizadas em catch blocks)
 
 ### v2.1.0
 - [x] 570 testes unitários implementados
