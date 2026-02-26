@@ -25,11 +25,9 @@ const createMockData = (overrides: Partial<OnboardingTempData> = {}): Onboarding
   brand_personality: [],
   products_services: "",
   target_audience: "",
-  target_interests: [],
   business_location: "",
   main_competitors: "",
   reference_profiles: "",
-  voice_tone: "",
   visual_style_ids: [],
   colors: [],
   logo: "",
@@ -147,33 +145,7 @@ describe("PhaseTransition", () => {
       expect(screen.getByText("2 de 3")).toBeInTheDocument();
     });
 
-    it("should display interests when available", () => {
-      render(
-        <PhaseTransition
-          phase="publico"
-          data={createMockData({
-            target_interests: ["Tecnologia", "Finanças", "Marketing"],
-          })}
-          onComplete={mockOnComplete}
-        />
-      );
-
-      expect(screen.getByText("Tecnologia, Finanças, Marketing")).toBeInTheDocument();
-    });
-
-    it("should truncate interests when more than 4", () => {
-      render(
-        <PhaseTransition
-          phase="publico"
-          data={createMockData({
-            target_interests: ["A", "B", "C", "D", "E", "F"],
-          })}
-          onComplete={mockOnComplete}
-        />
-      );
-
-      expect(screen.getByText("A, B, C, D +2")).toBeInTheDocument();
-    });
+    // Note: target_interests field was removed - AI infers from context
 
     it("should display location when available", () => {
       render(
@@ -203,17 +175,7 @@ describe("PhaseTransition", () => {
       expect(screen.getByText("Marca")).toBeInTheDocument();
     });
 
-    it("should display voice tone label", () => {
-      render(
-        <PhaseTransition
-          phase="marca"
-          data={createMockData({ voice_tone: "casual" })}
-          onComplete={mockOnComplete}
-        />
-      );
-
-      expect(screen.getByText(/Casual e Amigável/)).toBeInTheDocument();
-    });
+    // Note: voice_tone field was removed - AI infers from brand_personality
 
     it("should display visual styles count", () => {
       render(

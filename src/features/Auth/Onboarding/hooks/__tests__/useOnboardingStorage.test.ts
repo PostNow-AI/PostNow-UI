@@ -250,7 +250,6 @@ describe("useOnboardingStorage", () => {
         result.current.saveData({
           business_name: "Test Business",
           brand_personality: ["Profissional", "Inovador"],
-          target_interests: ["Tecnologia", "Finanças"],
         });
       });
 
@@ -258,7 +257,8 @@ describe("useOnboardingStorage", () => {
 
       expect(payload.business_name).toBe("Test Business");
       expect(payload.brand_personality).toBe("Profissional, Inovador");
-      expect(payload.target_interests).toBe("Tecnologia, Finanças");
+      // target_interests is always empty (AI infers from context)
+      expect(payload.target_interests).toBe("");
     });
 
     it("should convert arrays to comma-separated strings", () => {
@@ -281,7 +281,6 @@ describe("useOnboardingStorage", () => {
 
       act(() => {
         result.current.saveData({
-          voice_tone: "casual",
           logo: "https://example.com/logo.png",
           colors: ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF"],
           visual_style_ids: ["1", "2"],
@@ -290,7 +289,8 @@ describe("useOnboardingStorage", () => {
 
       const payload = result.current.getStep2Payload();
 
-      expect(payload.voice_tone).toBe("casual");
+      // voice_tone is always empty (AI infers from brand_personality)
+      expect(payload.voice_tone).toBe("");
       expect(payload.logo).toBe("https://example.com/logo.png");
       expect(payload.color_1).toBe("#FF0000");
       expect(payload.color_2).toBe("#00FF00");
@@ -399,16 +399,40 @@ describe("useOnboardingStorage", () => {
 
       expect(result.current.data.brand_personality.length).toBeLessThanOrEqual(10);
     });
+  });
 
-    it("should limit target_interests array to 20 items", () => {
+  describe("AI-Inferred Fields", () => {
+    it("should always return empty target_interests in getStep1Payload (AI infers from context)", () => {
       const { result } = renderHook(() => useOnboardingStorage());
-      const manyInterests = Array(25).fill("Interest").map((s, i) => `${s}${i}`);
 
+      // Even with rich context data, target_interests is always empty
       act(() => {
-        result.current.saveData({ target_interests: manyInterests });
+        result.current.saveData({
+          specialization: "saude",
+          target_audience: '{"gender":["mulheres"],"ageRange":["25-34"]}',
+          business_description: "Clínica de nutrição esportiva",
+        });
       });
 
-      expect(result.current.data.target_interests.length).toBeLessThanOrEqual(20);
+      const payload = result.current.getStep1Payload();
+      expect(payload.target_interests).toBe("");
+      // AI will infer interests from specialization + target_audience + business_description
+    });
+
+    it("should always return empty voice_tone in getStep2Payload (AI infers from brand_personality)", () => {
+      const { result } = renderHook(() => useOnboardingStorage());
+
+      // Even with personality traits set, voice_tone is always empty
+      act(() => {
+        result.current.saveData({
+          brand_personality: ["Descontraído", "Divertido", "Acolhedor"],
+        });
+      });
+
+      const payload = result.current.getStep2Payload();
+      expect(payload.voice_tone).toBe("");
+      // AI will infer voice_tone from brand_personality:
+      // "Descontraído + Divertido + Acolhedor" → casual, friendly tone
     });
   });
 

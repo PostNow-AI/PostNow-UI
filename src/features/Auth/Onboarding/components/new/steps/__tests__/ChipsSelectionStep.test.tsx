@@ -4,7 +4,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   ChipsSelectionStep,
   PERSONALITY_STEP_CONFIG,
-  INTERESTS_STEP_CONFIG,
 } from "../ChipsSelectionStep";
 
 // Mock framer-motion
@@ -75,7 +74,6 @@ vi.mock("../../SelectableChips", () => ({
 vi.mock("@/features/Auth/Onboarding/constants/onboardingNewSchema", () => ({
   TOTAL_STEPS: 13,
   personalityOptions: ["Criativo", "Profissional", "Autêntico", "Inovador"],
-  interestOptions: ["Tecnologia", "Saúde", "Finanças", "Lifestyle"],
 }));
 
 describe("ChipsSelectionStep", () => {
@@ -253,17 +251,4 @@ describe("PERSONALITY_STEP_CONFIG", () => {
   });
 });
 
-describe("INTERESTS_STEP_CONFIG", () => {
-  it("deve ter configuração correta", () => {
-    expect(INTERESTS_STEP_CONFIG.step).toBe(7);
-    expect(INTERESTS_STEP_CONFIG.maxSelections).toBe(8);
-    expect(INTERESTS_STEP_CONFIG.allowCustom).toBe(true);
-    expect(INTERESTS_STEP_CONFIG.title).toContain("interesses");
-  });
-
-  it("deve ter opções definidas", () => {
-    expect(INTERESTS_STEP_CONFIG.options).toBeDefined();
-    expect(Array.isArray(INTERESTS_STEP_CONFIG.options)).toBe(true);
-    expect(INTERESTS_STEP_CONFIG.options.length).toBeGreaterThan(0);
-  });
-});
+// Note: INTERESTS_STEP_CONFIG was removed - AI infers interests from context

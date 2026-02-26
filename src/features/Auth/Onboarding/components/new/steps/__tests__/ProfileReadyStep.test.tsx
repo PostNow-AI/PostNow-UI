@@ -28,7 +28,7 @@ vi.mock("@/features/Auth/Onboarding/constants/onboardingNewSchema", () => ({
     { id: "style1", label: "Minimalista" },
     { id: "style2", label: "Moderno" },
   ],
-  TOTAL_STEPS: 14,
+  TOTAL_STEPS: 13,
 }));
 
 // Mock audienceUtils
@@ -48,11 +48,9 @@ describe("ProfileReadyStep", () => {
     brand_personality: ["Inovador", "Criativo", "Profissional"],
     products_services: "Consultoria",
     target_audience: "Empreendedores",
-    target_interests: ["Marketing", "Vendas", "Tecnologia", "Negócios"],
     business_location: "São Paulo, SP",
     main_competitors: "Concorrente A",
     reference_profiles: "@perfil1",
-    voice_tone: "Profissional",
     visual_style_ids: ["style1", "style2"],
     colors: ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF"],
     logo: "",
@@ -167,10 +165,7 @@ describe("ProfileReadyStep", () => {
       expect(screen.getByText("Nicho")).toBeInTheDocument();
     });
 
-    it("should show voice tone", () => {
-      render(<ProfileReadyStep {...defaultProps} />);
-      expect(screen.getByText("Profissional")).toBeInTheDocument();
-    });
+    // Note: voice_tone field was removed - AI infers from brand_personality
 
     it("should show personality traits (max 3)", () => {
       render(<ProfileReadyStep {...defaultProps} />);
@@ -242,11 +237,7 @@ describe("ProfileReadyStep", () => {
       expect(screen.getByText(/Esta é uma descrição muito longa que/)).toBeInTheDocument();
     });
 
-    it("should show interests count when more than 3", () => {
-      render(<ProfileReadyStep {...defaultProps} />);
-      // With 4 interests, should show "Marketing, Vendas, Tecnologia +1"
-      expect(screen.getByText(/Marketing, Vendas, Tecnologia \+1/)).toBeInTheDocument();
-    });
+    // Note: target_interests field was removed - AI infers from context
   });
 
   describe("Success Message", () => {

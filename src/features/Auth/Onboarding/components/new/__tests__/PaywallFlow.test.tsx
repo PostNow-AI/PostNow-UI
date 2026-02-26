@@ -290,13 +290,17 @@ describe("PaywallFlow", () => {
   });
 
   describe("Nome do negócio", () => {
-    it("deve obter nome do negócio do localStorage", () => {
+    // Note: localStorage personalization is currently disabled (commented out in PaywallFlow.tsx)
+    // These tests verify the component works without personalization
+
+    it("deve renderizar corretamente sem personalização", () => {
       render(<PaywallFlow {...defaultProps} />);
 
-      expect(mockLocalStorage.getItem).toHaveBeenCalledWith("postnow_onboarding_data");
+      // O componente deve funcionar sem acessar localStorage
+      expect(screen.getByText("Teste por R$ 0,00")).toBeInTheDocument();
     });
 
-    it("deve usar 'SUA MARCA' como fallback", () => {
+    it("deve funcionar mesmo sem dados no localStorage", () => {
       mockLocalStorage.getItem.mockReturnValue(null);
       render(<PaywallFlow {...defaultProps} />);
 

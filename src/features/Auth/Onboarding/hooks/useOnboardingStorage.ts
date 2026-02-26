@@ -236,6 +236,7 @@ export const useOnboardingStorage = () => {
       products_services: data.products_services || "",
       business_location: data.business_location,
       target_audience: audienceJsonToString(data.target_audience), // JSON → String legível
+      target_interests: "", // Vazio - IA infere do nicho e público-alvo
       main_competitors: data.main_competitors,
       reference_profiles: data.reference_profiles,
     };

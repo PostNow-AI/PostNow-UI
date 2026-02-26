@@ -41,7 +41,7 @@ vi.mock("../../MicroStepLayout", () => ({
 
 // Mock constants
 vi.mock("@/features/Auth/Onboarding/constants/onboardingNewSchema", () => ({
-  TOTAL_STEPS: 14,
+  TOTAL_STEPS: 13,
 }));
 
 // Mock lucide-react
@@ -69,13 +69,14 @@ describe("LocationStep", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Default mock response for IP geolocation
+    // Default mock response for Vercel geolocation API
+    // Vercel returns the state abbreviation in region (e.g., "SP" not "São Paulo")
     mockFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({
+        success: true,
         city: "São Paulo",
-        region: "São Paulo",
-        region_code: "SP",
+        region: "SP",
       }),
     });
   });
@@ -129,6 +130,66 @@ describe("LocationStep", () => {
       await waitFor(() => {
         expect(screen.getByText("Online")).toBeInTheDocument();
         expect(screen.getByText("Todo Brasil")).toBeInTheDocument();
+      });
+    });
+
+    it("deve mostrar Distrito Federal corretamente", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({
+          success: true,
+          city: "Brasília",
+          region: "DF",
+        }),
+      });
+
+      render(<LocationStep {...defaultProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Brasília, DF")).toBeInTheDocument();
+        expect(screen.getByText("Distrito Federal")).toBeInTheDocument();
+      });
+    });
+
+    it("deve mostrar estado completo quando não é DF", async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({
+          success: true,
+          city: "Belo Horizonte",
+          region: "MG",
+        }),
+      });
+
+      render(<LocationStep {...defaultProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Belo Horizonte, MG")).toBeInTheDocument();
+        // "Estado de" prefix for non-DF states
+        expect(screen.getByText(/Estado de/)).toBeInTheDocument();
+      });
+    });
+
+    it("deve usar fallback quando Vercel retorna success: false", async () => {
+      // First call (Vercel) returns success: false
+      // Second call (FreeIPAPI fallback) returns city data
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ success: false }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({
+            cityName: "Rio de Janeiro",
+            regionName: "Rio de Janeiro",
+          }),
+        });
+
+      render(<LocationStep {...defaultProps} />);
+
+      await waitFor(() => {
+        expect(screen.getByText("Rio de Janeiro, RJ")).toBeInTheDocument();
       });
     });
   });
