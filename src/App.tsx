@@ -36,6 +36,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import { CreateFromOpportunityPage } from "./pages/CreateFromOpportunityPage";
 
 const App = () => {
   if (import.meta.env.MODE === "production") {
@@ -181,6 +182,16 @@ const App = () => {
                   </ProtectedRoute>
                 }
               /> */}
+
+              {/* Create from Opportunity - Full page (accessed via email link) */}
+              <Route
+                path="/create"
+                element={
+                  <ProtectedRoute>
+                    <CreateFromOpportunityPage />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
             <Toaster />
           </AuthProvider>
