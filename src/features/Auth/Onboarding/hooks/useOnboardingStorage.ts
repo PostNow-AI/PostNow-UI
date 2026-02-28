@@ -318,6 +318,23 @@ export const useOnboardingStorage = () => {
 
   // Inicializar com dados do backend (para modo edição)
   const initializeWithData = useCallback((backendData: OnboardingFormData | Partial<OnboardingTempData>) => {
+    // Cores padrão para fallback - garantir sempre 5 cores
+    const defaultColors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"];
+
+    // Processar cores do backend, garantindo sempre 5 cores
+    let colors: string[];
+    if ('colors' in backendData && Array.isArray(backendData.colors) && backendData.colors.length === 5) {
+      colors = backendData.colors;
+    } else {
+      colors = [
+        ('color_1' in backendData && backendData.color_1) || defaultColors[0],
+        ('color_2' in backendData && backendData.color_2) || defaultColors[1],
+        ('color_3' in backendData && backendData.color_3) || defaultColors[2],
+        ('color_4' in backendData && backendData.color_4) || defaultColors[3],
+        ('color_5' in backendData && backendData.color_5) || defaultColors[4],
+      ];
+    }
+
     const mappedData: OnboardingTempData = {
       ...getDefaultData(),
       business_name: backendData.business_name || "",
@@ -339,18 +356,11 @@ export const useOnboardingStorage = () => {
       main_competitors: backendData.main_competitors || "",
       reference_profiles: backendData.reference_profiles || "",
       voice_tone: backendData.voice_tone || "",
+      // Armazenar como strings para compatibilidade com SelectableCards, converter para int ao enviar
       visual_style_ids: ('visual_style_ids' in backendData && backendData.visual_style_ids)
         ? backendData.visual_style_ids.map(id => String(id))
         : [],
-      colors: ('colors' in backendData && backendData.colors)
-        ? backendData.colors
-        : [
-            ('color_1' in backendData && backendData.color_1) || "#FF6B6B",
-            ('color_2' in backendData && backendData.color_2) || "#4ECDC4",
-            ('color_3' in backendData && backendData.color_3) || "#45B7D1",
-            ('color_4' in backendData && backendData.color_4) || "#96CEB4",
-            ('color_5' in backendData && backendData.color_5) || "#FFBE0B",
-          ],
+      colors,
       logo: backendData.logo || "",
       suggested_colors: [],
       current_step: 2, // Pular welcome
@@ -390,7 +400,8 @@ export const useOnboardingStorage = () => {
       color_3: data.colors[2] || "#45B7D1",
       color_4: data.colors[3] || "#96CEB4",
       color_5: data.colors[4] || "#FFBE0B",
-      visual_style_ids: data.visual_style_ids,
+      // Converter para integers - backend espera IntegerField()
+      visual_style_ids: data.visual_style_ids.map(id => parseInt(id, 10)).filter(id => !isNaN(id)),
     };
   }, [data]);
 

@@ -91,6 +91,8 @@ export const OnboardingNew = ({
   useEffect(() => {
     if (isEditMode && initialData && isLoaded && !isInitialized) {
       // Converter OnboardingFormData para OnboardingTempData
+      // Cores padrão para fallback
+      const defaultColors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFBE0B"];
       const convertedData = {
         ...initialData,
         // Converter brand_personality de string para array
@@ -101,14 +103,14 @@ export const OnboardingNew = ({
         target_interests: initialData.target_interests
           ? initialData.target_interests.split(",").map((s) => s.trim())
           : [],
-        // Converter cores individuais para array
+        // Converter cores individuais para array - garantir sempre 5 cores com fallbacks
         colors: [
-          initialData.color_1,
-          initialData.color_2,
-          initialData.color_3,
-          initialData.color_4,
-          initialData.color_5,
-        ].filter((c): c is string => !!c),
+          initialData.color_1 || defaultColors[0],
+          initialData.color_2 || defaultColors[1],
+          initialData.color_3 || defaultColors[2],
+          initialData.color_4 || defaultColors[3],
+          initialData.color_5 || defaultColors[4],
+        ],
       };
       initializeWithData(convertedData);
       setIsInitialized(true);
