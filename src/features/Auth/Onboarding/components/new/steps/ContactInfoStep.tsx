@@ -17,25 +17,31 @@ interface ContactInfoStepProps {
   stepNumber: number;
 }
 
-// Validação do Instagram: apenas letras, números, _ e . (máx 30 caracteres)
+// Regex para validação do Instagram: letras, números, _ e . (1-30 caracteres)
+const INSTAGRAM_REGEX = /^[a-zA-Z0-9._]{1,30}$/;
+
+// Validação do Instagram: apenas letras, números, _ e . (1-30 caracteres)
 const validateInstagram = (value: string): string | null => {
   if (!value) return null; // Campo opcional
-  if (value.length > 30) {
-    return "Use apenas letras, números, _ e . (máx 30 caracteres)";
-  }
-  if (!/^[a-zA-Z0-9_.]*$/.test(value)) {
+  if (!INSTAGRAM_REGEX.test(value)) {
     return "Use apenas letras, números, _ e . (máx 30 caracteres)";
   }
   return null;
 };
 
-// Validação do Website: não pode ter espaços
+// Validação do Website: deve ser uma URL válida
 const validateWebsite = (value: string): string | null => {
   if (!value) return null; // Campo opcional
-  if (value.includes(" ")) {
-    return "URL não pode conter espaços";
+  try {
+    const url = new URL(value);
+    // Verificar se tem protocolo válido (http ou https)
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      return "URL deve começar com http:// ou https://";
+    }
+    return null;
+  } catch {
+    return "URL inválida. Use o formato: https://www.exemplo.com";
   }
-  return null;
 };
 
 export const ContactInfoStep = ({

@@ -111,7 +111,21 @@ describe("ContactInfoStep", () => {
       expect(screen.queryByText(/URL inválida/)).not.toBeInTheDocument();
     });
 
-    it("deve aceitar URL válida sem protocolo (adiciona https automaticamente)", async () => {
+    it("deve aceitar URL válida com http", async () => {
+      const user = userEvent.setup();
+
+      render(<ContactInfoStepWrapper initialPhone="(11) 99999-9999" />);
+
+      const websiteInput = screen.getByPlaceholderText(
+        "https://www.seunegocio.com"
+      );
+      await user.type(websiteInput, "http://meusite.com.br");
+
+      // Não deve mostrar erro
+      expect(screen.queryByText(/URL inválida/)).not.toBeInTheDocument();
+    });
+
+    it("deve mostrar erro para URL sem protocolo válido", async () => {
       const user = userEvent.setup();
 
       render(<ContactInfoStepWrapper initialPhone="(11) 99999-9999" />);
@@ -121,8 +135,10 @@ describe("ContactInfoStep", () => {
       );
       await user.type(websiteInput, "meusite.com.br");
 
-      // Não deve mostrar erro
-      expect(screen.queryByText(/URL inválida/)).not.toBeInTheDocument();
+      // Deve mostrar erro pois não tem protocolo
+      expect(
+        screen.getByText("URL inválida. Use o formato: https://www.exemplo.com")
+      ).toBeInTheDocument();
     });
 
     it("deve mostrar erro para URL com espaços", async () => {
@@ -137,7 +153,7 @@ describe("ContactInfoStep", () => {
 
       // Deve mostrar erro
       expect(
-        screen.getByText("URL não pode conter espaços")
+        screen.getByText("URL inválida. Use o formato: https://www.exemplo.com")
       ).toBeInTheDocument();
     });
 
