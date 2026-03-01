@@ -100,7 +100,12 @@ export function DateTimePicker({
             mode="single"
             selected={value}
             onSelect={handleDateSelect}
-            disabled={(date) => date < new Date(minDate.setHours(0, 0, 0, 0))}
+            disabled={(date) => {
+              // Create a copy to avoid mutating minDate
+              const minDateStart = new Date(minDate);
+              minDateStart.setHours(0, 0, 0, 0);
+              return date < minDateStart;
+            }}
             initialFocus
           />
 

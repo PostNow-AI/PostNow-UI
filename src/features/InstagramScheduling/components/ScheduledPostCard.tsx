@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/dropdown-menu";
 import { parseDate } from "@/lib/utils";
 import {
   AlertCircle,

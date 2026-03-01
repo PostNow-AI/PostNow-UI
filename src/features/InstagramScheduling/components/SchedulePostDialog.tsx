@@ -48,6 +48,18 @@ const MEDIA_TYPE_OPTIONS: { value: MediaType; label: string }[] = [
   { value: "STORY", label: "Story" },
 ];
 
+/**
+ * Strips HTML tags from text content.
+ * Used to sanitize captions from IdeaBank which may contain HTML.
+ */
+function stripHtml(html: string): string {
+  if (!html) return "";
+  // Create a temporary element to parse HTML
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || "";
+}
+
 export function SchedulePostDialog({
   open,
   onOpenChange,
@@ -75,7 +87,8 @@ export function SchedulePostDialog({
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      setCaption(initialCaption);
+      // Strip HTML from caption (IdeaBank may return HTML)
+      setCaption(stripHtml(initialCaption));
       setMediaUrls(initialImageUrl ? [initialImageUrl] : []);
       setMediaType("IMAGE");
       setScheduledFor(undefined);
