@@ -69,8 +69,9 @@ describe("StepSuccess", () => {
     it("deve navegar para /ideabank ao clicar em Ver na Biblioteca", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      const buttons = screen.getAllByText("Ver na Biblioteca");
-      fireEvent.click(buttons[0]);
+      const button = screen.getAllByRole("button").find(btn => btn.textContent?.includes("Ver na Biblioteca"));
+      expect(button).toBeDefined();
+      fireEvent.click(button!);
 
       expect(mockNavigate).toHaveBeenCalledWith("/ideabank");
     });
