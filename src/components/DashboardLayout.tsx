@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth, useDashboardLayout } from "@/hooks";
-import { Activity, ClipboardList, LogOut, Wallet } from "lucide-react";
+import { Activity, Calendar, ClipboardList, LogOut, Wallet } from "lucide-react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   Avatar,
@@ -42,6 +42,11 @@ export function AppSidebar() {
       title: "Posts",
       icon: ClipboardList,
       url: "/ideabank",
+    },
+    {
+      title: "Agendados",
+      icon: Calendar,
+      url: "/scheduled-posts",
     },
     // {
     //   title: "Campanhas",

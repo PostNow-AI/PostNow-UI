@@ -1,14 +1,18 @@
 import parse from "html-react-parser";
 import {
+  Calendar,
   Check,
   Copy,
   FileText,
   Image,
   Import,
+  Instagram,
   MessageSquare,
   RefreshCw,
   Sparkles,
 } from "lucide-react";
+import { useState } from "react";
+import { SchedulePostDialog } from "@/features/InstagramScheduling";
 
 import {
   Button,
@@ -54,6 +58,9 @@ export const PostViewDialog = ({
     handleImageGeneration,
     handleDownloadImage,
   } = usePostViewDialog(post, isOpen);
+
+  // Instagram scheduling state
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
 
   // Helper function to detect if content contains HTML
   const containsHTML = (content: string) => {
@@ -319,11 +326,32 @@ export const PostViewDialog = ({
           </div>
         )}
         <Separator className="absolute left-0 right-0 bottom-17 w-full" />
-        <div className="flex justify-end pt-4">
+        <div className="flex justify-between pt-4">
+          <Button
+            variant="outline"
+            onClick={() => setIsScheduleDialogOpen(true)}
+            disabled={!currentIdea?.content || !currentIdea?.image_url}
+            className="gap-2"
+          >
+            <Instagram className="h-4 w-4" />
+            Agendar no Instagram
+          </Button>
           <Button onClick={onClose}>
             Salvar post <Check className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Schedule Post Dialog */}
+        <SchedulePostDialog
+          open={isScheduleDialogOpen}
+          onOpenChange={setIsScheduleDialogOpen}
+          initialCaption={currentIdea?.content ?? ""}
+          initialImageUrl={currentIdea?.image_url ?? undefined}
+          postIdeaId={currentIdea?.id}
+          onSuccess={() => {
+            setIsScheduleDialogOpen(false);
+          }}
+        />
       </DialogContent>
     </Dialog>
   );

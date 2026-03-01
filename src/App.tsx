@@ -37,6 +37,7 @@ import { SubscriptionPage } from "./pages/SubscriptionPage";
 // import CarouselWizardPage from "./pages/CarouselWizardPage";
 // import CarouselGeneratingPage from "./pages/CarouselGeneratingPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import { ScheduledPostsPage } from "./pages/ScheduledPostsPage";
 
 const App = () => {
   if (process.env.NODE_ENV === "production") {
@@ -154,6 +155,7 @@ const App = () => {
                 }
               >
                 <Route path="/ideabank" element={<IdeaBankPage />} />
+                <Route path="/scheduled-posts" element={<ScheduledPostsPage />} />
                 {/* <Route path="/campaigns" element={<CampaignsPage />} /> */}
                 {/* <Route path="/campaigns/:id" element={<CampaignDetailPage />} /> */}
                 <Route path="/profile" element={<ProfilePage />} />
