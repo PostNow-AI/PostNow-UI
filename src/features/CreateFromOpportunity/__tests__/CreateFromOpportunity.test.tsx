@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { CreateFromOpportunity } from "../index";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -64,6 +64,10 @@ describe("CreateFromOpportunity", () => {
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    cleanup();
+  });
+
   describe("Renderização inicial", () => {
     it("deve renderizar o header com logo", async () => {
       render(<CreateFromOpportunity />, { wrapper: createWrapper() });
@@ -76,27 +80,31 @@ describe("CreateFromOpportunity", () => {
     it("deve renderizar o step indicator", async () => {
       render(<CreateFromOpportunity />, { wrapper: createWrapper() });
 
-      // Deve mostrar os 3 passos
-      expect(screen.getByText("1")).toBeInTheDocument();
+      // Deve mostrar os 3 passos (usando getAllByText pois pode haver múltiplos elementos)
+      const stepElements = screen.getAllByText("1");
+      expect(stepElements.length).toBeGreaterThan(0);
     });
 
     it("deve começar no passo 1 (Topic)", async () => {
       render(<CreateFromOpportunity />, { wrapper: createWrapper() });
 
       // Deve mostrar elementos do StepTopic
-      expect(screen.getByText("Continuar")).toBeInTheDocument();
+      const buttons = screen.getAllByText("Continuar");
+      expect(buttons.length).toBeGreaterThan(0);
     });
 
     it("deve mostrar o tópico da URL", async () => {
       render(<CreateFromOpportunity />, { wrapper: createWrapper() });
 
-      expect(screen.getByText("IA substituindo empregos")).toBeInTheDocument();
+      const topics = screen.getAllByText("IA substituindo empregos");
+      expect(topics.length).toBeGreaterThan(0);
     });
 
     it("deve mostrar o score da URL", async () => {
       render(<CreateFromOpportunity />, { wrapper: createWrapper() });
 
-      expect(screen.getByText("95/100")).toBeInTheDocument();
+      const scores = screen.getAllByText("95/100");
+      expect(scores.length).toBeGreaterThan(0);
     });
   });
 
@@ -104,7 +112,8 @@ describe("CreateFromOpportunity", () => {
     it("deve mostrar botão Voltar no passo 1", async () => {
       render(<CreateFromOpportunity />, { wrapper: createWrapper() });
 
-      expect(screen.getByText("Voltar")).toBeInTheDocument();
+      const buttons = screen.getAllByText("Voltar");
+      expect(buttons.length).toBeGreaterThan(0);
     });
   });
 

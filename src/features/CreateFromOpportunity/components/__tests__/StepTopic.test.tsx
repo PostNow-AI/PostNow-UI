@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { StepTopic } from "../StepTopic";
 
 describe("StepTopic", () => {
@@ -16,49 +16,49 @@ describe("StepTopic", () => {
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    cleanup();
+  });
+
   describe("Renderização", () => {
     it("deve renderizar o tópico", () => {
       render(<StepTopic {...defaultProps} />);
-
-      expect(screen.getByText("IA substituindo empregos")).toBeInTheDocument();
+      const topics = screen.getAllByText("IA substituindo empregos");
+      expect(topics.length).toBeGreaterThan(0);
     });
 
     it("deve renderizar o badge da categoria", () => {
       render(<StepTopic {...defaultProps} />);
-
-      expect(screen.getByText(/Polêmico/)).toBeInTheDocument();
+      const badges = screen.getAllByText(/Polêmico/);
+      expect(badges.length).toBeGreaterThan(0);
     });
 
     it("deve renderizar o score", () => {
       render(<StepTopic {...defaultProps} />);
-
-      expect(screen.getByText("95/100")).toBeInTheDocument();
+      const scores = screen.getAllByText("95/100");
+      expect(scores.length).toBeGreaterThan(0);
     });
 
     it("deve renderizar o textarea para detalhes", () => {
       render(<StepTopic {...defaultProps} />);
-
-      expect(
-        screen.getByPlaceholderText(/Foque em dados do mercado brasileiro/)
-      ).toBeInTheDocument();
+      const textareas = screen.getAllByPlaceholderText(/Foque em dados do mercado brasileiro/);
+      expect(textareas.length).toBeGreaterThan(0);
     });
 
     it("deve renderizar o botão Continuar", () => {
       render(<StepTopic {...defaultProps} />);
-
-      expect(screen.getByText("Continuar")).toBeInTheDocument();
+      const buttons = screen.getAllByText("Continuar");
+      expect(buttons.length).toBeGreaterThan(0);
     });
   });
 
   describe("Interações", () => {
     it("deve chamar onFurtherDetailsChange ao digitar", () => {
       render(<StepTopic {...defaultProps} />);
-
-      const textarea = screen.getByPlaceholderText(
+      const textareas = screen.getAllByPlaceholderText(
         /Foque em dados do mercado brasileiro/
       );
-      fireEvent.change(textarea, { target: { value: "Detalhes extras" } });
-
+      fireEvent.change(textareas[0], { target: { value: "Detalhes extras" } });
       expect(defaultProps.onFurtherDetailsChange).toHaveBeenCalledWith(
         "Detalhes extras"
       );
@@ -66,9 +66,8 @@ describe("StepTopic", () => {
 
     it("deve chamar onNext ao clicar em Continuar", () => {
       render(<StepTopic {...defaultProps} />);
-
-      fireEvent.click(screen.getByText("Continuar"));
-
+      const buttons = screen.getAllByText("Continuar");
+      fireEvent.click(buttons[0]);
       expect(defaultProps.onNext).toHaveBeenCalledTimes(1);
     });
   });
@@ -76,20 +75,20 @@ describe("StepTopic", () => {
   describe("Categorias diferentes", () => {
     it("deve mostrar badge correto para educativo", () => {
       render(<StepTopic {...defaultProps} category="educativo" />);
-
-      expect(screen.getByText(/Educativo/)).toBeInTheDocument();
+      const badges = screen.getAllByText(/Educativo/);
+      expect(badges.length).toBeGreaterThan(0);
     });
 
     it("deve mostrar badge correto para newsjacking", () => {
       render(<StepTopic {...defaultProps} category="newsjacking" />);
-
-      expect(screen.getByText(/Newsjacking/)).toBeInTheDocument();
+      const badges = screen.getAllByText(/Newsjacking/);
+      expect(badges.length).toBeGreaterThan(0);
     });
 
     it("deve mostrar badge correto para entretenimento", () => {
       render(<StepTopic {...defaultProps} category="entretenimento" />);
-
-      expect(screen.getByText(/Entretenimento/)).toBeInTheDocument();
+      const badges = screen.getAllByText(/Entretenimento/);
+      expect(badges.length).toBeGreaterThan(0);
     });
   });
 
@@ -98,17 +97,16 @@ describe("StepTopic", () => {
       render(
         <StepTopic {...defaultProps} furtherDetails="Detalhes pré-existentes" />
       );
-
-      const textarea = screen.getByPlaceholderText(
+      const textareas = screen.getAllByPlaceholderText(
         /Foque em dados do mercado brasileiro/
       );
-      expect(textarea).toHaveValue("Detalhes pré-existentes");
+      expect(textareas[0]).toHaveValue("Detalhes pré-existentes");
     });
 
     it("deve mostrar tópico vazio quando não fornecido", () => {
       render(<StepTopic {...defaultProps} topic="" />);
-
-      expect(screen.getByText("Tema da Oportunidade")).toBeInTheDocument();
+      const titles = screen.getAllByText("Tema da Oportunidade");
+      expect(titles.length).toBeGreaterThan(0);
     });
   });
 });

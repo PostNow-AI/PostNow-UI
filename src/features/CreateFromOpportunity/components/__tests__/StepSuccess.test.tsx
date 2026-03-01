@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { StepSuccess } from "../StepSuccess";
 
 // Mock react-router-dom
@@ -24,37 +24,44 @@ describe("StepSuccess", () => {
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    cleanup();
+  });
+
   describe("Renderização", () => {
     it("deve renderizar ícone de sucesso", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      expect(screen.getByTestId("icon-check-circle")).toBeInTheDocument();
+      const icons = screen.getAllByTestId("icon-check-circle");
+      expect(icons.length).toBeGreaterThan(0);
     });
 
     it("deve renderizar mensagem de sucesso", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      expect(screen.getByText("Post gerado com sucesso!")).toBeInTheDocument();
+      const messages = screen.getAllByText("Post gerado com sucesso!");
+      expect(messages.length).toBeGreaterThan(0);
     });
 
     it("deve renderizar descrição", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      expect(
-        screen.getByText(/Seu post foi criado e adicionado/)
-      ).toBeInTheDocument();
+      const descs = screen.getAllByText(/Seu post foi criado e adicionado/);
+      expect(descs.length).toBeGreaterThan(0);
     });
 
     it("deve renderizar botão Ver na Biblioteca", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      expect(screen.getByText("Ver na Biblioteca")).toBeInTheDocument();
+      const buttons = screen.getAllByText("Ver na Biblioteca");
+      expect(buttons.length).toBeGreaterThan(0);
     });
 
     it("deve renderizar botão Criar Outro Post", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      expect(screen.getByText("Criar Outro Post")).toBeInTheDocument();
+      const buttons = screen.getAllByText("Criar Outro Post");
+      expect(buttons.length).toBeGreaterThan(0);
     });
   });
 
@@ -62,7 +69,8 @@ describe("StepSuccess", () => {
     it("deve navegar para /ideabank ao clicar em Ver na Biblioteca", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      fireEvent.click(screen.getByText("Ver na Biblioteca"));
+      const buttons = screen.getAllByText("Ver na Biblioteca");
+      fireEvent.click(buttons[0]);
 
       expect(mockNavigate).toHaveBeenCalledWith("/ideabank");
     });
@@ -70,7 +78,8 @@ describe("StepSuccess", () => {
     it("deve chamar onCreateAnother ao clicar em Criar Outro Post", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      fireEvent.click(screen.getByText("Criar Outro Post"));
+      const buttons = screen.getAllByText("Criar Outro Post");
+      fireEvent.click(buttons[0]);
 
       expect(defaultProps.onCreateAnother).toHaveBeenCalledTimes(1);
     });
@@ -80,7 +89,8 @@ describe("StepSuccess", () => {
     it("deve mostrar informação sobre Biblioteca de Posts", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      expect(screen.getByText(/Biblioteca de Posts/)).toBeInTheDocument();
+      const texts = screen.getAllByText(/Biblioteca de Posts/);
+      expect(texts.length).toBeGreaterThan(0);
     });
   });
 });

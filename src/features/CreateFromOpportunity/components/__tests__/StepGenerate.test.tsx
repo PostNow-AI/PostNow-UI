@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { StepGenerate } from "../StepGenerate";
 
 // Mock lucide-react
@@ -9,6 +9,9 @@ vi.mock("lucide-react", () => ({
 }));
 
 describe("StepGenerate", () => {
+  afterEach(() => {
+    cleanup();
+  });
   describe("Estado de geração", () => {
     it("deve mostrar spinner quando gerando", () => {
       render(

@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import { MobileStepIndicator } from "../MobileStepIndicator";
 
 // Mock lucide-react
@@ -8,6 +8,9 @@ vi.mock("lucide-react", () => ({
 }));
 
 describe("MobileStepIndicator", () => {
+  afterEach(() => {
+    cleanup();
+  });
   describe("Renderização básica", () => {
     it("deve renderizar o número correto de passos", () => {
       render(<MobileStepIndicator currentStep={1} totalSteps={3} />);
