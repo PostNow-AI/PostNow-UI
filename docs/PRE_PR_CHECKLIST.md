@@ -798,6 +798,105 @@ npx shadcn@latest add <nome>
 
 ---
 
+## Segurança (Frontend)
+
+### Checklist de Segurança
+
+```
+[ ] Sem secrets/tokens hardcoded (usar VITE_*)
+[ ] Tokens em localStorage/sessionStorage (não em código)
+[ ] Sanitização de input do usuário
+[ ] Sem dangerouslySetInnerHTML (ou sanitizar antes)
+[ ] Validação com Zod antes de enviar ao backend
+[ ] HTTPS only em produção
+[ ] Não expor dados sensíveis em console.log
+```
+
+### Variáveis de Ambiente
+
+```typescript
+// CORRETO - usar VITE_* prefix
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+// ERRADO - NUNCA hardcode
+const API_KEY = 'sk-1234567890';
+```
+
+### XSS Prevention
+
+```typescript
+// ERRADO - vulnerável a XSS
+<div dangerouslySetInnerHTML={{ __html: userInput }} />
+
+// CORRETO - se precisar usar HTML, sanitizar
+import DOMPurify from 'dompurify';
+<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(userInput) }} />
+
+// MELHOR - usar texto normal
+<div>{userInput}</div>
+```
+
+### Autenticação
+
+```typescript
+// Token storage seguro
+const saveToken = (token: string) => {
+  localStorage.setItem('token', token);
+};
+
+// Axios interceptor para auth
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Limpar token no logout
+const logout = () => {
+  localStorage.removeItem('token');
+  // redirect to login
+};
+```
+
+### Validação de Input (Zod)
+
+```typescript
+// Sempre validar ANTES de enviar ao backend
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+// Isso previne envio de dados malformados
+const result = schema.safeParse(formData);
+if (!result.success) {
+  // mostrar erros
+  return;
+}
+// enviar dados válidos
+```
+
+### O que NÃO fazer
+
+```typescript
+// ❌ Expor secrets no código
+const API_KEY = 'sk-secret-key';
+
+// ❌ Console.log com dados sensíveis
+console.log('User data:', { password, token });
+
+// ❌ Armazenar senha no state
+const [password, setPassword] = useState(userPassword);
+
+// ❌ Confiar em dados do usuário
+<div dangerouslySetInnerHTML={{ __html: userComment }} />
+```
+
+---
+
 ## Analytics (Microsoft Clarity)
 
 O projeto usa Microsoft Clarity para analytics. Já está configurado, mas lembre-se:
