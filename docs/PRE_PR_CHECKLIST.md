@@ -6,9 +6,293 @@ Este documento define o processo padronizado para garantir PRs de qualidade ante
 
 ---
 
-## Índice
+## ⚠️ IMPORTANTE: Escolha o Checklist pelo Tipo de Branch
 
-- [Checklist Rápido](#checklist-rápido)
+| Tipo de Branch | Checklist a usar | Documentação |
+|----------------|------------------|--------------|
+| `fix/` | [Checklist FIX](#checklist-fix-bugfix) | ❌ Não criar (atualizar existente se necessário) |
+| `feat/` | [Checklist FEAT](#checklist-feat-feature) | ✅ Doc da funcionalidade (não do PR) |
+| `hotfix/` | [Checklist HOTFIX](#checklist-hotfix-urgente) | ❌ Não criar |
+| `refactor/` | [Checklist REFACTOR](#checklist-refactor) | ❌ Não criar |
+| `style/` | [Checklist STYLE](#checklist-style) | ❌ Não criar |
+| `docs/` | [Checklist DOCS](#checklist-docs) | N/A (é a própria mudança) |
+| `chore/` | [Checklist CHORE](#checklist-chore) | ❌ Não criar |
+
+---
+
+## Checklist FIX (Bugfix)
+
+**Use para:** Correções de bugs, ajustes de comportamento
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CHECKLIST FIX - BUGFIX                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ BRANCH & COMMITS                                                │
+│ [ ] Branch: fix/<descricao>                                     │
+│ [ ] Commit: fix(escopo): descrição                              │
+│                                                                 │
+│ CÓDIGO                                                          │
+│ [ ] Apenas o código necessário foi alterado                     │
+│ [ ] Sem console.logs                                            │
+│ [ ] Sem imports não utilizados                                  │
+│                                                                 │
+│ TESTES                                                          │
+│ [ ] npm run lint                                                │
+│ [ ] npx tsc --noEmit                                            │
+│ [ ] npm run build                                               │
+│ [ ] Bug específico foi testado manualmente                      │
+│                                                                 │
+│ INTEGRAÇÃO                                                      │
+│ [ ] Branch atualizada com main                                  │
+│ [ ] Sem conflitos                                               │
+│                                                                 │
+│ PR                                                              │
+│ [ ] Template preenchido                                         │
+│ [ ] Self-review feito                                           │
+│                                                                 │
+│ DOCUMENTAÇÃO                                                    │
+│ [ ] ❌ NÃO criar doc nova (ENTREGA_*.md)                        │
+│ [ ] Se necessário, atualizar doc EXISTENTE da funcionalidade    │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Checklist FEAT (Feature)
+
+**Use para:** Novas funcionalidades, novas telas, novos componentes
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   CHECKLIST FEAT - FEATURE                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ BRANCH & COMMITS                                                │
+│ [ ] Branch: feat/<descricao>                                    │
+│ [ ] Commits: feat(escopo): descrição                            │
+│ [ ] Commits pequenos e frequentes                               │
+│                                                                 │
+│ CÓDIGO                                                          │
+│ [ ] Componentes < 200 linhas                                    │
+│ [ ] Lógica complexa em hooks customizados                       │
+│ [ ] Sem console.logs                                            │
+│ [ ] Sem imports não utilizados                                  │
+│ [ ] Textos em português                                         │
+│ [ ] Tailwind classes (não CSS customizado)                      │
+│ [ ] Shadcn components quando aplicável                          │
+│                                                                 │
+│ FORMULÁRIOS & API (se aplicável)                                │
+│ [ ] React Hook Form + Zod                                       │
+│ [ ] TanStack Query (useQuery/useMutation)                       │
+│ [ ] Validação ANTES do envio                                    │
+│                                                                 │
+│ ACESSIBILIDADE                                                  │
+│ [ ] aria-label em elementos interativos                         │
+│ [ ] tabIndex={0} em elementos clicáveis                         │
+│ [ ] onKeyDown para navegação por teclado                        │
+│                                                                 │
+│ TESTES                                                          │
+│ [ ] npm run lint                                                │
+│ [ ] npx tsc --noEmit                                            │
+│ [ ] npm run test:run                                            │
+│ [ ] npm run build                                               │
+│ [ ] Testado em mobile/tablet/desktop                            │
+│ [ ] Testado em dark mode                                        │
+│                                                                 │
+│ INTEGRAÇÃO                                                      │
+│ [ ] Branch atualizada com main                                  │
+│ [ ] Sem conflitos de merge                                      │
+│                                                                 │
+│ PR                                                              │
+│ [ ] Template preenchido                                         │
+│ [ ] Screenshots (antes/depois)                                  │
+│ [ ] PR de backend linkada (se aplicável)                        │
+│ [ ] Self-review feito                                           │
+│                                                                 │
+│ DOCUMENTAÇÃO                                                    │
+│ [ ] Doc da FUNCIONALIDADE (não do PR)                           │
+│ [ ] Ex: DASHBOARD.md, não ENTREGA_PR40.md                       │
+│                                                                 │
+│ PÓS-PUSH                                                        │
+│ [ ] Vercel Preview funcionando                                  │
+│ [ ] CI passou                                                   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Checklist HOTFIX (Urgente)
+
+**Use para:** Correções urgentes em produção
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  CHECKLIST HOTFIX - URGENTE                     │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ BRANCH & COMMITS                                                │
+│ [ ] Branch: hotfix/<descricao>                                  │
+│ [ ] Commit: fix(escopo): descrição                              │
+│                                                                 │
+│ CÓDIGO (mínimo necessário)                                      │
+│ [ ] Apenas a correção, nada mais                                │
+│ [ ] Sem console.logs                                            │
+│                                                                 │
+│ TESTES                                                          │
+│ [ ] Teste manual do fix                                         │
+│ [ ] npm run build (se possível)                                 │
+│                                                                 │
+│ PR                                                              │
+│ [ ] Marcar como URGENTE                                         │
+│ [ ] Descrever o problema e a solução                            │
+│                                                                 │
+│ DOCUMENTAÇÃO                                                    │
+│ [ ] ❌ NÃO criar doc                                            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Checklist REFACTOR
+
+**Use para:** Refatoração sem mudança de comportamento
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CHECKLIST REFACTOR                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ BRANCH & COMMITS                                                │
+│ [ ] Branch: refactor/<descricao>                                │
+│ [ ] Commit: refactor(escopo): descrição                         │
+│                                                                 │
+│ CÓDIGO                                                          │
+│ [ ] Comportamento NÃO mudou (só estrutura)                      │
+│ [ ] Componentes < 200 linhas                                    │
+│ [ ] Lógica em hooks apropriados                                 │
+│ [ ] Sem console.logs                                            │
+│ [ ] Sem imports não utilizados                                  │
+│                                                                 │
+│ TESTES                                                          │
+│ [ ] npm run lint                                                │
+│ [ ] npx tsc --noEmit                                            │
+│ [ ] npm run test:run (TODOS devem passar)                       │
+│ [ ] npm run build                                               │
+│ [ ] Nenhum teste quebrou                                        │
+│                                                                 │
+│ INTEGRAÇÃO                                                      │
+│ [ ] Branch atualizada com main                                  │
+│ [ ] Sem conflitos                                               │
+│                                                                 │
+│ PR                                                              │
+│ [ ] Template preenchido                                         │
+│ [ ] Self-review feito                                           │
+│                                                                 │
+│ DOCUMENTAÇÃO                                                    │
+│ [ ] ❌ NÃO criar doc nova                                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Checklist STYLE
+
+**Use para:** Alterações visuais/CSS, ajustes de layout
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     CHECKLIST STYLE                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ BRANCH & COMMITS                                                │
+│ [ ] Branch: style/<descricao>                                   │
+│ [ ] Commit: style(escopo): descrição                            │
+│                                                                 │
+│ CÓDIGO                                                          │
+│ [ ] Apenas mudanças visuais                                     │
+│ [ ] Tailwind classes (não CSS customizado)                      │
+│ [ ] Cores do Shadcn (não hex hardcoded)                         │
+│                                                                 │
+│ TESTES                                                          │
+│ [ ] npm run build                                               │
+│ [ ] Testado em mobile/tablet/desktop                            │
+│ [ ] Testado em dark mode                                        │
+│                                                                 │
+│ PR                                                              │
+│ [ ] Screenshots (antes/depois)                                  │
+│                                                                 │
+│ DOCUMENTAÇÃO                                                    │
+│ [ ] ❌ NÃO criar doc                                            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Checklist DOCS
+
+**Use para:** Apenas documentação
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      CHECKLIST DOCS                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ BRANCH & COMMITS                                                │
+│ [ ] Branch: docs/<descricao>                                    │
+│ [ ] Commit: docs(escopo): descrição                             │
+│                                                                 │
+│ CONTEÚDO                                                        │
+│ [ ] Markdown válido                                             │
+│ [ ] Links funcionando                                           │
+│ [ ] Texto em português                                          │
+│                                                                 │
+│ PR                                                              │
+│ [ ] Template preenchido                                         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Checklist CHORE
+
+**Use para:** Manutenção, dependências, configs
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      CHECKLIST CHORE                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ BRANCH & COMMITS                                                │
+│ [ ] Branch: chore/<descricao>                                   │
+│ [ ] Commit: chore(escopo): descrição                            │
+│                                                                 │
+│ VERIFICAÇÕES                                                    │
+│ [ ] npm run build funciona                                      │
+│ [ ] npm run test:run passa                                      │
+│ [ ] npm audit (sem vulnerabilidades HIGH novas)                 │
+│                                                                 │
+│ PR                                                              │
+│ [ ] Template preenchido                                         │
+│ [ ] Listar dependências alteradas                               │
+│                                                                 │
+│ DOCUMENTAÇÃO                                                    │
+│ [ ] ❌ NÃO criar doc                                            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Índice - Detalhes por Fase
+
 - [Fase 1: Branch](#fase-1-branch)
 - [Fase 2: Commits](#fase-2-commits)
 - [Fase 3: Código](#fase-3-código)
@@ -22,77 +306,6 @@ Este documento define o processo padronizado para garantir PRs de qualidade ante
 - [Comandos Úteis](#comandos-úteis)
 - [Padrões React (Cursor Rules)](#padrões-react-cursor-rules)
 - [Feedbacks Recorrentes do CTO](#feedbacks-recorrentes-do-cto)
-
----
-
-## Checklist Rápido
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│              PRÉ-PR CHECKLIST POSTNOW - FRONTEND                │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│ BRANCH                                                          │
-│ [ ] Criada de main atualizado                                   │
-│ [ ] Nomenclatura: feat/, fix/, hotfix/, docs/, refactor/, chore/│
-│                                                                 │
-│ COMMITS                                                         │
-│ [ ] Conventional Commits: tipo(escopo): descrição               │
-│ [ ] Commits pequenos e frequentes                               │
-│                                                                 │
-│ CÓDIGO                                                          │
-│ [ ] Componentes < 200 linhas (separar UI de lógica)             │
-│ [ ] Hooks customizados para lógica complexa                     │
-│ [ ] Sem console.logs                                            │
-│ [ ] Sem código comentado                                        │
-│ [ ] Sem variáveis/imports não utilizados (TypeScript strict)    │
-│ [ ] Textos em português                                         │
-│ [ ] Tailwind classes (não CSS customizado)                      │
-│ [ ] Shadcn components quando aplicável                          │
-│                                                                 │
-│ FORMULÁRIOS & API                                               │
-│ [ ] React Hook Form + Zod para formulários                      │
-│ [ ] TanStack Query para GET (useQuery)                          │
-│ [ ] TanStack Query para POST/PUT/DELETE (useMutation)           │
-│ [ ] Axios para chamadas HTTP                                    │
-│ [ ] Validação ANTES do envio                                    │
-│ [ ] Erros mostrados no campo específico                         │
-│                                                                 │
-│ ACESSIBILIDADE                                                  │
-│ [ ] aria-label em elementos interativos                         │
-│ [ ] tabIndex={0} em elementos clicáveis                         │
-│ [ ] onKeyDown para navegação por teclado                        │
-│ [ ] Dark mode testado                                           │
-│                                                                 │
-│ TESTES LOCAIS                                                   │
-│ [ ] npm run lint                                                │
-│ [ ] npx tsc --noEmit                                            │
-│ [ ] npm run test:run                                            │
-│ [ ] npm run build                                               │
-│                                                                 │
-│ INTEGRAÇÃO                                                      │
-│ [ ] Branch atualizada com main                                  │
-│ [ ] Sem conflitos de merge                                      │
-│                                                                 │
-│ PR                                                              │
-│ [ ] Template preenchido                                         │
-│ [ ] Screenshots (antes/depois) se mudança visual                │
-│ [ ] PR de backend linkada (se aplicável)                        │
-│ [ ] Self-review feito                                           │
-│                                                                 │
-│ PÓS-PUSH                                                        │
-│ [ ] Vercel Preview funcionando                                  │
-│ [ ] CI passou (lint, typecheck, tests, build)                   │
-│ [ ] Testado na URL de preview                                   │
-│ [ ] Testado em mobile/tablet/desktop                            │
-│ [ ] Testado em dark mode                                        │
-│                                                                 │
-│ PÓS-MERGE (se release)                                          │
-│ [ ] npm version patch/minor/major                               │
-│ [ ] git push origin main --tags                                 │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
 
 ---
 
