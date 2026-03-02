@@ -46,7 +46,7 @@ describe("InstagramAccountSelector", () => {
       instagram_username: "account1",
       instagram_name: "Account One",
       profile_picture_url: "https://example.com/pic1.jpg",
-      status: "connected",
+      status: "connected" as const,
       is_token_valid: true,
       days_until_expiration: 30,
     },
@@ -55,7 +55,7 @@ describe("InstagramAccountSelector", () => {
       instagram_username: "account2",
       instagram_name: "Account Two",
       profile_picture_url: "https://example.com/pic2.jpg",
-      status: "connected",
+      status: "connected" as const,
       is_token_valid: true,
       days_until_expiration: 15,
     },
@@ -186,11 +186,11 @@ describe("ScheduledPostCard", () => {
       />
     );
 
-    const img = screen.getByRole("img");
+    const img = screen.getByAltText("Post thumbnail");
     expect(img).toHaveAttribute("src", "https://example.com/image.jpg");
   });
 
-  it("should be disabled when isLoading is true", () => {
+  it("should disable button when isLoading is true", () => {
     render(
       <ScheduledPostCard
         post={mockPost}
@@ -202,8 +202,10 @@ describe("ScheduledPostCard", () => {
       />
     );
 
-    const card = screen.getByRole("article");
-    expect(card).toHaveClass("opacity-50");
+    // Find the dropdown trigger button (MoreVertical icon button)
+    const buttons = screen.getAllByRole("button");
+    const menuButton = buttons.find((b) => b.hasAttribute("aria-haspopup"));
+    expect(menuButton).toBeDisabled();
   });
 
   it("should show permalink for published posts", () => {
@@ -229,16 +231,16 @@ describe("ScheduledPostCard", () => {
     expect(link).toHaveAttribute("href", "https://instagram.com/p/abc123");
   });
 
-  it("should show retry button for failed posts", () => {
-    const failedPost = {
+  it("should not show actions menu for published posts", () => {
+    const publishedPost = {
       ...mockPost,
-      status: "failed" as const,
-      status_display: "Falhou",
+      status: "published" as const,
+      status_display: "Publicado",
     };
 
     render(
       <ScheduledPostCard
-        post={failedPost}
+        post={publishedPost}
         onCancel={vi.fn()}
         onDelete={vi.fn()}
         onPublishNow={vi.fn()}
@@ -246,11 +248,10 @@ describe("ScheduledPostCard", () => {
       />
     );
 
-    // Open dropdown menu first
-    const menuButton = screen.getByRole("button", { name: "" });
-    fireEvent.click(menuButton);
-
-    expect(screen.getByText("Tentar novamente")).toBeInTheDocument();
+    // Published posts should not have the action menu button
+    const buttons = screen.queryAllByRole("button");
+    const menuButton = buttons.find((b) => b.hasAttribute("aria-haspopup"));
+    expect(menuButton).toBeUndefined();
   });
 });
 

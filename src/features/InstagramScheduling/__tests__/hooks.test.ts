@@ -7,10 +7,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 
-// Mock the service
+// Mock the service module
+const mockGetScheduledPosts = vi.fn();
+const mockGetStats = vi.fn();
+const mockGetAccounts = vi.fn();
+
 vi.mock("../services", () => ({
   instagramSchedulingService: {
-    getScheduledPosts: vi.fn(),
+    getScheduledPosts: (...args: unknown[]) => mockGetScheduledPosts(...args),
     getScheduledPost: vi.fn(),
     createScheduledPost: vi.fn(),
     updateScheduledPost: vi.fn(),
@@ -18,17 +22,12 @@ vi.mock("../services", () => ({
     cancelScheduledPost: vi.fn(),
     publishScheduledPostNow: vi.fn(),
     retryScheduledPost: vi.fn(),
-    getScheduledPostStats: vi.fn(),
-    getInstagramAccounts: vi.fn(),
+    getStats: () => mockGetStats(),
+    getAccounts: () => mockGetAccounts(),
+    getCalendarEvents: vi.fn(),
+    disconnectAccount: vi.fn(),
   },
 }));
-
-import { instagramSchedulingService } from "../services";
-import {
-  useScheduledPosts,
-  useScheduledPostStats,
-} from "../hooks/useScheduledPosts";
-import { useInstagramAccounts } from "../hooks/useInstagramAccounts";
 
 // Helper to create wrapper with QueryClient
 const createWrapper = () => {
@@ -36,6 +35,7 @@ const createWrapper = () => {
     defaultOptions: {
       queries: {
         retry: false,
+        gcTime: 0,
       },
     },
   });
@@ -58,9 +58,10 @@ describe("useScheduledPosts", () => {
       },
     ];
 
-    vi.mocked(instagramSchedulingService.getScheduledPosts).mockResolvedValue(
-      mockPosts
-    );
+    mockGetScheduledPosts.mockResolvedValue(mockPosts);
+
+    // Import after mocks are set up
+    const { useScheduledPosts } = await import("../hooks/useScheduledPosts");
 
     const { result } = renderHook(() => useScheduledPosts(), {
       wrapper: createWrapper(),
@@ -70,22 +71,14 @@ describe("useScheduledPosts", () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(result.current.posts).toEqual(mockPosts);
-    expect(instagramSchedulingService.getScheduledPosts).toHaveBeenCalled();
+    expect(result.current.data).toEqual(mockPosts);
+    expect(mockGetScheduledPosts).toHaveBeenCalled();
   });
 
   it("should filter posts by status", async () => {
-    const mockPosts = [
-      {
-        id: 1,
-        caption: "Scheduled post",
-        status: "scheduled",
-      },
-    ];
+    mockGetScheduledPosts.mockResolvedValue([]);
 
-    vi.mocked(instagramSchedulingService.getScheduledPosts).mockResolvedValue(
-      mockPosts
-    );
+    const { useScheduledPosts } = await import("../hooks/useScheduledPosts");
 
     const { result } = renderHook(
       () => useScheduledPosts({ status: "scheduled" }),
@@ -98,15 +91,17 @@ describe("useScheduledPosts", () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(instagramSchedulingService.getScheduledPosts).toHaveBeenCalledWith({
+    expect(mockGetScheduledPosts).toHaveBeenCalledWith({
       status: "scheduled",
+      start_date: undefined,
+      end_date: undefined,
     });
   });
 
   it("should handle error state", async () => {
-    vi.mocked(instagramSchedulingService.getScheduledPosts).mockRejectedValue(
-      new Error("API Error")
-    );
+    mockGetScheduledPosts.mockRejectedValue(new Error("API Error"));
+
+    const { useScheduledPosts } = await import("../hooks/useScheduledPosts");
 
     const { result } = renderHook(() => useScheduledPosts(), {
       wrapper: createWrapper(),
@@ -132,8 +127,10 @@ describe("useScheduledPostStats", () => {
       total_published: 10,
     };
 
-    vi.mocked(instagramSchedulingService.getScheduledPostStats).mockResolvedValue(
-      mockStats
+    mockGetStats.mockResolvedValue(mockStats);
+
+    const { useScheduledPostStats } = await import(
+      "../hooks/useScheduledPostStats"
     );
 
     const { result } = renderHook(() => useScheduledPostStats(), {
@@ -144,7 +141,7 @@ describe("useScheduledPostStats", () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(result.current.stats).toEqual(mockStats);
+    expect(result.current.data).toEqual(mockStats);
   });
 });
 
@@ -163,8 +160,10 @@ describe("useInstagramAccounts", () => {
       },
     ];
 
-    vi.mocked(instagramSchedulingService.getInstagramAccounts).mockResolvedValue(
-      mockAccounts
+    mockGetAccounts.mockResolvedValue(mockAccounts);
+
+    const { useInstagramAccounts } = await import(
+      "../hooks/useInstagramAccounts"
     );
 
     const { result } = renderHook(() => useInstagramAccounts(), {
@@ -194,8 +193,10 @@ describe("useInstagramAccounts", () => {
       },
     ];
 
-    vi.mocked(instagramSchedulingService.getInstagramAccounts).mockResolvedValue(
-      mockAccounts
+    mockGetAccounts.mockResolvedValue(mockAccounts);
+
+    const { useInstagramAccounts } = await import(
+      "../hooks/useInstagramAccounts"
     );
 
     const { result } = renderHook(() => useInstagramAccounts(), {
