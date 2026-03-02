@@ -1,8 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createFromOpportunityService } from "../services";
-import type { CreateFromOpportunityState, CreatePostData, VisualStyle } from "../types";
+import type { CreateFromOpportunityState, CreatePostData, Opportunity, VisualStyle } from "../types";
 import { useUrlParams } from "./useUrlParams";
 
 export const useCreateFromOpportunity = () => {
@@ -22,6 +22,36 @@ export const useCreateFromOpportunity = () => {
     error: null,
   });
 
+  // Fetch user opportunities for navigation
+  const {
+    data: opportunities = [],
+    isLoading: isLoadingOpportunities,
+  } = useQuery<Opportunity[]>({
+    queryKey: ["user-opportunities"],
+    queryFn: createFromOpportunityService.getOpportunities,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Find current opportunity index based on topic (partial match for URL compatibility)
+  const currentOpportunityIndex = useMemo(() => {
+    if (opportunities.length === 0) return -1;
+    // Try exact match first
+    const exactIndex = opportunities.findIndex((opp) => opp.topic === state.topic);
+    if (exactIndex !== -1) return exactIndex;
+    // Try partial match (topic from URL might be truncated)
+    return opportunities.findIndex((opp) =>
+      opp.topic.toLowerCase().includes(state.topic.toLowerCase()) ||
+      state.topic.toLowerCase().includes(opp.topic.toLowerCase())
+    );
+  }, [opportunities, state.topic]);
+
+  // Navigation info
+  const canNavigatePrev = currentOpportunityIndex > 0;
+  const canNavigateNext = currentOpportunityIndex < opportunities.length - 1 && currentOpportunityIndex !== -1;
+  // If topic not found in list, allow navigating to first opportunity
+  const canNavigateToFirst = currentOpportunityIndex === -1 && opportunities.length > 0;
+  const totalOpportunities = opportunities.length;
+
   // Fetch visual styles
   const {
     data: visualStyles = [],
@@ -36,7 +66,7 @@ export const useCreateFromOpportunity = () => {
   // Generate post mutation
   const generatePostMutation = useMutation({
     mutationFn: createFromOpportunityService.generatePost,
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Post gerado com sucesso!");
       // Invalidate posts query to refresh the list
       queryClient.invalidateQueries({ queryKey: ["posts-with-ideas"] });
@@ -44,6 +74,8 @@ export const useCreateFromOpportunity = () => {
         ...prev,
         step: 4,
         isGenerating: false,
+        generatedContent: data.post.content,
+        generatedImageUrl: data.post.image_url || null,
       }));
     },
     onError: (error: Error) => {
@@ -55,6 +87,39 @@ export const useCreateFromOpportunity = () => {
       }));
     },
   });
+
+  // Navigate to a specific opportunity
+  const goToOpportunity = useCallback((index: number) => {
+    if (index < 0 || index >= opportunities.length) return;
+
+    const opp = opportunities[index];
+    setState((prev) => ({
+      ...prev,
+      step: 1,
+      topic: opp.topic,
+      category: opp.category,
+      score: opp.score,
+      furtherDetails: "",
+      selectedStyleId: null,
+      generatedContent: null,
+      generatedImageUrl: null,
+      error: null,
+    }));
+  }, [opportunities]);
+
+  // Navigate to previous opportunity
+  const prevOpportunity = useCallback(() => {
+    if (canNavigatePrev) {
+      goToOpportunity(currentOpportunityIndex - 1);
+    }
+  }, [canNavigatePrev, currentOpportunityIndex, goToOpportunity]);
+
+  // Navigate to next opportunity
+  const nextOpportunity = useCallback(() => {
+    if (canNavigateNext) {
+      goToOpportunity(currentOpportunityIndex + 1);
+    }
+  }, [canNavigateNext, currentOpportunityIndex, goToOpportunity]);
 
   // Navigation handlers
   const nextStep = useCallback(() => {
@@ -111,7 +176,7 @@ export const useCreateFromOpportunity = () => {
       name: state.topic,
       objective: "engagement",
       type: "feed",
-      further_details: state.furtherDetails || undefined,
+      further_details: state.furtherDetails || "",
       include_image: true,
       style_id: state.selectedStyleId,
     };
@@ -141,6 +206,17 @@ export const useCreateFromOpportunity = () => {
     visualStyles,
     isLoadingStyles,
     stylesError,
+
+    // Opportunities navigation
+    opportunities,
+    isLoadingOpportunities,
+    currentOpportunityIndex,
+    totalOpportunities,
+    canNavigatePrev,
+    canNavigateNext: canNavigateNext || canNavigateToFirst,
+    prevOpportunity,
+    nextOpportunity: canNavigateToFirst ? () => goToOpportunity(0) : nextOpportunity,
+    goToOpportunity,
 
     // Actions
     nextStep,

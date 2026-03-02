@@ -8,16 +8,27 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
+// Mock sonner
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
+
 // Mock lucide-react
 vi.mock("lucide-react", () => ({
   CheckCircle2: () => <span data-testid="icon-check-circle">check</span>,
   ExternalLink: () => <span data-testid="icon-external">external</span>,
   Plus: () => <span data-testid="icon-plus">plus</span>,
+  Download: () => <span data-testid="icon-download">download</span>,
+  Copy: () => <span data-testid="icon-copy">copy</span>,
 }));
 
 describe("StepSuccess", () => {
   const defaultProps = {
     onCreateAnother: vi.fn(),
+    generatedContent: "Este é o conteúdo do post gerado #marketing #ia",
+    generatedImageUrl: "https://example.com/image.png",
   };
 
   beforeEach(() => {
@@ -43,11 +54,19 @@ describe("StepSuccess", () => {
       expect(messages.length).toBeGreaterThan(0);
     });
 
-    it("deve renderizar descrição", () => {
+    it("deve renderizar conteúdo gerado", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      const descs = screen.getAllByText(/Seu post foi criado e adicionado/);
-      expect(descs.length).toBeGreaterThan(0);
+      const content = screen.getByText(/Este é o conteúdo do post gerado/);
+      expect(content).toBeInTheDocument();
+    });
+
+    it("deve renderizar imagem gerada", () => {
+      render(<StepSuccess {...defaultProps} />);
+
+      const image = screen.getByAltText("Post gerado");
+      expect(image).toBeInTheDocument();
+      expect(image).toHaveAttribute("src", defaultProps.generatedImageUrl);
     });
 
     it("deve renderizar botão Ver na Biblioteca", () => {
@@ -86,12 +105,33 @@ describe("StepSuccess", () => {
     });
   });
 
-  describe("Card informativo", () => {
-    it("deve mostrar informação sobre Biblioteca de Posts", () => {
+  describe("Ações de conteúdo", () => {
+    it("deve mostrar botão de copiar conteúdo", () => {
       render(<StepSuccess {...defaultProps} />);
 
-      const texts = screen.getAllByText(/Biblioteca de Posts/);
-      expect(texts.length).toBeGreaterThan(0);
+      const copyButton = screen.getByText("Copiar");
+      expect(copyButton).toBeInTheDocument();
+    });
+
+    it("deve mostrar botão de baixar imagem", () => {
+      render(<StepSuccess {...defaultProps} />);
+
+      const downloadButton = screen.getByText("Baixar");
+      expect(downloadButton).toBeInTheDocument();
+    });
+
+    it("não deve renderizar imagem quando generatedImageUrl é null", () => {
+      render(<StepSuccess {...defaultProps} generatedImageUrl={null} />);
+
+      const image = screen.queryByAltText("Post gerado");
+      expect(image).not.toBeInTheDocument();
+    });
+
+    it("não deve renderizar conteúdo quando generatedContent é null", () => {
+      render(<StepSuccess {...defaultProps} generatedContent={null} />);
+
+      const copyButton = screen.queryByText("Copiar");
+      expect(copyButton).not.toBeInTheDocument();
     });
   });
 });

@@ -23,6 +23,16 @@ export const CreateFromOpportunity = () => {
     visualStyles,
     isLoadingStyles,
     isGenerating,
+    generatedContent,
+    generatedImageUrl,
+    // Opportunities navigation
+    currentOpportunityIndex,
+    totalOpportunities,
+    canNavigatePrev,
+    canNavigateNext,
+    prevOpportunity,
+    nextOpportunity,
+    // Actions
     nextStep,
     prevStep,
     setFurtherDetails,
@@ -95,6 +105,12 @@ export const CreateFromOpportunity = () => {
             furtherDetails={furtherDetails}
             onFurtherDetailsChange={setFurtherDetails}
             onNext={nextStep}
+            currentIndex={currentOpportunityIndex}
+            totalOpportunities={totalOpportunities}
+            canNavigatePrev={canNavigatePrev}
+            canNavigateNext={canNavigateNext}
+            onPrevOpportunity={prevOpportunity}
+            onNextOpportunity={nextOpportunity}
           />
         )}
 
@@ -117,7 +133,11 @@ export const CreateFromOpportunity = () => {
         )}
 
         {step === 4 && (
-          <StepSuccess onCreateAnother={createAnother} />
+          <StepSuccess
+            onCreateAnother={createAnother}
+            generatedContent={generatedContent}
+            generatedImageUrl={generatedImageUrl}
+          />
         )}
       </main>
     </div>

@@ -26,6 +26,16 @@ export interface GeneratedPost {
   image_url?: string;
 }
 
+export interface Opportunity {
+  topic: string;
+  description: string;
+  score: number;
+  category: CategoryKey;
+  category_title: string;
+  url_fonte?: string;
+  enriched_analysis?: string;
+}
+
 export interface CreateFromOpportunityState {
   step: number;
   topic: string;

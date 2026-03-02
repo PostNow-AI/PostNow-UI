@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,13 @@ interface StepTopicProps {
   furtherDetails: string;
   onFurtherDetailsChange: (details: string) => void;
   onNext: () => void;
+  // Navigation props
+  currentIndex?: number;
+  totalOpportunities?: number;
+  canNavigatePrev?: boolean;
+  canNavigateNext?: boolean;
+  onPrevOpportunity?: () => void;
+  onNextOpportunity?: () => void;
 }
 
 export const StepTopic = ({
@@ -21,8 +28,15 @@ export const StepTopic = ({
   furtherDetails,
   onFurtherDetailsChange,
   onNext,
+  currentIndex = -1,
+  totalOpportunities = 0,
+  canNavigatePrev = false,
+  canNavigateNext = false,
+  onPrevOpportunity,
+  onNextOpportunity,
 }: StepTopicProps) => {
   const categoryInfo = CATEGORY_LABELS[category] || CATEGORY_LABELS.outros;
+  const showNavigation = totalOpportunities > 1;
 
   return (
     <div className="flex flex-col h-full">
@@ -54,6 +68,35 @@ export const StepTopic = ({
                 {score}/100
               </Badge>
             </div>
+
+            {/* Opportunity Navigation */}
+            {showNavigation && (
+              <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onPrevOpportunity}
+                  disabled={!canNavigatePrev}
+                  className="gap-1"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Anterior
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  {currentIndex + 1} de {totalOpportunities}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onNextOpportunity}
+                  disabled={!canNavigateNext}
+                  className="gap-1"
+                >
+                  Próximo
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
