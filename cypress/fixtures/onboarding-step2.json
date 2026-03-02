@@ -1,0 +1,11 @@
+{
+  "voice_tone": "Profissional e Amigável",
+  "colors": [
+    "#FF6B6B",
+    "#4ECDC4",
+    "#45B7D1",
+    "#96CEB4",
+    "#FFBE0B"
+  ],
+  "visual_style_ids": [1, 2, 3]
+}

@@ -27,7 +27,8 @@ export interface OnboardingStep2Data {
   color_3?: string;
   color_4?: string;
   color_5?: string;
-  visual_style_ids?: string[];
+  // Backend espera integers (IntegerField)
+  visual_style_ids?: number[];
 }
 
 export interface OnboardingStatus {
@@ -86,6 +87,11 @@ export const submitOnboardingStep1 = async (data: OnboardingFormData | Onboardin
 };
 
 export const submitOnboardingStep2 = async (data: OnboardingFormData | OnboardingStep2Data): Promise<OnboardingStepResponse> => {
+  // Garantir que visual_style_ids seja um array de integers (backend espera IntegerField)
+  const visualStyleIds = (data.visual_style_ids || []).map(id =>
+    typeof id === 'string' ? parseInt(id, 10) : id
+  ).filter(id => !isNaN(id));
+
   const payload = {
     voice_tone: data.voice_tone,
     logo: data.logo || "",
@@ -94,7 +100,7 @@ export const submitOnboardingStep2 = async (data: OnboardingFormData | Onboardin
     color_3: data.color_3 || "",
     color_4: data.color_4 || "",
     color_5: data.color_5 || "",
-    visual_style_ids: data.visual_style_ids || [],
+    visual_style_ids: visualStyleIds,
   };
   const response = await api.put<OnboardingStepResponse>(
     "/api/v1/creator-profile/onboarding/step2/",
