@@ -24,18 +24,18 @@ import EmailSentPage from "./pages/EmailSentPage";
 import EmailVerificationPage from "./pages/EmailVerificationPage";
 import { GoogleCallbackPage } from "./pages/GoogleCallbackPage";
 import { IdeaBankPage } from "./pages/IdeaBankPage";
-// import { CampaignsPage } from "./pages/CampaignsPage";
-// import { CampaignCreationPage } from "./pages/CampaignCreationPage";
-// import { CampaignDetailPage } from "./pages/CampaignDetailPage";
+import { InstagramCallbackPage } from "./pages/InstagramCallbackPage";
+import { InstagramSettingsPage } from "./pages/InstagramSettingsPage";
 import LoginPage from "./pages/LoginPage";
+import OnboardingPage from "./pages/OnboardingPage";
 import PasswordResetConfirmPage from "./pages/PasswordResetConfirmPage";
 import PasswordResetRequestPage from "./pages/PasswordResetRequestPage";
 import PaymentCancelPage from "./pages/PaymentCancelPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
+import { ScheduledPostsPage } from "./pages/ScheduledPostsPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
-import OnboardingPage from "./pages/OnboardingPage";
 
 const App = () => {
   if (import.meta.env.MODE === "production") {
@@ -76,6 +76,10 @@ const App = () => {
               <Route
                 path="/auth/google/callback"
                 element={<GoogleCallbackPage />}
+              />
+              <Route
+                path="/auth/instagram/callback"
+                element={<InstagramCallbackPage />}
               />
               <Route
                 path="/verify-email"
@@ -130,7 +134,7 @@ const App = () => {
                 <Route
                   path="/admin/daily-posts"
                   element={<AdminDailyPosts />}
-                /> 
+                />
                 <Route path="/dashboard" element={<BehaviorDashboard/>}/>
               </Route>
 
@@ -155,32 +159,12 @@ const App = () => {
                 }
               >
                 <Route path="/ideabank" element={<IdeaBankPage />} />
-                {/* <Route path="/campaigns" element={<CampaignsPage />} /> */}
-                {/* <Route path="/campaigns/:id" element={<CampaignDetailPage />} /> */}
+                <Route path="/scheduled-posts" element={<ScheduledPostsPage />} />
+                <Route path="/settings/instagram" element={<InstagramSettingsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                {/* <Route path="/weekly-context" element={<WeeklyContextPage />} /> */}
-
                 <Route path="/credits" element={<CreditsPage />} />
                 <Route path="/subscription" element={<SubscriptionPage />} />
-
-                {/* Carousel routes - DISABLED */}
-                {/* <Route path="/carousel" element={<CarouselListPage />} /> */}
-                {/* <Route path="/carousel/create" element={<CarouselCreatePage />} /> */}
-                {/* <Route path="/carousel/create/manual" element={<CarouselManualFormPage />} /> */}
-                {/* <Route path="/carousel/wizard" element={<CarouselWizardPage />} /> */}
-                {/* <Route path="/carousel/generating/:sessionId" element={<CarouselGeneratingPage />} /> */}
-                {/* <Route path="/carousel/:id" element={<CarouselViewPage />} /> */}
               </Route>
-
-              {/* Campaign creation - Full page (not in DashboardLayout) - DISABLED */}
-              {/* <Route
-                path="/campaigns/new"
-                element={
-                  <ProtectedRoute>
-                    <CampaignCreationPage />
-                  </ProtectedRoute>
-                }
-              /> */}
             </Routes>
             <Toaster />
           </AuthProvider>

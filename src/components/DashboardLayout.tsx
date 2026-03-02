@@ -16,8 +16,9 @@ import { useAuth, useDashboardLayout } from "@/hooks";
 import {
   Activity,
   BarChart3,
-  ChartArea,
+  Calendar,
   ClipboardList,
+  Instagram,
   LogOut,
   Wallet,
 } from "lucide-react";
@@ -50,16 +51,16 @@ export function AppSidebar() {
       icon: ClipboardList,
       url: "/ideabank",
     },
-    // {
-    //   title: "Campanhas",
-    //   icon: Zap,
-    //   url: "/campaigns",
-    // },
-    // {
-    //   title: "Carrosséis",
-    //   icon: Layers,
-    //   url: "/carousel",
-    // },
+    {
+      title: "Agendados",
+      icon: Calendar,
+      url: "/scheduled-posts",
+    },
+    {
+      title: "Instagram",
+      icon: Instagram,
+      url: "/settings/instagram",
+    },
     {
       title: "Assinatura",
       icon: Wallet,
@@ -78,7 +79,6 @@ export function AppSidebar() {
       icon: Activity,
       url: "/admin/daily-posts",
     },
-    
   ];
 
   if (user?.is_superuser) {
