@@ -771,6 +771,16 @@ npx shadcn@latest add <nome>
 
 ## Feedbacks Recorrentes do CTO
 
+### Alta Prioridade - Documentação
+
+| Feedback | Solução |
+|----------|---------|
+| "Não criar doc por PR/bugfix" | **NÃO** criar arquivos como `ENTREGA_PR40.md` |
+| "Documentação polui e dificulta leitura" | Manter docs consolidadas por funcionalidade |
+| "Atualizar doc antiga" | Editar doc existente com novo funcionamento |
+
+**Regra:** Documentação deve ser **por funcionalidade**, não por PR. Em caso de bugfix, atualizar a documentação existente substituindo o texto para contemplar o novo funcionamento.
+
 ### Problemas de UX (Alta Prioridade)
 
 | Feedback | Solução |
