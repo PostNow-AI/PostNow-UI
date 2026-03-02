@@ -33,12 +33,6 @@ export function InstagramAccountSelector({
 }: InstagramAccountSelectorProps) {
   const selectedAccount = accounts.find((acc) => acc.id === value);
 
-  const getStatusColor = (status: string, isValid: boolean) => {
-    if (!isValid) return "destructive";
-    if (status === "connected") return "default";
-    return "secondary";
-  };
-
   if (accounts.length === 0) {
     return (
       <div className="flex items-center gap-2 p-3 border rounded-md bg-muted/50">

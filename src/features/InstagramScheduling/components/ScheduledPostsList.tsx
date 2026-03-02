@@ -5,7 +5,7 @@
  */
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, Instagram, Loader2, Plus, RefreshCw } from "lucide-react";
+import { Calendar, Instagram, Plus, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { useScheduledPostMutations } from "../hooks/useScheduledPostMutations";
 import { useScheduledPosts } from "../hooks/useScheduledPosts";

@@ -10,7 +10,6 @@ import type {
   InstagramAccount,
   InstagramAccountListItem,
   PublishNowResponse,
-  ScheduledPost,
   ScheduledPostCreateData,
   ScheduledPostDetail,
   ScheduledPostListItem,
