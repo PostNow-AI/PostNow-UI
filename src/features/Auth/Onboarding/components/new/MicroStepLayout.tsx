@@ -175,17 +175,6 @@ export const MicroStepLayout = memo(({
       {/* Header fixo com progresso */}
       <header className="shrink-0 bg-background border-b">
         <div className="flex items-center gap-4 px-4 py-3">
-          {showBack && onBack && step > 1 && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onBack}
-              className="shrink-0"
-              aria-label="Voltar"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-          )}
           <div className="flex-1">
             {showPhases ? (
               <ProgressBarWithPhases
@@ -255,11 +244,22 @@ export const MicroStepLayout = memo(({
 
       {/* Footer fixo com botão de continuar */}
       <footer className="shrink-0 bg-background border-t p-4 pb-safe">
-        <div className="max-w-lg mx-auto w-full">
+        <div className="max-w-lg mx-auto w-full flex gap-3">
+          {showBack && onBack && step > 1 && (
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={onBack}
+              className="h-12 w-12 shrink-0"
+              aria-label="Voltar"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+          )}
           <Button
             onClick={onNext}
             disabled={!isValid || isLoading}
-            className="w-full h-12 text-base font-medium"
+            className="flex-1 h-12 text-base font-medium"
             size="lg"
             aria-label={isValid ? `${nextLabel} - Ir para etapa ${step + 1}` : `${nextLabel} - Preencha os campos obrigatórios`}
             aria-disabled={!isValid || isLoading}
