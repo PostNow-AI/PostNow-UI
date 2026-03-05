@@ -15,9 +15,10 @@ interface Phase {
 // - Público: steps 5-8 (completa após step 8, ou seja, quando currentStep >= 9)
 // - Marca: steps 9-12 (completa após step 12, ou seja, quando currentStep >= 13)
 const PHASES: Phase[] = [
-  { name: "Negócio", shortName: "Neg", steps: [1, 2, 3, 4], position: 33 },
-  { name: "Público", shortName: "Púb", steps: [5, 6, 7, 8], position: 66 },
-  { name: "Marca", shortName: "Mar", steps: [9, 10, 11, 12], position: 100 },
+  { name: "Negócio", shortName: "Neg", steps: [1, 2, 3, 4], position: 0 },
+  { name: "Público", shortName: "Púb", steps: [5, 6, 7], position: 33 },
+  { name: "Marca", shortName: "Mar", steps: [8, 9, 10], position: 66 },
+  { name: "Revisão", shortName: "Rev", steps: [11, 12], position: 100 },
 ];
 
 // Total de steps do onboarding (até Cores = step 12)
@@ -45,21 +46,17 @@ export const ProgressBarWithPhases = memo(({
     if (step <= 0) return 0;
     if (step >= TOTAL_ONBOARDING_STEPS) return 100;
 
-    // Steps 1-4 (Negócio): progresso de 0% a 33%
-    if (step <= 4) {
-      const progressInPhase = step / 4; // 0.25 to 1
-      return progressInPhase * 33; // 8.25% to 33%
-    }
+    // Steps 1-4 (Negócio): 0% → 33%
+    if (step <= 4) return (step / 4) * 33;
 
-    // Steps 5-8 (Público): progresso de 33% a 66%
-    if (step <= 8) {
-      const progressInPhase = (step - 4) / 4; // 0.25 to 1
-      return 33 + progressInPhase * 33; // ~41% to 66%
-    }
+    // Steps 5-7 (Público): 33% → 66%
+    if (step <= 7) return 33 + ((step - 4) / 3) * 33;
 
-    // Steps 9-12 (Marca): progresso de 66% a 100%
-    const progressInPhase = (step - 8) / 4; // 0.25 to 1
-    return 66 + progressInPhase * 34; // ~74.5% to 100%
+    // Steps 8-10 (Marca): 66% → 100%
+    if (step <= 10) return 66 + ((step - 7) / 3) * 34;
+
+    // Steps 11-12 (Revisão): 100%
+    return 100;
   };
 
   const percentage = getProgressPercentage(currentStep);
@@ -100,7 +97,7 @@ export const ProgressBarWithPhases = memo(({
   }, [currentStep]);
 
   return (
-    <div className={cn("w-full relative pr-4", className)}>
+    <div className={cn("w-full relative px-4", className)}>
       {/* Barra de fundo - pr-4 para dar espaço ao texto "Marca" */}
       <div className="relative h-2 bg-muted rounded-full overflow-visible">
         {/* Barra de progresso preenchida */}
