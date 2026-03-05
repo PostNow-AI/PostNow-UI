@@ -28,7 +28,12 @@ const features = [
 
 export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
   return (
-    <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
+    <div
+      className="h-[100dvh] flex flex-col overflow-hidden"
+      style={{
+        background: "radial-gradient(ellipse at 50% 0%, #7c3aed55 0%, #0f172a 65%)",
+      }}
+    >
       {/* Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-6 overflow-hidden">
         <div className="w-full max-w-lg">
@@ -49,11 +54,11 @@ export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="text-left mb-6"
           >
-            <h1 className="text-2xl font-bold mb-2">
+            <h1 className="text-2xl font-bold mb-2 text-white">
               Vamos construir seu negócio{" "}
-              <span className="text-primary">juntos!</span>
+              <span className="text-primary-light">juntos!</span>
             </h1>
-            <p className="text-muted-foreground text-base">
+            <p className="text-white/60 text-base">
               Em poucos minutos, seu perfil estará pronto para receber ideias de
               posts personalizadas.
             </p>
@@ -64,7 +69,7 @@ export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35, duration: 0.4 }}
-            className="text-sm font-medium text-muted-foreground mb-3"
+            className="text-sm font-medium text-white/50 mb-3"
           >
             O que você vai receber?
           </motion.p>
@@ -77,14 +82,14 @@ export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 + index * 0.1, duration: 0.4 }}
-                className="flex items-start gap-3 p-3 rounded-xl bg-muted/50"
+                className="flex items-start gap-3 p-3 rounded-xl bg-white/8 border border-white/10"
               >
-                <div className="shrink-0 w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <feature.icon className="h-4 w-4 text-primary" />
+                <div className="shrink-0 w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <feature.icon className="h-4 w-4 text-primary-light" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-sm mb-0.5">{feature.title}</h3>
-                  <p className="text-xs text-muted-foreground">
+                  <h3 className="font-medium text-sm mb-0.5 text-white">{feature.title}</h3>
+                  <p className="text-xs text-white/50">
                     {feature.description}
                   </p>
                 </div>
@@ -95,7 +100,7 @@ export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
       </main>
 
       {/* Footer */}
-      <footer className="shrink-0 bg-background border-t p-4 pb-safe">
+      <footer className="shrink-0 p-4 pb-safe">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -110,12 +115,12 @@ export const WelcomeStep = ({ onNext, onLogin }: WelcomeStepProps) => {
             Começar agora
           </Button>
           {onLogin && (
-            <p className="text-center text-sm mt-3">
+            <p className="text-center text-sm mt-3 text-white/50">
               Já tem uma conta?{" "}
               <button
                 type="button"
                 onClick={onLogin}
-                className="text-primary font-medium hover:underline cursor-pointer"
+                className="text-primary-light font-medium hover:underline cursor-pointer"
               >
                 Fazer login
               </button>
