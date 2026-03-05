@@ -181,20 +181,6 @@ export const SignupStep = ({
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
-      {/* HEADER - Apenas botão voltar */}
-      <header className="shrink-0 bg-background">
-        <div className="px-4 py-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="-ml-2"
-            aria-label="Voltar"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-        </div>
-      </header>
 
       {/* Título */}
       <div className="shrink-0 px-4 pt-4 pb-2">
@@ -358,14 +344,25 @@ export const SignupStep = ({
       {/* FOOTER - Fixo embaixo */}
       <footer className="shrink-0 px-4 pb-safe pt-2 pb-4 space-y-3">
         <div className="max-w-md mx-auto space-y-3">
-          <Button
-            type="submit"
-            disabled={registerMutation.isPending || emailStatus === "taken" || emailStatus === "checking"}
-            onClick={handleSubmit(onSubmit)}
-            className="w-full h-11 text-base"
-          >
-            {registerMutation.isPending ? <Loader /> : "Criar conta"}
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={onBack}
+              className="h-11 w-11 shrink-0"
+              aria-label="Voltar"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              type="submit"
+              disabled={registerMutation.isPending || emailStatus === "taken" || emailStatus === "checking"}
+              onClick={handleSubmit(onSubmit)}
+              className="flex-1 h-11 text-base"
+            >
+              {registerMutation.isPending ? <Loader /> : "Criar conta"}
+            </Button>
+          </div>
 
           {/* Divider */}
           <div className="relative">

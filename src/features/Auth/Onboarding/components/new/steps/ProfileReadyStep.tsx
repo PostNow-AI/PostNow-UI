@@ -57,15 +57,6 @@ export const ProfileReadyStep = ({
       {/* Header com navegação */}
       <header className="shrink-0 bg-background border-b">
         <div className="flex items-center gap-4 px-4 py-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="shrink-0"
-            aria-label="Voltar"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
           <div className="flex-1">
             <ProgressBarWithPhases
               currentStep={13}
@@ -173,12 +164,21 @@ export const ProfileReadyStep = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
-          className="max-w-lg mx-auto w-full space-y-2"
+          className="max-w-lg mx-auto w-full flex gap-3"
         >
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={onBack}
+            className="h-12 w-12 shrink-0"
+            aria-label="Voltar"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
           <Button
             onClick={onNext}
             disabled={isLoading}
-            className="w-full h-12 text-base font-medium gap-2"
+            className="flex-1 h-12 text-base font-medium gap-2"
             size="lg"
           >
             {isLoading ? (

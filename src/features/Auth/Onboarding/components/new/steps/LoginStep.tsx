@@ -106,20 +106,6 @@ export const LoginStep = ({
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
-      {/* HEADER - Apenas botão voltar */}
-      <header className="shrink-0 bg-background">
-        <div className="px-4 py-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="-ml-2"
-            aria-label="Voltar"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-        </div>
-      </header>
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-4 overflow-y-auto">
         <motion.div
@@ -193,13 +179,6 @@ export const LoginStep = ({
               )}
             </div>
 
-            <Button
-              type="submit"
-              disabled={loginMutation.isPending}
-              className="w-full h-12 text-base"
-            >
-              {loginMutation.isPending ? <Loader /> : "Entrar"}
-            </Button>
           </form>
 
           {/* Divider */}
@@ -235,6 +214,29 @@ export const LoginStep = ({
           </p>
         </motion.div>
       </main>
+
+      {/* Footer */}
+      <footer className="shrink-0 p-4 pb-safe">
+        <div className="max-w-md mx-auto flex gap-3">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={onBack}
+            className="h-12 w-12 shrink-0"
+            aria-label="Voltar"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            type="button"
+            disabled={loginMutation.isPending}
+            onClick={handleSubmit(onSubmit)}
+            className="flex-1 h-12 text-base"
+          >
+            {loginMutation.isPending ? <Loader /> : "Entrar"}
+          </Button>
+        </div>
+      </footer>
     </div>
   );
 };

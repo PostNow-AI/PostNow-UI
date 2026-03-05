@@ -251,15 +251,6 @@ export const PersonalityQuizStep = ({
       {/* Header com progresso */}
       <header className="shrink-0 bg-background border-b">
         <div className="flex items-center gap-4 px-4 py-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="shrink-0"
-            aria-label="Voltar para etapa anterior"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
           <div className="flex-1">
             <ProgressBarWithPhases
               currentStep={5}
@@ -559,11 +550,20 @@ export const PersonalityQuizStep = ({
 
       {/* Footer com botão Continuar */}
       <footer className="shrink-0 bg-background border-t p-4 pb-safe">
-        <div className="max-w-lg mx-auto w-full">
+        <div className="max-w-lg mx-auto w-full flex gap-3">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={onBack}
+            className="h-12 w-12 shrink-0"
+            aria-label="Voltar"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
           <Button
             onClick={handleConfirm}
             disabled={answers.filter(Boolean).length === 0}
-            className="w-full h-12 text-base font-medium"
+            className="flex-1 h-12 text-base font-medium"
             size="lg"
           >
             Continuar
