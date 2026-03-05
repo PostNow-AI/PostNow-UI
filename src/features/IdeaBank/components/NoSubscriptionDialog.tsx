@@ -21,11 +21,8 @@ export const NoSubscriptionDialog = () => {
     const cancelUrl = `${baseUrl}${STRIPE_URLS.CANCEL}`;
 
     try {
-      const baseUrl = window.location.origin;
       await createCheckout.mutateAsync({
         plan_id: 12,
-        success_url: `${baseUrl}/subscription/success`,
-        cancel_url: `${baseUrl}/subscription/cancel`,
         upgrade: false,
         success_url: successUrl,
         cancel_url: cancelUrl,
