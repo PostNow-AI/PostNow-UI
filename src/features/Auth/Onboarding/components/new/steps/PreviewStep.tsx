@@ -74,7 +74,7 @@ export const PreviewStep = ({
               transition={{ delay: 0.1 }}
               className="text-xl font-bold mb-1"
             >
-              Veja o que preparamos para você
+              Crie sua conta e veja o que preparamos para você
             </motion.h1>
 
             <motion.p
