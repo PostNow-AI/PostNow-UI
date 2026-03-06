@@ -11,12 +11,12 @@ interface Phase {
 }
 
 // 4 fases do onboarding (baseado em PHASE_END_STEPS do OnboardingNew.tsx)
-// - Negócio: steps 1-4  (completa quando currentStep > 4)
+// - Negócio: steps 2-4  (WelcomeStep=1 não é um step do stepper)
 // - Público:  steps 5-7  (completa quando currentStep > 7)
 // - Marca:    steps 8-10 (completa quando currentStep > 10)
 // - Revisão:  steps 11-12
 const PHASES: Phase[] = [
-  { name: "Negócio", shortName: "Neg", steps: [1, 2, 3, 4], position: 0 },
+  { name: "Negócio", shortName: "Neg", steps: [2, 3, 4], position: 0 },
   { name: "Público", shortName: "Púb", steps: [5, 6, 7], position: 33 },
   { name: "Marca", shortName: "Mar", steps: [8, 9, 10], position: 66 },
   { name: "Revisão", shortName: "Rev", steps: [11, 12], position: 100 },
@@ -44,8 +44,8 @@ export const ProgressBarWithPhases = memo(({
     if (step <= 0) return 0;
     if (step >= totalSteps) return 100;
 
-    // Steps 1-4 (Negócio): 0% → 33%
-    if (step <= 4) return (step / 4) * 33;
+    // Steps 2-4 (Negócio): 0% → 33% (WelcomeStep não é step do stepper)
+    if (step <= 4) return ((step - 1) / 3) * 33;
 
     // Steps 5-7 (Público): 33% → 66%
     if (step <= 7) return 33 + ((step - 4) / 3) * 33;
