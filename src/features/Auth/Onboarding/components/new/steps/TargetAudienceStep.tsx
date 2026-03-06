@@ -195,7 +195,7 @@ export const TargetAudienceStep = ({
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
       {/* Header */}
       <header className="shrink-0 bg-background border-b">
-        <div className="flex items-center gap-4 px-4 py-3">
+        <div className="flex items-center gap-4 px-4 py-5">
           <div className="flex-1">
             <ProgressBarWithPhases
               currentStep={6}
