@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Check } from "lucide-react";
+import { ChevronLeft, Check, User } from "lucide-react";
 import { ThisOrThatCard } from "../ThisOrThatCard";
 import {
   PERSONALITY_QUIZ,
@@ -448,17 +448,17 @@ export const PersonalityQuizStep = ({
               className="flex-1 flex flex-col"
             >
               {/* Título celebrativo */}
-              <div className="text-center pt-6 pb-8">
+              <div className="text-center pb-8">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, damping: 15 }}
                   className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4"
                 >
-                  <Check className="h-6 w-6 text-primary" />
+                  <User className="h-6 w-6 text-primary" />
                 </motion.div>
                 <h1 className="text-2xl font-bold tracking-tight mb-2">
-                  Perfeito! Sua marca é:
+                  Como seu público reconhece sua marca?
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   {answers.filter((a) => a && !a.startsWith("[custom]")).length} características definidas
