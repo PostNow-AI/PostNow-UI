@@ -50,7 +50,7 @@ export const PreviewStep = ({
         <div className="flex items-center gap-4 px-4 py-5">
           <div className="flex-1">
             <ProgressBarWithPhases
-              currentStep={14}
+              currentStep={12}
               totalSteps={TOTAL_STEPS}
               showPhaseNames={true}
             />
