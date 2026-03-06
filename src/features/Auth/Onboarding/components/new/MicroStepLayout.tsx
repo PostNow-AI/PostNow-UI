@@ -221,7 +221,7 @@ export const MicroStepLayout = memo(({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
-            className="flex-1 flex flex-col overflow-hidden"
+            className="flex-1 flex flex-col"
           >
             {/* Título e subtítulo */}
             <div className="mb-4 space-y-1 shrink-0">
@@ -235,7 +235,7 @@ export const MicroStepLayout = memo(({
             </div>
 
             {/* Conteúdo do step */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1">
               {children}
             </div>
           </motion.div>
