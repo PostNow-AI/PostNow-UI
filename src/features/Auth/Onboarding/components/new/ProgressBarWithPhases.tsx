@@ -14,12 +14,12 @@ interface Phase {
 // - Negócio: steps 2-4  (WelcomeStep=1 não é um step do stepper)
 // - Público:  steps 5-7  (completa quando currentStep > 7)
 // - Marca:    steps 8-10 (completa quando currentStep > 10)
-// - Revisão:  steps 11-12
+// - Revisão:  step 11 (PreviewStep=12 não exibe stepper)
 const PHASES: Phase[] = [
   { name: "Negócio", shortName: "Neg", steps: [2, 3, 4], position: 0 },
-  { name: "Público", shortName: "Púb", steps: [5, 6, 7], position: 33 },
-  { name: "Marca", shortName: "Mar", steps: [8, 9, 10], position: 66 },
-  { name: "Revisão", shortName: "Rev", steps: [11, 12], position: 100 },
+  { name: "Público", shortName: "Púb", steps: [5, 6, 7], position: 33.3 },
+  { name: "Marca", shortName: "Mar", steps: [8, 9, 10], position: 66.7 },
+  { name: "Revisão", shortName: "Rev", steps: [11], position: 100 },
 ];
 
 interface ProgressBarWithPhasesProps {
@@ -38,23 +38,12 @@ export const ProgressBarWithPhases = memo(({
   const prevStepRef = useRef(currentStep);
   const [recentlyCompletedPhase, setRecentlyCompletedPhase] = useState<string | null>(null);
 
-  // Calcula a porcentagem da barra baseado no step atual
-  // A barra preenche ATÉ o marcador da fase atual
+  // Barra vai do step 2 (Negócio) ao step 11 (Revisão) = 9 passos.
+  // Marcador de fase n → (firstStep - 2) / 9 * 100%
+  // Negócio=0%, Público=33.3%, Marca=66.7%, Revisão=100%
   const getProgressPercentage = (step: number): number => {
-    if (step <= 0) return 0;
-    if (step >= totalSteps) return 100;
-
-    // Steps 2-4 (Negócio): 0% → 33% (WelcomeStep não é step do stepper)
-    if (step <= 4) return ((step - 1) / 3) * 33;
-
-    // Steps 5-7 (Público): 33% → 66%
-    if (step <= 7) return 33 + ((step - 4) / 3) * 33;
-
-    // Steps 8-10 (Marca): 66% → 100%
-    if (step <= 10) return 66 + ((step - 7) / 3) * 34;
-
-    // Steps 11-12 (Revisão): 100%
-    return 100;
+    if (step <= 1) return 0;
+    return Math.min(100, ((step - 2) / 9) * 100);
   };
 
   const percentage = getProgressPercentage(currentStep);

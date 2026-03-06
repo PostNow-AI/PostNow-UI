@@ -89,7 +89,7 @@ export const VisualStyleStep = ({
 
   return (
     <MicroStepLayout
-      step={10}
+      step={8}
       totalSteps={TOTAL_STEPS}
       title="Escolha seu estilo visual"
       titleRight={

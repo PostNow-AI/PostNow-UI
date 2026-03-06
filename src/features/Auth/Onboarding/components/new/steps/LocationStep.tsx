@@ -124,7 +124,7 @@ export const LocationStep = ({
 
   return (
     <MicroStepLayout
-      step={8}
+      step={7}
       totalSteps={TOTAL_STEPS}
       title="Onde seu público está?"
       subtitle="Selecione uma opção ou digite sua localização."

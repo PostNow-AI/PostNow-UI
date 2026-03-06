@@ -33,7 +33,7 @@ export const ColorsStep = ({
 
   return (
     <MicroStepLayout
-      step={12}
+      step={10}
       totalSteps={TOTAL_STEPS}
       title="Paletas sugeridas"
       onNext={onNext}

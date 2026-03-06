@@ -127,7 +127,7 @@ export const LogoStep = ({
 
   return (
     <MicroStepLayout
-      step={11}
+      step={9}
       totalSteps={TOTAL_STEPS}
       title="Adicione seu logo"
       subtitle="Opcional - vamos extrair as cores automaticamente!"
