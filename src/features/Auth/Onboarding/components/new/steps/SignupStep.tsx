@@ -180,30 +180,38 @@ export const SignupStep = ({
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
+    <div className="h-[100dvh] flex flex-col overflow-hidden" style={{ background: "radial-gradient(ellipse at 50% 0%, #7c3aed55 0%, #0f172a 65%)" }}>
 
-      {/* Título */}
-      <div className="shrink-0 px-4 pt-4 pb-2">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-md mx-auto"
-        >
-          <BetaLogo />
-          <h1 className="text-xl font-bold mt-2">Crie sua conta</h1>
-        </motion.div>
-      </div>
+      {/* CONTEÚDO - centralizado como WelcomeStep */}
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-6 overflow-hidden">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-4"
+          >
+            <BetaLogo />
+          </motion.div>
 
-      {/* CONTEÚDO - Flexível no meio */}
-      <main className="flex-1 px-4 overflow-hidden">
-        <motion.form
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          onSubmit={handleSubmit(onSubmit)}
-          className="h-full flex flex-col max-w-md mx-auto"
-        >
-          <div className="flex-1 flex flex-col justify-center space-y-3">
+          {/* Título */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="mb-6"
+          >
+            <h1 className="text-2xl font-bold text-white">Crie sua conta</h1>
+          </motion.div>
+
+          <motion.form
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            onSubmit={handleSubmit(onSubmit)}
+          >
+          <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label htmlFor="first_name" className="text-sm">Nome</Label>
@@ -338,7 +346,8 @@ export const SignupStep = ({
               )}
             </div>
           </div>
-        </motion.form>
+          </motion.form>
+        </div>
       </main>
 
       {/* FOOTER - Fixo embaixo */}
@@ -370,7 +379,7 @@ export const SignupStep = ({
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-2 bg-background text-muted-foreground">
+              <span className="px-2 bg-[#0f172a] text-muted-foreground">
                 Ou continue com
               </span>
             </div>
