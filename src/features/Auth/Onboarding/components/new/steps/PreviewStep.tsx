@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { ArrowRight, Calendar, ChevronLeft, Lightbulb, Palette, Sparkles, Target, TrendingUp } from "lucide-react";
 import type { OnboardingTempData } from "@/features/Auth/Onboarding/hooks/useOnboardingStorage";
 import { usePreviewIdeas } from "@/features/Auth/Onboarding/hooks/usePreviewIdeas";
+import { ProgressBarWithPhases } from "../ProgressBarWithPhases";
+import { TOTAL_STEPS } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
 
 interface PreviewStepProps {
   data: OnboardingTempData;
@@ -43,6 +45,19 @@ export const PreviewStep = ({
 
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
+      {/* Header com stepper */}
+      <header className="shrink-0 bg-background border-b">
+        <div className="flex items-center gap-4 px-4 py-5">
+          <div className="flex-1">
+            <ProgressBarWithPhases
+              currentStep={12}
+              totalSteps={TOTAL_STEPS}
+              showPhaseNames={true}
+            />
+          </div>
+        </div>
+      </header>
+
       {/* Main scrollável com todo o conteúdo */}
       <main className="flex-1 px-4 py-4 overflow-y-auto">
         <div className="max-w-md mx-auto">

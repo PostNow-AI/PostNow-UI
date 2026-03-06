@@ -14,7 +14,7 @@ interface Phase {
 // - Negócio: steps 2-4  (WelcomeStep=1 não é um step do stepper)
 // - Público:  steps 5-7  (completa quando currentStep > 7)
 // - Marca:    steps 8-10 (completa quando currentStep > 10)
-// - Revisão:  step 11 (PreviewStep=12 não exibe stepper)
+// - Revisão:  step 11 (completa quando currentStep > 11, i.e., PreviewStep=12)
 const PHASES: Phase[] = [
   { name: "Negócio", shortName: "Neg", steps: [2, 3, 4], position: 0 },
   { name: "Público", shortName: "Púb", steps: [5, 6, 7], position: 33.3 },
