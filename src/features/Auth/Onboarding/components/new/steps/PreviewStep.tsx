@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowRight, Calendar, ChevronLeft, Lightbulb, Palette, Sparkles, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronLeft, Lightbulb, Palette, Sparkles, Target, TrendingUp } from "lucide-react";
 import type { OnboardingTempData } from "@/features/Auth/Onboarding/hooks/useOnboardingStorage";
-import { usePreviewIdeas } from "@/features/Auth/Onboarding/hooks/usePreviewIdeas";
 import { ProgressBarWithPhases } from "../ProgressBarWithPhases";
 import { TOTAL_STEPS } from "@/features/Auth/Onboarding/constants/onboardingNewSchema";
 
@@ -40,9 +39,6 @@ export const PreviewStep = ({
   onNext,
   onBack,
 }: PreviewStepProps) => {
-  // Gerar ideias dinâmicas baseadas nos dados
-  const ideas = usePreviewIdeas(data);
-
   return (
     <div className="h-[100dvh] flex flex-col bg-background overflow-hidden">
       {/* Header com stepper */}
@@ -114,66 +110,6 @@ export const PreviewStep = ({
             ))}
           </div>
 
-          {/* Dynamic ideas preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="mt-4"
-          >
-          <div className="p-3 rounded-lg border bg-card">
-            <div className="flex items-center gap-2 mb-3">
-              <Calendar className="h-3 w-3 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">
-                Ideias personalizadas para você
-              </span>
-            </div>
-
-            {/* Lista de ideias dinâmicas */}
-            <div className="space-y-2">
-              {ideas.map((idea, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                  className="p-2.5 rounded-md bg-muted/50 border border-transparent hover:border-primary/20 transition-colors"
-                >
-                  <div className="flex items-start gap-2">
-                    <div className="shrink-0 w-6 h-6 rounded flex items-center justify-center bg-primary/10 text-primary">
-                      <Sparkles className="h-3.5 w-3.5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-sm leading-tight">
-                        {idea.title}
-                      </h4>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {idea.description}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Cores da marca */}
-            <div className="flex items-center gap-1.5 mt-3 pt-2 border-t">
-              {data.colors.slice(0, 5).map((color, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.9 + index * 0.05 }}
-                  className="w-4 h-4 rounded-full border border-white/20 shadow-sm"
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-              <span className="text-[10px] text-muted-foreground ml-1">
-                Suas cores
-              </span>
-            </div>
-            </div>
-          </motion.div>
         </div>
       </main>
 
