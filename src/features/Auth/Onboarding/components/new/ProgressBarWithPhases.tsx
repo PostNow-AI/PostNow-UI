@@ -10,19 +10,17 @@ interface Phase {
   position: number; // Posição do marcador na barra (0-100%)
 }
 
-// 3 fases do onboarding (baseado em PHASE_END_STEPS do OnboardingNew.tsx)
-// - Negócio: steps 1-4 (completa após step 4, ou seja, quando currentStep >= 5)
-// - Público: steps 5-8 (completa após step 8, ou seja, quando currentStep >= 9)
-// - Marca: steps 9-12 (completa após step 12, ou seja, quando currentStep >= 13)
+// 4 fases do onboarding (baseado em PHASE_END_STEPS do OnboardingNew.tsx)
+// - Negócio: steps 1-4  (completa quando currentStep > 4)
+// - Público:  steps 5-7  (completa quando currentStep > 7)
+// - Marca:    steps 8-10 (completa quando currentStep > 10)
+// - Revisão:  steps 11-12
 const PHASES: Phase[] = [
   { name: "Negócio", shortName: "Neg", steps: [1, 2, 3, 4], position: 0 },
   { name: "Público", shortName: "Púb", steps: [5, 6, 7], position: 33 },
   { name: "Marca", shortName: "Mar", steps: [8, 9, 10], position: 66 },
   { name: "Revisão", shortName: "Rev", steps: [11, 12], position: 100 },
 ];
-
-// Total de steps do onboarding (até Cores = step 12)
-const TOTAL_ONBOARDING_STEPS = 12;
 
 interface ProgressBarWithPhasesProps {
   currentStep: number;
@@ -33,7 +31,7 @@ interface ProgressBarWithPhasesProps {
 
 export const ProgressBarWithPhases = memo(({
   currentStep,
-  totalSteps: _totalSteps,
+  totalSteps,
   showPhaseNames = true,
   className,
 }: ProgressBarWithPhasesProps) => {
@@ -44,7 +42,7 @@ export const ProgressBarWithPhases = memo(({
   // A barra preenche ATÉ o marcador da fase atual
   const getProgressPercentage = (step: number): number => {
     if (step <= 0) return 0;
-    if (step >= TOTAL_ONBOARDING_STEPS) return 100;
+    if (step >= totalSteps) return 100;
 
     // Steps 1-4 (Negócio): 0% → 33%
     if (step <= 4) return (step / 4) * 33;
@@ -98,7 +96,7 @@ export const ProgressBarWithPhases = memo(({
 
   return (
     <div className={cn("w-full relative px-4", className)}>
-      {/* Barra de fundo - pr-4 para dar espaço ao texto "Marca" */}
+      {/* Barra de fundo */}
       <div className="relative h-2 bg-muted rounded-full overflow-visible">
         {/* Barra de progresso preenchida */}
         <motion.div
