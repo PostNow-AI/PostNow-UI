@@ -14,8 +14,7 @@ interface ThisOrThatCardProps {
  * Card de escolha binária para o quiz "This or That"
  *
  * Design:
- * - Frase de exemplo em destaque (itálico, aspas)
- * - Label da característica embaixo (menor, bold)
+ * - Layout horizontal: label à esquerda | divisor | frase de exemplo à direita
  * - Estado selecionado: borda primary + glow sutil
  * - Animação de hover/tap
  */
@@ -31,9 +30,9 @@ export const ThisOrThatCard = ({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      initial={{ opacity: 0, x: direction === "left" ? -20 : 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: direction === "left" ? -20 : 20 }}
+      initial={{ opacity: 0, y: direction === "left" ? -16 : 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: direction === "left" ? -16 : 16 }}
       whileHover={{ scale: disabled ? 1 : 1.02 }}
       whileTap={{ scale: disabled ? 1 : 0.98 }}
       transition={{
@@ -43,9 +42,8 @@ export const ThisOrThatCard = ({
         opacity: { duration: 0.2 }
       }}
       className={cn(
-        "relative flex-1 flex flex-col items-center justify-between p-6 rounded-2xl",
-        "border-2 transition-all duration-200",
-        "min-h-[200px] text-center",
+        "relative w-full flex flex-row items-center gap-4 px-6 py-5 rounded-2xl",
+        "border-2 transition-all duration-200 text-left",
         isSelected
           ? "border-primary bg-primary/10 shadow-lg shadow-primary/20 ring-2 ring-primary/30"
           : "border-border bg-card hover:border-primary/50 hover:bg-primary/5",
@@ -54,20 +52,24 @@ export const ThisOrThatCard = ({
       aria-pressed={isSelected}
       aria-label={`Selecionar: ${option.label}. Exemplo: ${option.example}`}
     >
-      {/* Frase de exemplo - centralizada verticalmente */}
-      <div className="flex-1 flex items-center justify-center">
-        <p className="text-xl italic text-foreground leading-relaxed">
-          "{option.example}"
-        </p>
-      </div>
-
       {/* Label da característica */}
       <span className={cn(
-        "text-base font-bold uppercase tracking-wider shrink-0 pt-2",
+        "text-sm font-bold uppercase tracking-wider shrink-0 w-28",
         isSelected ? "text-primary" : "text-muted-foreground"
       )}>
         {option.label}
       </span>
+
+      {/* Divisor vertical */}
+      <div className={cn(
+        "w-px self-stretch shrink-0",
+        isSelected ? "bg-primary/30" : "bg-border"
+      )} />
+
+      {/* Frase de exemplo */}
+      <p className="flex-1 text-base italic text-foreground leading-relaxed">
+        "{option.example}"
+      </p>
 
       {/* Indicador de seleção */}
       {isSelected && (

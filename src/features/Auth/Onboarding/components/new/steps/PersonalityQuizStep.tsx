@@ -345,7 +345,7 @@ export const PersonalityQuizStep = ({
                   </div>
 
                   {/* 3. CARDS */}
-                  <div className="flex-1 flex gap-4 min-h-0">
+                  <div className="flex flex-col gap-3">
                     <ThisOrThatCard
                       option={currentQ.optionA}
                       isSelected={
