@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Dialog para editar post individual.
  * Adaptado de GeneratingPostSheet.tsx (< 200 linhas).

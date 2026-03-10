@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
   Loader2,
-  CheckCircle,
   AlertCircle,
   ExternalLink,
   RefreshCw,
@@ -215,7 +214,7 @@ export const GeneratingPostSheet = ({
       const cleanText = editableContent.replace(/<[^>]*>/g, "").trim();
       await navigator.clipboard.writeText(cleanText);
       toast.success("Conteúdo copiado!");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erro ao copiar");
     }
   };
@@ -256,7 +255,7 @@ export const GeneratingPostSheet = ({
     try {
       toast.loading("Regenerando imagem...", { id: "regen-image" });
       
-      const result = await ideaBankService.regenerateImageForIdea(
+      const _result = await ideaBankService.regenerateImageForIdea(
         generatedPost.idea.id,
         {}  // Objeto vazio (sem prompt customizado)
       );

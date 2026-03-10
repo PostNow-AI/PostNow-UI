@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ import { BulkActions } from "@/features/Campaigns/components/BulkActions";
 import { InstagramFeedPreview } from "@/features/Campaigns/components/InstagramFeedPreview";
 import { HarmonyAnalyzer } from "@/features/Campaigns/components/HarmonyAnalyzer";
 import { PostViewDialog } from "@/features/IdeaBank/components/PostViewDialog";
-import type { CampaignWithPosts, CampaignPost } from "@/features/Campaigns/types";
+import type { CampaignPost } from "@/features/Campaigns/types";
 
 export const CampaignDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -114,7 +114,7 @@ export const CampaignDetailPage = () => {
         briefing_data: campaign.briefing_data || {},
       });
       // Não desliga isGenerating aqui, vai desligar quando o polling detectar completed/failed
-    } catch (error) {
+    } catch (_error) {
       setIsGenerating(false);
     }
   };

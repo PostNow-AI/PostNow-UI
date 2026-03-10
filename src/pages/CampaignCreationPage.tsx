@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Página dedicada de criação de campanha (não modal).
  * Seguindo padrão de OnboardingForm.tsx - página cheia sem desfoque de fundo.
@@ -10,7 +10,7 @@
  * - Advanced: Wizard com controles extras (futuro)
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Progress, Button } from "@/components/ui";
 import { BlurryBackground } from "@/components/ui/blurry-background";
@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { briefingSchema, type BriefingFormData } from "@/features/Campaigns/constants";
-import { useCampaignWizard, useCampaignCreation, useCampaignGeneration } from "@/features/Campaigns/hooks";
+import { useCampaignWizard, useCampaignCreation } from "@/features/Campaigns/hooks";
 import { useJourneyDetection } from "@/features/Campaigns/hooks/useJourneyDetection";
 import { BriefingStep } from "@/features/Campaigns/components/wizard/BriefingStep";
 import { StructureSelector } from "@/features/Campaigns/components/wizard/StructureSelector";
@@ -34,7 +34,7 @@ export const CampaignCreationPage = () => {
   const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
   const [showJourneySelector, setShowJourneySelector] = useState(true);
-  const [campaignId, setCampaignId] = useState<string | null>(null);
+  const [_campaignId, setCampaignId] = useState<string | null>(null);
   
   const {
     selectedJourney,
@@ -53,13 +53,13 @@ export const CampaignCreationPage = () => {
     postCount,
     briefingData,
     percentage,
-    weeklyContextOpportunities,
+    _weeklyContextOpportunities,
     showWeeklyContextModal,
     setShowWeeklyContextModal,
     generationQuality,
     setGenerationQuality,
     visualHarmonyEnabled,
-    setVisualHarmonyEnabled,
+    _setVisualHarmonyEnabled,
     handleBriefingComplete,
     handleWeeklyContextSelect,
     handleStructureSelected,

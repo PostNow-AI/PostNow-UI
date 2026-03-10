@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Hook para detecção e gerenciamento de jornadas adaptativas
  * 
@@ -10,7 +10,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { campaignsService } from "../services";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export type JourneyType = 'quick' | 'guided' | 'advanced';
 

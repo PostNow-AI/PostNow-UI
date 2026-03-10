@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Seletor de estilos visuais para campanha.
  * Adaptado de Auth/Onboarding/BrandingStep.tsx (reutilização 80%).
@@ -15,7 +15,6 @@ import {
   Checkbox,
   Input,
   Tabs,
-  TabsContent,
   TabsList,
   TabsTrigger,
   Badge,
@@ -34,7 +33,7 @@ export const VisualStylePicker = ({ onSelect, onBack }: VisualStylePickerProps) 
     selected,
     toggleStyle,
     isSelected,
-    isFromProfile,
+    isFromProfile: _isFromProfile,
     visualStylePreferences,
     campaignStyles,
     isLoading,

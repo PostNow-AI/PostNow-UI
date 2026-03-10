@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Hook para criar campanha.
  * Seguindo padrão de IdeaBank/hooks/useCreatePostWithIdea.ts

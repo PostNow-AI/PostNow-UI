@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Hook para auto-save de campanha em criação.
  * IMPORTANTE: Cada campanha tem seu próprio draft ID único.

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Step de Briefing do wizard de criação.
  */
@@ -6,7 +6,6 @@
 import { useEffect } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import {
-  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -14,6 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -24,7 +24,6 @@ import {
   CardHeader,
   CardTitle,
   Separator,
-  Badge,
 } from "@/components/ui";
 import { MessageSquare, FileText, Sparkles } from "lucide-react";
 import type { BriefingFormData } from "../../constants";

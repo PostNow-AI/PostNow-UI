@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -22,7 +22,7 @@ interface SessionData {
   expires_at: string;
 }
 
-interface StructureData {
+interface _StructureData {
   theme: string;
   semantic_analysis: any;
   slides_structure: any[];
@@ -33,12 +33,12 @@ interface StructureData {
   };
 }
 
-interface TextsData {
+interface _TextsData {
   slides: any[];
   visual_system: any;
 }
 
-interface PromptsData {
+interface _PromptsData {
   image_prompts: any[];
   logo_placement: any;
   total_estimated_time: string;
@@ -252,13 +252,13 @@ function StepInit({ onSubmit, isLoading, initialTheme = '', initialSlideCount = 
 }
 
 // Step 2 UNIFICADO: Structure + Texts + Visual
-function StepStructureAndTexts({ 
-  data, 
-  savedAdjustments, 
-  savedEditedSlides, 
-  onNext, 
-  onBack, 
-  onRegenerate, 
+function StepStructureAndTexts({
+  data,
+  _savedAdjustments,
+  savedEditedSlides,
+  onNext,
+  onBack,
+  onRegenerate,
   isLoading,
   isGenerating,
   realProgress  // NOVO: progresso real do backend

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 import { useQuery } from "@tanstack/react-query";
 import { campaignService } from "../services";
 

@@ -1,5 +1,5 @@
-// @ts-nocheck
-import { isAxiosError, AxiosError } from "axios";
+// @ts-nocheck - Legacy file pending TypeScript migration
+import { isAxiosError } from "axios";
 import type { AxiosResponse } from "axios";
 import { cookieUtils } from "./api";
 

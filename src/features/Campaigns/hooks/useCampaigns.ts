@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Hook para listar campanhas do usuário.
  * Seguindo padrão de IdeaBank/hooks/usePostList.ts

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Hook de lógica para seleção de estilos visuais.
  * Busca os estilos do perfil do usuário E todos os estilos disponíveis.
@@ -7,7 +7,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { campaignService } from "../services";
 import { api } from "@/lib/api";
 
 export const useVisualStyles = () => {

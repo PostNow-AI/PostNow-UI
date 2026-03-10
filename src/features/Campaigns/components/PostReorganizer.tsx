@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Componente para reorganizar posts com Drag & Drop.
  * Usa @dnd-kit para funcionalidade moderna de arrastar.

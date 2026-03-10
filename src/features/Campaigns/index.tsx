@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Página principal de Campanhas - Dashboard.
  * Seguindo padrão de IdeaBank/index.tsx

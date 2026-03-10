@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Modal para selecionar oportunidades do Weekly Context durante criação de campanha.
  * Aparece após o usuário preencher o briefing (Step 1).
@@ -37,12 +37,12 @@ export const WeeklyContextModal = ({
   isOpen,
   onClose,
   onSelect,
-  briefingData,
+  _briefingData,
 }: WeeklyContextModalProps) => {
   const [selected, setSelected] = useState<number[]>([]);
 
   // Buscar oportunidades do Weekly Context
-  const { data: opportunities, isLoading, error } = useQuery({
+  const { data: opportunities, isLoading, _error } = useQuery({
     queryKey: ["weekly-context-opportunities"],
     queryFn: async () => {
       try {

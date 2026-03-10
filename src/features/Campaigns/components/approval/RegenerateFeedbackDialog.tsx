@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Dialog para regenerar post com feedback específico.
  * Component < 150 linhas (React Rule).

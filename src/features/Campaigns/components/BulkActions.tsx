@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Ações em massa para posts selecionados.
  * Permite aprovar/rejeitar/regenerar múltiplos posts de uma vez.

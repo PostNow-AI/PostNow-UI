@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Seletor de estrutura narrativa da campanha.
  */
@@ -21,7 +21,7 @@ export const StructureSelector = ({
 }: StructureSelectorProps) => {
   // Buscar sugestão de Thompson Sampling (IA!)
   const { data: aiSuggestion } = useStructureSuggestion(campaignType);
-  const suggestedStructure: CampaignStructure = aiSuggestion?.suggested || "aida";
+  const _suggestedStructure: CampaignStructure = aiSuggestion?.suggested || "aida";
   
   const structures = [
     {

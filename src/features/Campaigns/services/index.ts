@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Campaign Service - API calls para campanhas.
  * Seguindo padrão de IdeaBank/services/index.ts

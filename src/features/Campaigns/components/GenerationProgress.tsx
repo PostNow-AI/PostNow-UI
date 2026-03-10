@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Component to show campaign generation progress.
  * Displays progress bar and current phase with loading animation.

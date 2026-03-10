@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Step de revisão final antes de gerar campanha.
  * Adaptado de Onboarding/ReviewStep.tsx (< 150 linhas).

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Re-exports de todos os hooks de Campaigns.
  * Seguindo padrão de IdeaBank/hooks/index.ts

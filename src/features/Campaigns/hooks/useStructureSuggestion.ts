@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Hook para buscar sugestão de estrutura com Thompson Sampling.
  * Segue React Rules: TanStack Query para data fetching.

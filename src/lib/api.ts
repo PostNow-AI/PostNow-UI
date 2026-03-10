@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 import axios, { AxiosError } from "axios";
 import type { AxiosResponse } from "axios";
 import Cookies from "js-cookie";

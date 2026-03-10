@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Hook para gerar conteúdo de campanha (todos os posts).
  * Agora usa geração assíncrona com Celery.
@@ -11,7 +11,7 @@ import type { CampaignGenerationRequest } from "../types";
 import { handleApiError } from "@/lib/utils/errorHandling";
 
 export const useCampaignGeneration = (campaignId: number) => {
-  const queryClient = useQueryClient();
+  const _queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (params: CampaignGenerationRequest) =>

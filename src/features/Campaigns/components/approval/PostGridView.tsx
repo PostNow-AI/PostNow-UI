@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Grid de aprovação de posts com checkboxes.
  * Feature crítica descoberta nas 25 simulações.

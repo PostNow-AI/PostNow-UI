@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 import React, { useMemo } from 'react';
 
 interface SlidePreviewProps {

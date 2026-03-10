@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Seletor de fluxo: Rápido vs. Completo.
  * Component < 100 linhas (React Rule).

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 import { api } from "@/lib/api";
 import { AxiosError } from "axios";
 

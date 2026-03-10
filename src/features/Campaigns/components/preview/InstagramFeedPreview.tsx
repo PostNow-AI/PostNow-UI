@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Preview do Instagram Feed - Grid 3x3 simulado.
  * Feature #1 em impacto descoberta nas 25 simulações.
@@ -16,9 +16,9 @@ interface InstagramFeedPreviewProps {
 
 export const InstagramFeedPreview = ({
   posts,
-  onReorganize,
+  _onReorganize,
 }: InstagramFeedPreviewProps) => {
-  const [harmonScore, setHarmonyScore] = useState<number | null>(null);
+  const [harmonScore, _setHarmonyScore] = useState<number | null>(null);
 
   // Organizar posts em grid 3x3
   const arrangeInGrid = () => {
@@ -75,8 +75,8 @@ export const InstagramFeedPreview = ({
 
           {/* Grid 3x3 */}
           <div className="grid grid-cols-3 gap-1 p-1 bg-white dark:bg-gray-950">
-            {grid.map((row, rowIndex) => (
-              row.map((post, colIndex) => (
+            {grid.map((row, _rowIndex) => (
+              row.map((post, _colIndex) => (
                 <div
                   key={post.id}
                   className="aspect-square bg-gray-200 dark:bg-gray-800 rounded-sm overflow-hidden relative group"

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * QuickWizard - Wizard simplificado para Jornada Rápida
  * 
@@ -43,7 +43,7 @@ export const QuickWizard: React.FC<QuickWizardProps> = ({
   onComplete,
   onBack,
 }) => {
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
   const [step, setStep] = useState<"input" | "confirm">("input");
   
   // Form state

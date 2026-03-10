@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Step de configuração de duração da campanha.
  * Component < 100 linhas (só UI), seguindo React Rules.

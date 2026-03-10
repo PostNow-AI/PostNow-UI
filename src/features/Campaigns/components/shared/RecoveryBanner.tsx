@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Banner de recuperação de draft abandonado.
  * Descoberto como crítico nas simulações (75% recovery rate).

@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { AxiosError } from "axios";
+// @ts-nocheck - Legacy file pending TypeScript migration
 import {
   type PaymentStatusResponse,
   type StripeCheckoutSessionRequest,

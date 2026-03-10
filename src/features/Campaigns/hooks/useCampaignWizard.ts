@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Legacy file pending TypeScript migration
 /**
  * Hook principal para lógica do wizard de campanhas.
  * Gerencia estado, navegação entre steps, e dados acumulados.
