@@ -39,6 +39,7 @@ import {
   useUserSubscription,
 } from "@/features/Subscription/hooks/useSubscription";
 import { authUtils } from "@/lib/auth";
+import { InstagramHandleStep } from "./components/new/steps/InstagramHandleStep";
 
 type AuthMode = "signup" | "login" | null;
 
@@ -413,8 +414,17 @@ export const OnboardingNew = ({
             onBack={isEditMode ? handleEditBack : handleBack}
           />
         );
-
       case 3:
+        return (
+          <InstagramHandleStep
+            value={data.business_instagram_handle}
+            onChange={(value) => saveData({ business_instagram_handle: value })}
+            onNext={handleNext}
+            onBack={isEditMode ? handleEditBack : handleBack}
+          />
+        );
+
+      case 4:
         return (
           <NicheStep
             value={data.specialization}
@@ -424,7 +434,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 4:
+      case 5:
         return (
           <DescriptionStep
             value={data.business_description}
@@ -434,7 +444,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 5:
+      case 6:
         return (
           <PurposeStep
             value={data.business_purpose}
@@ -444,7 +454,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 6:
+      case 7:
         return (
           <PersonalityStep
             value={data.brand_personality}
@@ -454,7 +464,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 7:
+      case 8:
         return (
           <ProductsStep
             value={data.products_services}
@@ -464,7 +474,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 8:
+      case 9:
         return (
           <TargetAudienceStep
             value={data.target_audience}
@@ -474,7 +484,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 9:
+      case 10:
         return (
           <InterestsStep
             value={data.target_interests}
@@ -484,7 +494,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 10:
+      case 11:
         return (
           <LocationStep
             value={data.business_location}
@@ -494,7 +504,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 11:
+      case 12:
         return (
           <CompetitorsStep
             competitors={data.main_competitors}
@@ -506,7 +516,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 12:
+      case 13:
         return (
           <VoiceToneStep
             value={data.voice_tone}
@@ -516,7 +526,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 13:
+      case 14:
         return (
           <VisualStyleStep
             value={data.visual_style_ids}
@@ -526,7 +536,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 14:
+      case 15:
         return (
           <LogoStep
             value={data.logo}
@@ -538,7 +548,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 15:
+      case 16:
         return (
           <ColorsStep
             value={data.colors}
@@ -549,7 +559,7 @@ export const OnboardingNew = ({
           />
         );
 
-      case 16:
+      case 17:
         return (
           <ProfileReadyStep
             data={data}
@@ -568,8 +578,8 @@ export const OnboardingNew = ({
           />
         );
 
-      case 17:
-        // No modo edição, não deve chegar aqui (salva no step 16)
+      case 18:
+        // No modo edição, não deve chegar aqui (salva no step 17)
         if (isAuthenticated) {
           updateMutation.mutate();
           return null;

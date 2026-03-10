@@ -75,6 +75,12 @@ export const OnboardingReview = ({
               {values.business_name}
             </span>
           </div>
+          <div className="space-y-2 flex flex-col">
+            <span className="text-sm">Instagram do negócio</span>
+            <span className="text-sm text-muted-foreground">
+              @{values.business_instagram_handle}
+            </span>
+          </div>
           {values?.specialization?.length && (
             <div className="space-y-2 flex flex-col">
               <span className="text-sm">Setor/Nicho</span>
