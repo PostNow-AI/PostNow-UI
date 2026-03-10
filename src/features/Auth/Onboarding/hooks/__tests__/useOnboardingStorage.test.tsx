@@ -4,6 +4,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useOnboardingStorage } from "../useOnboardingStorage";
 import type { OnboardingFormData } from "../../constants/onboardingSchema";
 
+// Mock do profileApi para evitar requisições de rede
+vi.mock("../../../Profile/services", () => ({
+  profileApi: {
+    getProfile: vi.fn().mockResolvedValue(null),
+  },
+}));
+
 // Wrapper com QueryClientProvider
 const createWrapper = () => {
   const queryClient = new QueryClient({
