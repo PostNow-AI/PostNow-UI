@@ -4,9 +4,9 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { PaywallStep } from "../PaywallStep";
 
-// Mock do PaywallScreen para isolar o teste
-vi.mock("../../PaywallScreen", () => ({
-  PaywallScreen: ({
+// Mock do PaywallFlow para isolar o teste (PaywallStep usa PaywallFlow, não PaywallScreen)
+vi.mock("../../PaywallFlow", () => ({
+  PaywallFlow: ({
     trialDays,
     plans,
     onSelectPlan,

@@ -1,12 +1,25 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useOnboardingStorage } from "../useOnboardingStorage";
 import type { OnboardingFormData } from "../../constants/onboardingSchema";
 
+// Wrapper com QueryClientProvider
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
+
 describe("useOnboardingStorage", () => {
   beforeEach(() => {
     // Limpar localStorage antes de cada teste
-    vi.mocked(localStorage.getItem).mockReturnValue(null);
+    vi.mocked(localStorage.getItem).mockClear().mockReturnValue(null);
     vi.mocked(localStorage.setItem).mockClear();
     vi.mocked(localStorage.removeItem).mockClear();
   });
@@ -38,7 +51,9 @@ describe("useOnboardingStorage", () => {
         logo: "https://example.com/logo.png",
       };
 
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.initializeWithData(backendData);
@@ -66,7 +81,9 @@ describe("useOnboardingStorage", () => {
         brand_personality: "Inovador, Criativo, Profissional",
       } as OnboardingFormData;
 
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.initializeWithData(backendData);
@@ -84,7 +101,9 @@ describe("useOnboardingStorage", () => {
         target_interests: "Marketing, Vendas, Tecnologia",
       } as OnboardingFormData;
 
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.initializeWithData(backendData);
@@ -106,7 +125,9 @@ describe("useOnboardingStorage", () => {
         color_5: "#FF00FF",
       } as OnboardingFormData;
 
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.initializeWithData(backendData);
@@ -126,7 +147,9 @@ describe("useOnboardingStorage", () => {
         business_name: "Teste",
       } as OnboardingFormData;
 
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.initializeWithData(backendData);
@@ -138,7 +161,9 @@ describe("useOnboardingStorage", () => {
     it("deve usar valores padrão quando campos estão vazios", () => {
       const backendData: OnboardingFormData = {} as OnboardingFormData;
 
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.initializeWithData(backendData);
@@ -160,7 +185,9 @@ describe("useOnboardingStorage", () => {
         business_name: "Teste Storage",
       } as OnboardingFormData;
 
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.initializeWithData(backendData);
@@ -175,7 +202,9 @@ describe("useOnboardingStorage", () => {
 
   describe("getStep1Payload", () => {
     it("deve formatar dados corretamente para API Step 1", () => {
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.saveData({
@@ -195,7 +224,9 @@ describe("useOnboardingStorage", () => {
 
   describe("getStep2Payload", () => {
     it("deve formatar dados corretamente para API Step 2", () => {
-      const { result } = renderHook(() => useOnboardingStorage());
+      const { result } = renderHook(() => useOnboardingStorage(), {
+        wrapper: createWrapper(),
+      });
 
       act(() => {
         result.current.saveData({
