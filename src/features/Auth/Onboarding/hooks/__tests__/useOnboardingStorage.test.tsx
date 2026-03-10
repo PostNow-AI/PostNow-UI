@@ -11,6 +11,14 @@ vi.mock("../../../Profile/services", () => ({
   },
 }));
 
+// Mock dos serviços de onboarding para evitar requisições de rede
+vi.mock("../../services", () => ({
+  saveTempOnboardingData: vi.fn().mockResolvedValue({}),
+  getTempOnboardingData: vi.fn().mockResolvedValue(null),
+  linkTempDataToUser: vi.fn().mockResolvedValue({ profile_updated: true }),
+  trackOnboardingStep: vi.fn().mockResolvedValue({}),
+}));
+
 // Wrapper com QueryClientProvider
 const createWrapper = () => {
   const queryClient = new QueryClient({
