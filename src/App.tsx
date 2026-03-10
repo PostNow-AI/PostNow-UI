@@ -36,6 +36,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
 const App = () => {
   if (import.meta.env.MODE === "production") {
@@ -112,6 +113,9 @@ const App = () => {
 
               {/* Public Onboarding - Mobile-First Flow */}
               <Route path="/onboarding" element={<OnboardingPage />} />
+
+              {/* Privacy Policy - Public */}
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
               {/* ADMIN ROUTES */}
               <Route
