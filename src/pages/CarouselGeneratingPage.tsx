@@ -1,10 +1,10 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import { Card } from '@/components/ui/card';
-import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { api } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface StatusData {
   session_id: string;

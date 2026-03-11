@@ -1,4 +1,4 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Constants e Zod schemas para Campaigns.
  * Seguindo padrão de IdeaBank/constants/index.ts

@@ -1,11 +1,11 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Hook para auto-save de campanha em criação.
  * IMPORTANTE: Cada campanha tem seu próprio draft ID único.
  * Salva a cada 30 segundos automaticamente.
  */
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { campaignService } from "../services";
 import type { CampaignDraft } from "../types";
 

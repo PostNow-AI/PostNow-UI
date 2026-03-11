@@ -1,6 +1,6 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
-import React, { useMemo, useEffect } from 'react';
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal } from 'lucide-react';
+
+import { Bookmark, Heart, MessageCircle, MoreHorizontal, Send } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
 
 interface InstagramPreviewProps {
   slide: {

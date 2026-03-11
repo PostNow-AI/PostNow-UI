@@ -1,19 +1,11 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Loader2, CheckCircle, AlertCircle, ExternalLink, RefreshCw, Sparkles } from "lucide-react";
-import type { OpportunityItem } from "../types";
-import type { PostCreationResponse, PostCreationData } from "@/features/IdeaBank/types";
+
 import {
+  Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  Button,
   Form,
   FormControl,
   FormField,
@@ -25,10 +17,18 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Textarea,
   Switch,
+  Textarea,
 } from "@/components/ui";
+import type { PostCreationData, PostCreationResponse } from "@/features/IdeaBank/types";
 import { postObjectiveOptions, postTypeOptions } from "@/schemas/postSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertCircle, CheckCircle, ExternalLink, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+import type { OpportunityItem } from "../types";
 
 const customizationSchema = z.object({
   objective: z.enum(["sales", "branding", "engagement", "awareness", "lead_generation", "education"]),

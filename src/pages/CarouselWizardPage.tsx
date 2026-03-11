@@ -1,17 +1,17 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+
+import { CarouselTemplateGallery, type CarouselTemplate } from '@/components/CarouselTemplateGallery';
+import { InstagramPreview } from '@/components/InstagramPreview';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Loader2, Palette, CheckCircle } from 'lucide-react';
-import { useCarouselEdit } from '@/hooks/useCarouselEdit';
-import { InstagramPreview } from '@/components/InstagramPreview';
-import { CarouselTemplateGallery, type CarouselTemplate } from '@/components/CarouselTemplateGallery';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { profileApi } from '@/features/Auth/Profile/services';
+import { useCarouselEdit } from '@/hooks/useCarouselEdit';
+import { api } from '@/lib/api';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { CheckCircle, Loader2, Palette } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Types
 interface SessionData {

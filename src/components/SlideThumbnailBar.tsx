@@ -1,6 +1,5 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
-import React from 'react';
-import { Check, AlertCircle } from 'lucide-react';
+
+import { AlertCircle, Check } from 'lucide-react';
 
 interface SlideThumbnailProps {
   slide: {

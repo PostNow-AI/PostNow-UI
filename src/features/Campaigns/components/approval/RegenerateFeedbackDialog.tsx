@@ -1,22 +1,22 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Dialog para regenerar post com feedback específico.
  * Component < 150 linhas (React Rule).
  */
 
-import { useState } from "react";
 import {
+  Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
-  Checkbox,
   Label,
-  Textarea,
   Separator,
+  Textarea,
 } from "@/components/ui";
 import { RefreshCw } from "lucide-react";
+import { useState } from "react";
 import type { CampaignPost } from "../../types";
 
 interface RegenerateFeedbackDialogProps {

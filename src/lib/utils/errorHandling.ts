@@ -1,6 +1,6 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
-import { isAxiosError } from "axios";
+
 import type { AxiosError } from "axios";
+import { isAxiosError } from "axios";
 
 /**
  * Unified backend error response format

@@ -1,12 +1,12 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Ações em massa para posts selecionados.
  * Permite aprovar/rejeitar/regenerar múltiplos posts de uma vez.
  */
 
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, X, RotateCcw, Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Check, RotateCcw, Trash2, X } from "lucide-react";
 
 interface BulkActionsProps {
   selectedCount: number;

@@ -1,4 +1,4 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Modal para selecionar oportunidades do Weekly Context durante criação de campanha.
  * Aparece após o usuário preencher o briefing (Step 1).
@@ -6,22 +6,22 @@
  * Component < 200 linhas, lógica em hook.
  */
 
-import { useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  Badge,
   Button,
   Card,
   CardContent,
-  Badge,
   Checkbox,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui";
-import { TrendingUp, Calendar, Target } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { Calendar, Target, TrendingUp } from "lucide-react";
+import { useState } from "react";
 
 interface WeeklyContextModalProps {
   isOpen: boolean;

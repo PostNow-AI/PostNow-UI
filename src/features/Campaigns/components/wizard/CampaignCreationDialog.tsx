@@ -1,30 +1,30 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Dialog/Sheet de criação de campanha - Wizard multi-step.
  * Híbrido: Sheet em mobile, Dialog em desktop (seguindo padrão sidebar.tsx).
  */
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  Progress,
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  Progress,
 } from "@/components/ui";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { briefingSchema, type BriefingFormData } from "../../constants";
-import { BriefingStep } from "./BriefingStep";
-import { StructureSelector } from "./StructureSelector";
-import { DurationStep } from "./DurationStep";
-import { VisualStylePicker } from "./VisualStylePicker";
-import { ReviewStep } from "./ReviewStep";
 import { useCampaignWizard } from "../../hooks/useCampaignWizard";
+import { BriefingStep } from "./BriefingStep";
+import { DurationStep } from "./DurationStep";
+import { ReviewStep } from "./ReviewStep";
+import { StructureSelector } from "./StructureSelector";
+import { VisualStylePicker } from "./VisualStylePicker";
 
 interface CampaignCreationDialogProps {
   isOpen: boolean;

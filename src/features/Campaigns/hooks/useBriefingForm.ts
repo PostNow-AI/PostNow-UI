@@ -1,4 +1,4 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Hook de lógica para BriefingStep.
  * Separa lógica de UI seguindo React Rules (< 200 linhas).

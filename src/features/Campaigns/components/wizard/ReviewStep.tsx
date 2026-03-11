@@ -1,22 +1,22 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Step de revisão final antes de gerar campanha.
  * Adaptado de Onboarding/ReviewStep.tsx (< 150 linhas).
  */
 
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  Button,
-  Badge,
-  Separator,
+  Label,
   RadioGroup,
   RadioGroupItem,
-  Label,
+  Separator,
 } from "@/components/ui";
-import { CheckCircle, AlertCircle, Zap, Sparkles } from "lucide-react";
+import { AlertCircle, CheckCircle, Sparkles, Zap } from "lucide-react";
 import type { BriefingData, CampaignStructure } from "../../types";
 
 interface ReviewStepProps {

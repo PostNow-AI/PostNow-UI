@@ -1,22 +1,22 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Step de configuração de duração da campanha.
  * Component < 100 linhas (só UI), seguindo React Rules.
  */
 
-import { useState, useEffect } from "react";
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  Button,
   Input,
   Label,
   Separator,
-  Badge,
 } from "@/components/ui";
 import { Calendar, TrendingUp } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { CampaignStructure } from "../../types";
 
 interface DurationStepProps {

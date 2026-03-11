@@ -1,4 +1,4 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Campaign Service - API calls para campanhas.
  * Seguindo padrão de IdeaBank/services/index.ts
@@ -7,15 +7,15 @@
 import { api } from "@/lib/api";
 import type {
   Campaign,
-  CampaignWithPosts,
   CampaignCreationData,
+  CampaignDraft,
   CampaignGenerationRequest,
   CampaignGenerationResponse,
-  CampaignDraft,
-  VisualStyle,
-  CampaignTemplate,
   CampaignStructureConfig,
+  CampaignTemplate,
+  CampaignWithPosts,
   PostRegenerationRequest,
+  VisualStyle,
 } from "../types";
 
 export const campaignService = {

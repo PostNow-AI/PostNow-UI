@@ -1,23 +1,8 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Step de Briefing do wizard de criação.
  */
 
-import { useEffect } from "react";
-import type { UseFormReturn } from "react-hook-form";
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Form } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -25,7 +10,22 @@ import {
   CardTitle,
   Separator,
 } from "@/components/ui";
-import { MessageSquare, FileText, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { FileText, MessageSquare, Sparkles } from "lucide-react";
+import { useEffect } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import type { BriefingFormData } from "../../constants";
 import { useBriefingForm } from "../../hooks/useBriefingForm";
 

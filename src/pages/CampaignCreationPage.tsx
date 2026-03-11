@@ -1,4 +1,4 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Página dedicada de criação de campanha (não modal).
  * Seguindo padrão de OnboardingForm.tsx - página cheia sem desfoque de fundo.
@@ -10,25 +10,25 @@
  * - Advanced: Wizard com controles extras (futuro)
  */
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, Progress, Button } from "@/components/ui";
+import { Button, Card, Progress } from "@/components/ui";
 import { BlurryBackground } from "@/components/ui/blurry-background";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { briefingSchema, type BriefingFormData } from "@/features/Campaigns/constants";
-import { useCampaignWizard, useCampaignCreation } from "@/features/Campaigns/hooks";
-import { useJourneyDetection } from "@/features/Campaigns/hooks/useJourneyDetection";
-import { BriefingStep } from "@/features/Campaigns/components/wizard/BriefingStep";
-import { StructureSelector } from "@/features/Campaigns/components/wizard/StructureSelector";
-import { DurationStep } from "@/features/Campaigns/components/wizard/DurationStep";
-import { VisualStylePicker } from "@/features/Campaigns/components/wizard/VisualStylePicker";
-import { ReviewStep } from "@/features/Campaigns/components/wizard/ReviewStep";
-import { WeeklyContextModal } from "@/features/Campaigns/components/WeeklyContextModal";
 import { JourneySelector } from "@/features/Campaigns/components/JourneySelector";
 import { QuickWizard } from "@/features/Campaigns/components/QuickWizard";
+import { WeeklyContextModal } from "@/features/Campaigns/components/WeeklyContextModal";
+import { BriefingStep } from "@/features/Campaigns/components/wizard/BriefingStep";
+import { DurationStep } from "@/features/Campaigns/components/wizard/DurationStep";
+import { ReviewStep } from "@/features/Campaigns/components/wizard/ReviewStep";
+import { StructureSelector } from "@/features/Campaigns/components/wizard/StructureSelector";
+import { VisualStylePicker } from "@/features/Campaigns/components/wizard/VisualStylePicker";
+import { briefingSchema, type BriefingFormData } from "@/features/Campaigns/constants";
+import { useCampaignCreation, useCampaignWizard } from "@/features/Campaigns/hooks";
+import { useJourneyDetection } from "@/features/Campaigns/hooks/useJourneyDetection";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export const CampaignCreationPage = () => {
   const navigate = useNavigate();

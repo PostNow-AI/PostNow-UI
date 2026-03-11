@@ -1,12 +1,12 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Preview do Instagram Feed - Grid 3x3 simulado.
  * Feature #1 em impacto descoberta nas 25 simulações.
  */
 
-import { useState } from "react";
-import { Card, Button, Badge } from "@/components/ui";
+import { Badge, Button, Card } from "@/components/ui";
 import { Grid3x3, Shuffle } from "lucide-react";
+import { useState } from "react";
 import type { CampaignPost } from "../../types";
 
 interface InstagramFeedPreviewProps {

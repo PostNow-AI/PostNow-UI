@@ -1,4 +1,4 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Types para o sistema de Campanhas.
  * Seguindo padrão de IdeaBank/types/index.ts

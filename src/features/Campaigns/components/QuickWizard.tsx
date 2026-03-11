@@ -1,4 +1,4 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * QuickWizard - Wizard simplificado para Jornada Rápida
  * 
@@ -8,8 +8,8 @@
  * 3. Gerar! (45seg de loading)
  */
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -17,20 +17,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import {
-  Rocket,
-  Sparkles,
+  ArrowLeft,
+  ArrowRight,
   CheckCircle2,
   Clock,
-  ArrowRight,
-  ArrowLeft,
+  Rocket,
+  Sparkles,
   Zap,
 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCampaignGeneration } from "../hooks/useCampaignGeneration";
 import type { Campaign } from "../types";
 

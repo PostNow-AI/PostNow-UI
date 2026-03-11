@@ -1,12 +1,12 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Grid de aprovação de posts com checkboxes.
  * Feature crítica descoberta nas 25 simulações.
  */
 
+import { Badge, Button, Card, CardContent, Checkbox, Progress } from "@/components/ui";
+import { CheckCircle2, Edit2, Eye, RefreshCw, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Button, Checkbox, Card, CardContent, Badge, Progress } from "@/components/ui";
-import { Eye, Edit2, RefreshCw, Trash2, CheckCircle2 } from "lucide-react";
 import type { CampaignPost } from "../../types";
 
 interface PostGridViewProps {

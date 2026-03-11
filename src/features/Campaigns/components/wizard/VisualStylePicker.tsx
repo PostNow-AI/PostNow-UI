@@ -1,26 +1,26 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Seletor de estilos visuais para campanha.
  * Adaptado de Auth/Onboarding/BrandingStep.tsx (reutilização 80%).
  * Component < 200 linhas (só UI), lógica em useVisualStyles hook.
  */
 
-import { useState } from "react";
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  Button,
   Checkbox,
   Input,
+  Separator,
   Tabs,
   TabsList,
   TabsTrigger,
-  Badge,
-  Separator,
 } from "@/components/ui";
 import { Palette, Search } from "lucide-react";
+import { useState } from "react";
 import { useVisualStyles } from "../../hooks/useVisualStyles";
 
 interface VisualStylePickerProps {

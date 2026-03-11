@@ -1,8 +1,8 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface VisualSystemModalProps {
   isOpen: boolean;

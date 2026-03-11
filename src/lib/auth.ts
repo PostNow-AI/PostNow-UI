@@ -1,4 +1,4 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 import {
   type AuthResponse,
   type LoginRequest,

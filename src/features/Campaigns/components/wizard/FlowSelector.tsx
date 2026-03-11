@@ -1,11 +1,11 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Seletor de fluxo: Rápido vs. Completo.
  * Component < 100 linhas (React Rule).
  */
 
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from "@/components/ui";
-import { Zap, Target } from "lucide-react";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { Target, Zap } from "lucide-react";
 
 interface FlowSelectorProps {
   onSelectQuick: () => void;

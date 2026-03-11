@@ -1,24 +1,24 @@
-// @ts-nocheck - Legacy file pending TypeScript migration
+
 /**
  * Dialog para editar post individual.
  * Adaptado de GeneratingPostSheet.tsx (< 200 linhas).
  */
 
-import { useState } from "react";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
-  Textarea,
   Label,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
+  Textarea,
 } from "@/components/ui";
 import { Edit3, Eye } from "lucide-react";
+import { useState } from "react";
 import type { CampaignPost } from "../../types";
 
 interface PostEditorDialogProps {
