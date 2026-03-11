@@ -1,4 +1,6 @@
-// @ts-nocheck
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -6,10 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Download, Sparkles, Loader2 } from "lucide-react";
+import { Download, Loader2, Sparkles } from "lucide-react";
 import { useCarouselSlideDialog } from "../hooks/useCarouselSlideDialog";
 
 interface CarouselSlide {

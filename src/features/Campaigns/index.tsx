@@ -1,14 +1,14 @@
-// @ts-nocheck
+
 /**
  * Página principal de Campanhas - Dashboard.
  * Seguindo padrão de IdeaBank/index.tsx
  */
 
-import { useNavigate } from "react-router-dom";
+import { Button, Card, CardContent, CardHeader, CardTitle, Container, Skeleton } from "@/components/ui";
 import { Plus, Zap } from "lucide-react";
-import { Container, Button, Skeleton, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
-import { useCampaigns } from "./hooks";
+import { useNavigate } from "react-router-dom";
 import { CampaignList } from "./components/CampaignList";
+import { useCampaigns } from "./hooks";
 
 export const Campaigns = () => {
   const navigate = useNavigate();

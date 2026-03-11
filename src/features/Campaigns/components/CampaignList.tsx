@@ -1,11 +1,11 @@
-// @ts-nocheck
+
 /**
  * Lista de campanhas em grid.
  */
 
+import { Badge, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { Calendar, CheckCircle2, Clock, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
-import { Calendar, FileText, CheckCircle2, Clock } from "lucide-react";
 import type { Campaign } from "../types";
 
 interface CampaignListProps {

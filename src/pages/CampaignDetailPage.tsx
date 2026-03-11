@@ -1,21 +1,21 @@
-// @ts-nocheck
-import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { Container, Tabs, TabsContent, TabsList, TabsTrigger, Card, CardHeader, CardTitle, CardContent, Badge, Button } from "@/components/ui";
-import { Calendar, FileText, Eye, ArrowLeft, Edit, Play, Loader2 } from "lucide-react";
-import { campaignService } from "@/features/Campaigns/services";
+
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Container, Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui";
+import { BulkActions } from "@/features/Campaigns/components/BulkActions";
+import { GenerationProgress } from "@/features/Campaigns/components/GenerationProgress";
+import { HarmonyAnalyzer } from "@/features/Campaigns/components/HarmonyAnalyzer";
+import { InstagramFeedPreview } from "@/features/Campaigns/components/InstagramFeedPreview";
+import { PostGridView } from "@/features/Campaigns/components/PostGridView";
 import { useCampaignGeneration } from "@/features/Campaigns/hooks/useCampaignGeneration";
 import { useCampaignProgress } from "@/features/Campaigns/hooks/useCampaignProgress";
 import { usePostApproval } from "@/features/Campaigns/hooks/usePostApproval";
-import { GenerationProgress } from "@/features/Campaigns/components/GenerationProgress";
-import { PostGridView } from "@/features/Campaigns/components/PostGridView";
-import { BulkActions } from "@/features/Campaigns/components/BulkActions";
-import { InstagramFeedPreview } from "@/features/Campaigns/components/InstagramFeedPreview";
-import { HarmonyAnalyzer } from "@/features/Campaigns/components/HarmonyAnalyzer";
+import { campaignService } from "@/features/Campaigns/services";
+import type { CampaignPost } from "@/features/Campaigns/types";
 import { PostViewDialog } from "@/features/IdeaBank/components/PostViewDialog";
-import type { CampaignWithPosts, CampaignPost } from "@/features/Campaigns/types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Calendar, Edit, Eye, FileText, Loader2, Play } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 export const CampaignDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -114,7 +114,7 @@ export const CampaignDetailPage = () => {
         briefing_data: campaign.briefing_data || {},
       });
       // Não desliga isGenerating aqui, vai desligar quando o polling detectar completed/failed
-    } catch (error) {
+    } catch (_error) {
       setIsGenerating(false);
     }
   };

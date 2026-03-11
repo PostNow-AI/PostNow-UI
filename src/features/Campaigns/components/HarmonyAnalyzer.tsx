@@ -1,15 +1,15 @@
-// @ts-nocheck
+
 /**
  * Analisador de Harmonia Visual - Descoberta: 60% reorganizaram posts após ver score.
  * Calcula score de harmonia e oferece sugestões de melhorias.
  */
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Sparkles, TrendingUp } from "lucide-react";
 
 interface HarmonyAnalyzerProps {
   score: number;

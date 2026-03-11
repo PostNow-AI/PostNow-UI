@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { useState } from "react";
 import { toast } from "sonner";
 import { carouselService } from "../services";
@@ -17,7 +17,7 @@ interface CarouselSlide {
 /**
  * Hook para gerenciar o dialog de visualização e edição de slide do carrossel
  */
-export const useCarouselSlideDialog = (slide: CarouselSlide | null, isOpen: boolean) => {
+export const useCarouselSlideDialog = (slide: CarouselSlide | null, _isOpen: boolean) => {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
   const [downloadingImage, setDownloadingImage] = useState(false);

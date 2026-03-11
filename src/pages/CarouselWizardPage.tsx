@@ -1,17 +1,17 @@
-// @ts-nocheck
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+
+import { CarouselTemplateGallery, type CarouselTemplate } from '@/components/CarouselTemplateGallery';
+import { InstagramPreview } from '@/components/InstagramPreview';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Loader2, Palette, CheckCircle } from 'lucide-react';
-import { useCarouselEdit } from '@/hooks/useCarouselEdit';
-import { InstagramPreview } from '@/components/InstagramPreview';
-import { CarouselTemplateGallery, type CarouselTemplate } from '@/components/CarouselTemplateGallery';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { profileApi } from '@/features/Auth/Profile/services';
+import { useCarouselEdit } from '@/hooks/useCarouselEdit';
+import { api } from '@/lib/api';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { CheckCircle, Loader2, Palette } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Types
 interface SessionData {
@@ -22,7 +22,7 @@ interface SessionData {
   expires_at: string;
 }
 
-interface StructureData {
+interface _StructureData {
   theme: string;
   semantic_analysis: any;
   slides_structure: any[];
@@ -33,12 +33,12 @@ interface StructureData {
   };
 }
 
-interface TextsData {
+interface _TextsData {
   slides: any[];
   visual_system: any;
 }
 
-interface PromptsData {
+interface _PromptsData {
   image_prompts: any[];
   logo_placement: any;
   total_estimated_time: string;
@@ -252,13 +252,13 @@ function StepInit({ onSubmit, isLoading, initialTheme = '', initialSlideCount = 
 }
 
 // Step 2 UNIFICADO: Structure + Texts + Visual
-function StepStructureAndTexts({ 
-  data, 
-  savedAdjustments, 
-  savedEditedSlides, 
-  onNext, 
-  onBack, 
-  onRegenerate, 
+function StepStructureAndTexts({
+  data,
+  _savedAdjustments,
+  savedEditedSlides,
+  onNext,
+  onBack,
+  onRegenerate,
   isLoading,
   isGenerating,
   realProgress  // NOVO: progresso real do backend

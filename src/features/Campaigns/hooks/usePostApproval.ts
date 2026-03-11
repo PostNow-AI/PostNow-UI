@@ -1,12 +1,12 @@
-// @ts-nocheck
+
 /**
  * Hook para aprovar/rejeitar posts de campanha.
  */
 
+import { handleApiError } from "@/lib/utils/errorHandling";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { campaignService } from "../services";
-import { handleApiError } from "@/lib/utils/errorHandling";
 
 export const usePostApproval = (campaignId: number) => {
   const queryClient = useQueryClient();

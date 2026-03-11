@@ -1,6 +1,5 @@
-// @ts-nocheck
+
 import { isAxiosError } from "axios";
-import type { AxiosError } from "axios";
 import { handleApiError, type ErrorHandlingResult } from "./errorHandling";
 
 /**

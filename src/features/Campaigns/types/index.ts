@@ -1,10 +1,10 @@
-// @ts-nocheck
+
 /**
  * Types para o sistema de Campanhas.
  * Seguindo padrão de IdeaBank/types/index.ts
  */
 
-import type { Post, PostIdea } from "@/features/IdeaBank/types";
+import type { Post } from "@/features/IdeaBank/types";
 
 // ============================================================================
 // CAMPAIGN TYPES

@@ -16,7 +16,6 @@ import { useAuth, useDashboardLayout } from "@/hooks";
 import {
   Activity,
   BarChart3,
-  ChartArea,
   ClipboardList,
   LogOut,
   Wallet,

@@ -1,29 +1,29 @@
-// @ts-nocheck
+
 /**
  * Componente para reorganizar posts com Drag & Drop.
  * Usa @dnd-kit para funcionalidade moderna de arrastar.
  */
 
-import { useState } from "react";
+import { Badge, Button, Card, CardContent } from "@/components/ui";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
+  rectSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
-  rectSortingStrategy,
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Card, CardContent, Badge, Button } from "@/components/ui";
 import { GripVertical, Save } from "lucide-react";
+import { useState } from "react";
 import type { CampaignPost } from "../types";
 
 interface PostReorganizerProps {

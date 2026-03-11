@@ -1,14 +1,14 @@
-// @ts-nocheck
+
 /**
  * Grid de aprovação de posts - Descoberta #1 das simulações (40-60% mais rápido que linear).
  * Permite seleção múltipla, visualização rápida e ações em massa.
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Edit } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Edit, Eye } from "lucide-react";
 import type { CampaignPost } from "../types";
 
 interface PostGridViewProps {

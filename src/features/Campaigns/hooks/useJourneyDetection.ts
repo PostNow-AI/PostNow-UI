@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 /**
  * Hook para detecção e gerenciamento de jornadas adaptativas
  * 
@@ -8,9 +8,9 @@
  * - 10% usuários → AVANÇADA (30min-2h)
  */
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { campaignsService } from "../services";
-import { useState, useEffect } from "react";
 
 export type JourneyType = 'quick' | 'guided' | 'advanced';
 

@@ -9,7 +9,7 @@ vi.mock("recharts", async () => {
   return {
     ...actual,
     ResponsiveContainer: ({ children, height }: { children: React.ReactNode; height: number }) => (
-      <div style={{ width: 500, height }}>{children}</div>
+      <div className="recharts-wrapper" style={{ width: 500, height }}>{children}</div>
     ),
   };
 });

@@ -1,11 +1,11 @@
-// @ts-nocheck
+
 /**
  * Hook para buscar sugestão de estrutura com Thompson Sampling.
  * Segue React Rules: TanStack Query para data fetching.
  */
 
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 
 export const useStructureSuggestion = (campaignType: string = "branding") => {
   return useQuery({

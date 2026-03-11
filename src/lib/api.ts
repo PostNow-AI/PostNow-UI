@@ -1,6 +1,6 @@
-// @ts-nocheck
-import axios, { AxiosError } from "axios";
+
 import type { AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 
 export const API_BASE_URL =

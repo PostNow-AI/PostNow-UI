@@ -1,14 +1,14 @@
-// @ts-nocheck
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
+
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CarouselSlideViewDialog } from '@/features/Carousel/components/CarouselSlideViewDialog';
+import { api } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface CarouselSlide {
   id: number;

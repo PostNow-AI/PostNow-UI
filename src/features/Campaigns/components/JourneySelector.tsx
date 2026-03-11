@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 /**
  * JourneySelector - Componente para seleção de jornada adaptativa
  * 
@@ -8,7 +8,9 @@
  * - Avançada (30min-2h)
  */
 
-import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,20 +18,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  Rocket,
-  GraduationCap,
-  Settings,
-  Clock,
   CheckCircle2,
-  Lightbulb,
   ChevronDown,
   ChevronUp,
+  Clock,
+  GraduationCap,
+  Lightbulb,
+  Rocket,
+  Settings,
 } from "lucide-react";
-import type { JourneyType, JourneyData } from "../hooks/useJourneyDetection";
+import { useState } from "react";
+import type { JourneyData, JourneyType } from "../hooks/useJourneyDetection";
 
 interface JourneySelectorProps {
   suggestedJourney?: JourneyType;

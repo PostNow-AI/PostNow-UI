@@ -1,5 +1,5 @@
-// @ts-nocheck
-import React, { useMemo } from 'react';
+
+import { useMemo } from 'react';
 
 interface SlidePreviewProps {
   slide: {

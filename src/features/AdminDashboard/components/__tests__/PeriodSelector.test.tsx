@@ -11,7 +11,7 @@ describe("PeriodSelector", () => {
   };
 
   // Helper para encontrar tab pelo valor
-  const getTabByValue = (value: string) => {
+  const _getTabByValue = (value: string) => {
     return screen.getByRole("tab", { name: new RegExp(value) });
   };
 

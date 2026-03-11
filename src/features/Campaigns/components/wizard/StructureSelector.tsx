@@ -1,12 +1,12 @@
-// @ts-nocheck
+
 /**
  * Seletor de estrutura narrativa da campanha.
  */
 
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from "@/components/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { BookOpen, TrendingUp } from "lucide-react";
-import type { CampaignType, CampaignStructure } from "../../types";
 import { useStructureSuggestion } from "../../hooks/useStructureSuggestion";
+import type { CampaignStructure, CampaignType } from "../../types";
 
 interface StructureSelectorProps {
   campaignType: CampaignType;
@@ -21,7 +21,7 @@ export const StructureSelector = ({
 }: StructureSelectorProps) => {
   // Buscar sugestão de Thompson Sampling (IA!)
   const { data: aiSuggestion } = useStructureSuggestion(campaignType);
-  const suggestedStructure: CampaignStructure = aiSuggestion?.suggested || "aida";
+  const _suggestedStructure: CampaignStructure = aiSuggestion?.suggested || "aida";
   
   const structures = [
     {

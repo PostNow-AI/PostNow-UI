@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { api } from "@/lib/api";
 
 interface RegenerateSlideImagePayload {

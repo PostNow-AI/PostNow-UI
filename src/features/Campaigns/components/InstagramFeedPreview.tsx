@@ -1,11 +1,11 @@
-// @ts-nocheck
+
 /**
  * Preview do Feed do Instagram - Descoberta #2 das simulações (#1 em impacto, 100% valorizam).
  * Simula como os posts aparecerão no feed do Instagram em grid 3x3.
  */
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Instagram } from "lucide-react";
 import type { CampaignPost } from "../types";
 

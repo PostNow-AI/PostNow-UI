@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 /**
  * Hook principal para lógica do wizard de campanhas.
  * Gerencia estado, navegação entre steps, e dados acumulados.
@@ -6,8 +6,8 @@
  * Seguindo padrão de useOnboarding.ts do Onboarding.
  */
 
-import { useState, useEffect } from "react";
-import type { WizardStep, CampaignType, CampaignStructure, BriefingData } from "../types";
+import { useEffect, useState } from "react";
+import type { BriefingData, CampaignStructure, CampaignType, WizardStep } from "../types";
 import { useCampaignAutoSave } from "./useCampaignAutoSave";
 
 export const useCampaignWizard = () => {

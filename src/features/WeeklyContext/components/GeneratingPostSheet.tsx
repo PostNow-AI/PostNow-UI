@@ -1,31 +1,5 @@
-// @ts-nocheck
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+
 import {
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-  ExternalLink,
-  RefreshCw,
-  Sparkles,
-  ChevronLeft,
-  Copy,
-  Edit3,
-} from "lucide-react";
-import type { OpportunityItem } from "../types";
-import type { PostCreationResponse, PostCreationData } from "@/features/IdeaBank/types";
-import { InstagramPreview } from "./InstagramPreview";
-import { ideaBankService } from "@/features/IdeaBank/services";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
   Button,
   Form,
   FormControl,
@@ -33,22 +7,47 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  Progress,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Textarea,
+  Separator,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
   Switch,
-  Progress,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-  Separator,
+  Textarea,
 } from "@/components/ui";
+import { ideaBankService } from "@/features/IdeaBank/services";
+import type { PostCreationData, PostCreationResponse } from "@/features/IdeaBank/types";
 import { postObjectiveOptions, postTypeOptions } from "@/schemas/postSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  AlertCircle,
+  ChevronLeft,
+  Copy,
+  Edit3,
+  ExternalLink,
+  Loader2,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { z } from "zod";
+import type { OpportunityItem } from "../types";
+import { InstagramPreview } from "./InstagramPreview";
 
 const customizationSchema = z.object({
   objective: z.enum(["sales", "branding", "engagement", "awareness", "lead_generation", "education"]),
@@ -215,7 +214,7 @@ export const GeneratingPostSheet = ({
       const cleanText = editableContent.replace(/<[^>]*>/g, "").trim();
       await navigator.clipboard.writeText(cleanText);
       toast.success("Conteúdo copiado!");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Erro ao copiar");
     }
   };
@@ -256,7 +255,7 @@ export const GeneratingPostSheet = ({
     try {
       toast.loading("Regenerando imagem...", { id: "regen-image" });
       
-      const result = await ideaBankService.regenerateImageForIdea(
+      const _result = await ideaBankService.regenerateImageForIdea(
         generatedPost.idea.id,
         {}  // Objeto vazio (sem prompt customizado)
       );

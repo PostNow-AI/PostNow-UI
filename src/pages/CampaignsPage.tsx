@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 /**
  * Página de Campanhas.
  * Re-export do feature component.
