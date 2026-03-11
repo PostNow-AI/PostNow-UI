@@ -22,8 +22,10 @@ export function PublicRoute({
 
   // Redirect authenticated users to home (or intended destination from login)
   if (isAuthenticated) {
-    const from = location.state?.from?.pathname || redirectTo;
-    return <Navigate to={from} replace />;
+    const fromState = location.state?.from;
+    const pathname = fromState?.pathname || redirectTo;
+    const search = fromState?.search || "";
+    return <Navigate to={`${pathname}${search}`} replace />;
   }
 
   // Render the public component if not authenticated

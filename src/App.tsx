@@ -9,6 +9,7 @@ import { AdminRoute } from "./components/AdminRoute";
 import {
   DashboardLayout,
   ErrorBoundary,
+  MagicLinkRoute,
   ProtectedRoute,
   PublicRoute,
   ThemeProvider,
@@ -37,6 +38,7 @@ import RegisterPage from "./pages/RegisterPage";
 import { SubscriptionPage } from "./pages/SubscriptionPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import { CreateFromOpportunityPage } from "./pages/CreateFromOpportunityPage";
 
 const App = () => {
   if (import.meta.env.MODE === "production") {
@@ -175,6 +177,16 @@ const App = () => {
                 {/* <Route path="/carousel/generating/:sessionId" element={<CarouselGeneratingPage />} /> */}
                 {/* <Route path="/carousel/:id" element={<CarouselViewPage />} /> */}
               </Route>
+
+              {/* Create from Opportunity - Supports magic link auth from email */}
+              <Route
+                path="/create"
+                element={
+                  <MagicLinkRoute>
+                    <CreateFromOpportunityPage />
+                  </MagicLinkRoute>
+                }
+              />
 
               {/* Campaign creation - Full page (not in DashboardLayout) - DISABLED */}
               {/* <Route
