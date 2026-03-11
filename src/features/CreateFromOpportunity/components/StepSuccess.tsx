@@ -17,16 +17,25 @@ export const StepSuccess = ({
 }: StepSuccessProps) => {
   const navigate = useNavigate();
 
-  const handleCopyContent = () => {
+  const handleCopyContent = async () => {
     if (generatedContent) {
-      navigator.clipboard.writeText(generatedContent);
-      toast.success("Conteudo copiado!");
+      try {
+        await navigator.clipboard.writeText(generatedContent);
+        toast.success("Conteúdo copiado!");
+      } catch {
+        toast.error("Não foi possível copiar o conteúdo");
+      }
     }
   };
 
   const handleDownloadImage = () => {
     if (generatedImageUrl) {
-      window.open(generatedImageUrl, "_blank");
+      const link = document.createElement("a");
+      link.href = generatedImageUrl;
+      link.download = "post.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   };
 

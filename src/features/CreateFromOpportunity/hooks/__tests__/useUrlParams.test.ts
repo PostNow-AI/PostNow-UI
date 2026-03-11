@@ -116,5 +116,16 @@ describe("useUrlParams", () => {
 
       expect(result.current.topic).toBe("Tema com espaços");
     });
+
+    it("deve retornar 'outros' para category inválida", async () => {
+      vi.doMock("react-router-dom", () => ({
+        useSearchParams: () => [new URLSearchParams("category=invalida")],
+      }));
+
+      const { useUrlParams } = await import("../useUrlParams");
+      const { result } = renderHook(() => useUrlParams());
+
+      expect(result.current.category).toBe("outros");
+    });
   });
 });

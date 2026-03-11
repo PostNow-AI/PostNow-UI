@@ -5,7 +5,6 @@ import type { VisualStyle } from "../types";
 interface StepGenerateProps {
   isGenerating: boolean;
   selectedStyle: VisualStyle | undefined;
-  businessName?: string;
 }
 
 export const StepGenerate = ({
@@ -41,7 +40,7 @@ export const StepGenerate = ({
         <div className="w-full max-w-xs space-y-2">
           <Progress value={undefined} className="h-2 animate-pulse" />
           <p className="text-sm text-muted-foreground text-center">
-            Gerando conteudo...
+            Gerando conteúdo...
           </p>
         </div>
       )}

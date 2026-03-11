@@ -9,7 +9,6 @@ import {
   StepSuccess,
 } from "./components";
 import { useCreateFromOpportunity } from "./hooks";
-import type { CategoryKey } from "./types";
 
 export const CreateFromOpportunity = () => {
   const navigate = useNavigate();
@@ -100,7 +99,7 @@ export const CreateFromOpportunity = () => {
         {step === 1 && (
           <StepTopic
             topic={topic}
-            category={category as CategoryKey}
+            category={category}
             score={score}
             furtherDetails={furtherDetails}
             onFurtherDetailsChange={setFurtherDetails}

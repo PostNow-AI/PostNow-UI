@@ -95,7 +95,7 @@ describe("StepGenerate", () => {
         />
       );
 
-      expect(screen.getByText("Gerando conteudo...")).toBeInTheDocument();
+      expect(screen.getByText("Gerando conteúdo...")).toBeInTheDocument();
     });
 
     it("não deve mostrar progress bar quando não gerando", () => {
@@ -106,7 +106,7 @@ describe("StepGenerate", () => {
         />
       );
 
-      expect(screen.queryByText("Gerando conteudo...")).not.toBeInTheDocument();
+      expect(screen.queryByText("Gerando conteúdo...")).not.toBeInTheDocument();
     });
   });
 });

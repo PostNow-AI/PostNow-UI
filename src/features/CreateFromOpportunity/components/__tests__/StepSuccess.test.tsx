@@ -12,6 +12,7 @@ vi.mock("react-router-dom", () => ({
 vi.mock("sonner", () => ({
   toast: {
     success: vi.fn(),
+    error: vi.fn(),
   },
 }));
 

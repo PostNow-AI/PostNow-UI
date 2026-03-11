@@ -7,7 +7,7 @@ export interface VisualStyle {
 
 export interface OpportunityParams {
   topic: string;
-  category: string;
+  category: CategoryKey;
   score: number;
 }
 
@@ -39,7 +39,7 @@ export interface Opportunity {
 export interface CreateFromOpportunityState {
   step: number;
   topic: string;
-  category: string;
+  category: CategoryKey;
   score: number;
   furtherDetails: string;
   selectedStyleId: number | null;
