@@ -66,14 +66,6 @@ Antes de abrir PR, verificar:
 - [ ] Nao usei `any` sem necessidade
 - [ ] Nao desabilitei regras de lint sem motivo
 
-## Dividas Tecnicas Conhecidas
-
-### @ts-nocheck em arquivos legados
-- **Status:** ~40 arquivos com @ts-nocheck
-- **Origem:** PR #33 (correcao de lint para CI passar)
-- **Acao:** Remover gradualmente e corrigir tipos reais
-- **Issue:** TODO - criar issue para tracking
-
 ## Contatos
 
 - **CTO:** MatheusBlanco (GitHub)
