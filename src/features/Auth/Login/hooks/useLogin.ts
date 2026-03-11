@@ -35,9 +35,11 @@ export function useLogin() {
       // Small delay to ensure authentication state propagates
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Navigate to intended destination or home page
-      const from = location.state?.from?.pathname || "/ideabank";
-      navigate(from, { replace: true });
+      // Navigate to intended destination or home page (preserving search params)
+      const fromState = location.state?.from;
+      const pathname = fromState?.pathname || "/ideabank";
+      const search = fromState?.search || "";
+      navigate(`${pathname}${search}`, { replace: true });
     },
     onError: (error: unknown) => {
       const errorResult = handleApiError(error, {
